@@ -1,4 +1,4 @@
-name: Deploy topics to dev
+name: Deploy kafka-manager to dev
 
 on:
   push:
