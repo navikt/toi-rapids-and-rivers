@@ -23,3 +23,6 @@ spec:
     - team: arbeidsgiver
       application: rekrutteringsbistand-stilling-indekser
       access: read # read, write, readwrite
+    - team: arbeidsgiver-inkludering
+      application: arbeidsgiver-inkludering-kafka-manager
+      access: read # read, write, readwrite
