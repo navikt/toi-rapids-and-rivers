@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - topic.yml
+      - kafka-manager.yml
 
 jobs:
-  deploy-rapid-to-dev:
-    name: Deploy rapid to dev
+  deploy-kafka-manager-to-dev:
+    name: Deploy kafka manager to dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -17,4 +17,4 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: topic.yml
+          RESOURCE: kafka-manager.yml
