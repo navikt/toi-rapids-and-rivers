@@ -46,7 +46,7 @@ spec:
         {
           "topics": [
             {
-              "name": "arbeidsgiver-inkludering.rekrutteringsbistand-rapid",
+              "name": "arbeidsgiver-inkludering.rapid",
               "location": "AIVEN",
               "keyDeserializerType": "STRING",
               "valueDeserializerType": "STRING"
