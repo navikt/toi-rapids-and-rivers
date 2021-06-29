@@ -25,4 +25,4 @@ spec:
       access: read # read, write, readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
-      access: read # read, write, readwrite
+      access: readwrite # read, write, readwrite
