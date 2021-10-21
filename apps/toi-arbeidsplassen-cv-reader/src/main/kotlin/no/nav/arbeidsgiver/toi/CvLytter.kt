@@ -1,13 +1,17 @@
 package no.nav.arbeidsgiver.toi
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import no.nav.arbeidsgiver.toi.no.nav.arbeidsgiver.toi.Configuration
+import no.nav.arbeid.cv.avro.Melding
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.errors.RetriableException
 import org.apache.kafka.common.serialization.StringDeserializer
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
@@ -19,15 +23,11 @@ class CvLytter(private val consumerConfig: Properties = cvLytterConfig()) : Coro
 
     fun start() {
         launch {
-            KafkaConsumer<String, String>(consumerConfig).use { consumer ->
+            KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.cvTopic))
                 while (job.isActive) {
                     try {
                         val records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
-                        val subumsjonliste = records.onEach { MESSAGES_RECEIVED.inc() }.map {
-                            objectMapper.readTree(it.value())
-                        }
-                        subsumsjonStore.saveBatch(subumsjonliste)
                     } catch (e: RetriableException) {
                         logger.warn("Had a retriable exception, retrying", e)
                     }
@@ -38,6 +38,6 @@ class CvLytter(private val consumerConfig: Properties = cvLytterConfig()) : Coro
 }
 
 fun cvLytterConfig() = mapOf<String,String>(
-    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to Avro::class.java
+    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
+    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName
 ).toProperties()

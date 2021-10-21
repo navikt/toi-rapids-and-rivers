@@ -9,6 +9,16 @@ repositories {
     mavenCentral()
     maven("https://kotlin.bintray.com/ktor")
     maven("https://packages.confluent.io/maven/")
+    maven("https://maven.pkg.github.com/navikt/maven-release") {
+        val user = properties["mavenUserGithub"]?.toString() ?: "token"
+        val token = System.getenv("GITHUB_TOKEN")
+            ?: properties["passwordGithub"]
+            ?: throw NullPointerException("Manglende token, du må sette GITHUB_TOKEN eller passwordGithub i gradle.properties i hjemme-området ditt, se README")
+        credentials {
+            username = user
+            password = token.toString()
+        }
+    }
 }
 
 dependencies {
