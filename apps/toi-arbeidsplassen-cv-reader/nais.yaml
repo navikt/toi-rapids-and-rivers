@@ -33,5 +33,5 @@ spec:
     application:
       enabled: true
   env:
-    - name: PAM_CV_TOPIC
-      value: arbeid-pam-cv-endret-v6
+    - name: KAFKA_RAPID_TOPIC
+      value: toi.rapid

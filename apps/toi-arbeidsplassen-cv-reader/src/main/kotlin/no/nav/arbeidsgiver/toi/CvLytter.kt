@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CvLytter(
     private val meldingsPublisher: (String) -> Unit,
-    private val shutdownRapid: () -> Unit,
+    shutdownRapidApplication: () -> Unit,
     private val consumerConfig: Properties = cvLytterConfig(),
 ) : CoroutineScope {
 
@@ -27,12 +27,15 @@ class CvLytter(
         get() = Dispatchers.IO + job
 
     init {
-        job.invokeOnCompletion { shutdownRapid() }
+        job.invokeOnCompletion {
+            log.error("Shutting down Rapid", it)
+            shutdownRapidApplication()
+        }
     }
 
     fun start() {
         launch {
-            KafkaConsumer<String, String>(consumerConfig).use { consumer ->
+            KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.cvTopic))
                 while (job.isActive) {
                     try {
@@ -40,7 +43,7 @@ class CvLytter(
                             .map(ConsumerRecord<String, Melding>::value)
                             .map(::NyKandidatHendelse)
                             .map(NyKandidatHendelse::somString)
-                            .forEach (meldingsPublisher::invoke)
+                            .forEach(meldingsPublisher::invoke)
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
                     }

@@ -5,12 +5,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() {
-
-    val rapidApplication = RapidApplication.create(mapOf())
+    val rapidApplication = RapidApplication.create(System.getenv())
     rapidApplication.start()
 
-    CvLytter(meldingsPublisher = rapidApplication::publish, shutdownRapid = rapidApplication::stop).start()
-
+    CvLytter(meldingsPublisher = rapidApplication::publish, shutdownRapidApplication = rapidApplication::stop).start()
 }
 
 val Any.log: Logger
