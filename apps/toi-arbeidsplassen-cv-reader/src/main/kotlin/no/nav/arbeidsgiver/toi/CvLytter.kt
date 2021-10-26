@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Melding
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -15,11 +16,19 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-class CvLytter(private val consumerConfig: Properties = cvLytterConfig()) : CoroutineScope {
+class CvLytter(
+    private val meldingsPublisher: (String) -> Unit,
+    private val shutdownRapid: () -> Unit,
+    private val consumerConfig: Properties = cvLytterConfig(),
+) : CoroutineScope {
 
-    val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
+
+    init {
+        job.invokeOnCompletion { shutdownRapid() }
+    }
 
     fun start() {
         launch {
@@ -27,9 +36,13 @@ class CvLytter(private val consumerConfig: Properties = cvLytterConfig()) : Coro
                 consumer.subscribe(listOf(Configuration.cvTopic))
                 while (job.isActive) {
                     try {
-                        val records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                        consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                            .map(ConsumerRecord<String, Melding>::value)
+                            .map(::NyKandidatHendelse)
+                            .map(NyKandidatHendelse::somString)
+                            .forEach (meldingsPublisher::invoke)
                     } catch (e: RetriableException) {
-                        logger.warn("Had a retriable exception, retrying", e)
+                        log.warn("Had a retriable exception, retrying", e)
                     }
                 }
             }
@@ -37,7 +50,7 @@ class CvLytter(private val consumerConfig: Properties = cvLytterConfig()) : Coro
     }
 }
 
-fun cvLytterConfig() = mapOf<String,String>(
+fun cvLytterConfig() = mapOf<String, String>(
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName
 ).toProperties()
