@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.veileder
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import kotlinx.coroutines.CoroutineScope
