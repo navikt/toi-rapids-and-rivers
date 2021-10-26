@@ -10,6 +10,7 @@ on:
     - main
     paths:
     - apps/toi-arbeidsplassen-cv-reader/**
+    - .github/workflows/deploy-arbeidsplassen-cv-reader.yaml
 
 jobs:
   build-and-publish:
