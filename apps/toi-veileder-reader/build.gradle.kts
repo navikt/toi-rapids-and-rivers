@@ -5,8 +5,6 @@ import Kafka.AvroSerializer
         }
 
 dependencies {
-
-    implementation("no.nav.arbeid.pam:pam-cv-avro-cvmeldinger:51")
     implementation(AvroSerializer)
     /*
     </groupId>
