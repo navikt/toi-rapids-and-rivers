@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import no.nav.arbeid.cv.avro.Melding
+import log
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
@@ -23,13 +23,13 @@ class VeilederLytter(private val consumerConfig: Properties = cvLytterConfig()) 
 
     fun start() {
         launch {
-            KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
+            KafkaConsumer<String, String>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.veilederTopic))
                 while (job.isActive) {
                     try {
                         val records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                     } catch (e: RetriableException) {
-                        logger.warn("Had a retriable exception, retrying", e)
+                        log.warn("Had a retriable exception, retrying", e)
                     }
                 }
             }

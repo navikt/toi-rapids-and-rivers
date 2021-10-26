@@ -24,6 +24,8 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
 
+    implementation("org.apache.kafka:kafka-clients:2.7.0")
+
     // Logging
     implementation(Logging.Slf4jApi)
     implementation(Logging.LogbackClassic)

@@ -32,7 +32,7 @@ class CvLytter(
 
     fun start() {
         launch {
-            KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
+            KafkaConsumer<String, String>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.cvTopic))
                 while (job.isActive) {
                     try {
