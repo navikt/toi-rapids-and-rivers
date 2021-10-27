@@ -35,3 +35,5 @@ spec:
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: toi-arbeidsplassen-cv-reader-rapidconsumer-1
