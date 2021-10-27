@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: veileder-cv-reader
+  name: toi-veileder-reader
   namespace: toi
   labels:
     team: toi
@@ -37,5 +37,5 @@ spec:
       value: toi.rapid
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{kafka_consumer_group_id}}
-    - name: ARBEIDSPLASSEN_CV_KAFKA_GROUP
+    - name: TOI_VEILEDER_KAFKA_GROUP
       value: {{toi_veileder_kafka_group}}
