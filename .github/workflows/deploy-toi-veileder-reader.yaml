@@ -1,4 +1,4 @@
-name: toi-arbeidsplassen-cv-reader
+name: toi-veileder-reader
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
@@ -9,8 +9,8 @@ on:
     branches:
     - main
     paths:
-    - apps/toi-arbeidsplassen-cv-reader/**
-    - .github/workflows/deploy-arbeidsplassen-cv-reader.yaml
+    - apps/toi-veileder-reader/**
+    - .github/workflows/deploy-toi-veileder-reader.yaml
 
 jobs:
   build-and-publish:
