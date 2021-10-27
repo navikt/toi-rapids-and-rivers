@@ -11,6 +11,7 @@ on:
     paths:
     - apps/toi-veileder-reader/**
     - .github/workflows/deploy-toi-veileder-reader.yaml
+    - buildSrc/**
 
 jobs:
   build-and-publish:

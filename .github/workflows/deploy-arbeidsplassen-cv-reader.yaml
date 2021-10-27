@@ -11,6 +11,7 @@ on:
     paths:
     - apps/toi-arbeidsplassen-cv-reader/**
     - .github/workflows/deploy-arbeidsplassen-cv-reader.yaml
+    - buildSrc/**
 
 jobs:
   build-and-publish:
