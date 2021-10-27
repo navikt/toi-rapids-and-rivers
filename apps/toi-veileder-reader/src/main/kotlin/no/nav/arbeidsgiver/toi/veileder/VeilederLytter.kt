@@ -5,8 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import log
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -15,19 +15,31 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-class VeilederLytter(private val consumerConfig: Properties = cvLytterConfig()) : CoroutineScope {
+class VeilederLytter(
+    shutdownRapidApplication: () -> Unit,
+    private val consumerConfig: Properties = cvLytterConfig(),
+) : CoroutineScope {
 
-    val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
+    init {
+        job.invokeOnCompletion {
+            log.error("Shutting down Rapid", it)
+            shutdownRapidApplication()
+        }
+    }
+
     fun start() {
         launch {
-            KafkaConsumer<String, String>(consumerConfig).use { consumer ->
+            KafkaConsumer<String, SisteTilordnetVeilederKafkaDTO>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.veilederTopic))
                 while (job.isActive) {
                     try {
-                        val records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                        consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                            .map(ConsumerRecord<String, SisteTilordnetVeilederKafkaDTO>::value)
+                            .forEach { log.info("veiledermelding: $it") }
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
                     }
@@ -37,7 +49,7 @@ class VeilederLytter(private val consumerConfig: Properties = cvLytterConfig()) 
     }
 }
 
-fun cvLytterConfig() = mapOf<String,String>(
+fun cvLytterConfig() = mapOf<String, String>(
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName
 ).toProperties()
