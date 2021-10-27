@@ -1,4 +1,4 @@
-name: toi-veileder-cv-reader
+name: toi-veileder-reader
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
