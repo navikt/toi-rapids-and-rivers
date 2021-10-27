@@ -16,8 +16,9 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class VeilederLytter(
+    private val meldingsPublisher: (String) -> Unit,
     shutdownRapidApplication: () -> Unit,
-    private val consumerConfig: Properties = veilederLytterConfig(),
+    private val consumerConfig: Properties
 ) : CoroutineScope {
 
     private val job = Job()
@@ -39,7 +40,10 @@ class VeilederLytter(
                     try {
                         consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, SisteTilordnetVeilederKafkaDTO>::value)
-                            .forEach { log.info("veiledermelding: $it") }
+                            .forEach {
+                                log.info("veiledermelding: $it")
+                                //meldingsPublisher.invoke("veiledertest")
+                            }
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
                     }
@@ -49,8 +53,9 @@ class VeilederLytter(
     }
 }
 
-fun veilederLytterConfig() = mapOf<String, String>(
+fun veilederLytterConfig(veilederKafkaGroupID: String) = mapOf<String, String>(
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
-    ConsumerConfig.GROUP_ID_CONFIG to "toi-microservices-veileder-1"
+    ConsumerConfig.GROUP_ID_CONFIG to veilederKafkaGroupID,
+    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest"
 ).toProperties()
