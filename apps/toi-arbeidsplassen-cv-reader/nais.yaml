@@ -36,6 +36,6 @@ spec:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: {{ kafka.consumer.group.id }}
+      value: {{kafka_consumer_group_id}}
     - name: ARBEIDSPLASSEN_CV_KAFKA_GROUP
-      value: {{ arbeidsplassen.cv.kafka.group }}
+      value: {{arbeidsplassen_cv_kafka_group}}
