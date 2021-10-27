@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Melding
+import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -17,23 +18,20 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class CvLytter(
-    private val meldingsPublisher: (String) -> Unit,
-    shutdownRapidApplication: () -> Unit,
     private val consumerConfig: Properties,
-) : CoroutineScope {
+) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
-    init {
+    override fun onReady(rapidsConnection: RapidsConnection) {
+        log.info("Rapid'en er ready. Starter CV-lytting.")
         job.invokeOnCompletion {
             log.error("Shutting down Rapid", it)
-            shutdownRapidApplication()
+            rapidsConnection.stop()
         }
-    }
 
-    fun start() {
         launch {
             KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.cvTopic))
@@ -47,7 +45,7 @@ class CvLytter(
                             .onEach{
                                 log.info("Skal publisere hendelse")
                             }
-                            .forEach(meldingsPublisher::invoke)
+                            .forEach(rapidsConnection::publish)
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
                     }
