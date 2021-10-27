@@ -37,12 +37,16 @@ class CvLytter(
         launch {
             KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
                 consumer.subscribe(listOf(Configuration.cvTopic))
+                log.info("Har abonnert på arbeidsplassen-cv-topic")
                 while (job.isActive) {
                     try {
                         consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, Melding>::value)
                             .map(::NyKandidatHendelse)
                             .map(NyKandidatHendelse::somString)
+                            .onEach{
+                                log.info("Skal publisere hendelse")
+                            }
                             .forEach(meldingsPublisher::invoke)
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
