@@ -8,7 +8,11 @@ fun main() {
     val rapidApplication = RapidApplication.create(System.getenv())
     rapidApplication.start()
 
-    CvLytter(meldingsPublisher = rapidApplication::publish, shutdownRapidApplication = rapidApplication::stop).start()
+    CvLytter(
+        meldingsPublisher = rapidApplication::publish,
+        shutdownRapidApplication = rapidApplication::stop,
+        consumerConfig = cvLytterConfig(System.getenv("ARBEIDSPLASSEN_CV_KAFKA_GROUP"))
+    ).start()
 }
 
 val Any.log: Logger

@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 class CvLytter(
     private val meldingsPublisher: (String) -> Unit,
     shutdownRapidApplication: () -> Unit,
-    private val consumerConfig: Properties = cvLytterConfig(),
+    private val consumerConfig: Properties,
 ) : CoroutineScope {
 
     private val job = Job()
@@ -53,7 +53,9 @@ class CvLytter(
     }
 }
 
-fun cvLytterConfig() = mapOf<String, String>(
+fun cvLytterConfig(arbeidsplassenKafkaGroupID: String) = mapOf<String, String>(
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
-    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName
+    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
+    ConsumerConfig.GROUP_ID_CONFIG to arbeidsplassenKafkaGroupID,
+    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest"
 ).toProperties()
