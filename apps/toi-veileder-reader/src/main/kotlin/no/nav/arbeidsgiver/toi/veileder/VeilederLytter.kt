@@ -17,7 +17,7 @@ import kotlin.coroutines.CoroutineContext
 
 class VeilederLytter(
     shutdownRapidApplication: () -> Unit,
-    private val consumerConfig: Properties = cvLytterConfig(),
+    private val consumerConfig: Properties = veilederLytterConfig(),
 ) : CoroutineScope {
 
     private val job = Job()
@@ -49,7 +49,8 @@ class VeilederLytter(
     }
 }
 
-fun cvLytterConfig() = mapOf<String, String>(
+fun veilederLytterConfig() = mapOf<String, String>(
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
-    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName
+    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
+    ConsumerConfig.GROUP_ID_CONFIG to "toi-microservices-veileder-1"
 ).toProperties()
