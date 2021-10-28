@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 
 fun main() =
     RapidApplication.create(System.getenv()).apply {
-        register(CvLytter(cvLytterConfig(System.getenv("ARBEIDSPLASSEN_CV_KAFKA_GROUP"))))
+        register(CvLytter(cvLytterConfig(System.getenv())))
     }.start()
 
 val Any.log: Logger
