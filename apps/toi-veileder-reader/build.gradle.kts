@@ -5,15 +5,4 @@ import Kafka.AvroSerializer
         }
 
 dependencies {
-    implementation(AvroSerializer)
-    /*
-    </groupId>
-            <artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>avro-tools</artifactId>
-                    <groupId>org.apache.avro</groupId>
-                </exclusion>
-            </exclusions>
-     */
 }
