@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -59,5 +60,10 @@ fun cvLytterConfig(arbeidsplassenKafkaGroupID: String) = mapOf<String, String>(
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
     ConsumerConfig.GROUP_ID_CONFIG to arbeidsplassenKafkaGroupID,
-    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest"
+    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+
+    KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to "true",
+    KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG to System.getenv("KAFKA_SCHEMA_REGISTRY"),
+    KafkaAvroDeserializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
+    KafkaAvroDeserializerConfig.USER_INFO_CONFIG to "${System.getenv("KAFKA_SCHEMA_REGISTRY_USER")}:${System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD")}"
 ).toProperties()
