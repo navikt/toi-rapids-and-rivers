@@ -1,3 +1,4 @@
+import Jackson.MapperAsl
 import Kafka.AvroSerializer
 
 plugins {
@@ -8,6 +9,7 @@ dependencies {
 
     implementation("no.nav.arbeid.pam:pam-cv-avro-cvmeldinger:51")
     implementation(AvroSerializer)
+    implementation(MapperAsl)
     /*
     </groupId>
             <artifactId>

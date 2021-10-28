@@ -47,6 +47,8 @@ object Jackson {
     const val DatatypeJsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$version"
     const val DatatypeJdk8 = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$version"
     const val ModuleKotlin = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
+
+    const val MapperAsl = "org.codehaus.jackson:jackson-mapper-asl:1.9.13"
 }
 
 object Jupiter {
