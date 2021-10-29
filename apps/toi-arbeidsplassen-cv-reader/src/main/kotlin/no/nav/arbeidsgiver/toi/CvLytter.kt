@@ -1,25 +1,21 @@
 package no.nav.arbeidsgiver.toi
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializer
-import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.RapidsConnection
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.RetriableException
-import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class CvLytter(
-    private val consumerConfig: Properties,
+    private val consumer: Consumer<String, Melding>,
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val job = Job()
@@ -34,7 +30,7 @@ class CvLytter(
         }
 
         launch {
-            KafkaConsumer<String, Melding>(consumerConfig).use { consumer ->
+            consumer.use { consumer ->
                 consumer.subscribe(listOf(Configuration.cvTopic))
                 log.info("Har abonnert på arbeidsplassen-cv-topic")
                 while (job.isActive) {
