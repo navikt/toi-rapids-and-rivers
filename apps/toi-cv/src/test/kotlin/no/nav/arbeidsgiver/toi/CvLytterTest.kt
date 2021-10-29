@@ -31,7 +31,7 @@ class CvLytterTest {
         mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(500)
+        Thread.sleep(100)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
