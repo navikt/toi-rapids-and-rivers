@@ -1,8 +1,6 @@
-rootProject.name = "toi-microservices"
-include(
-    "apps:toi-veileder-reader"
-)
-include(
-    "apps:toi-arbeidsplassen-cv-reader"
-)
+rootProject.name = "toi-rapids-and-rivers"
 
+include(
+    "apps:toi-cv",
+    "apps:toi-veileder"
+)
