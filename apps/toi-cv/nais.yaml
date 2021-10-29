@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: toi-arbeidsplassen-cv-reader
+  name: toi-cv
   namespace: toi
   labels:
     team: toi
