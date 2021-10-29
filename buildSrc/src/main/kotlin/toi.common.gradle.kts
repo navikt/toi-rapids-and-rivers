@@ -25,14 +25,15 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     // Logging
-    implementation(Logging.Slf4jApi)
-    implementation(Logging.LogbackClassic)
-    implementation(Logging.LogstashLogbackEncoder)
+    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.6")
 
     // JUnit Testing
-    testImplementation(Jupiter.Api)
-    testImplementation(Jupiter.Params)
-    testRuntimeOnly(Jupiter.Engine)
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+    testImplementation("org.assertj:assertj-core:3.19.0")
 }
 
 tasks {

@@ -1,6 +1,3 @@
-import Jackson.MapperAsl
-import Kafka.AvroSerializer
-
 plugins {
     id("toi.rapids-and-rivers")
 }
@@ -8,8 +5,8 @@ plugins {
 dependencies {
 
     implementation("no.nav.arbeid.pam:pam-cv-avro-cvmeldinger:51")
-    implementation(AvroSerializer)
-    implementation(MapperAsl)
+    implementation("io.confluent:kafka-avro-serializer:5.0.0")
+    implementation("org.codehaus.jackson:jackson-mapper-asl:1.9.13")
     /*
     </groupId>
             <artifactId>

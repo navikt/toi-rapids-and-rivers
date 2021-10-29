@@ -1,8 +1,6 @@
-import Kafka.AvroSerializer
-
-        plugins {
-            id("toi.rapids-and-rivers")
-        }
+plugins {
+    id("toi.rapids-and-rivers")
+}
 
 dependencies {
 }

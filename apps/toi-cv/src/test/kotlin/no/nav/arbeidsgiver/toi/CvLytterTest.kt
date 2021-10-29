@@ -1,16 +1,24 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeid.cv.avro.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class CvLytterTest {
+
+    val jacksonObjectMapper = jacksonObjectMapper().apply {
+        this.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
 
     @Test
     fun `Lesing av melding på CV-topic skal føre til at en tilsvarende melding blir publisert på rapid`() {
@@ -23,12 +31,13 @@ class CvLytterTest {
         mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(1000)
-        val rapidInspektør = rapid.inspektør
+        Thread.sleep(500)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
 
-        assertTrueWithTimeout {
-            rapidInspektør.size == 1
-        }
+        val cvJson = inspektør.message(0)
+        val cv = jacksonObjectMapper.treeToValue(cvJson, Melding::class.java)
+        assertThat(cv.aktoerId).isEqualTo(aktørId)
     }
 }
 
