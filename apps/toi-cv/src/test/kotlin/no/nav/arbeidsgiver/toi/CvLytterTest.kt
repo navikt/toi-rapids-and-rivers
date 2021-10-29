@@ -17,12 +17,14 @@ class CvLytterTest {
         val consumer = mockConsumer()
         val cvLytter = CvLytter(consumer)
         val rapid = TestRapid()
-        val rapidInspektør = rapid.inspektør
         val aktørId = "123"
         val melding = melding(aktørId)
-        mottaCvMelding(consumer, melding)
 
+        mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
+
+        Thread.sleep(1000)
+        val rapidInspektør = rapid.inspektør
 
         assertTrueWithTimeout {
             rapidInspektør.size == 1
