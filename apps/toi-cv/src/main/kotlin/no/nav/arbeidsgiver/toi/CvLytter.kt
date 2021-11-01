@@ -37,8 +37,12 @@ class CvLytter(
                     try {
                         consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, Melding>::value)
-                            .map(::NyKandidatHendelse)
-                            .map(NyKandidatHendelse::somString)
+                            .map {
+                                NyKandidatHendelse(it)
+                            }
+                            .map {
+                                it.somString()
+                            }
                             .onEach{
                                 log.info("Skal publisere hendelse")
                             }

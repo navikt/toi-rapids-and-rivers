@@ -12,11 +12,15 @@ import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.time.Month
+import java.time.Period
+import java.time.temporal.TemporalAmount
+import java.time.temporal.TemporalUnit
 
 class CvLytterTest {
 
     @Test
-    fun `Lesing av melding på CV-topic skal føre til at en tilsvarende melding blir publisert på rapid`() {
+    fun  `Lesing av melding på CV-topic skal føre til at en tilsvarende melding blir publisert på rapid`() {
         val consumer = mockConsumer()
         val cvLytter = CvLytter(consumer)
         val rapid = TestRapid()
@@ -63,12 +67,24 @@ private fun mottaCvMelding(consumer: MockConsumer<String, Melding>, melding: Mel
 
 private val topic = TopicPartition(Configuration.cvTopic, 0)
 
-private fun melding(aktørId: String) = Melding().apply {
+private fun melding(aktørIdValue: String) = Melding().apply {
     meldingstype = Meldingstype.OPPRETT
-    opprettCv = OpprettCv().apply {  cv = Cv().apply  { aktoerId = aktørId; this.etternavn = "Testetternavn" }}
-    opprettJobbprofil = OpprettJobbprofil().apply { aktoerId = aktoerId; this.jobbprofil = Jobbprofil().apply { this.aktiv = true } }
-    oppfolgingsinformasjon =  Oppfolgingsinformasjon().apply { this.oppfolgingskontor = "testkontor" }
-    aktoerId = aktoerId
+    opprettCv = OpprettCv().apply {  cv = Cv().apply  {
+        aktoerId = aktørIdValue;
+        etternavn = "Testetternavn"
+        opprettet = Instant.now()
+        sistEndret = Instant.now().minus(Period.ofDays(1))
+    }}
+    opprettJobbprofil = OpprettJobbprofil().apply {
+        aktoerId = aktørIdValue;
+        jobbprofil = Jobbprofil().apply {
+            aktiv = true
+            opprettet = Instant.now()
+        } }
+    oppfolgingsinformasjon =  Oppfolgingsinformasjon().apply {
+        oppfolgingskontor = "testkontor"
+    }
+    aktoerId = aktørIdValue
     sistEndret = Instant.now()
 }
 
