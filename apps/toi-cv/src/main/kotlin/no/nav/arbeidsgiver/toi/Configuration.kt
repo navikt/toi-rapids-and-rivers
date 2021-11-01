@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SaslConfigs
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
+import java.io.File
 
 object Configuration {
     val cvTopic = "arbeid-pam-cv-endret-v6"
@@ -22,14 +23,9 @@ fun cvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
     CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SASL_SSL",
     SaslConfigs.SASL_MECHANISM to "PLAIN",
     SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"srv-toi-cv\" password=\"${envs["TOI_CV_SERVICEBRUKER_PASSORD"] ?: throw Exception("TOI_CV_SERVICEBRUKER_PASSORD kunne ikke hentes fra k8s secrets")}\";",
-    SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "",
-    SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG to "jks",
-    SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to (envs["KAFKA_TRUSTSTORE_PATH"] ?: throw Exception("KAFKA_TRUSTSTORE_PATH er ikke definert")),
-    SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to (envs["KAFKA_CREDSTORE_PASSWORD"] ?: throw Exception("KAFKA_CREDSTORE_PASSWORD er ikke definert")),
-    SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
-    SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG to (envs["KAFKA_KEYSTORE_PATH"] ?: throw Exception("KAFKA_KEYSTORE_PATH er ikke definert")),
-    SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG to (envs["KAFKA_CREDSTORE_PASSWORD"] ?: throw Exception("KAFKA_CREDSTORE_PASSWORD er ikke definert")),
-    SslConfigs.SSL_KEY_PASSWORD_CONFIG to (envs["KAFKA_CREDSTORE_PASSWORD"] ?: throw Exception("KAFKA_CREDSTORE_PASSWORD er ikke definert")),
+    SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to (envs["NAV_TRUSTSTORE_PATH"]?.let { File(it).absolutePath } ?: throw Exception("NAV_TRUSTSTORE_PATH er ikke definert")),
+    SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to (envs["NAV_TRUSTSTORE_PASSWORD"] ?: throw Exception("NAV_TRUSTSTORE_PASSWORD er ikke definert")),
+
     KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to "true",
     KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG to (envs["KAFKA_SCHEMA_REGISTRY_ONPREM_URL"] ?: throw Exception("KAFKA_SCHEMA_REGISTRY_ONPREM_URL er ikke definert")),
     KafkaAvroDeserializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
