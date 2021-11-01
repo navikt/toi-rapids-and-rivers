@@ -30,7 +30,7 @@ class CvLytterTest {
         mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(100)
+        Thread.sleep(400)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
@@ -80,6 +80,7 @@ private fun melding(aktørIdValue: String) = Melding().apply {
         jobbprofil = Jobbprofil().apply {
             aktiv = true
             opprettet = Instant.now()
+            sistEndret = Instant.now().minus(Period.ofDays(1))
         } }
     oppfolgingsinformasjon =  Oppfolgingsinformasjon().apply {
         oppfolgingskontor = "testkontor"
