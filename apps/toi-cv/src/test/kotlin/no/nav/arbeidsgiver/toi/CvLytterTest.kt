@@ -1,7 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.arbeid.cv.avro.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -9,16 +10,10 @@ import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class CvLytterTest {
-
-    val jacksonObjectMapper = jacksonObjectMapper().apply {
-        this.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    }
 
     @Test
     fun `Lesing av melding på CV-topic skal føre til at en tilsvarende melding blir publisert på rapid`() {
@@ -31,13 +26,17 @@ class CvLytterTest {
         mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(100)
+        Thread.sleep(1000)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
         val cvJson = inspektør.message(0)
-        val cv = jacksonObjectMapper.treeToValue(cvJson, Melding::class.java)
-        assertThat(cv.aktoerId).isEqualTo(aktørId)
+        val aktørIdPåRapidMelding = cvJson.get("@aktør_id").asText()
+        assertThat(aktørIdPåRapidMelding).isEqualTo(aktørId)
+
+        val cvMelding = cvJson.get("@cv_melding")
+        val meldingPåRapid = objectMapper.treeToValue(cvMelding, Melding::class.java)
+        assertThat(meldingPåRapid.aktoerId).isEqualTo(melding.aktoerId)
     }
 }
 
@@ -77,8 +76,13 @@ private fun melding(aktørId: String) = Melding(
     Instant.now()
 )
 
-private fun assertTrueWithTimeout(timeoutSeconds: Int = 2, conditional: (Any) -> Boolean) =
-    assertTrue((0..(timeoutSeconds * 10)).any(sleepIfFalse(conditional)))
+private val objectMapper = ObjectMapper()
+    .registerModule(JavaTimeModule())
+    .addMixIn(Object::class.java, AvroMixIn::class.java)
 
-private fun sleepIfFalse(conditional: (Any) -> Boolean): (Any) -> Boolean =
-    { conditional(it).also { answer -> if (!answer) Thread.sleep(100) } }
+abstract class AvroMixIn {
+    @JsonIgnore
+    abstract fun getSchema(): org.apache.avro.Schema
+    @JsonIgnore
+    abstract fun getSpecificData() : org.apache.avro.specific.SpecificData
+}

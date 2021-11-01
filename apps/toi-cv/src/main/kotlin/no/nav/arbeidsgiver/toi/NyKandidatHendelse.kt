@@ -1,24 +1,29 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.arbeid.cv.avro.Melding
 
-class NyKandidatHendelse(private val melding: Melding) {
-    private val dto = NyKandidatHendelseDTO(melding.aktoerId,melding.somCVDto())
-    fun somString() = dto.somString()
-}
-
-private class NyKandidatHendelseDTO(
-    @JsonProperty("@aktor_id")
-    private val aktor_id: String,
-    private val cv: CVDto
-){
+class NyKandidatHendelse(melding: Melding) {
     @JsonProperty("@event_name")
     private val event_name = "Kandidat.NyFraArbeidsplassen"
-    fun somString() = ObjectMapper().writeValueAsString(this)!!
+    @JsonProperty("@aktør_id")
+    private val aktørId = melding.aktoerId
+    @JsonProperty("@cv_melding")
+    private val cvMelding = melding
+
+    fun somString() = objectMapper.writeValueAsString(this)
 }
 
-private class CVDto
+private val objectMapper = ObjectMapper()
+    .registerModule(JavaTimeModule())
+    .addMixIn(Object::class.java, AvroMixIn::class.java)
 
-private fun Melding.somCVDto() = CVDto()
+abstract class AvroMixIn {
+    @JsonIgnore
+    abstract fun getSchema(): org.apache.avro.Schema
+    @JsonIgnore
+    abstract fun getSpecificData() : org.apache.avro.specific.SpecificData
+}
