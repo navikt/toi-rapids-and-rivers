@@ -25,6 +25,11 @@ spec:
     requests:
       cpu: 400m
       memory: 512Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: {{{ kvPath }}}
+        mountPath: /secret/serviceuser
   secureLogs:
     enabled: true
   kafka:
