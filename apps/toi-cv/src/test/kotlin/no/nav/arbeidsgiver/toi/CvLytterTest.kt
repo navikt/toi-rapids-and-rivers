@@ -40,7 +40,11 @@ class CvLytterTest {
 
         val cvMelding = cvJson.get("@cv_melding")
         val meldingPåRapid = objectMapper.treeToValue(cvMelding, Melding::class.java)
+
         assertThat(meldingPåRapid.aktoerId).isEqualTo(melding.aktoerId)
+        assertThat(meldingPåRapid.opprettCv.cv.etternavn).isEqualTo("Testetternavn")
+        assertThat(meldingPåRapid.opprettJobbprofil.jobbprofil.kompetanser).containsExactly("testkompetanse")
+        assertThat(meldingPåRapid.oppfolgingsinformasjon.oppfolgingskontor).isEqualTo("testkontor")
     }
 }
 
@@ -79,6 +83,7 @@ private fun melding(aktørIdValue: String) = Melding().apply {
         aktoerId = aktørIdValue;
         jobbprofil = Jobbprofil().apply {
             aktiv = true
+            kompetanser = listOf("testkompetanse")
             opprettet = Instant.now()
             sistEndret = Instant.now().minus(Period.ofDays(1))
         } }
