@@ -20,7 +20,7 @@ fun cvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
 
     CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SASL_SSL",
     SaslConfigs.SASL_MECHANISM to "PLAIN",
-    SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${envs["SERVICE_USER"]}\" password=\"${envs["SERVICE_USER_PASS"]}\";",
+    SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"srv-toi-cv\" password=\"${envs["TOI_CV_SERVICEBRUKER_PASSORD"]}\";",
 
     KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to "true",
     KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG to (envs["KAFKA_SCHEMA_REGISTRY"] ?: throw Exception("KAFKA_SCHEMA_REGISTRY er ikke definert")),

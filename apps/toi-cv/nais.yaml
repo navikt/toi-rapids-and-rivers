@@ -25,11 +25,6 @@ spec:
     requests:
       cpu: 200m
       memory: 512Mi
-  vault:
-    enabled: true
-    paths:
-      - kvPath: {{{ kvPath }}}
-        mountPath: /secret/serviceuser
   secureLogs:
     enabled: true
   kafka:
@@ -44,3 +39,5 @@ spec:
       value: {{kafka_consumer_group_id}}
     - name: ARBEIDSPLASSEN_CV_KAFKA_GROUP
       value: {{arbeidsplassen_cv_kafka_group}}
+  envFrom:
+    - secret: toi-cv-servicebruker
