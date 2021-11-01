@@ -18,7 +18,7 @@ spec:
     retentionHours: 336 # 336 = 14 dager
   acl:
     - team: toi
-      application: toi-arbeidsplassen-cv-reader
+      application: toi-cv
       access: readwrite # read, write, readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
