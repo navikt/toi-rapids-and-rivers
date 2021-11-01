@@ -2,7 +2,9 @@ package no.nav.arbeidsgiver.toi
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
+import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.config.SaslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
 
 object Configuration {
@@ -15,6 +17,10 @@ fun cvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
     ConsumerConfig.GROUP_ID_CONFIG to (envs["ARBEIDSPLASSEN_CV_KAFKA_GROUP"] ?: throw Exception("ARBEIDSPLASSEN_CV_KAFKA_GROUP er ikke definert")),
     ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+
+    CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SASL_SSL",
+    SaslConfigs.SASL_MECHANISM to "PLAIN",
+    SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${envs["SERVICE_USER"]}\" password=\"${envs["SERVICE_USER_PASS"]}\";",
 
     KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to "true",
     KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG to (envs["KAFKA_SCHEMA_REGISTRY"] ?: throw Exception("KAFKA_SCHEMA_REGISTRY er ikke definert")),
