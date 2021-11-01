@@ -20,13 +20,13 @@ class CvLytterTest {
         val consumer = mockConsumer()
         val cvLytter = CvLytter(consumer)
         val rapid = TestRapid()
-        val aktørId = "123"
+        val aktørId = "123456789"
         val melding = melding(aktørId)
 
         mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(1000)
+        Thread.sleep(100)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
@@ -63,18 +63,14 @@ private fun mottaCvMelding(consumer: MockConsumer<String, Melding>, melding: Mel
 
 private val topic = TopicPartition(Configuration.cvTopic, 0)
 
-private fun melding(aktørId: String) = Melding(
-    Meldingstype.OPPRETT,
-    OpprettCv(),
-    EndreCv(),
-    SlettCv(),
-    OpprettJobbprofil(),
-    EndreJobbprofil(),
-    SlettJobbprofil(),
-    Oppfolgingsinformasjon(),
-    aktørId,
-    Instant.now()
-)
+private fun melding(aktørId: String) = Melding().apply {
+    meldingstype = Meldingstype.OPPRETT
+    opprettCv = OpprettCv().apply {  cv = Cv().apply  { aktoerId = aktørId; this.etternavn = "Testetternavn" }}
+    opprettJobbprofil = OpprettJobbprofil().apply { aktoerId = aktoerId; this.jobbprofil = Jobbprofil().apply { this.aktiv = true } }
+    oppfolgingsinformasjon =  Oppfolgingsinformasjon().apply { this.oppfolgingskontor = "testkontor" }
+    aktoerId = aktoerId
+    sistEndret = Instant.now()
+}
 
 private val objectMapper = ObjectMapper()
     .registerModule(JavaTimeModule())
