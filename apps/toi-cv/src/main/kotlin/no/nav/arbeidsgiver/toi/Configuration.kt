@@ -23,6 +23,7 @@ fun cvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
     SaslConfigs.SASL_MECHANISM to "PLAIN",
     SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"srv-toi-cv\" password=\"${envs["TOI_CV_SERVICEBRUKER_PASSORD"] ?: throw Exception("TOI_CV_SERVICEBRUKER_PASSORD kunne ikke hentes fra k8s secrets")}\";",
     SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "",
+    SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG to "JAVA_KEYSTORE",
     SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to (envs["KAFKA_TRUSTSTORE_PATH"] ?: throw Exception("KAFKA_TRUSTSTORE_PATH er ikke definert")),
     SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to (envs["KAFKA_CREDSTORE_PASSWORD"] ?: throw Exception("KAFKA_CREDSTORE_PASSWORD er ikke definert")),
     SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
