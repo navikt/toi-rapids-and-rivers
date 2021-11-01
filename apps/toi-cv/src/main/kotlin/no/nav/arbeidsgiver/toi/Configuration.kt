@@ -29,7 +29,7 @@ fun cvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
     SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
     SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG to (envs["KAFKA_KEYSTORE_PATH"] ?: throw Exception("KAFKA_KEYSTORE_PATH er ikke definert")),
     SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG to (envs["KAFKA_CREDSTORE_PASSWORD"] ?: throw Exception("KAFKA_CREDSTORE_PASSWORD er ikke definert")),
-
+    SslConfigs.SSL_KEY_PASSWORD_CONFIG to (envs["KAFKA_CREDSTORE_PASSWORD"] ?: throw Exception("KAFKA_CREDSTORE_PASSWORD er ikke definert")),
     KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to "true",
     KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG to (envs["KAFKA_SCHEMA_REGISTRY_ONPREM_URL"] ?: throw Exception("KAFKA_SCHEMA_REGISTRY_ONPREM_URL er ikke definert")),
     KafkaAvroDeserializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
