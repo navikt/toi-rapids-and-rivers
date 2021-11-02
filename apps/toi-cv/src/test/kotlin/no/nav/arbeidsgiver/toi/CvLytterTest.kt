@@ -12,10 +12,8 @@ import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Instant
-import java.time.Month
 import java.time.Period
-import java.time.temporal.TemporalAmount
-import java.time.temporal.TemporalUnit
+
 
 class CvLytterTest {
 
