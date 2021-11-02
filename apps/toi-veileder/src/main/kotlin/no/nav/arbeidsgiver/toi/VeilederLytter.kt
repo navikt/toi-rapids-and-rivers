@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.veileder
+package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
