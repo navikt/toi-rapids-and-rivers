@@ -1,3 +1,2 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-veileder-reader-rapidconsumer-1
-toi_veileder_kafka_group: toi-veileder-kafkagroup-id-1

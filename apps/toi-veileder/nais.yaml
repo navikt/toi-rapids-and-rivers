@@ -39,7 +39,5 @@ spec:
       value: "siste-tilordnet-veileder-v1"
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{kafka_consumer_group_id}}
-    - name: TOI_VEILEDER_KAFKA_GROUP
-      value: {{toi_veileder_kafka_group}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
