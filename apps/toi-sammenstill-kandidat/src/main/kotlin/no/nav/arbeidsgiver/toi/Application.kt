@@ -5,11 +5,30 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
+fun behandleHendelse(
+    aktøridHendelse: AktøridHendelse,
+    lagreHendelse: (AktøridHendelse) -> Unit,
+    hentAlleHendelser: (String) -> List<String>,
+    publiserHendelse: (String) -> Unit
+) = aktøridHendelse.let { (aktørid, packet) ->
+    lagreHendelse(aktøridHendelse)
+    val berikelsesFunksjoner = hentAlleHendelser(aktørid)
+        .map(String::hendelseSomBerikelsesFunksjon)
+    if (berikelsesFunksjoner.erKomplett()) {
+        berikelsesFunksjoner.forEach { it(packet) }
+        packet["komplett_kandidat"] = true
+        publiserHendelse(packet.toJson())
+    }
+}
 
-fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    VeilederLytter(rapidsConnection, Repository::lagreVeilederHendelse)
-    CvLytter(rapidsConnection)
+fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).also { rapid ->
+    VeilederLytter(rapid) {
+        behandleHendelse(it, repository::lagreVeilederHendelse, repository::hentAlleHendelser, rapid::publish)
+    }
+    CvLytter(rapid)
 }.start()
+
+fun main() = startApp(Repository())
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)

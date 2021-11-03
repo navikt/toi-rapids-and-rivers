@@ -11,7 +11,7 @@ class NyKandidatHendelse(melding: Melding) {
     private val event_name = "Kandidat.NyFraArbeidsplassen"
     @JsonProperty("@aktør_id")
     private val aktørId = melding.aktoerId
-    @JsonProperty("@cv_melding")
+    @JsonProperty("cv_melding")
     private val cvMelding = melding
 
     fun somString() = objectMapper.writeValueAsString(this)
