@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.cv
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

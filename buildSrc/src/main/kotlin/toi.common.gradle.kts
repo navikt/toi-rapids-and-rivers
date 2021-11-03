@@ -36,12 +36,20 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.19.0")
 }
 
+val stiTilApplicationClass =
+    File("${projectDir}/src/main/kotlin")
+        .walk()
+        .find { it.name == "Application.kt" }
+        ?.path!!.removePrefix("${project.projectDir}/src/main/kotlin/")
+        .replace("/", ".")
+        .replace(".kt", "Kt")
+
 tasks {
     named<Jar>("jar") {
         archiveBaseName.set("app")
 
         manifest {
-            attributes["Main-Class"] = "no.nav.arbeidsgiver.toi.ApplicationKt"
+            attributes["Main-Class"] = stiTilApplicationClass
             attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
                 it.name
             }
