@@ -22,10 +22,13 @@ fun behandleHendelse(
 }
 
 fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).also { rapid ->
-    VeilederLytter(rapid) {
+
+    val behandleHendelse: (AktøridHendelse /* = kotlin.Pair<kotlin.String, no.nav.helse.rapids_rivers.JsonMessage> */) -> Unit = {
         behandleHendelse(it, repository::lagreVeilederHendelse, repository::hentAlleHendelser, rapid::publish)
     }
-    CvLytter(rapid)
+
+    VeilederLytter(rapid, behandleHendelse)
+    CvLytter(rapid, behandleHendelse)
 }.start()
 
 fun main() = startApp(Repository())

@@ -5,7 +5,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class CvLytter(private val rapidsConnection: RapidsConnection): River.PacketListener {
+class CvLytter(rapidsConnection: RapidsConnection, private val behandleHendelse: (AktøridHendelse) -> Unit): River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {
@@ -15,8 +15,6 @@ class CvLytter(private val rapidsConnection: RapidsConnection): River.PacketList
         }.register(this)
     }
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        // Lagre i basen
-        // Sammenstill
-        // Legg på rapid
+        behandleHendelse(packet["aktørid"].asText() to packet)
     }
 }
