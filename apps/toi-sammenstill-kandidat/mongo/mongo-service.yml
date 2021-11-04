@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: toi-sammenstill-kandidat-mongodb
+  namespace: toi
+  labels:
+    name: toi-sammenstill-kandidat-mongodb
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  clusterIP: None
+  selector:
+    role: toi-sammenstill-kandidat-mongodb

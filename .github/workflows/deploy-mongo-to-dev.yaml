@@ -1,0 +1,36 @@
+name: Deploy topics to dev
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - apps/toi-sammenstill-kandidat/mongo/mongo-dev.yml
+      - apps/toi-sammenstill-kandidat/mongo/mongo-network-policy.yml
+      - apps/toi-sammenstill-kandidat/mongo/mongo-service.yml
+
+jobs:
+  deploy-mongo-to-dev:
+    name: Deploy mongo to dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-actions
+        uses: actions/checkout@master
+      - name: mongo-instance
+        uses: nais/deploy/actions/deploy@master
+          env:
+            APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+            CLUSTER: dev-gcp
+            RESOURCE: apps/toi-sammenstill-kandidat/mongo/mongo-dev.yml
+      - name: mongo-network-policy
+        uses: nais/deploy/actions/deploy@master
+          env:
+            APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+            CLUSTER: dev-gcp
+            RESOURCE: apps/toi-sammenstill-kandidat/mongo/mongo-network-policy.yml
+      - name: mongo-service
+        uses: nais/deploy/actions/deploy@master
+          env:
+            APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+            CLUSTER: dev-gcp
+            RESOURCE: apps/toi-sammenstill-kandidat/mongo/mongo-service.yml
