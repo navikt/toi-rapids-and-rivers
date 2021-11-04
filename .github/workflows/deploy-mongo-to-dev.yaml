@@ -14,18 +14,22 @@ jobs:
     name: Deploy mongo to dev
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: nais/deploy/actions/deploy@master
+      - name: checkout-actions
+        uses: actions/checkout@master
+      - name: mongo-instance
+        uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: apps/toi-sammenstill-kandidat/mongo/mongo-dev.yml
-      - uses: nais/deploy/actions/deploy@master
+      - name: mongo-network-policy
+        uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: apps/toi-sammenstill-kandidat/mongo/mongo-network-policy.yml
-      - uses: nais/deploy/actions/deploy@master
+      - name: mongo-service
+        uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp

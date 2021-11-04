@@ -5,6 +5,7 @@ metadata:
   namespace: toi
   labels:
     name: toi-sammenstill-kandidat-mongodb
+    team: toi
 spec:
   ports:
     - port: 27017

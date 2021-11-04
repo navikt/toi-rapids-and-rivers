@@ -3,6 +3,8 @@ kind: StatefulSet
 metadata:
   name: toi-sammenstill-kandidat-mongodb
   namespace: toi
+  labels:
+    team: toi
 spec:
   serviceName: toi-sammenstill-kandidat-mongodb
   replicas: 3
