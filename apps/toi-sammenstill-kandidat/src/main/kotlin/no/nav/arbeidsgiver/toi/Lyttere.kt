@@ -10,13 +10,13 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "Kandidat.NyFraArbeidsplassen")
-                it.demandKey("aktørid")
+                it.demandKey("aktørId")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.CV, packet["aktørid"].asText() , packet))
+        behandler.behandleHendelse(Hendelse(HendelseType.CV, packet["aktørId"].asText() , packet))
     }
 }
 
@@ -27,12 +27,12 @@ class VeilederLytter(
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "Kandidat.ny_veileder")
-                it.demandKey("aktørid")
+                it.demandKey("aktørId")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørid"].asText(), packet ))
+        behandler.behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørId"].asText(), packet ))
     }
 }

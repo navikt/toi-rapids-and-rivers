@@ -9,10 +9,8 @@ import no.nav.arbeid.cv.avro.Melding
 class NyKandidatHendelse(melding: Melding) {
     @JsonProperty("@event_name")
     private val event_name = "Kandidat.NyFraArbeidsplassen"
-    @JsonProperty("@aktør_id")
-    private val aktørId = melding.aktoerId
-    @JsonProperty("cv_melding")
-    private val cvMelding = melding
+    val aktørId = melding.aktoerId
+    val cv = melding
 
     fun somString() = objectMapper.writeValueAsString(this)
 }

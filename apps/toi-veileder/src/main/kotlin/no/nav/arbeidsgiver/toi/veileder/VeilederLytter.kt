@@ -17,6 +17,7 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection): River.Pack
     }
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         packet["@event_name"] = "Kandidat.ny_veileder"
+        packet["aktørId"] = packet["aktorId"]
         rapidsConnection.publish(packet.toJson())
     }
 }
