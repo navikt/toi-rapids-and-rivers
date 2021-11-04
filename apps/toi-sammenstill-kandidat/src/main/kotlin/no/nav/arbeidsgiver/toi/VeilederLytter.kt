@@ -6,7 +6,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 class VeilederLytter(
-    rapidsConnection: RapidsConnection, private val behandleHendelse: (Hendelse) -> Unit
+    rapidsConnection: RapidsConnection, private val behandler: Behandler
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -18,6 +18,6 @@ class VeilederLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørid"].asText(), packet ))
+        behandler.behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørid"].asText(), packet ))
     }
 }
