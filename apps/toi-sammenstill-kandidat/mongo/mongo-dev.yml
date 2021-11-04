@@ -5,7 +5,7 @@ metadata:
   namespace: toi
 spec:
   serviceName: toi-sammenstill-kandidat-mongodb
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       role: toi-sammenstill-kandidat-mongodb
