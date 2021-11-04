@@ -1,4 +1,4 @@
-name: Deploy mongo to dev
+name: Deploy toi-sammenstill-kandidat-mongodb to dev
 
 on:
   push:
