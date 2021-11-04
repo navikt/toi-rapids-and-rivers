@@ -39,3 +39,5 @@ spec:
       value: {{kafka_consumer_group_id}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: MONGODB_CONNECTION
+      value : "mongodb://toi-sammenstill-kandidat-mongodb:27017"

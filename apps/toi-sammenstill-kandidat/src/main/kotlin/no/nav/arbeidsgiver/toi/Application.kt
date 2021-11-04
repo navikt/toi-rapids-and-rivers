@@ -13,8 +13,8 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
     CvLytter(rapid, behandler)
 }.start()
 
-
-fun main() = startApp(Repository())
+val mongoDbConnection = System.getenv("MONGODB_CONNECTION")
+fun main() = startApp(Repository(mongoDbConnection))
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
