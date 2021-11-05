@@ -35,7 +35,7 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: toi-sammenstill-kandidat-mongodb
+      - application: toi-sammenstill-kandidat-mongodb
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid

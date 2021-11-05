@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi
 
-import com.mongodb.MongoClient
-import com.mongodb.ServerAddress
 import com.mongodb.client.MongoClients
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
@@ -15,10 +13,8 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
     CvLytter(rapid, behandler)
 }.start()
 
-//val mongoDbUrl = System.getenv("MONGODB_URL")
-//val mongoClient = MongoClients.create(mongoDbUrl)
-
-val mongoClient = MongoClient(listOf(ServerAddress("toi-sammenstill-kandidat-mongodb:27017")))
+val mongoDbUrl = System.getenv("MONGODB_URL")
+val mongoClient = MongoClients.create(mongoDbUrl)
 
 fun main() = startApp(Repository(mongoClient))
 

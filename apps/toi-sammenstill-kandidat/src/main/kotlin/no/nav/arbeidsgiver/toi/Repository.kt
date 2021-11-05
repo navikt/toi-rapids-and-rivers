@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import com.mongodb.client.model.Filters
 import no.nav.helse.rapids_rivers.JsonMessage
 import org.bson.Document
