@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         role: toi-sammenstill-kandidat-mongodb
-        environment: dev
+        environment: test
         replicaset: MainRepSet
         app: toi-sammenstill-kandidat-mongodb
     spec:
