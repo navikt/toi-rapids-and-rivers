@@ -12,7 +12,7 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
     CvLytter(rapid, behandler)
 }.start()
 
-val mongoClient = MongoClient("mongodb://toi-sammenstill-kandidat-mongodb:27017")
+val mongoClient = MongoClient("mongodb://toi-sammenstill-kandidat-mongodb-2.toi-sammenstill-kandidat-mongodb:27017")
 fun main() = startApp(Repository(mongoClient))
 
 val Any.log: Logger
