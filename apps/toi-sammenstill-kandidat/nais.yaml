@@ -44,4 +44,4 @@ spec:
     - name: KAFKA_RESET_POLICY
       value: "earliest"
     - name: MONGODB_URL
-      value: mongodb://toi-sammenstill-kandidat-mongodb-0.toi-sammenstill-kandidat-mongodb:27017,toi-sammenstill-kandidat-mongodb-1.toi-sammenstill-kandidat-mongodb:27017,toi-sammenstill-kandidat-mongodb-2.toi-sammenstill-kandidat-mongodb:27017/deploy_log?replicaSet=MainRepSet
+      value: mongodb://toi-sammenstill-kandidat-mongodb-0.toi-sammenstill-kandidat-mongodb:27017,toi-sammenstill-kandidat-mongodb-1.toi-sammenstill-kandidat-mongodb:27017,toi-sammenstill-kandidat-mongodb-2.toi-sammenstill-kandidat-mongodb:27017
