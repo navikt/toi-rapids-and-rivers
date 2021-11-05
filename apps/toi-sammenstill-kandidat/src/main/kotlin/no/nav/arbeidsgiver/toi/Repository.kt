@@ -6,9 +6,8 @@ import com.mongodb.client.model.Filters
 import no.nav.helse.rapids_rivers.JsonMessage
 import org.bson.Document
 
-class Repository(connectionString: String) {
+class Repository(mongoClient: MongoClient) {
 
-    val mongoClient = MongoClient(connectionString)
     val db = mongoClient.getDatabase("sammenstilteKandidater")
     val collection = db.getCollection("kandidater")
 
