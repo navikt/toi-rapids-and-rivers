@@ -15,9 +15,7 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
 }.start()
 
 val mongoClient = MongoClient(listOf(
-    ServerAddress("toi-sammenstill-kandidat-mongodb-0.toi-sammenstill-kandidat-mongodb", 27017),
-    ServerAddress("toi-sammenstill-kandidat-mongodb-1.toi-sammenstill-kandidat-mongodb", 27017),
-    ServerAddress("toi-sammenstill-kandidat-mongodb-2.toi-sammenstill-kandidat-mongodb", 27017)
+    ServerAddress("toi-sammenstill-kandidat-mongodb", 27017),
 ))
 
 fun main() = startApp(Repository(mongoClient))
