@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
+import com.mongodb.ServerAddress
 import com.mongodb.client.MongoClients
 import com.mongodb.connection.ClusterConnectionMode
 import com.mongodb.connection.ClusterType
@@ -18,7 +19,11 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
 
 val mongoSettings = MongoClientSettings.builder()
     .applyToClusterSettings {
-        it.srvHost(System.getenv("MONGODB_HOST"))
+        it.hosts(listOf(
+            ServerAddress("toi-sammenstill-kandidat-mongodb-2.toi-sammenstill-kandidat-mongodb:27017/deploy_log?replicaSet=MainRepSet"),
+            ServerAddress("toi-sammenstill-kandidat-mongodb-1.toi-sammenstill-kandidat-mongodb:27017"),
+            ServerAddress("toi-sammenstill-kandidat-mongodb-0.toi-sammenstill-kandidat-mongodb:27017")
+        ))
         it.mode(ClusterConnectionMode.MULTIPLE)
         it.requiredClusterType(ClusterType.REPLICA_SET)
     }.build()
