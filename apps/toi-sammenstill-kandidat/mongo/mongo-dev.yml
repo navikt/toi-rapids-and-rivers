@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: mongod-container
-          image: mongo:4
+          image: mongo:5
           command:
             - "mongod"
             - "--bind_ip"
