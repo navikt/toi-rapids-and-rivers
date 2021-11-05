@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 
 
 fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).also { rapid ->
-
+    System.setProperty("java.net.preferIPv4Stack" , "true");
     val behandler =  Behandler( repository, rapid::publish)
 
     VeilederLytter(rapid, behandler)
