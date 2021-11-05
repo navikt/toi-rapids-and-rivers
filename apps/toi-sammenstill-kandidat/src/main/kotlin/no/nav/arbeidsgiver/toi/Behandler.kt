@@ -27,7 +27,6 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
 }
 
 data class Kandidat(
-    val _id: ObjectId? = null,
     val aktørId: String,
     val cv: JsonMessage? = null,
     val veileder: JsonMessage? = null
