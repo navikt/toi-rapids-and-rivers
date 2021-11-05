@@ -16,7 +16,7 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
 }.start()
 
 val mongoDbUrl = System.getenv("MONGODB_URL")
-val mongoClient = MongoClient(MongoClientURI(mongoDbUrl))
+val mongoClient = MongoClient(mongoDbUrl)
 
 fun main() = startApp(Repository(mongoClient))
 
