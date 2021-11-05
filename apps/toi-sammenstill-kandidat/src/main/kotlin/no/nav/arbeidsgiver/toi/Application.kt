@@ -1,13 +1,12 @@
 package no.nav.arbeidsgiver.toi
 
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClients
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
 fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).also { rapid ->
-    System.setProperty("java.net.preferIPv4Stack" , "true");
     val behandler =  Behandler( repository, rapid::publish)
 
     VeilederLytter(rapid, behandler)
@@ -15,8 +14,7 @@ fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).
 }.start()
 
 val mongoDbUrl = System.getenv("MONGODB_URL")
-val mongoClient = MongoClient(mongoDbUrl)
-
+val mongoClient = MongoClients.create(mongoDbUrl)
 fun main() = startApp(Repository(mongoClient))
 
 val Any.log: Logger
