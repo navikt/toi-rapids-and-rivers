@@ -24,7 +24,7 @@ spec:
       application: toi-veileder
       access: readwrite # read, write, readwrite
     - team: toi
-      application: toi-sammenstill-kandidat
+      application: toi-sammenstille-kandidat
       access: readwrite # read, write, readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager

@@ -8,7 +8,7 @@
     kubectl get pods -n=toi
 * Gå inn en av mongodb-pod'ene:
   
-    kubectl exec -it toi-sammenstill-kandidat-mongodb-0 /bin/bash -n=toi
+    kubectl exec -it toi-sammenstille-kandidat-mongodb-0 /bin/bash -n=toi
 
 * Start MongoShell:
 

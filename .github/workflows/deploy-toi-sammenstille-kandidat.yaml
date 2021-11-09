@@ -1,4 +1,4 @@
-name: toi-sammenstill-kandidat
+name: toi-sammenstille-kandidat
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
@@ -9,8 +9,8 @@ on:
     branches:
       - main
     paths:
-      - apps/toi-sammenstill-kandidat/**
-      - .github/workflows/deploy-toi-sammenstill-kandidat.yaml
+      - apps/toi-sammenstille-kandidat/**
+      - .github/workflows/deploy-toi-sammenstille-kandidat.yaml
       - buildSrc/**
 
 jobs:
