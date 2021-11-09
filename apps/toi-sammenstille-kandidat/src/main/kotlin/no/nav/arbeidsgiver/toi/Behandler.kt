@@ -1,9 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.JsonMessage
 
 class Behandler(val repository: Repository, val publiserHendelse: (String) -> Unit) {
 
@@ -12,10 +10,7 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
         val kandidat = hentEllerLagTomKandidat(hendelse.aktørid)
         log.info("Hentet kandidat: $kandidat")
 
-        val oppdatertKandidat = when (hendelse.hendelseType) {
-            HendelseType.CV -> kandidat.copy(cv = hendelse.jsonMessage["cv"].toString())
-            HendelseType.VEILEDER -> kandidat.copy(veileder = hendelse.jsonMessage.toJson())
-        }
+        val oppdatertKandidat = hendelse.populerKandidat(kandidat)
 
         repository.lagreKandidat(oppdatertKandidat)
         log.info("Har lagret kandidat: $oppdatertKandidat")
