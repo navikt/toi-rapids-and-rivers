@@ -33,7 +33,7 @@ spec:
     sqlInstances:
       - type: POSTGRES_12
         databases:
-          - name: database
+          - name: db
   azure:
     application:
       enabled: true
