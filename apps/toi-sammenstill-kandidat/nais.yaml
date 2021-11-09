@@ -33,15 +33,10 @@ spec:
     sqlInstances:
       - type: POSTGRES_12
         databases:
-          - name: toi-sammenstill-kandidat
-        cascadingDelete: true
+          - name: database
   azure:
     application:
       enabled: true
-  accessPolicy:
-    outbound:
-      rules:
-      - application: toi-sammenstill-kandidat-mongodb
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid
