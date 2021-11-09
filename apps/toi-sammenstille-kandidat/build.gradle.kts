@@ -1,8 +1,13 @@
+val postgresVersion = "42.2.18"
+val hikariVersion = "4.0.2"
+val flywayVersion = "7.5.3"
+
 plugins {
     id("toi.rapids-and-rivers")
 }
 
 dependencies {
-    implementation("org.mongodb:mongo-java-driver:3.12.10")
-    implementation("org.litote.kmongo:kmongo:4.3.0")
+    implementation("org.postgresql:postgresql:$postgresVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
 }

@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
-import org.bson.types.ObjectId
 
 class Behandler(val repository: Repository, val publiserHendelse: (String) -> Unit) {
 
@@ -13,8 +13,8 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
         log.info("Hentet kandidat: $kandidat")
 
         val oppdatertKandidat = when (hendelse.hendelseType) {
-            HendelseType.CV -> kandidat.copy(cv = hendelse.jsonMessage)
-            HendelseType.VEILEDER -> kandidat.copy(veileder = hendelse.jsonMessage)
+            HendelseType.CV -> kandidat.copy(cv = hendelse.jsonMessage["cv"].toString())
+            HendelseType.VEILEDER -> kandidat.copy(veileder = hendelse.jsonMessage.toJson())
         }
 
         repository.lagreKandidat(oppdatertKandidat)
@@ -28,13 +28,20 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
 
 data class Kandidat(
     val aktørId: String,
-    val cv: JsonMessage? = null,
-    val veileder: JsonMessage? = null
+    val cv: String? = null,
+    val veileder: String? = null
 ) {
     @JsonProperty("@event_name")
     private val event_name = "Kandidat.sammenstilltKandidat"
 
-    fun toJson(): String = jacksonObjectMapper().writeValueAsString(this)
+    companion object {
+        private val objectMapper = jacksonObjectMapper()
+        fun fraJson(json:String) = objectMapper.readTree(json).let {
+            Kandidat(it["aktørId"].asText(), it["cv"].toString(),it["veileder"].toString())
+        }
+    }
+
+    fun toJson(): String = objectMapper.writeValueAsString(this)
 
     val erKomplett = cv != null && veileder != null
 }

@@ -4,13 +4,15 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-fun startApp() = RapidApplication.create(System.getenv()).also {
-    //val behandler =  Behandler( repository, rapid::publish)
-    //VeilederLytter(rapid, behandler)
-    //CvLytter(rapid, behandler)
+fun startApp(repository: Repository) = RapidApplication.create(System.getenv()).also { rapid ->
+    val behandler =  Behandler(repository, rapid::publish)
+    VeilederLytter(rapid, behandler)
+    CvLytter(rapid, behandler)
 }.start()
 
-fun main() = startApp()
+fun main() = startApp(lagRepository())
+
+fun lagRepository() = Repository(DatabaseKonfigurasjon(System.getenv()).lagDatasource())
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
