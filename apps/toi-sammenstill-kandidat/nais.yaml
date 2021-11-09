@@ -34,6 +34,7 @@ spec:
       - type: POSTGRES_12
         databases:
           - name: toi-sammenstill-kandidat
+        cascadingDelete: true
   azure:
     application:
       enabled: true
