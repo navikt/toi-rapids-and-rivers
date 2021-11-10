@@ -33,7 +33,7 @@ class Repository(private val dataSource: DataSource) {
 
     fun lagreKandidat(kandidat: Kandidat) {
         dataSource.connection.use {
-            it.prepareStatement("insert into sammenstiltkandidat(aktorid, nyeste) VALUES (?,?) ON CONFLICT (aktorid) DO UPDATE SET nyeste = ?")
+            it.prepareStatement("insert into sammenstiltkandidat(aktorid, kandidat) VALUES (?,?) ON CONFLICT (aktorid) DO UPDATE SET nyeste = ?")
         }.apply {
             setString(1, kandidat.aktørId)
             setString(2, kandidat.toJson())
@@ -42,7 +42,7 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun hentKandidat(aktørId: String) = dataSource.connection.use {
-        it.prepareStatement("select nyeste from sammenstiltkandidat where aktorid = ?")
+        it.prepareStatement("select kandidat from sammenstiltkandidat where aktorid = ?")
     }.apply {
         setString(1, aktørId)
         execute()
