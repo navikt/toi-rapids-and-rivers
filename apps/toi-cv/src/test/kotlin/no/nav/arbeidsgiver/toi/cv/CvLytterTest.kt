@@ -18,7 +18,7 @@ import java.time.Period
 class CvLytterTest {
 
 
-//    @Test
+    @Test
     fun  `Lesing av melding på CV-topic skal føre til at en tilsvarende melding blir publisert på rapid`() {
         val consumer = mockConsumer()
         val cvLytter = CvLytter(consumer)
@@ -34,10 +34,10 @@ class CvLytterTest {
         assertThat(inspektør.size).isEqualTo(1)
 
         val cvJson = inspektør.message(0)
-        val aktørIdPåRapidMelding = cvJson.get("@aktør_id").asText()
+        val aktørIdPåRapidMelding = cvJson.get("aktørId").asText()
         assertThat(aktørIdPåRapidMelding).isEqualTo(aktørId)
 
-        val cvMelding = cvJson.get("@cv_melding")
+        val cvMelding = cvJson.get("cv")
         val meldingPåRapid = objectMapper.treeToValue(cvMelding, Melding::class.java)
 
         assertThat(meldingPåRapid.aktoerId).isEqualTo(melding.aktoerId)
