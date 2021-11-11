@@ -7,13 +7,11 @@ import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
-    private val host = env["NAIS_DATABASE_MYAPP_MYDB_HOST"] ?: throw Exception("Hostnavn for database er ikke angitt")
-    private val port = env["NAIS_DATABASE_MYAPP_MYDB_PORT"] ?: throw Exception("Portnummer for database er ikke angitt")
-    private val database = env["NAIS_DATABASE_MYAPP_MYDB_DATABASE"] ?: throw Exception("Database-navn er ikke angitt")
-    private val username =
-        env["NAIS_DATABASE_MYAPP_MYDB_USERNAME"] ?: throw Exception("Database-brukernavn er ikke angitt")
-    private val password =
-        env["NAIS_DATABASE_MYAPP_MYDB_PASSWORD"] ?: throw Exception("Database-passord er ikke angitt")
+    private val host = env.variable("NAIS_DATABASE_MYAPP_MYDB_HOST")
+    private val port = env.variable("NAIS_DATABASE_MYAPP_MYDB_PORT")
+    private val database = env.variable("NAIS_DATABASE_MYAPP_MYDB_DATABASE")
+    private val username = env.variable("NAIS_DATABASE_MYAPP_MYDB_USERNAME")
+    private val password = env.variable("NAIS_DATABASE_MYAPP_MYDB_PASSWORD")
 
     fun lagDatasource() = HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://$host:$port/$database"
@@ -27,13 +25,19 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
 
 class Repository(private val dataSource: DataSource) {
 
+    private val aktørIdKolonne = "aktor_id"
+    private val kandidatKolonne = "kandidat"
+
     init {
         kjørFlywayMigreringer()
     }
 
     fun lagreKandidat(kandidat: Kandidat) {
         dataSource.connection.use {
-            it.prepareStatement("insert into sammenstiltkandidat(aktorid, kandidat) VALUES (?,?) ON CONFLICT (aktorid) DO UPDATE SET nyeste = ?")
+            it.prepareStatement("""
+                insert into sammenstiltkandidat($aktørIdKolonne, $kandidatKolonne) 
+                VALUES (?,?) 
+                ON CONFLICT (aktorid) DO UPDATE SET $kandidatKolonne = ?""".trimIndent())
         }.apply {
             setString(1, kandidat.aktørId)
             setString(2, kandidat.toJson())
@@ -42,7 +46,7 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun hentKandidat(aktørId: String) = dataSource.connection.use {
-        it.prepareStatement("select kandidat from sammenstiltkandidat where aktorid = ?")
+        it.prepareStatement("select $kandidatKolonne from sammenstiltkandidat where aktorid = ?")
     }.apply {
         setString(1, aktørId)
         execute()
@@ -59,5 +63,7 @@ class Repository(private val dataSource: DataSource) {
 }
 
 typealias AktøridHendelse = Pair<String, JsonMessage>
+
+private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
 
 

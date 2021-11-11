@@ -1,4 +1,4 @@
 CREATE TABLE sammenstiltkandidat (
-    aktorid TEXT PRIMARY KEY,
+    aktor_id TEXT PRIMARY KEY,
     kandidat TEXT
 );
