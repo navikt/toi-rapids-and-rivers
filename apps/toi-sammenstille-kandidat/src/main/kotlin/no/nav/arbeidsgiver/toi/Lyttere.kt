@@ -17,7 +17,7 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
     }
 
     override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        log.error("CvLytter onSevere", error)
+        log.error("CvLytter onSevere: ${error.problems.toExtendedReport()}", error)
         super.onSevere(error, context)
     }
 
@@ -44,7 +44,7 @@ class VeilederLytter(
     }
 
     override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        log.error("VeikederLytter onSevere", error)
+        log.error("VeikederLytter onSevere: ${error.problems.toExtendedReport()}", error)
         super.onSevere(error, context)
     }
 
