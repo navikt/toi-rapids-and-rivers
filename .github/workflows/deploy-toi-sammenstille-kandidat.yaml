@@ -7,7 +7,7 @@ env:
 on:
   push:
     branches:
-      - mainDisableForNow
+      - main
     paths:
       - apps/toi-sammenstille-kandidat/**
       - .github/workflows/deploy-toi-sammenstille-kandidat.yaml
