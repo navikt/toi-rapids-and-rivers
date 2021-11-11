@@ -1,9 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.*
 
 class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behandler) : River.PacketListener {
     init {
@@ -17,6 +14,16 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         behandler.behandleHendelse(Hendelse(CvHendelse, packet["aktørId"].asText() , packet))
+    }
+
+    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
+        log.error("CvLytter onSevere", error)
+        super.onSevere(error, context)
+    }
+
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        log.error("CvLytter onError ${problems.toExtendedReport()}")
+        super.onError(problems, context)
     }
 }
 
@@ -34,5 +41,15 @@ class VeilederLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         behandler.behandleHendelse(Hendelse(VeilederHendelse, packet["aktørId"].asText(), packet ))
+    }
+
+    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
+        log.error("VeikederLytter onSevere", error)
+        super.onSevere(error, context)
+    }
+
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        log.error("VeikederLytter onError ${problems.toExtendedReport()}")
+        super.onError(problems, context)
     }
 }
