@@ -27,14 +27,14 @@ class SammenstillTest {
 
     private fun veilederMelding(aktørId: String, rapid: RapidsConnection) = """
         {
-            "@event_name": "Kandidat.ny_veileder",
+            "@event_name": "veileder",
             "aktørId": "$aktørId"
         }
     """.trimIndent()
 
     private fun cvMelding(aktørId: String, rapid: RapidsConnection) = """
         {
-            "@event_name": "Kandidat.NyFraArbeidsplassen",
+            "@event_name": "cv",
             "aktørId": "$aktørId"
         }
     """.trimIndent()

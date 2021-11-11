@@ -1,5 +1,5 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-arbeidsplassen-cv-reader-rapidconsumer-2
-arbeidsplassen_cv_kafka_group: arbeidsplassen-cv-kafkagroup-id-1
+arbeidsplassen_cv_kafka_group: arbeidsplassen-cv-kafkagroup-id-2
 kafka-bootstrap-on-prem-url: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
 schema-on-prem-url: https://kafka-schema-registry.nais-q.adeo.no

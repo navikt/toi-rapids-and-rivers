@@ -9,7 +9,7 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("@event_name", "Kandidat.NyFraArbeidsplassen")
+                it.demandValue("@event_name", "cv")
                 it.demandKey("aktørId")
             }
         }.register(this)
@@ -26,7 +26,7 @@ class VeilederLytter(
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("@event_name", "Kandidat.ny_veileder")
+                it.demandValue("@event_name", "veileder")
                 it.demandKey("aktørId")
             }
         }.register(this)

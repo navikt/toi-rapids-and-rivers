@@ -6,9 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.arbeid.cv.avro.Melding
 
-class NyKandidatHendelse(melding: Melding) {
+class Cv(melding: Melding) {
     @JsonProperty("@event_name")
-    private val event_name = "Kandidat.NyFraArbeidsplassen"
+    private val event_name = "cv"
+
     val aktørId = melding.aktoerId
     val cv = melding
 
