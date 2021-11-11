@@ -22,6 +22,7 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
         initializationFailTimeout = 5000
         username = user
         password = pw
+        validate()
     }.let(::HikariDataSource)
 }
 
