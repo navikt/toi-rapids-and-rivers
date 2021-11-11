@@ -2,11 +2,13 @@ import no.nav.arbeidsgiver.toi.startApp
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class SammenstillTest {
 
     @Test
+    @Disabled
     fun `Når veileder og CV har blitt mottatt for kandidat skal ny melding publiseres på rapid`() { //TODO: bedre navn
         val testRapid = TestRapid()
         startApp(TestDatabase.dataSource, testRapid)
