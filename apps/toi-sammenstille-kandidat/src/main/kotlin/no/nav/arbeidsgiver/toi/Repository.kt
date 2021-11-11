@@ -10,8 +10,8 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
     private val host = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_HOST")
     private val port = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_PORT")
     private val database = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_DATABASE")
-    private val username = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_USERNAME")
-    private val password = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_PASSWORD")
+    private val user = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_USERNAME")
+    private val pw = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_PASSWORD")
 
 
     fun lagDatasource() = HikariConfig().apply {
@@ -20,6 +20,8 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
         maximumPoolSize = 2
         driverClassName = "org.postgresql.Driver"
         initializationFailTimeout = 5000
+        username = user
+        password = pw
     }.let(::HikariDataSource)
 }
 
