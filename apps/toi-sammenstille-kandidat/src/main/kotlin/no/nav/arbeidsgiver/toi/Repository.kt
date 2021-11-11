@@ -7,11 +7,11 @@ import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
-    private val host = env.variable("NAIS_DATABASE_MYAPP_MYDB_HOST")
-    private val port = env.variable("NAIS_DATABASE_MYAPP_MYDB_PORT")
-    private val database = env.variable("NAIS_DATABASE_MYAPP_MYDB_DATABASE")
-    private val username = env.variable("NAIS_DATABASE_MYAPP_MYDB_USERNAME")
-    private val password = env.variable("NAIS_DATABASE_MYAPP_MYDB_PASSWORD")
+    private val host = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_HOST")
+    private val port = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_PORT")
+    private val database = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_DATABASE")
+    private val username = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_USERNAME")
+    private val password = env.variable("NAIS_DATABASE_TOI_SAMMENSTILLE_KANDIDAT_DB_PASSWORD")
 
     fun lagDatasource() = HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://$host:$port/$database"
