@@ -14,6 +14,7 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
         minimumIdle = 1
         maximumPoolSize = 2
         driverClassName = "org.postgresql.Driver"
+        initializationFailTimeout = 5000
     }.let(::HikariDataSource)
 }
 
