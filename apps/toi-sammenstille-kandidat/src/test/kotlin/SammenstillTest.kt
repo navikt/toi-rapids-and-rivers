@@ -19,19 +19,52 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
         assertThat(rapidInspektør.message(0).get("cv")).isNotNull
         assertThat(rapidInspektør.message(0).get("cv").asText()).isNotEqualTo("null")
+        assertThat(rapidInspektør.message(0).get("cv").asText()).isEqualToIgnoringWhitespace(
+            """
+            {
+              "meldingstype": "SLETT",
+              "oppfolgingsinformasjon": null,
+              "opprettCv": null,
+              "endreCv": null,
+              "slettCv": null,
+              "opprettJobbprofil": null,
+              "endreJobbprofil": null,
+              "slettJobbprofil": null,
+              "aktoerId": "10000100000",
+              "sistEndret": 1.636718935195E9
+            }
+        """.trimIndent()
+        )
     }
 
     private fun veilederMelding(aktørId: String, rapid: RapidsConnection) = """
         {
             "@event_name": "veileder",
-            "aktørId": "$aktørId"
+            "aktørId": "$aktørId",
+            "veileder": {
+                "aktorId":"1000001002586",
+                "veilederId":"Z994526",
+                "tilordnet":"2020-12-21T10:58:19.023+01:00"
+            }
         }
     """.trimIndent()
 
     private fun cvMelding(aktørId: String, rapid: RapidsConnection) = """
         {
-            "@event_name": "cv",
-            "aktørId": "$aktørId"
+          "aktørId": "$aktørId",
+          "cv": {
+            "meldingstype": "SLETT",
+            "oppfolgingsinformasjon": null,
+            "opprettCv": null,
+            "endreCv": null,
+            "slettCv": null,
+            "opprettJobbprofil": null,
+            "endreJobbprofil": null,
+            "slettJobbprofil": null,
+            "aktoerId": "$aktørId",
+            "sistEndret": 1636718935.195
+          },
+          "@event_name": "cv"
         }
     """.trimIndent()
 }

@@ -14,7 +14,7 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
 
         repository.lagreKandidat(oppdatertKandidat)
         log.info("Har lagret kandidat: $oppdatertKandidat")
-        if (oppdatertKandidat.erKomplett) publiserHendelse(kandidat.toJson())
+        if (oppdatertKandidat.erKomplett) publiserHendelse(oppdatertKandidat.toJson())
     }
 
     private fun hentEllerLagTomKandidat(aktørId: String) =
