@@ -16,7 +16,7 @@ interface HendelseType {
 object VeilederHendelse : HendelseType {
     override fun populerKandidat(kandidat: Kandidat, jsonMessage: JsonMessage) =
         kandidat.copy(
-            veileder = jsonMessage.toString()
+            veileder = jsonMessage.toJson()
         )
 }
 

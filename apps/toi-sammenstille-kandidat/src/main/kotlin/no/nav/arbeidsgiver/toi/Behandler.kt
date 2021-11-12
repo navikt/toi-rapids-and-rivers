@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.helse.rapids_rivers.JsonMessage
 
 class Behandler(val repository: Repository, val publiserHendelse: (String) -> Unit) {
 
@@ -14,29 +14,12 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
 
         repository.lagreKandidat(oppdatertKandidat)
         log.info("Har lagret kandidat: $oppdatertKandidat")
-        if (oppdatertKandidat.erKomplett) publiserHendelse(oppdatertKandidat.toJson())
+
+        oppdatertKandidat.cv?.let { hendelse.jsonMessage["cv"] = it }
+        oppdatertKandidat.veileder?.let { hendelse.jsonMessage["veileder"] = it }
+        publiserHendelse(hendelse.jsonMessage.toJson())
     }
 
     private fun hentEllerLagTomKandidat(aktørId: String) =
         repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
-}
-
-data class Kandidat(
-    val aktørId: String,
-    val cv: String? = null,
-    val veileder: String? = null
-) {
-    @JsonProperty("@event_name")
-    private val event_name = "Kandidat.sammenstilltKandidat"
-
-    companion object {
-        private val objectMapper = jacksonObjectMapper()
-        fun fraJson(json:String) = objectMapper.readTree(json).let {
-            Kandidat(it["aktørId"].asText(), it["cv"].toString(),it["veileder"].toString())
-        }
-    }
-
-    fun toJson(): String = objectMapper.writeValueAsString(this)
-
-    val erKomplett = cv != null && veileder != null
 }

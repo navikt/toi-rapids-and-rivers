@@ -16,10 +16,27 @@ class SammenstillTest {
 
         Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
-        assertThat(rapidInspektør.size).isEqualTo(1)
-        assertThat(rapidInspektør.message(0).get("cv")).isNotNull
-        assertThat(rapidInspektør.message(0).get("cv").asText()).isNotEqualTo("null")
-        assertThat(rapidInspektør.message(0).get("cv").asText()).isEqualToIgnoringWhitespace(
+        assertThat(rapidInspektør.size).isEqualTo(2)
+
+        val veilederExpected = """
+            {
+              "@event_name": "veileder",
+              "aktørId": "10000100000",
+              "veileder": {
+                "aktorId": "1000001002586",
+                "veilederId": "Z994526",
+                "tilordnet": "2020-12-21T10:58:19.023+01:00"
+              },
+              "system_read_count": 0
+            }
+        """.trimIndent()
+        assertThat(rapidInspektør.message(0).get("@event_name").asText()).isEqualTo("veileder")
+        assertThat(rapidInspektør.message(0).get("cv")).isNull()
+        assertThat(rapidInspektør.message(0).get("veileder").asText()).isEqualToIgnoringWhitespace(veilederExpected)
+
+        assertThat(rapidInspektør.message(1).get("@event_name").asText()).isEqualTo("cv")
+        assertThat(rapidInspektør.message(1).get("veileder").asText()).isEqualToIgnoringWhitespace(veilederExpected)
+        assertThat(rapidInspektør.message(1).get("cv").asText()).isEqualToIgnoringWhitespace(
             """
             {
               "meldingstype": "SLETT",
