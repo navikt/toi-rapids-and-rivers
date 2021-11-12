@@ -17,7 +17,7 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
 
         oppdatertKandidat.cv?.let { hendelse.jsonMessage["cv"] = it }
         oppdatertKandidat.veileder?.let { hendelse.jsonMessage["veileder"] = it }
-        hendelse.jsonMessage["@event_name"] = hendelse.jsonMessage["@event_name"]+".sammenstilt"
+        hendelse.jsonMessage["@event_name"] = hendelse.jsonMessage["@event_name"].asText()+".sammenstilt"
         publiserHendelse(hendelse.jsonMessage.toJson())
     }
 

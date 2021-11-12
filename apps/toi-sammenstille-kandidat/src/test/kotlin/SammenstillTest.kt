@@ -30,11 +30,11 @@ class SammenstillTest {
               "system_read_count": 0
             }
         """.trimIndent()
-        assertThat(rapidInspektør.message(0).get("@event_name").asText()).isEqualTo("veileder")
+        assertThat(rapidInspektør.message(0).get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
         assertThat(rapidInspektør.message(0).get("cv")).isNull()
         assertThat(rapidInspektør.message(0).get("veileder").asText()).isEqualToIgnoringWhitespace(veilederExpected)
 
-        assertThat(rapidInspektør.message(1).get("@event_name").asText()).isEqualTo("cv")
+        assertThat(rapidInspektør.message(1).get("@event_name").asText()).isEqualTo("cv.sammenstilt")
         assertThat(rapidInspektør.message(1).get("veileder").asText()).isEqualToIgnoringWhitespace(veilederExpected)
         assertThat(rapidInspektør.message(1).get("cv").asText()).isEqualToIgnoringWhitespace(
             """
