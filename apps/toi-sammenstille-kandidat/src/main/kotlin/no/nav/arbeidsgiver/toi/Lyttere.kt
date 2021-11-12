@@ -8,6 +8,7 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
             validate {
                 it.demandValue("@event_name", "cv")
                 it.demandKey("aktørId")
+                it.interestedIn("cv")
             }
         }.register(this)
     }

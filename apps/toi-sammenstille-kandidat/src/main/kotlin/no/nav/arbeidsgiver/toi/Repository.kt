@@ -37,16 +37,23 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun lagreKandidat(kandidat: Kandidat) {
+        val kandidatFinnes = hentKandidat(kandidat.aktørId) != null
+
         dataSource.connection.use {
-            it.prepareStatement("""
-                insert into $sammenstiltkandidatTabell($aktørIdKolonne, $kandidatKolonne) 
-                VALUES (?,?) 
-                ON CONFLICT ($aktørIdKolonne) DO UPDATE SET $kandidatKolonne = ?""".trimIndent())
-        }.apply {
-            setString(1, kandidat.aktørId)
-            setString(2, kandidat.toJson())
-            setString(3, kandidat.toJson())
-        }.executeUpdate()
+            if (kandidatFinnes) {
+                it.prepareStatement("UPDATE $sammenstiltkandidatTabell SET $kandidatKolonne = ? WHERE $aktørIdKolonne = ?")
+                    .apply {
+                        setString(1, kandidat.toJson())
+                        setString(2, kandidat.aktørId)
+                    }
+            } else {
+                it.prepareStatement("insert into $sammenstiltkandidatTabell($aktørIdKolonne, $kandidatKolonne) VALUES (?,?)")
+                    .apply {
+                        setString(1, kandidat.aktørId)
+                        setString(2, kandidat.toJson())
+                    }
+            }.executeUpdate()
+        }
     }
 
     fun hentKandidat(aktørId: String) = dataSource.connection.use {

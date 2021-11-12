@@ -16,7 +16,6 @@ interface HendelseType {
 object VeilederHendelse : HendelseType {
     override fun populerKandidat(kandidat: Kandidat, jsonMessage: JsonMessage) =
         kandidat.copy(
-            cv = TODO("Oppdater veileder-felt i cv"),
             veileder = jsonMessage.toString()
         )
 }
