@@ -30,6 +30,7 @@ class Repository(private val dataSource: DataSource) {
 
     private val aktørIdKolonne = "aktor_id"
     private val kandidatKolonne = "kandidat"
+    private val sammenstiltkandidatTabell = "sammenstiltkandidat"
 
     init {
         kjørFlywayMigreringer()
@@ -38,9 +39,9 @@ class Repository(private val dataSource: DataSource) {
     fun lagreKandidat(kandidat: Kandidat) {
         dataSource.connection.use {
             it.prepareStatement("""
-                insert into sammenstiltkandidat($aktørIdKolonne, $kandidatKolonne) 
+                insert into $sammenstiltkandidatTabell($aktørIdKolonne, $kandidatKolonne) 
                 VALUES (?,?) 
-                ON CONFLICT (aktorid) DO UPDATE SET $kandidatKolonne = ?""".trimIndent())
+                ON CONFLICT ($aktørIdKolonne) DO UPDATE SET $kandidatKolonne = ?""".trimIndent())
         }.apply {
             setString(1, kandidat.aktørId)
             setString(2, kandidat.toJson())
@@ -49,12 +50,14 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun hentKandidat(aktørId: String) = dataSource.connection.use {
-        it.prepareStatement("select $kandidatKolonne from sammenstiltkandidat where aktorid = ?")
-    }.apply {
-        setString(1, aktørId)
-        execute()
-    }.executeQuery().let { resultSet ->
-        if (resultSet.next()) Kandidat.fraJson(resultSet.getString(1)) else null
+        val statement =
+            it.prepareStatement("select $kandidatKolonne from $sammenstiltkandidatTabell where $aktørIdKolonne = ?")
+        statement.setString(1, aktørId)
+        val resultSet = statement.executeQuery()
+        if (resultSet.next())
+            Kandidat.fraJson(resultSet.getString(1))
+        else null
+
     }
 
     private fun kjørFlywayMigreringer() {
