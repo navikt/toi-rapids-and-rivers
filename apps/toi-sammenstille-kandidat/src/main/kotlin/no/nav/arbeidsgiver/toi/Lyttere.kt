@@ -41,11 +41,6 @@ class VeilederLytter(
         behandler.behandleHendelse(Hendelse(VeilederHendelse, packet["aktørId"].asText(), packet ))
     }
 
-    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        log.error("VeikederLytter onSevere: ${error.problems.toExtendedReport()}", error)
-        super.onSevere(error, context)
-    }
-
     override fun onError(problems: MessageProblems, context: MessageContext) {
         log.error("VeikederLytter onError ${problems.toExtendedReport()}")
         super.onError(problems, context)
