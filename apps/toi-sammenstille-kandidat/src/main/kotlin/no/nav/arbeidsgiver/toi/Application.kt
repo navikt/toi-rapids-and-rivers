@@ -10,13 +10,17 @@ fun startApp(
     datasource: DataSource,
     rapidsConnection: RapidsConnection
 ) {
-    rapidsConnection.also { rapid ->
-        val behandler = Behandler(
-            Repository(datasource), rapid::publish
-        )
-        VeilederLytter(rapid, behandler)
-        CvLytter(rapid, behandler)
-    }.start()
+    try {
+        rapidsConnection.also { rapid ->
+            val behandler = Behandler(
+                Repository(datasource), rapid::publish
+            )
+            VeilederLytter(rapid, behandler)
+            CvLytter(rapid, behandler)
+        }.start()
+    } catch (t: Throwable) {
+        LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
+    }
 }
 
 
