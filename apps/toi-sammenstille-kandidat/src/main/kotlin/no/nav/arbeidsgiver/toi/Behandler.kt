@@ -1,8 +1,5 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.JsonMessage
-
 class Behandler(val repository: Repository, val publiserHendelse: (String) -> Unit) {
 
     fun behandleHendelse(hendelse: Hendelse) {

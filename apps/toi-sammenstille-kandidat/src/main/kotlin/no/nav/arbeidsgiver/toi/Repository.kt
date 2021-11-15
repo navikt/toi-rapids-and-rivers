@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -78,13 +79,13 @@ class Repository(private val dataSource: DataSource) {
 
 data class Kandidat(
     val aktørId: String,
-    val cv: String? = null,
-    val veileder: String? = null
+    val cv: JsonNode? = null,
+    val veileder: JsonNode? = null
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()
         fun fraJson(json:String) = objectMapper.readTree(json).let {
-            Kandidat(it["aktørId"].asText(), it["cv"].toString(),it["veileder"].toString())
+            Kandidat(it["aktørId"].asText(), it["cv"],it["veileder"])
         }
     }
     fun toJson(): String = """ {

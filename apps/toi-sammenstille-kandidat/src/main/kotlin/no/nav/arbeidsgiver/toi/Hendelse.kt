@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 
 data class Hendelse(val hendelseType: HendelseType, val aktørid: String, val jsonMessage: JsonMessage) {
@@ -16,11 +17,11 @@ interface HendelseType {
 object VeilederHendelse : HendelseType {
     override fun populerKandidat(kandidat: Kandidat, jsonMessage: JsonMessage) =
         kandidat.copy(
-            veileder = jsonMessage.toJson()
+            veileder = jacksonObjectMapper().readTree(jsonMessage.toJson())
         )
 }
 
 object CvHendelse : HendelseType {
     override fun populerKandidat(kandidat: Kandidat, jsonMessage: JsonMessage) =
-        kandidat.copy(cv = jsonMessage["cv"].toString())
+        kandidat.copy(cv = jsonMessage["cv"])
 }
