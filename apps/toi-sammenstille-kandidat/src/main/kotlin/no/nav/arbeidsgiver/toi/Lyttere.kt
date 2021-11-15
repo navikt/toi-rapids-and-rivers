@@ -14,7 +14,7 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        log.info("CvLytter.onPacket() ", packet.toJson())
+        log.info("CvLytter.onPacket()", packet.toJson())
         behandler.behandleHendelse(Hendelse(CvHendelse, packet["aktørId"].asText() , packet))
     }
 
