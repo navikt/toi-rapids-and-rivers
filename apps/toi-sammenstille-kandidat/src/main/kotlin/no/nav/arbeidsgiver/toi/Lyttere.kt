@@ -18,11 +18,6 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
         behandler.behandleHendelse(Hendelse(CvHendelse, packet["aktørId"].asText() , packet))
     }
 
-    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        log.error("CvLytter onSevere: ${error.problems.toExtendedReport()}", error)
-        super.onSevere(error, context)
-    }
-
     override fun onError(problems: MessageProblems, context: MessageContext) {
         log.error("CvLytter onError ${problems.toExtendedReport()}")
         super.onError(problems, context)
