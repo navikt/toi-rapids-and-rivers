@@ -4,8 +4,12 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
 
-class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection, producer: KafkaProducer<String, String>) :
+    River.PacketListener {
+
     init {
         River(rapidsConnection).apply {
             validate {
@@ -17,8 +21,12 @@ class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection) : Riv
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        // (Opprett nytt aiven topic)
-        // Send til nytt topic
+        if (packet["veileder"].isNull || packet["cv"].isNull) {
+            val feilmelding = "cv eller veileder kan ikke være null for aktørid ${packet["aktorId"]}"
+            log.error(feilmelding)
+            throw IllegalArgumentException(feilmelding)
+        }
+        producer.send(ProducerRecord("nyttopic-todo", packet.toJson()))
     }
 }
 
