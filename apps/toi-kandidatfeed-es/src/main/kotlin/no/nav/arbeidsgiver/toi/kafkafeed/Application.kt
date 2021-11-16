@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kafkafeedes
+package no.nav.arbeidsgiver.toi.kafkafeed
 
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
