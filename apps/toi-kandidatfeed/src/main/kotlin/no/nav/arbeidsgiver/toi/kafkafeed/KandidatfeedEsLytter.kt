@@ -13,7 +13,7 @@ class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection, priva
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandKey("aktorId")
+                it.demandKey("aktørId")
                 it.demandKey("veileder")
                 it.demandKey("cv")
             }
@@ -26,7 +26,7 @@ class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection, priva
             log.error(feilmelding)
             throw IllegalArgumentException(feilmelding)
         }
-        log.info("Fikk melding for aktorid ${packet["aktorId"]}")
+        log.info("Fikk melding for aktørId ${packet["aktørId"]}")
         producer.send(ProducerRecord("toi-kandidat-1", packet.toJson()))
     }
 }
