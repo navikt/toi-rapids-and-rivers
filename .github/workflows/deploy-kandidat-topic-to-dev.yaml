@@ -1,0 +1,20 @@
+name: Deploy topics to dev
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - apps/toi-kandidatfeed/topic-kandidat-dev.yml
+
+jobs:
+  deploy-rapid-to-dev:
+    name: Deploy rapid to dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: nais/deploy/actions/deploy@master
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: topic-dev.yml
