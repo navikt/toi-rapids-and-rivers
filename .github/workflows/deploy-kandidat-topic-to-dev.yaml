@@ -1,4 +1,4 @@
-name: Deploy topics to dev
+name: Deploy kandidat topic to dev
 
 on:
   push:
