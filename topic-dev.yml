@@ -19,16 +19,16 @@ spec:
   acl:
     - team: toi
       application: toi-cv
-      access: readwrite # read, write, readwrite
+      access: readwrite
     - team: toi
       application: toi-veileder
-      access: readwrite # read, write, readwrite
+      access: readwrite
     - team: toi
       application: toi-sammenstille-kandidat
-      access: readwrite # read, write, readwrite
+      access: readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
-      access: readwrite # read, write, readwrite
+      access: readwrite
     - team: toi
       application: toi-kandidatfeed
-      access: read # read, write, readwrite
+      access: readwrite
