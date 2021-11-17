@@ -8,7 +8,7 @@ on:
       - apps/toi-kandidatfeed/topic-kandidat-dev.yml
 
 jobs:
-  deplo-kandidat-topic-to-dev:
+  deploy-kandidat-topic-to-dev:
     name: Deploy kandidat topic to dev
     runs-on: ubuntu-latest
     steps:
