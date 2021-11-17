@@ -5,6 +5,8 @@ metadata:
   namespace: toi
   labels:
     team: toi
+  annotations:
+    kafka.nais.io/removeDataWhenResourceIsDeleted: "false"
 spec:
   pool: nav-dev
   config: # optional; all fields are optional too

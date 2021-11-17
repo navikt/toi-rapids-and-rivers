@@ -17,4 +17,4 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: topic-kandidat-dev.yml
+          RESOURCE: apps/toi-kandidatfeed/topic-kandidat-dev.yml
