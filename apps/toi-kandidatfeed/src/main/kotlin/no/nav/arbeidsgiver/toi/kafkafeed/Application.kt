@@ -5,11 +5,8 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
-val producer = KafkaProducer<String, String>(producerConfig)
-
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    KandidatfeedEsLytter(rapidsConnection, producer)
+    KandidatfeedEsLytter(rapidsConnection, KafkaProducer<String, String>(producerConfig))
 }.start()
 
 val Any.log: Logger
