@@ -27,7 +27,7 @@ class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection, priva
             throw IllegalArgumentException(feilmelding)
         }
         log.info("Fikk melding for aktørId ${packet["aktørId"]}")
-        producer.send(ProducerRecord("toi-kandidat-1", packet.toJson()))
+        producer.send(ProducerRecord("toi.kandidat-1", packet.toJson()))
     }
 }
 
