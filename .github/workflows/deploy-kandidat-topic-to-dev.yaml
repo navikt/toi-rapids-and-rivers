@@ -8,8 +8,8 @@ on:
       - apps/toi-kandidatfeed/topic-kandidat-dev.yml
 
 jobs:
-  deploy-rapid-to-dev:
-    name: Deploy rapid to dev
+  deplo-kandidat-topic-to-dev:
+    name: Deploy kandidat topic to dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -17,4 +17,4 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: topic-dev.yml
+          RESOURCE: topic-kandidat-dev.yml
