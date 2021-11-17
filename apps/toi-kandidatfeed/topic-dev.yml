@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: todo  # Todo: Finn et navn
+  name: toi-kandidat-1  # Todo: Finn et navn
   namespace: toi
   labels:
     team: toi
@@ -10,16 +10,19 @@ metadata:
 spec:
   pool: nav-dev
   config: # optional; all fields are optional too
-    cleanupPolicy: delete
+    cleanupPolicy: compact,delete
     minimumInSyncReplicas: 1
     partitions: 1
     replication: 3
     retentionBytes: -1 # -1 means unlimited
-    retentionHours: 336 # 336 = 14 dager
+    retentionHours: -1 # -1 means unlimited
   acl:
     - team: toi
-      application: toi-kandidatfeed-es
+      application: toi-kandidatfeed-
       access: readwrite # read, write, readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite # read, write, readwrite
+    - team: arbeidsgiver
+      application: rekrutteringsbistand-kandidat-indekser
+      access: read # read, write, readwrite

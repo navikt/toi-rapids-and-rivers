@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: toi-kafkafeed-es
+  name: toi-kandidatfeed
   namespace: toi
   labels:
     team: toi
