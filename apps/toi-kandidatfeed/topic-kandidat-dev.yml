@@ -23,6 +23,6 @@ spec:
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite
-    - team: toi
+    - team: arbeidsgiver
       application: rekrutteringsbistand-kandidat-indekser
       access: read
