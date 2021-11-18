@@ -95,11 +95,3 @@ private fun melding(aktørIdValue: String) = Melding().apply {
 
 private val objectMapper = ObjectMapper()
     .registerModule(JavaTimeModule())
-    .addMixIn(Object::class.java, AvroMixIn::class.java)
-
-abstract class AvroMixIn {
-    @JsonIgnore
-    abstract fun getSchema(): org.apache.avro.Schema
-    @JsonIgnore
-    abstract fun getSpecificData() : org.apache.avro.specific.SpecificData
-}
