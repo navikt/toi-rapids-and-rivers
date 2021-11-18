@@ -9,7 +9,7 @@ metadata:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "false"
 spec:
   pool: nav-dev
-  config: # optional; all fields are optional too
+  config:
     cleanupPolicy: compact,delete
     minimumInSyncReplicas: 1
     partitions: 1
@@ -19,10 +19,10 @@ spec:
   acl:
     - team: toi
       application: toi-kandidatfeed
-      access: readwrite # read, write, readwrite
+      access: readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
-      access: readwrite # read, write, readwrite
-    - team: arbeidsgiver
+      access: readwrite
+    - team: toi
       application: rekrutteringsbistand-kandidat-indekser
-      access: read # read, write, readwrite
+      access: read
