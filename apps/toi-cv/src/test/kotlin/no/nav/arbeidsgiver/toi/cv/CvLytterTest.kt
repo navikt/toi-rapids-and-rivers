@@ -33,17 +33,22 @@ class CvLytterTest {
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
-        val cvJson = inspektør.message(0)
-        val aktørIdPåRapidMelding = cvJson.get("aktørId").asText()
+        val meldingJson = inspektør.message(0)
+
+        assertThat(meldingJson.get("@event_name")).isEqualTo("cv")
+        assertThat(meldingJson.get("cv")).isNotNull
+        assertThat(meldingJson.get("aktørId")).isNotNull
+
+        val aktørIdPåRapidMelding = meldingJson.get("aktørId").asText()
         assertThat(aktørIdPåRapidMelding).isEqualTo(aktørId)
 
-        val cvMelding = cvJson.get("cv")
-        val meldingPåRapid = objectMapper.treeToValue(cvMelding, Melding::class.java)
+        val cvMeldingJson = meldingJson.get("cv")
+        val cvMelding = objectMapper.treeToValue(cvMeldingJson, Melding::class.java)
 
-        assertThat(meldingPåRapid.aktoerId).isEqualTo(melding.aktoerId)
-        assertThat(meldingPåRapid.opprettCv.cv.etternavn).isEqualTo("Testetternavn")
-        assertThat(meldingPåRapid.opprettJobbprofil.jobbprofil.kompetanser).containsExactly("testkompetanse")
-        assertThat(meldingPåRapid.oppfolgingsinformasjon.oppfolgingskontor).isEqualTo("testkontor")
+        assertThat(cvMelding.aktoerId).isEqualTo(melding.aktoerId)
+        assertThat(cvMelding.opprettCv.cv.etternavn).isEqualTo("Testetternavn")
+        assertThat(cvMelding.opprettJobbprofil.jobbprofil.kompetanser).containsExactly("testkompetanse")
+        assertThat(cvMelding.oppfolgingsinformasjon.oppfolgingskontor).isEqualTo("testkontor")
     }
 }
 
