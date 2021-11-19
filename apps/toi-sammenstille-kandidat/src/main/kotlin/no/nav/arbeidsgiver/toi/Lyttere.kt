@@ -31,6 +31,7 @@ class VeilederLytter(
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "veileder")
+                it.demandKey("veileder")
                 it.demandKey("aktørId")
             }
         }.register(this)

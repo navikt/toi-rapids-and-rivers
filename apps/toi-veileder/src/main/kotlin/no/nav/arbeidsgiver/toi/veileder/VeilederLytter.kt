@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.veileder
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -23,17 +22,17 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val melding = mapOf(
             "aktørId" to packet["aktorId"],
-            "veileder" to packet.fjernMetadata(),
+            "veileder" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "veileder",
         )
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
     }
 
-    private fun JsonMessage.fjernMetadata(): JsonNode {
+    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson())
         val alleFelter = jsonNode.fieldNames().asSequence().toList()
-        val metadataFelter = listOf("system_read_count")
+        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
         val aktuelleFelter = alleFelter.filter { !metadataFelter.contains(it) }
 
         val rotNode = jacksonObjectMapper().createObjectNode()

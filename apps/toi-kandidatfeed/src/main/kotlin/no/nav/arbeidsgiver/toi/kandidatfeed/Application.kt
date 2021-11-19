@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kafkafeed
+package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    KandidatfeedEsLytter(rapidsConnection, KafkaProducer<String, String>(producerConfig))
+    KandidatfeedLytter(rapidsConnection, KafkaProducer<String, String>(producerConfig))
 }.start()
 
 val Any.log: Logger

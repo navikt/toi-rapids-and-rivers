@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kafkafeed
+package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig

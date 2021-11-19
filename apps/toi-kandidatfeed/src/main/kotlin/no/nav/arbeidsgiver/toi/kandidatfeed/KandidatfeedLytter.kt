@@ -1,13 +1,14 @@
-package no.nav.arbeidsgiver.toi.kafkafeed
+package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-class KandidatfeedEsLytter(private val rapidsConnection: RapidsConnection, private val producer: KafkaProducer<String, String>) :
+class KandidatfeedLytter(private val rapidsConnection: RapidsConnection, private val producer: Producer<String, String>) :
     River.PacketListener {
 
     init {
