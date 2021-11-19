@@ -35,6 +35,13 @@ class CvLytterTest {
 
         val meldingJson = inspektør.message(0)
 
+        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+            "@event_name",
+            "cv",
+            "aktørId",
+            "system_read_count"
+        )
+
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("cv")
         assertThat(meldingJson.get("cv")).isNotNull
         assertThat(meldingJson.get("aktørId")).isNotNull
