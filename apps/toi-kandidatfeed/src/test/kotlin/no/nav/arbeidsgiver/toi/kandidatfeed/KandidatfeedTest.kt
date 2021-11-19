@@ -2,28 +2,33 @@ package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.producer.MockProducer
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class KandidatfeedTest {
 
     @Test
     fun `Lesing av melding fra rapid skal produsere melding på nytt topic`() {
-        val rapid = TestRapid()
+        val testrapid = TestRapid()
         val producer = MockProducer<String, String>()
-        KandidatfeedLytter(rapid, producer)
+        val lytter = KandidatfeedLytter(testrapid, producer)
 
-        rapid.sendTestMessage(rapidMelding())
-        
+        testrapid.sendTestMessage(rapidMelding())
+
+        Thread.sleep(500)
 
 
+        assertThat(testrapid.inspektør.size).isEqualTo(1)
+
+        assertThat(producer.history().size).isEqualTo(1)
+        val melding = producer.history()[0]
+
+        assertThat(melding.key()).isEqualTo("aktørId")
+        assertThat(melding.value()).isEqualTo(rapidMelding())
     }
 
-
-    fun rapidMelding(): String =
-        """
-            {
-              "aktørId": "2490025158176",
-              "cv": {
+    private val cv = """
+        {
                 "meldingstype": "SLETT",
                 "oppfolgingsinformasjon": null,
                 "opprettCv": null,
@@ -32,9 +37,24 @@ class KandidatfeedTest {
                 "opprettJobbprofil": null,
                 "endreJobbprofil": null,
                 "slettJobbprofil": null,
-                "aktoerId": "2490025158176",
+                "aktoerId": "123",
                 "sistEndret": 1637238150.172
-              },
+              }
+    """.trimIndent()
+
+    private val veileder = """
+        "veileder":         {
+                 "aktorId":"123",
+                 "veilederId":"A123123",
+                 "tilordnet":"2021-11-19T13:18:03.307756228"
+             }
+    """.trimIndent()
+
+    fun rapidMelding(): String =
+        """
+            {
+              "aktørId": "123",
+              "cv": $cv,
               "@event_name": "cv.sammenstilt",
               "system_read_count": 1,
               "system_participating_services": [
@@ -49,11 +69,7 @@ class KandidatfeedTest {
                   "time": "2021-11-19T13:18:03.307756227"
                 }
               ],
-              "veileder":         {
-                 "aktorId":"123",
-                 "veilederId":"A123123",
-                 "tilordnet":"2021-11-19T13:18:03.307756228"
-             }
+              "veileder":  $veileder
             }
         """.trimIndent()
 }
