@@ -35,7 +35,7 @@ class CvLytterTest {
 
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.get("@event_name")).isEqualTo("cv")
+        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("cv")
         assertThat(meldingJson.get("cv")).isNotNull
         assertThat(meldingJson.get("aktørId")).isNotNull
 
