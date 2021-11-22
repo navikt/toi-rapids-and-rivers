@@ -7,11 +7,9 @@ import org.junit.jupiter.api.Test
 
 class SammenstillTest {
 
-
-
     @Test
     fun `Når veileder og CV har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
-        val aktørId = "10000100000"
+        val aktørId = "12141321"
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(veilederMelding(aktørId, testRapid))
@@ -21,32 +19,34 @@ class SammenstillTest {
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(2)
 
-        assertThat(rapidInspektør.message(0).get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
-        assertThat(rapidInspektør.message(0).has("cv")).isFalse
-        assertThat(rapidInspektør.message(0).get("veileder").get("aktørId").asText()).isEqualTo("10000100000")
-        assertThat(rapidInspektør.message(0).get("veileder").get("veileder").get("aktorId").asText()).isEqualTo("1000001002586")
-        assertThat(rapidInspektør.message(0).get("veileder").get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
-        assertThat(rapidInspektør.message(0).get("veileder").get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
+        val førsteMelding = rapidInspektør.message(0)
+        assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
+        assertThat(førsteMelding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(førsteMelding.has("cv")).isFalse
+        assertThat(førsteMelding.get("veileder").get("aktorId").asText()).isEqualTo(aktørId)
+        assertThat(førsteMelding.get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
+        assertThat(førsteMelding.get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
 
-        assertThat(rapidInspektør.message(1).get("@event_name").asText()).isEqualTo("cv.sammenstilt")
-        assertThat(rapidInspektør.message(1).get("aktørId").asText()).isEqualTo("10000100000")
-        assertThat(rapidInspektør.message(1).get("veileder").get("veileder").get("aktorId").asText()).isEqualTo("1000001002586")
-        assertThat(rapidInspektør.message(1).get("veileder").get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
-        assertThat(rapidInspektør.message(1).get("veileder").get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
-        assertThat(rapidInspektør.message(1).get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
-        assertTrue(rapidInspektør.message(1).get("cv").get("oppfolgingsinformasjon").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("opprettCv").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("endreCv").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("slettCv").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("opprettJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("endreJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("slettJobbprofil").isNull)
-        assertThat(rapidInspektør.message(1).get("cv").get("aktoerId").asText()).isEqualTo("10000100000")
+        val andreMelding = rapidInspektør.message(1)
+        assertThat(andreMelding.get("@event_name").asText()).isEqualTo("cv.sammenstilt")
+        assertThat(andreMelding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(andreMelding.get("veileder").get("aktorId").asText()).isEqualTo(aktørId)
+        assertThat(andreMelding.get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
+        assertThat(andreMelding.get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
+        assertThat(andreMelding.get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
+        assertTrue(andreMelding.get("cv").get("oppfolgingsinformasjon").isNull)
+        assertTrue(andreMelding.get("cv").get("opprettCv").isNull)
+        assertTrue(andreMelding.get("cv").get("endreCv").isNull)
+        assertTrue(andreMelding.get("cv").get("slettCv").isNull)
+        assertTrue(andreMelding.get("cv").get("opprettJobbprofil").isNull)
+        assertTrue(andreMelding.get("cv").get("endreJobbprofil").isNull)
+        assertTrue(andreMelding.get("cv").get("slettJobbprofil").isNull)
+        assertThat(andreMelding.get("cv").get("aktoerId").asText()).isEqualTo(aktørId)
     }
 
     @Test
     fun `Når cv og veileder har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
-        val aktørId = "10000100000"
+        val aktørId = "12141321"
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(cvMelding(aktørId, testRapid))
@@ -57,38 +57,40 @@ class SammenstillTest {
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(2)
 
-        assertThat(rapidInspektør.message(0).get("@event_name").asText()).isEqualTo("cv.sammenstilt")
-        assertThat(rapidInspektør.message(0).get("aktørId").asText()).isEqualTo("10000100000")
-        assertThat(rapidInspektør.message(0).has("veileder")).isFalse
-        assertThat(rapidInspektør.message(0).get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
-        assertTrue(rapidInspektør.message(0).get("cv").get("oppfolgingsinformasjon").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("opprettCv").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("endreCv").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("slettCv").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("opprettJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("endreJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("slettJobbprofil").isNull)
-        assertThat(rapidInspektør.message(0).get("cv").get("aktoerId").asText()).isEqualTo("10000100000")
+        val førsteMelding = rapidInspektør.message(0)
+        assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("cv.sammenstilt")
+        assertThat(førsteMelding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(førsteMelding.has("veileder")).isFalse
+        assertThat(førsteMelding.get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
+        assertTrue(førsteMelding.get("cv").get("oppfolgingsinformasjon").isNull)
+        assertTrue(førsteMelding.get("cv").get("opprettCv").isNull)
+        assertTrue(førsteMelding.get("cv").get("endreCv").isNull)
+        assertTrue(førsteMelding.get("cv").get("slettCv").isNull)
+        assertTrue(førsteMelding.get("cv").get("opprettJobbprofil").isNull)
+        assertTrue(førsteMelding.get("cv").get("endreJobbprofil").isNull)
+        assertTrue(førsteMelding.get("cv").get("slettJobbprofil").isNull)
+        assertThat(førsteMelding.get("cv").get("aktoerId").asText()).isEqualTo(aktørId)
 
-        assertThat(rapidInspektør.message(1).get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
-        assertThat(rapidInspektør.message(1).get("veileder").get("aktørId").asText()).isEqualTo("10000100000")
-        assertThat(rapidInspektør.message(1).get("veileder").get("veileder").get("aktorId").asText()).isEqualTo("1000001002586")
-        assertThat(rapidInspektør.message(1).get("veileder").get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
-        assertThat(rapidInspektør.message(1).get("veileder").get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
-        assertThat(rapidInspektør.message(1).get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
-        assertTrue(rapidInspektør.message(1).get("cv").get("oppfolgingsinformasjon").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("opprettCv").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("endreCv").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("slettCv").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("opprettJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("endreJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(1).get("cv").get("slettJobbprofil").isNull)
-        assertThat(rapidInspektør.message(1).get("cv").get("aktoerId").asText()).isEqualTo("10000100000")
+        val andreMelding = rapidInspektør.message(1)
+        assertThat(andreMelding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(andreMelding.get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
+        assertThat(andreMelding.get("veileder").get("aktorId").asText()).isEqualTo(aktørId)
+        assertThat(andreMelding.get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
+        assertThat(andreMelding.get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
+        assertThat(andreMelding.get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
+        assertTrue(andreMelding.get("cv").get("oppfolgingsinformasjon").isNull)
+        assertTrue(andreMelding.get("cv").get("opprettCv").isNull)
+        assertTrue(andreMelding.get("cv").get("endreCv").isNull)
+        assertTrue(andreMelding.get("cv").get("slettCv").isNull)
+        assertTrue(andreMelding.get("cv").get("opprettJobbprofil").isNull)
+        assertTrue(andreMelding.get("cv").get("endreJobbprofil").isNull)
+        assertTrue(andreMelding.get("cv").get("slettJobbprofil").isNull)
+        assertThat(andreMelding.get("cv").get("aktoerId").asText()).isEqualTo(aktørId)
     }
 
     @Test
     fun `Når bare CV har blitt mottatt for kandidat skal ny melding publiseres på rapid uten veileder`() {
-        val aktørId = "10000100000"
+        val aktørId = "12141321"
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(cvMelding(aktørId, testRapid))
@@ -97,18 +99,19 @@ class SammenstillTest {
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(1)
 
-        assertThat(rapidInspektør.message(0).get("@event_name").asText()).isEqualTo("cv.sammenstilt")
-        assertThat(rapidInspektør.message(0).get("aktørId").asText()).isEqualTo("10000100000")
-        assertThat(rapidInspektør.message(0).has("veileder")).isFalse
-        assertThat(rapidInspektør.message(0).get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
-        assertTrue(rapidInspektør.message(0).get("cv").get("oppfolgingsinformasjon").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("opprettCv").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("endreCv").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("slettCv").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("opprettJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("endreJobbprofil").isNull)
-        assertTrue(rapidInspektør.message(0).get("cv").get("slettJobbprofil").isNull)
-        assertThat(rapidInspektør.message(0).get("cv").get("aktoerId").asText()).isEqualTo("10000100000")
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("@event_name").asText()).isEqualTo("cv.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(melding.has("veileder")).isFalse
+        assertThat(melding.get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
+        assertTrue(melding.get("cv").get("oppfolgingsinformasjon").isNull)
+        assertTrue(melding.get("cv").get("opprettCv").isNull)
+        assertTrue(melding.get("cv").get("endreCv").isNull)
+        assertTrue(melding.get("cv").get("slettCv").isNull)
+        assertTrue(melding.get("cv").get("opprettJobbprofil").isNull)
+        assertTrue(melding.get("cv").get("endreJobbprofil").isNull)
+        assertTrue(melding.get("cv").get("slettJobbprofil").isNull)
+        assertThat(melding.get("cv").get("aktoerId").asText()).isEqualTo(aktørId)
     }
 
     private fun veilederMelding(aktørId: String, rapid: RapidsConnection) = """
@@ -116,7 +119,7 @@ class SammenstillTest {
             "@event_name": "veileder",
             "aktørId": "$aktørId",
             "veileder": {
-                "aktorId":"1000001002586",
+                "aktorId":"$aktørId",
                 "veilederId":"Z994526",
                 "tilordnet":"2020-12-21T10:58:19.023+01:00"
             }

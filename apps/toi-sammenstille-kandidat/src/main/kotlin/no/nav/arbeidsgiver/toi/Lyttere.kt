@@ -15,7 +15,7 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         log.info("CvLytter.onPacket()", packet.toJson())
-        behandler.behandleHendelse(Hendelse(CvHendelse, packet["aktørId"].asText() , packet))
+        behandler.behandleHendelse(Hendelse(HendelseType.CV, packet["aktørId"].asText() , packet))
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
@@ -39,7 +39,7 @@ class VeilederLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         log.info("VeilederLytter.onPacket()", packet.toJson())
-        behandler.behandleHendelse(Hendelse(VeilederHendelse, packet["aktørId"].asText(), packet ))
+        behandler.behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørId"].asText(), packet))
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {

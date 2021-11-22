@@ -7,7 +7,10 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
         val kandidat = hentEllerLagTomKandidat(hendelse.aktørid)
         log.info("Hentet kandidat: $kandidat")
 
-        val oppdatertKandidat = hendelse.populerKandidat(kandidat)
+        val oppdatertKandidat = when (hendelse.hendelseType) {
+            HendelseType.CV -> kandidat.copy(cv = hendelse.jsonMessage["cv"])
+            HendelseType.VEILEDER -> kandidat.copy(veileder = hendelse.jsonMessage["veileder"])
+        }
 
         repository.lagreKandidat(oppdatertKandidat)
         log.info("Har lagret kandidat: $oppdatertKandidat")
