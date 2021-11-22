@@ -7,7 +7,7 @@ import no.nav.helse.rapids_rivers.River
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-class KandidatfeedLytter(private val rapidsConnection: RapidsConnection, private val producer: Producer<String, String>) :
+class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val producer: Producer<String, String>) :
     River.PacketListener {
 
     init {

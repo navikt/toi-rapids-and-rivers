@@ -43,7 +43,7 @@ class KandidatfeedTest {
     """.trimIndent()
 
     private val veileder = """
-        "veileder":         {
+        {
                  "aktorId":"123",
                  "veilederId":"A123123",
                  "tilordnet":"2021-11-19T13:18:03.307756228"
