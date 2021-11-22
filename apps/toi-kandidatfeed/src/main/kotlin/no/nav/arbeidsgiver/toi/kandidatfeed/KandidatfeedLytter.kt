@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -28,7 +30,8 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
         }
 
         val aktørId = packet["aktørId"].asText()
-        val melding = ProducerRecord("toi.kandidat-1", aktørId, packet.toJson())
+        val packetUtenMetadata = packet.fjernMetadataOgKonverter()
+        val melding = ProducerRecord("toi.kandidat-1", aktørId, packetUtenMetadata.toString())
 
         producer.send(melding) { _, exception ->
             if (exception == null) {
@@ -37,6 +40,20 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
                 log.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
         }
+    }
+
+    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
+        val jsonNode = jacksonObjectMapper().readTree(this.toJson())
+        val alleFelter = jsonNode.fieldNames().asSequence().toList()
+        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
+        val aktuelleFelter = alleFelter.filter { !metadataFelter.contains(it) }
+
+        val rotNode = jacksonObjectMapper().createObjectNode()
+
+        aktuelleFelter.forEach {
+            rotNode.set<JsonNode>(it, jacksonObjectMapper().valueToTree(this[it]))
+        }
+        return rotNode
     }
 }
 
