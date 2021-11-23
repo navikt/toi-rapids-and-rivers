@@ -34,7 +34,7 @@ spec:
       enabled: true
   env:
     - name: KAFKA_RAPID_TOPIC
-      value: toi.rapid
+      value: toi.rapid-1
     - name: KAFKA_EXTRA_TOPIC
       value: "pto.siste-tilordnet-veileder-v1"
     - name: KAFKA_CONSUMER_GROUP_ID
