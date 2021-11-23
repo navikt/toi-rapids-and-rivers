@@ -31,7 +31,7 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
 
         val aktørId = packet["aktørId"].asText()
         val packetUtenMetadata = packet.fjernMetadataOgKonverter()
-        val melding = ProducerRecord("toi.kandidat-1", aktørId, packetUtenMetadata.toString())
+        val melding = ProducerRecord("toi.kandidat-2", aktørId, packetUtenMetadata.toString())
 
         producer.send(melding) { _, exception ->
             if (exception == null) {
