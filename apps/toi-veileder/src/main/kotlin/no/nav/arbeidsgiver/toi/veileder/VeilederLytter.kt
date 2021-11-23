@@ -26,6 +26,7 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
             "@event_name" to "veileder",
         )
         val nyPacket = JsonMessage.newMessage(melding)
+        log.info("Skal publisere veiledermelding")
         rapidsConnection.publish(nyPacket.toJson())
     }
 
