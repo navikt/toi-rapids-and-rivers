@@ -12,8 +12,8 @@ class SammenstillTest {
         val aktørId = "12141321"
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
-        testRapid.sendTestMessage(veilederMelding(aktørId, testRapid))
-        testRapid.sendTestMessage(cvMelding(aktørId, testRapid))
+        testRapid.sendTestMessage(veilederMelding(aktørId))
+        testRapid.sendTestMessage(cvMelding(aktørId))
 
         Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
@@ -49,9 +49,9 @@ class SammenstillTest {
         val aktørId = "12141321"
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
-        testRapid.sendTestMessage(cvMelding(aktørId, testRapid))
+        testRapid.sendTestMessage(cvMelding(aktørId))
         Thread.sleep(1000)
-        testRapid.sendTestMessage(veilederMelding(aktørId, testRapid))
+        testRapid.sendTestMessage(veilederMelding(aktørId))
 
         Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
@@ -93,7 +93,7 @@ class SammenstillTest {
         val aktørId = "12141321"
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
-        testRapid.sendTestMessage(cvMelding(aktørId, testRapid))
+        testRapid.sendTestMessage(cvMelding(aktørId))
 
         Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
@@ -114,7 +114,26 @@ class SammenstillTest {
         assertThat(melding.get("cv").get("aktoerId").asText()).isEqualTo(aktørId)
     }
 
-    private fun veilederMelding(aktørId: String, rapid: RapidsConnection) = """
+    @Test
+    fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
+        val aktørId = "12141321"
+        val testRapid = TestRapid()
+        val testDatabase = TestDatabase()
+        startApp(testDatabase.dataSource, testRapid)
+        testRapid.sendTestMessage(cvMelding(aktørId))
+        testRapid.sendTestMessage(veilederMelding(aktørId))
+        testRapid.sendTestMessage(cvMelding(aktørId))
+        testRapid.sendTestMessage(cvMelding(aktørId))
+        testRapid.sendTestMessage(veilederMelding(aktørId))
+        testRapid.sendTestMessage(veilederMelding(aktørId))
+
+        Thread.sleep(1000)
+
+        val antallLagredeKandidater = testDatabase.hentAntallKandidater();
+        assertThat(antallLagredeKandidater).isEqualTo(1)
+    }
+
+    private fun veilederMelding(aktørId: String) = """
         {
             "@event_name": "veileder",
             "aktørId": "$aktørId",
@@ -126,7 +145,7 @@ class SammenstillTest {
         }
     """.trimIndent()
 
-    private fun cvMelding(aktørId: String, rapid: RapidsConnection) = """
+    private fun cvMelding(aktørId: String) = """
         {
           "aktørId": "$aktørId",
           "cv": {

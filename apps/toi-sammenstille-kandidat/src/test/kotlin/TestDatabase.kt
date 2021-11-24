@@ -1,5 +1,6 @@
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import no.nav.arbeidsgiver.toi.Kandidat
 import no.nav.arbeidsgiver.toi.Repository
 import javax.sql.DataSource
 
@@ -25,5 +26,12 @@ class TestDatabase {
             ).execute()
         }
     }
-}
 
+    fun hentAntallKandidater() =
+        dataSource.connection.use {
+            val statement = it.prepareStatement("SELECT count(*) FROM sammenstiltkandidat")
+            val resultSet = statement.executeQuery()
+            if (resultSet.next()) resultSet.getInt(1)
+            else 0
+        }
+}
