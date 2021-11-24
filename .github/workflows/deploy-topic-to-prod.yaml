@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - topic-prod.yml
+      - topic-prod.yaml
 
 jobs:
   deploy-rapid-to-prod:
@@ -17,4 +17,4 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: topic-prod.yml
+          RESOURCE: topic-prod.yaml

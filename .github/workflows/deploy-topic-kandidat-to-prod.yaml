@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/deploy-topic-kandidat-to-prod.yaml
-      - apps/toi-kandidatfeed/topic-kandidat-prod.yml
+      - apps/toi-kandidatfeed/topic-kandidat-prod.yaml
 
 jobs:
   deploy-kandidat-topic-to-prod:
@@ -18,4 +18,4 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: apps/toi-kandidatfeed/topic-kandidat-prod.yml
+          RESOURCE: apps/toi-kandidatfeed/topic-kandidat-prod.yaml
