@@ -1,8 +1,8 @@
-name: Bygg og deploy toi-veileder
+name: toi-veileder
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
-  APP_NAME: ${{ github.workflow }}
+  APP_NAME: toi-veileder
+  IMAGE: ghcr.io/${{ github.repository }}/${{ APP_NAME }}:${{ github.sha }}
 
 on:
   push:
