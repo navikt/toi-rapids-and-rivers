@@ -1,0 +1,2 @@
+kafka_pool: nav-prod
+kafka_consumer_group_id: toi-sammenstille-kandidat-rapidconsumer-1

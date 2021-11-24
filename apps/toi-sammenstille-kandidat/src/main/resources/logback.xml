@@ -3,10 +3,6 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <logger name="com.zaxxer.hikari.pool.PoolBase" level="TRACE"/>
-    <logger name="com.zaxxer.hikari.pool.HikariPool" level="TRACE"/>
-    <logger name="com.zaxxer.hikari.HikariDataSource" level="TRACE"/>
-
     <root level="INFO">
         <appender-ref ref="loggIJsonFormatTilKibana"/>
     </root>
