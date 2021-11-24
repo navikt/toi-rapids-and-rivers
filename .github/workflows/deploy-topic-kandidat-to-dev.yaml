@@ -1,4 +1,4 @@
-name: Deploy kandidat topic to dev
+name: Deploy kandidat-topic to dev
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy-kandidat-topic-to-dev:
-    name: Deploy kandidat topic to dev
+    name: Deploy kandidat-topic to dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
