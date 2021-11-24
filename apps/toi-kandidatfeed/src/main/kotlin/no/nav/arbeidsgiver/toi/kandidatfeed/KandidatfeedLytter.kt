@@ -2,10 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
@@ -16,15 +13,15 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-                it.demandKey("veileder")
+                it.interestedIn("veileder")
                 it.demandKey("cv")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if (packet["veileder"].isNull || packet["cv"].isNull) {
-            val feilmelding = "cv eller veileder kan ikke være null for aktørid ${packet["aktorId"]}"
+        if (packet["cv"].isNull) {
+            val feilmelding = "cv kan ikke være null for aktørid ${packet["aktorId"]}"
             log.error(feilmelding)
             throw IllegalArgumentException(feilmelding)
         }

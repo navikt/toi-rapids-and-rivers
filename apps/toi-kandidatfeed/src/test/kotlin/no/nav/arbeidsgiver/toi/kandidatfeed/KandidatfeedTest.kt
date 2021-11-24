@@ -10,12 +10,13 @@ import org.junit.jupiter.api.Test
 class KandidatfeedTest {
 
     @Test
-    fun `Lesing av melding fra rapid skal produsere melding på nytt topic`() {
+    fun `Lesing av melding med cv og veileder fra rapid skal produsere melding på nytt topic`() {
+        val rapidMelding = rapidMelding(cv, veileder)
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
         KandidatfeedLytter(testrapid, producer)
 
-        testrapid.sendTestMessage(rapidMelding())
+        testrapid.sendTestMessage(rapidMelding)
 
         Thread.sleep(500)
 
@@ -25,7 +26,7 @@ class KandidatfeedTest {
         assertThat(melding.key()).isEqualTo("123")
 
         val resultatJson = jacksonObjectMapper().readTree(melding.value())
-        val forventetJson = jacksonObjectMapper().readTree(rapidMelding())
+        val forventetJson = jacksonObjectMapper().readTree(rapidMelding)
 
         assertThat(resultatJson.get("cv")).isEqualTo(forventetJson.get("cv"))
         assertThat(resultatJson.get("veileder")).isEqualTo(forventetJson.get("veileder"))
@@ -36,8 +37,60 @@ class KandidatfeedTest {
         assertThat(resultatJson.has("@event_name")).isFalse
     }
 
+    @Test
+    fun `Lesing av melding med cv og uten veileder fra rapid skal produsere melding på nytt topic`() {
+        val rapidMelding = rapidMelding(cv, "")
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+        KandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(rapidMelding)
+
+        Thread.sleep(500)
+
+        assertThat(producer.history().size).isEqualTo(1)
+        val melding = producer.history()[0]
+
+        assertThat(melding.key()).isEqualTo("123")
+
+        val resultatJson = jacksonObjectMapper().readTree(melding.value())
+        val forventetJson = jacksonObjectMapper().readTree(rapidMelding)
+
+        assertThat(resultatJson.get("cv")).isEqualTo(forventetJson.get("cv"))
+        assertThat(resultatJson.get("veileder")).isNull()
+        assertThat(resultatJson.get("aktørId")).isEqualTo(forventetJson.get("aktørId"))
+    }
+
+    @Test
+    fun `Lesing av melding med veileder og uten cv fra rapid skal ikke produsere melding på nytt topic`() {
+        val rapidMelding = rapidMelding("", veileder)
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+        KandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(rapidMelding)
+
+        Thread.sleep(500)
+
+        assertThat(producer.history().size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Lesing av melding med veileder og cv uten verdi fra rapid skal ikke produsere melding på nytt topic`() {
+        val rapidMelding = rapidMelding(cvUtenVerdi, veileder)
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+        KandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(rapidMelding)
+
+        Thread.sleep(500)
+
+        assertThat(producer.history().size).isEqualTo(0)
+    }
+
     private val cv = """
-        {
+        "cv": {
             "meldingstype": "SLETT",
             "oppfolgingsinformasjon": null,
             "opprettCv": null,
@@ -48,21 +101,26 @@ class KandidatfeedTest {
             "slettJobbprofil": null,
             "aktoerId": "123",
             "sistEndret": 1637238150.172
-        }
+        },
+    """.trimIndent()
+
+    private val cvUtenVerdi = """
+        "cv": null,
     """.trimIndent()
 
     private val veileder = """
-        {
+        "veileder": {
              "aktorId":"123",
              "veilederId":"A123123",
              "tilordnet":"2021-11-19T13:18:03.307756228"
-        }
+        },
     """.trimIndent()
 
-    fun rapidMelding(): String = """
+    fun rapidMelding(cvJson: String?, veilederJson: String?): String = """
         {
           "aktørId": "123",
-          "cv": $cv,
+          $cvJson
+          $veilederJson
           "@event_name": "cv.sammenstilt",
           "system_read_count": 1,
           "system_participating_services": [
@@ -76,8 +134,7 @@ class KandidatfeedTest {
               "instance": "toi-sammenstille-kandidat-85b9d49b9c-fctpx",
               "time": "2021-11-19T13:18:03.307756227"
             }
-          ],
-          "veileder":  $veileder
+          ]
         }
     """.trimIndent()
 }
