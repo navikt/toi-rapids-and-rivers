@@ -1,8 +1,8 @@
 name: toi-veileder
 
 env:
-  APP_NAME: toi-veileder
   IMAGE: ghcr.io/${{ github.repository }}/toi-veileder:${{ github.sha }}
+  APP_NAME: toi-veileder
 
 on:
   push:
