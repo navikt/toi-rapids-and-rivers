@@ -1,0 +1,20 @@
+name: Deploy alerts to prod
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - alerts.yaml
+
+jobs:
+  deploy-rapid-to-prod:
+    name: Deploy alerts to prod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: nais/deploy/actions/deploy@master
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: alerts.yaml

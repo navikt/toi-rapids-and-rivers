@@ -5,6 +5,7 @@ metadata:
   namespace: toi
   labels:
     team: toi
+    gruppe: toi-rapids-and-rivers
 spec:
   image: {{image}}
   port: 8080
