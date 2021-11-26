@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.oppfølgingsinformasjon
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.arbeidsgiver.toi.oppfølgingsinforamsjon.log
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
