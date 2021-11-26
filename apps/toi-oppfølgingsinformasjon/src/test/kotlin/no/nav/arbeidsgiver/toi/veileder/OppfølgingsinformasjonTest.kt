@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.veileder
+package no.nav.arbeidsgiver.toi.oppfølgingsinformasjon
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
@@ -10,7 +10,7 @@ class OppfølgingsinformasjonTest {
     fun `Lesing av oppfølgingsionformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
         val aktørId = "10000100000"
         val testRapid = TestRapid()
-        VeilederLytter(testRapid)
+        OppfølgingsinformasjonLytter(testRapid)
 
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId))
         Thread.sleep(300)
