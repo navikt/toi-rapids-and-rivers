@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.oppfølgingsinformasjon
+package no.nav.arbeidsgiver.toi.oppfolgingsinformasjon
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.oppfølgingsinformasjon
+package no.nav.arbeidsgiver.toi.oppfolgingsinformasjon
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
