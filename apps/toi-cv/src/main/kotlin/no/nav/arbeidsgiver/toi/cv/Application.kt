@@ -13,5 +13,6 @@ fun main() =
         register(CvLytter(consumer))
     }.start()
 
+
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
