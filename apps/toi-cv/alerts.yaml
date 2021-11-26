@@ -14,7 +14,6 @@ spec:
       severity: danger
       expr: sum(up{app="toi-cv", job="kubernetes-pods"}) == 0
       for: 1s
-      description: 'toi-cv er nede i namespace {{ $labels.kubernetes_namespace }}'
       action: "https://logs.adeo.no/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-2h,to:now))&_a=(columns:!(message,envclass,level,application,host),filters:!(),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:kuery,query:'application:%22{{ $labels.app }}%22%20and%20cluster:%22prod-gcp%22%20and%20level:%22Error%22'),sort:!())'"
 
     - alert: Det har skjedd en feil i toi-cv
