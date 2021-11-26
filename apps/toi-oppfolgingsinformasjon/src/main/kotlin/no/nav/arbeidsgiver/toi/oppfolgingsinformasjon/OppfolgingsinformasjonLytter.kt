@@ -8,7 +8,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class OppfølgingsinformasjonLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {

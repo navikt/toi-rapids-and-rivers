@@ -4,13 +4,13 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class OppfølgingsinformasjonTest {
+class OppfolgingsinformasjonTest {
 
     @Test
     fun `Lesing av oppfølgingsionformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
         val aktørId = "10000100000"
         val testRapid = TestRapid()
-        OppfølgingsinformasjonLytter(testRapid)
+        OppfolgingsinformasjonLytter(testRapid)
 
         testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(aktørId))
         Thread.sleep(300)
