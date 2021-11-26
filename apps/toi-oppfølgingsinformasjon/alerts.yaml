@@ -10,19 +10,22 @@ spec:
     slack:
       channel: 'inkludering-alerts-prod'
   alerts:
-    - alert: toi-oppfølgingsinformasjon er nede (ingen Kubernetes-pods er oppe)
+    - alert: toi-oppfølgingsinformasjon
       severity: danger
       expr: sum(up{app="toi-oppfølgingsinformasjon", job="kubernetes-pods"}) == 0
       for: 1s
-      action: "https://logs.adeo.no/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-2h,to:now))&_a=(columns:!(message,envclass,level,application,host),filters:!(),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:kuery,query:'application:%22{{ $labels.app }}%22%20and%20cluster:%22prod-gcp%22%20and%20level:%22Error%22'),sort:!())'"
+      description: Appen er nede (ingen Kubernetes-pods er oppe)
+      action: "https://logs.adeo.no/goto/645e523d47c67f16d8c498e245fe1c3a"
 
-    - alert: Det har skjedd en feil i toi-oppfølgingsinformasjon
+    - alert: toi-oppfølgingsinformasjon
       expr: sum(increase(logd_messages_total{log_app="toi-oppfølgingsinformasjon",log_level="Error"}[10m])) > 0
       for: 1s
-      action: "https://logs.adeo.no/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-2h,to:now))&_a=(columns:!(message,envclass,level,application,host),filters:!(),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:kuery,query:'application:%22{{ $labels.app }}%22%20and%20cluster:%22prod-gcp%22%20and%20level:%22Error%22'),sort:!())'"
+      description: Appen har logget en error
+      action: "https://logs.adeo.no/goto/645e523d47c67f16d8c498e245fe1c3a"
 
-    - alert: Økning i warnings i toi-oppfølgingsinformasjon
+    - alert: toi-oppfølgingsinformasjon
       severity: warning
       expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfølgingsinformasjon",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfølgingsinformasjon"}[5m]))) > 20
       for: 5m
-      action: "https://logs.adeo.no/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-2h,to:now))&_a=(columns:!(message,envclass,level,application,host),filters:!(),index:'96e648c0-980a-11e9-830a-e17bbd64b4db',interval:auto,query:(language:kuery,query:'application:%22{{ $labels.app }}%22%20and%20cluster:%22prod-gcp%22%20and%20level:%22Warning%22'),sort:!())'"
+      description: Økning i warnings
+      action: "https://logs.adeo.no/goto/645e523d47c67f16d8c498e245fe1c3a"
