@@ -15,15 +15,30 @@ class OppfølgingsinformasjonLytter(private val rapidsConnection: RapidsConnecti
                 it.demandKey("aktoerid")
                 it.demandKey("har_oppfolgingssak")
                 it.rejectKey("@event_name")
+                it.interestedIn("fodselsnr")
+                it.interestedIn("formidlingsgruppekode")
+                it.interestedIn("iserv_fra_dato")
+                it.interestedIn("etternavn")
+                it.interestedIn("fornavn")
+                it.interestedIn("nav_kontor")
+                it.interestedIn("kvalifiseringsgruppekode")
+                it.interestedIn("rettighetsgruppekode")
+                it.interestedIn("hovedmaalkode")
+                it.interestedIn("sikkerhetstiltak_type_kode")
+                it.interestedIn("fr_kode")
+                it.interestedIn("sperret_ansatt")
+                it.interestedIn("er_doed")
+                it.interestedIn("doed_fra_dato")
+                it.interestedIn("endret_dato")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val melding = mapOf(
-            "aktørId" to packet["aktorId"],
+            "aktørId" to packet["aktoerid"],
             "oppfølgingsinformasjon" to packet.fjernMetadataOgKonverter(),
-                "@event_name" to "oppfølgingsinformasjon",
+            "@event_name" to "oppfølgingsinformasjon",
         )
         val nyPacket = JsonMessage.newMessage(melding)
         log.info("Skal publisere veiledermelding")

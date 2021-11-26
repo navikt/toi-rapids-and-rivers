@@ -12,7 +12,7 @@ class OppfølgingsinformasjonTest {
         val testRapid = TestRapid()
         OppfølgingsinformasjonLytter(testRapid)
 
-        testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId))
+        testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(aktørId))
         Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
@@ -30,8 +30,8 @@ class OppfølgingsinformasjonTest {
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
-        val veilederJson = meldingJson.get("oppfølgingsinformasjon")
-        assertThat(veilederJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        val oppfølgingsinformasjonJson = meldingJson.get("oppfølgingsinformasjon")
+        assertThat(oppfølgingsinformasjonJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
                 "aktoerid",
                 "fodselsnr",
                 "formidlingsgruppekode",
@@ -50,14 +50,14 @@ class OppfølgingsinformasjonTest {
                 "doed_fra_dato",
                 "endret_dato",
         )
-        meldingJson.get("veileder").apply {
+        meldingJson.get("oppfølgingsinformasjon").apply {
             assertThat(get("aktoerid").asText()).isEqualTo(aktørId)
-            assertThat(get("fodselsnr").asText()).isEqualTo("12312312")
+            assertThat(get("fodselsnr").asText()).isEqualTo("12312312312")
             assertThat(get("iserv_fra_dato").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
         }
     }
 
-    private fun veilederMeldingFraEksterntTopic(aktørId: String) = """
+    private fun oppfølgingsinformasjonMeldingFraEksterntTopic(aktørId: String) = """
         {
             "aktoerid":"$aktørId",
             "fodselsnr":"12312312312",
