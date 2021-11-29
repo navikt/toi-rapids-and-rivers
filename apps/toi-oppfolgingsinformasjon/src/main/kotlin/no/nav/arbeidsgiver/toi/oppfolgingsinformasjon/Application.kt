@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    OppfølgingsinformasjonLytter(rapidsConnection)
+    OppfolgingsinformasjonLytter(rapidsConnection)
 }.start()
 
 val Any.log: Logger
