@@ -24,11 +24,14 @@ spec:
       application: toi-veileder
       access: readwrite
     - team: toi
-      application: toi-sammenstille-kandidat
+      application: toi-oppfolgingsinformasjon
       access: readwrite
-    - team: arbeidsgiver-inkludering
-      application: arbeidsgiver-inkludering-kafkamanager
+    - team: toi
+      application: toi-sammenstille-kandidat
       access: readwrite
     - team: toi
       application: toi-kandidatfeed
+      access: readwrite
+    - team: arbeidsgiver-inkludering
+      application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite
