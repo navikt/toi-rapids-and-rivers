@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: toi-oppfølgingsinformasjon
+  name: toi-oppfolgingsinformasjon
   namespace: toi
   labels:
     team: toi
