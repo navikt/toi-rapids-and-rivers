@@ -10,7 +10,7 @@ class OppfolgingsinformasjonTest {
     fun `Lesing av oppfølgingsinformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
         val aktørId = "10000100000"
         val testRapid = TestRapid()
-        OppfolgingsinformasjonLytter(testRapid)
+        OppfølgingsinformasjonLytter(testRapid)
 
         testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(aktørId))
         Thread.sleep(300)
