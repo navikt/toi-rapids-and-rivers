@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsinformasjon
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsgiver.toi.oppfølgingsinforamsjon.log
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -15,21 +16,6 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
                 it.demandKey("aktoerid")
                 it.demandKey("har_oppfolgingssak")
                 it.rejectKey("@event_name")
-                it.interestedIn("fodselsnr")
-                it.interestedIn("formidlingsgruppekode")
-                it.interestedIn("iserv_fra_dato")
-                it.interestedIn("etternavn")
-                it.interestedIn("fornavn")
-                it.interestedIn("nav_kontor")
-                it.interestedIn("kvalifiseringsgruppekode")
-                it.interestedIn("rettighetsgruppekode")
-                it.interestedIn("hovedmaalkode")
-                it.interestedIn("sikkerhetstiltak_type_kode")
-                it.interestedIn("fr_kode")
-                it.interestedIn("sperret_ansatt")
-                it.interestedIn("er_doed")
-                it.interestedIn("doed_fra_dato")
-                it.interestedIn("endret_dato")
             }
         }.register(this)
     }
@@ -46,16 +32,9 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson())
-        val alleFelter = jsonNode.fieldNames().asSequence().toList()
+        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        val aktuelleFelter = alleFelter.filter { !metadataFelter.contains(it) }
-
-        val rotNode = jacksonObjectMapper().createObjectNode()
-
-        aktuelleFelter.forEach {
-            rotNode.set<JsonNode>(it, jacksonObjectMapper().valueToTree(this[it]))
-        }
-        return rotNode
+        jsonNode.remove(metadataFelter)
+        return jsonNode
     }
 }
