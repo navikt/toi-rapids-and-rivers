@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
@@ -40,17 +41,10 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson())
-        val alleFelter = jsonNode.fieldNames().asSequence().toList()
+        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        val aktuelleFelter = alleFelter.filter { !metadataFelter.contains(it) }
-
-        val rotNode = jacksonObjectMapper().createObjectNode()
-
-        aktuelleFelter.forEach {
-            rotNode.set<JsonNode>(it, jacksonObjectMapper().valueToTree(this[it]))
-        }
-        return rotNode
+        jsonNode.remove(metadataFelter)
+        return jsonNode
     }
 }
 

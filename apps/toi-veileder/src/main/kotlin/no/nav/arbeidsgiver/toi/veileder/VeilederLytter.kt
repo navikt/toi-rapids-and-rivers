@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.veileder
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -14,7 +15,6 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
                 it.demandKey("aktorId")
                 it.demandKey("veilederId")
                 it.rejectKey("@event_name")
-                it.interestedIn("tilordnet")
             }
         }.register(this)
     }
@@ -31,16 +31,9 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson())
-        val alleFelter = jsonNode.fieldNames().asSequence().toList()
+        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        val aktuelleFelter = alleFelter.filter { !metadataFelter.contains(it) }
-
-        val rotNode = jacksonObjectMapper().createObjectNode()
-
-        aktuelleFelter.forEach {
-            rotNode.set<JsonNode>(it, jacksonObjectMapper().valueToTree(this[it]))
-        }
-        return rotNode
+        jsonNode.remove(metadataFelter)
+        return jsonNode
     }
 }
