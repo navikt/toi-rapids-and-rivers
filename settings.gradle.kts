@@ -5,5 +5,6 @@ include(
     "apps:toi-veileder",
     "apps:toi-sammenstille-kandidat",
     "apps:toi-kandidatfeed",
-    "apps:toi-oppfolgingsinformasjon"
+    "apps:toi-oppfolgingsinformasjon",
+    "apps:toi-identmapper"
 )
