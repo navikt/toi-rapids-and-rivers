@@ -1,3 +1,2 @@
 kafka_pool: nav-prod
 kafka_consumer_group_id: toi-oppfølgingsinformasjon-rapidconsumer-1
-kafka_consumer_topic: aapen-fo-endringPaaOppfoelgingsBruker-v1-p
