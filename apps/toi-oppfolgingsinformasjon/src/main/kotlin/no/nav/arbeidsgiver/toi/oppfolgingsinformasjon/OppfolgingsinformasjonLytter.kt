@@ -41,7 +41,7 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
             "@event_name" to "oppfølgingsinformasjon",
         )
         val nyPacket = JsonMessage.newMessage(melding)
-        log.info("Skal publisere veiledermelding")
+        log.info("Skal publisere oppfølgingsinformasjonmelding")
         rapidsConnection.publish(nyPacket.toJson())
     }
 
