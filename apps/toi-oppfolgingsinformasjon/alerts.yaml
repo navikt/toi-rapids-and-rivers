@@ -1,7 +1,7 @@
 apiVersion: 'nais.io/v1'
 kind: 'Alert'
 metadata:
-  name: toi-oppfølgingsinformasjon
+  name: toi-oppfolgingsinformasjon
   namespace: toi
   labels:
     team: toi
@@ -10,22 +10,22 @@ spec:
     slack:
       channel: 'inkludering-alerts-prod'
   alerts:
-    - alert: toi-oppfølgingsinformasjon
+    - alert: toi-oppfolgingsinformasjon
       severity: danger
-      expr: sum(up{app="toi-oppfølgingsinformasjon", job="kubernetes-pods"}) == 0
+      expr: sum(up{app="toi-oppfolgingsinformasjon", job="kubernetes-pods"}) == 0
       for: 1s
       description: Appen er nede (ingen Kubernetes-pods er oppe)
       action: "https://logs.adeo.no/goto/645e523d47c67f16d8c498e245fe1c3a"
 
-    - alert: toi-oppfølgingsinformasjon
-      expr: sum(increase(logd_messages_total{log_app="toi-oppfølgingsinformasjon",log_level="Error"}[10m])) > 0
+    - alert: toi-oppfolgingsinformasjon
+      expr: sum(increase(logd_messages_total{log_app="toi-oppfolgingsinformasjon",log_level="Error"}[10m])) > 0
       for: 1s
       description: Appen har logget en error
       action: "https://logs.adeo.no/goto/645e523d47c67f16d8c498e245fe1c3a"
 
-    - alert: toi-oppfølgingsinformasjon
+    - alert: toi-oppfolgingsinformasjon
       severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfølgingsinformasjon",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfølgingsinformasjon"}[5m]))) > 20
+      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsinformasjon",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsinformasjon"}[5m]))) > 20
       for: 5m
       description: Økning i warnings
       action: "https://logs.adeo.no/goto/645e523d47c67f16d8c498e245fe1c3a"
