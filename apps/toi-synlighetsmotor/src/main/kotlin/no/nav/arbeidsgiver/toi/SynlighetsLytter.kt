@@ -17,7 +17,7 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection): River.PacketListener
     private val publish: (String) -> Unit = rapidsConnection::publish
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        packet["synlighet"] = Synlighet(erSynlig(packet),false)
+        packet["synlighet"] = Synlighet(erSynlig(packet),harBeregningsgrunnlag(packet))
         publish(packet.toJson())
     }
     private class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)
