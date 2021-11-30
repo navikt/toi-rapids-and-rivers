@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.jackson.responseObject
 import java.time.Instant
 import kotlin.RuntimeException
+import com.github.kittinunf.result.Result
 
 class AccessTokenClient(private val env: Map<String, String>) {
     private var tokenUtgår = Instant.ofEpochSecond(0)
@@ -37,8 +38,8 @@ class AccessTokenClient(private val env: Map<String, String>) {
             .responseObject<AccessTokenResponse>()
 
         when (result) {
-            is Result.Success -> return result.get()
-            is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.getException())
+             is Result.Success -> return result.get()
+             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.getException())
         }
     }
 }

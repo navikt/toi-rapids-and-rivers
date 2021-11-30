@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.jackson.responseObject
+import com.github.kittinunf.result.Result
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
 
@@ -18,7 +19,10 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             .jsonBody(graphql)
             .responseObject<Respons>()
 
-        return result.get().data.hentIdenter.identer.first().ident
+        when (result) {
+            is Result.Success -> return  result.get().data.hentIdenter.identer.first().ident
+            is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av aktørId: ", result.getException())
+        }
     }
 
     fun lagGraphQLSpørring(fødselsnummer: String): String {
