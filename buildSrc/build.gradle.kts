@@ -11,9 +11,6 @@ version = "unspecified"
 
 repositories {
     gradlePluginPortal()
-    maven(
-        url = "https://dl.bintray.com/gradle/gradle-plugins"
-    )
 }
 
 dependencies {

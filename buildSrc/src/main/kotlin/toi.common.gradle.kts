@@ -7,7 +7,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://kotlin.bintray.com/ktor")
     maven("https://packages.confluent.io/maven/")
     maven("https://maven.pkg.github.com/navikt/maven-release") {
         val user = properties["mavenUserGithub"]?.toString() ?: "token"
