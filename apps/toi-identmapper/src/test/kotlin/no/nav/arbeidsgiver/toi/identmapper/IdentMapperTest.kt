@@ -12,7 +12,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnummer"
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
-        AktørIdPopulator(fødselsnummerKey, rapid) { aktørId }
+        AktorIdPopulator(fødselsnummerKey, rapid) { aktørId }
 
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
         Thread.sleep(300)
@@ -42,7 +42,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fnr"
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
-        AktørIdPopulator(fødselsnummerKey, rapid) { aktørId }
+        AktorIdPopulator(fødselsnummerKey, rapid) { aktørId }
 
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
         Thread.sleep(300)
@@ -60,7 +60,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnr"
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
-        AktørIdPopulator(fødselsnummerKey, rapid) { aktørId }
+        AktorIdPopulator(fødselsnummerKey, rapid) { aktørId }
 
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
         Thread.sleep(300)

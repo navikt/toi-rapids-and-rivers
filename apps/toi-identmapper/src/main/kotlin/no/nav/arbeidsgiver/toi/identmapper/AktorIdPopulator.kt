@@ -8,7 +8,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class AktørIdPopulator(
+class AktorIdPopulator(
     private val fnrKey: String,
     private val rapidsConnection: RapidsConnection,
     private val hentAktørId: (fødselsnummer: String) -> String
