@@ -12,7 +12,7 @@ fun main() {
         val pdlKlient = PdlKlient(pdlUrl, accessTokenClient)
 
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
-            //AktorIdPopulator(fnrKey, rapidsConnection, pdlKlient::aktørIdFor)
+            AktorIdPopulator(fnrKey, rapidsConnection, pdlKlient::aktørIdFor)
         }
     }.start()
 }
