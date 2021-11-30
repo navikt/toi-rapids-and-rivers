@@ -1,7 +1,10 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-class PdlKlient {
+class PdlKlient(private val accessTokenClient: AccessTokenClient) {
+
     fun aktørIdFor(fødselsnummer: String): String {
-        TODO("Not yet implemented")
+        val accessToken = accessTokenClient.hentAccessToken()
+
+
     }
 }
