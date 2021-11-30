@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.jackson.responseObject
-import com.github.kittinunf.result.Result
 import java.time.Instant
 import kotlin.RuntimeException
 

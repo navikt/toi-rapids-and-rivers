@@ -2,11 +2,17 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import no.nav.helse.rapids_rivers.RapidApplication
 
-fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    val accessTokenClient = AccessTokenClient(System.getenv())
-    val pdlKlient = PdlKlient(accessTokenClient)
+fun main() {
+    val env = System.getenv()
 
-    listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
-        // AktørIdPopulator(fnrKey, rapidsConnection, pdlKlient::aktørIdFor)
-    }
-}.start()
+    RapidApplication.create(env).also { rapidsConnection ->
+        val accessTokenClient = AccessTokenClient(env)
+
+        val pdlUrl = env["PDL_URL"]!!
+        val pdlKlient = PdlKlient(pdlUrl, accessTokenClient)
+
+        listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
+            // AktørIdPopulator(fnrKey, rapidsConnection, pdlKlient::aktørIdFor)
+        }
+    }.start()
+}

@@ -6,7 +6,7 @@ metadata:
   labels:
     team: toi
 spec:
-  image: {{image}}
+  image: {{ image }}
   port: 8080
   liveness:
     path: /isalive
@@ -28,7 +28,7 @@ spec:
   secureLogs:
     enabled: true
   kafka:
-    pool: {{kafka_pool}}
+    pool: {{ kafka_pool }}
   azure:
     application:
       enabled: true
@@ -36,6 +36,8 @@ spec:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: {{kafka_consumer_group_id}}
+      value: {{ kafka_consumer_group_id }}
     - name: PDL_SCOPE
-      value: {{pdl_scope}}
+      value: {{ pdl_scope }}
+    - name: PDL_URL
+      value: {{ pdl_url }}
