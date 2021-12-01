@@ -7,7 +7,6 @@ import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
-
     fun aktørIdFor(fødselsnummer: String): String {
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(fødselsnummer)
@@ -25,7 +24,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         }
     }
 
-    fun lagGraphQLSpørring(fødselsnummer: String): String {
+    private fun lagGraphQLSpørring(fødselsnummer: String): String {
         val pesostegn = "$"
 
         return """
