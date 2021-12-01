@@ -1,5 +1,4 @@
 import no.nav.arbeidsgiver.toi.startApp
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -115,6 +114,42 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når oppfølgingsinformasjon har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+        val aktørId = "12141321"
+        val testRapid = TestRapid()
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(oppfølgingsinformasjonMelding(aktørId))
+
+        Thread.sleep(300)
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(melding.get("fodselsnummer").asText()).isEqualTo("12345678912")
+        assertThat(melding.has("veileder")).isFalse
+        assertThat(melding.has("cv")).isFalse
+
+        val oppfølgingsinformasjonPåMelding = melding.get("oppfølgingsinformasjon")
+        assertThat(oppfølgingsinformasjonPåMelding.get("formidlingsgruppe").asText()).isEqualTo("IARBS")
+        assertThat(oppfølgingsinformasjonPåMelding.get("iservFraDato").isNull).isTrue
+        assertThat(oppfølgingsinformasjonPåMelding.get("fornavn").asText()).isEqualTo("TULLETE")
+        assertThat(oppfølgingsinformasjonPåMelding.get("etternavn").asText()).isEqualTo("TABBE")
+        assertThat(oppfølgingsinformasjonPåMelding.get("oppfolgingsenhet").asText()).isEqualTo("0318")
+        assertThat(oppfølgingsinformasjonPåMelding.get("kvalifiseringsgruppe").asText()).isEqualTo("BATT")
+        assertThat(oppfølgingsinformasjonPåMelding.get("rettighetsgruppe").asText()).isEqualTo("AAP")
+        assertThat(oppfølgingsinformasjonPåMelding.get("hovedmaal").asText()).isEqualTo("BEHOLDEA")
+        assertThat(oppfølgingsinformasjonPåMelding.get("sikkerhetstiltakType").isNull).isTrue
+        assertThat(oppfølgingsinformasjonPåMelding.get("diskresjonskode").isNull).isTrue
+        assertThat(oppfølgingsinformasjonPåMelding.get("harOppfolgingssak").asBoolean()).isTrue
+        assertThat(oppfølgingsinformasjonPåMelding.get("sperretAnsatt").asBoolean()).isFalse
+        assertThat(oppfølgingsinformasjonPåMelding.get("erDoed").asBoolean()).isFalse
+        assertThat(oppfølgingsinformasjonPåMelding.get("doedFraDato").isNull).isTrue
+        assertThat(oppfølgingsinformasjonPåMelding.get("sistEndretDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
+    }
+
+    @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
@@ -161,6 +196,32 @@ class SammenstillTest {
             "sistEndret": 1636718935.195
           },
           "@event_name": "cv"
+        }
+    """.trimIndent()
+
+    private fun oppfølgingsinformasjonMelding(aktørId: String) = """
+        {
+            "aktørId": "$aktørId",
+            "fodselsnummer": "12345678912",
+            "@event_name": "oppfølgingsinformasjon",
+            "oppfølgingsinformasjon": {
+                "fodselsnummer": "12345678912",
+                "formidlingsgruppe": "IARBS",
+                "iservFraDato": null,
+                "fornavn": "TULLETE",
+                "etternavn": "TABBE",
+                "oppfolgingsenhet": "0318",
+                "kvalifiseringsgruppe": "BATT",
+                "rettighetsgruppe": "AAP",
+                "hovedmaal": "BEHOLDEA",
+                "sikkerhetstiltakType": null,
+                "diskresjonskode": null,
+                "harOppfolgingssak": true,
+                "sperretAnsatt": false,
+                "erDoed": false,
+                "doedFraDato": null,
+                "sistEndretDato": "2020-10-30T14:15:38+01:00"
+            }   
         }
     """.trimIndent()
 }

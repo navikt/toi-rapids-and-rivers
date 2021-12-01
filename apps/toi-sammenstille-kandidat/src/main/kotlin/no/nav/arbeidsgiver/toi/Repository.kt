@@ -80,17 +80,21 @@ class Repository(private val dataSource: DataSource) {
 data class Kandidat(
     val aktørId: String,
     val cv: JsonNode? = null,
-    val veileder: JsonNode? = null
+    val veileder: JsonNode? = null,
+    val oppfølgingsinformasjon: JsonNode? = null
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()
         fun fraJson(json:String) = fraJson(objectMapper.readTree(json))
-        fun fraJson(json:JsonNode) = Kandidat(json["aktørId"].asText(), json["cv"],json["veileder"])
+        fun fraJson(json:JsonNode) = Kandidat(json["aktørId"].asText(), json["cv"], json["veileder"], json["oppfølgingsinformasjon"])
     }
+
+    // TODO: Kan vel endres til å bruke objectMapper?
     fun toJson(): String = """ {
         "aktørId":$aktørId,
         "cv":$cv,
-        "veileder":$veileder
+        "veileder":$veileder,
+        "oppfølgingsinformasjon": $oppfølgingsinformasjon
         }
     """.trimIndent()
 }

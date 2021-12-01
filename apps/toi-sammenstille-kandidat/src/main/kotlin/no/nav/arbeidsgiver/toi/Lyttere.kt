@@ -16,11 +16,6 @@ class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behand
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         behandler.behandleHendelse(Hendelse(HendelseType.CV, packet["aktørId"].asText() , packet))
     }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        log.error("CvLytter onError $problems")
-        super.onError(problems, context)
-    }
 }
 
 class VeilederLytter(
@@ -39,9 +34,22 @@ class VeilederLytter(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         behandler.behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørId"].asText(), packet))
     }
+}
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        log.error("VeilederLytter onError $problems")
-        super.onError(problems, context)
+class OppfølgingsinformasjonLytter(
+    rapidsConnection: RapidsConnection, private val behandler: Behandler
+) : River.PacketListener {
+    init {
+        River(rapidsConnection).apply {
+            validate {
+                it.demandValue("@event_name", "oppfølgingsinformasjon")
+                it.demandKey("oppfølgingsinformasjon")
+                it.demandKey("aktørId")
+            }
+        }.register(this)
+    }
+
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        behandler.behandleHendelse(Hendelse(HendelseType.OPPFØLGINGSINFORMASJON, packet["aktørId"].asText(), packet))
     }
 }
