@@ -17,6 +17,7 @@ fun startApp(
             )
             VeilederLytter(rapid, behandler)
             CvLytter(rapid, behandler)
+            OppfølgingsinformasjonLytter(rapid, behandler)
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)

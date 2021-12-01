@@ -18,8 +18,6 @@ class KandidatfeedTest {
 
         testrapid.sendTestMessage(rapidMelding)
 
-        Thread.sleep(500)
-
         assertThat(producer.history().size).isEqualTo(1)
         val melding = producer.history()[0]
 
@@ -46,8 +44,6 @@ class KandidatfeedTest {
 
         testrapid.sendTestMessage(rapidMelding)
 
-        Thread.sleep(500)
-
         assertThat(producer.history().size).isEqualTo(1)
         val melding = producer.history()[0]
 
@@ -70,8 +66,6 @@ class KandidatfeedTest {
 
         testrapid.sendTestMessage(rapidMelding)
 
-        Thread.sleep(500)
-
         assertThat(producer.history().size).isEqualTo(0)
     }
 
@@ -83,8 +77,6 @@ class KandidatfeedTest {
         KandidatfeedLytter(testrapid, producer)
 
         testrapid.sendTestMessage(rapidMelding)
-
-        Thread.sleep(500)
 
         assertThat(producer.history().size).isEqualTo(0)
     }

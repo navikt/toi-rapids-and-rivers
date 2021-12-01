@@ -10,5 +10,6 @@ data class Hendelse(val hendelseType: HendelseType, val aktørid: String, val js
 
 enum class HendelseType {
     CV,
-    VEILEDER
+    VEILEDER,
+    OPPFØLGINGSINFORMASJON
 }

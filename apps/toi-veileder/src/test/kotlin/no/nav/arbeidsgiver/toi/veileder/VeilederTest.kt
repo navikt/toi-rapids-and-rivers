@@ -15,7 +15,6 @@ class VeilederTest {
         VeilederLytter(testRapid)
 
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
-        Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
 
