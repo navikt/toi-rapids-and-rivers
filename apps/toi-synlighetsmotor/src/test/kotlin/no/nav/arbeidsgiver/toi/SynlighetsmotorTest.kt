@@ -22,28 +22,35 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person er under oppfølging skal synlighet være false`() :Unit = TODO()
+    fun `om Person er under oppfølging skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person har feil hovedmaalkode skal synlighet være false`() :Unit = TODO()
+    fun `om Person har feil hovedmaalkode skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person har feil formidlingsgruppe skal synlighet være false`() :Unit = TODO()
+    fun `om Person har formidlingsgruppe ARBS skal synlighet være true`(): Unit = testProgramMedHendelse(
+        oppfølgingsinformasjonHendelse(formidlingsgruppe = "ARBS"), enHendelseErPublisertMedSynlighetsverdi(true)
+    )
 
     @Test
-    fun `om Person er familie skal synlighet være false`() :Unit = TODO()
+    fun `om Person har feil formidlingsgruppe skal synlighet være false`(): Unit = testProgramMedHendelse(
+        oppfølgingsinformasjonHendelse(formidlingsgruppe = "IKKEARBSELLERIARBS"), enHendelseErPublisertMedSynlighetsverdi(false)
+    )
 
     @Test
-    fun `om Person ikke er manuell skal synlighet være false`() :Unit = TODO()
+    fun `om Person er familie skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person ikke er fritattkandidatsøk skal synlighet være false`() :Unit = TODO()
+    fun `om Person ikke er manuell skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person er kode 6 skal synlighet være false`() :Unit = TODO()
+    fun `om Person ikke er fritattkandidatsøk skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person er kode 7 skal synlighet være false`() :Unit = TODO()
+    fun `om Person er kode 6 skal synlighet være false`(): Unit = TODO()
+
+    @Test
+    fun `om Person er kode 7 skal synlighet være false`(): Unit = TODO()
 
     @Test
     fun `ignorer uinteressante hendelser`() = testProgramMedHendelse(
@@ -79,12 +86,16 @@ class SynlighetsmotorTest {
         rapid.inspektør.apply(assertion)
     }
 
-    private fun oppfølgingsinformasjonHendelse(erDoed: Boolean = false, sperretAnsatt: Boolean = false) = """
+    private fun oppfølgingsinformasjonHendelse(
+        erDoed: Boolean = false,
+        sperretAnsatt: Boolean = false,
+        formidlingsgruppe: String = "IARBS"
+    ) = """
             {
                 "@event_name":"oppfølgingsinformasjon",
                 "oppfølgingsinformasjon": {
                     "fodselsnummer": "12345678912",
-                    "formidlingsgruppe": "IARBS",
+                    "formidlingsgruppe": "$formidlingsgruppe",
                     "iservFraDato": null,
                     "fornavn": "TULLETE",
                     "etternavn": "TABBE",
