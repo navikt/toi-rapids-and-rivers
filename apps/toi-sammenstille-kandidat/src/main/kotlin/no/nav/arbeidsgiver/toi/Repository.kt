@@ -85,18 +85,16 @@ data class Kandidat(
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()
-        fun fraJson(json:String) = fraJson(objectMapper.readTree(json))
-        fun fraJson(json:JsonNode) = Kandidat(json["aktørId"].asText(), json["cv"], json["veileder"], json["oppfølgingsinformasjon"])
+        fun fraJson(json: String) = fraJson(objectMapper.readTree(json))
+        fun fraJson(json: JsonNode) = Kandidat(
+            aktørId = json["aktørId"].asText(),
+            cv = json["cv"],
+            veileder = json["veileder"],
+            oppfølgingsinformasjon = json["oppfølgingsinformasjon"]
+        )
     }
 
-    // TODO: Kan vel endres til å bruke objectMapper?
-    fun toJson(): String = """ {
-        "aktørId":$aktørId,
-        "cv":$cv,
-        "veileder":$veileder,
-        "oppfølgingsinformasjon": $oppfølgingsinformasjon
-        }
-    """.trimIndent()
+    fun toJson() = jacksonObjectMapper().writeValueAsString(this)
 }
 
 typealias AktøridHendelse = Pair<String, JsonMessage>
