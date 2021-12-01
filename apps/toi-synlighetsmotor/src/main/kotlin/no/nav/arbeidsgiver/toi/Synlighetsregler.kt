@@ -2,12 +2,24 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.JsonMessage
 
-interface Synlighetsregel {
+private interface Synlighetsregel {
     fun erSynlig(packet: JsonMessage): Boolean
     fun harBeregningsgrunnlag(packet: JsonMessage): Boolean
+    infix fun og(other: Synlighetsregel) = OgRegel(this, other)
+    infix fun eller(other: Synlighetsregel) = EllerRegel(this, other)
 }
 
-object `er ikke død` : Synlighetsregel {
+private class OgRegel(private val regel1: Synlighetsregel, private val regel2: Synlighetsregel): Synlighetsregel {
+    override fun erSynlig(packet: JsonMessage) = regel1.erSynlig(packet) && regel2.erSynlig(packet)
+    override fun harBeregningsgrunnlag(packet: JsonMessage) = regel1.harBeregningsgrunnlag(packet) && regel2.harBeregningsgrunnlag(packet)
+}
+
+private class EllerRegel(private val regel1: Synlighetsregel, private val regel2: Synlighetsregel): Synlighetsregel {
+    override fun erSynlig(packet: JsonMessage) = regel1.erSynlig(packet) || regel2.erSynlig(packet)
+    override fun harBeregningsgrunnlag(packet: JsonMessage) = regel1.harBeregningsgrunnlag(packet) && regel2.harBeregningsgrunnlag(packet)
+}
+
+private object `er ikke død` : Synlighetsregel {
     override fun erSynlig(packet: JsonMessage) =
         harBeregningsgrunnlag(packet) && !packet["oppfølgingsinformasjon"]["erDoed"].asBoolean()
 
@@ -15,7 +27,7 @@ object `er ikke død` : Synlighetsregel {
         packet["oppfølgingsinformasjon"].has("erDoed")
 }
 
-object `er ikke sperret ansatt` : Synlighetsregel {
+private object `er ikke sperret ansatt` : Synlighetsregel {
     override fun erSynlig(packet: JsonMessage) =
         harBeregningsgrunnlag(packet) && !packet["oppfølgingsinformasjon"]["sperretAnsatt"].asBoolean()
 
@@ -23,15 +35,14 @@ object `er ikke sperret ansatt` : Synlighetsregel {
         packet["oppfølgingsinformasjon"].has("sperretAnsatt")
 }
 
-object `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag` : Synlighetsregel {
+private object `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag` : Synlighetsregel {
     override fun erSynlig(packet: JsonMessage) = true
     override fun harBeregningsgrunnlag(packet: JsonMessage) = false
 }
 
-private val synlighetsregler = listOf(
-    `er ikke død`, `er ikke sperret ansatt`,
+private val synlighetsregel =
+    `er ikke død` og `er ikke sperret ansatt` og
     `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
-)
 
-fun erSynlig(packet: JsonMessage) = synlighetsregler.all { it.erSynlig(packet) }
-fun harBeregningsgrunnlag(packet: JsonMessage) = synlighetsregler.all { it.harBeregningsgrunnlag(packet) }
+fun erSynlig(packet: JsonMessage) = synlighetsregel.erSynlig(packet)
+fun harBeregningsgrunnlag(packet: JsonMessage) = synlighetsregel.harBeregningsgrunnlag(packet)
