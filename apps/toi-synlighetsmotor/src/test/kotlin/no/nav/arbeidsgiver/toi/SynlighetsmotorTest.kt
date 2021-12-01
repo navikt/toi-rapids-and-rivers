@@ -7,8 +7,19 @@ import org.junit.jupiter.api.Test
 class SynlighetsmotorTest {
 
     @Test
+    fun `legg på synlighet som sann om all data i hendelse tilsier det`() = testProgramMedHendelse(
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(), cv = cv()),
+        enHendelseErPublisertMedSynlighetsverdi(true)
+    )
+
+    @Test
     fun `legg på synlighet ved oppfølgingsinformasjon`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdi(true)
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdi(false)
+    )
+
+    @Test
+    fun `legg på synlighet ved cv`() = testProgramMedHendelse(
+        hendelse(cv = cv()), enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
     @Test
@@ -30,8 +41,8 @@ class SynlighetsmotorTest {
     fun `om Person er under oppfølging skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person har formidlingsgruppe ARBS skal synlighet være true`(): Unit = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS")),
+    fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`(): Unit = testProgramMedHendelse(
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS"), cv = cv()),
         enHendelseErPublisertMedSynlighetsverdi(true)
     )
 
@@ -54,7 +65,10 @@ class SynlighetsmotorTest {
     fun `om Person er kode 7 skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person ikke har CV skal synlighet være false`(): Unit = TODO()
+    fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
+        hendelse(cv = manglendeCV()),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
 
     @Test
     fun `om Person ikke har jobbønsker skal synlighet være false`(): Unit = TODO()
@@ -80,7 +94,6 @@ class SynlighetsmotorTest {
         {
             assertThat(size).isEqualTo(1)
             assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
-            assertThat(message(0).hasNonNull("oppfølgingsinformasjon")).isTrue
             field(0, "synlighet").apply {
                 assertThat(get("erSynlig").asBoolean()).apply { if (synlighet) isTrue else isFalse }
                 assertThat(get("ferdigBeregnet").asBoolean()).isFalse
@@ -109,6 +122,11 @@ class SynlighetsmotorTest {
             }
             """.trimIndent()
 
+    private fun manglendeOppfølgingsinformasjon() =
+        """
+            "oppfølgingsinformasjon": null
+        """.trimIndent()
+
     private fun oppfølgingsinformasjon(
         erDoed: Boolean = false,
         sperretAnsatt: Boolean = false,
@@ -133,5 +151,17 @@ class SynlighetsmotorTest {
                     "doedFraDato": null,
                     "sistEndretDato": "2020-10-30T14:15:38+01:00"
                 }
+        """.trimIndent()
+
+    private fun cv(
+    ) =
+        """
+            "cv": {
+                }
+        """.trimIndent()
+
+    private fun manglendeCV() =
+        """
+            "cv": null
         """.trimIndent()
 }

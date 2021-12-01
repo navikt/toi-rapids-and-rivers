@@ -17,7 +17,7 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection): River.PacketListener
     private val interessanteFelt = listOf("oppfølgingsinformasjon", "cv")
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if(interessanteFelt.map(packet::get).all(JsonNode::isMissingOrNull)) return
+        if(interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)) return
         packet["synlighet"] = Synlighet(erSynlig(packet),harBeregningsgrunnlag(packet))
         publish(packet.toJson())
     }
