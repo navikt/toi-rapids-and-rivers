@@ -12,22 +12,21 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandKey("aktoerid")
-                it.demandKey("har_oppfolgingssak")
+                it.demandKey("fodselsnummer")
+                it.demandKey("oppfolgingsenhet")
+                it.demandKey("harOppfolgingssak")
                 it.rejectKey("@event_name")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val aktoerid = packet["aktoerid"]
         val melding = mapOf(
-            "aktørId" to aktoerid,
             "oppfølgingsinformasjon" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "oppfølgingsinformasjon",
         )
         val nyPacket = JsonMessage.newMessage(melding)
-        log.info("Skal publisere oppfølgingsinformasjonmelding for aktørid til rapid: ${aktoerid.asText()}")
+        log.info("Skal publisere oppfølgingsinformasjonmelding uten aktørId")
         rapidsConnection.publish(nyPacket.toJson())
     }
 

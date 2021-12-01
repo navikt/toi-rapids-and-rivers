@@ -8,11 +8,10 @@ class OppfolgingsinformasjonTest {
 
     @Test
     fun `Lesing av oppfølgingsinformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
-        val aktørId = "10000100000"
         val testRapid = TestRapid()
         OppfolgingsinformasjonLytter(testRapid)
 
-        testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(aktørId))
+        testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic())
         Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
@@ -23,59 +22,67 @@ class OppfolgingsinformasjonTest {
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "oppfølgingsinformasjon",
-            "aktørId",
             "system_read_count"
-
         )
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
         val oppfølgingsinformasjonJson = meldingJson.get("oppfølgingsinformasjon")
         assertThat(oppfølgingsinformasjonJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-                "aktoerid",
-                "fodselsnr",
-                "formidlingsgruppekode",
-                "iserv_fra_dato",
-                "etternavn",
-                "fornavn",
-                "nav_kontor",
-                "kvalifiseringsgruppekode",
-                "rettighetsgruppekode",
-                "hovedmaalkode",
-                "sikkerhetstiltak_type_kode",
-                "fr_kode",
-                "har_oppfolgingssak",
-                "sperret_ansatt",
-                "er_doed",
-                "doed_fra_dato",
-                "endret_dato",
+            "fodselsnummer",
+            "formidlingsgruppe",
+            "iservFraDato",
+            "fornavn",
+            "etternavn",
+            "oppfolgingsenhet",
+            "kvalifiseringsgruppe",
+            "rettighetsgruppe",
+            "hovedmaal",
+            "sikkerhetstiltakType",
+            "diskresjonskode",
+            "harOppfolgingssak",
+            "sperretAnsatt",
+            "erDoed",
+            "doedFraDato",
+            "sistEndretDato"
         )
         meldingJson.get("oppfølgingsinformasjon").apply {
-            assertThat(get("aktoerid").asText()).isEqualTo(aktørId)
-            assertThat(get("fodselsnr").asText()).isEqualTo("12312312312")
-            assertThat(get("iserv_fra_dato").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
+            assertThat(get("fodselsnummer").asText()).isEqualTo("12345678912")
+            assertThat(get("formidlingsgruppe").asText()).isEqualTo("IARBS")
+            assertThat(get("iservFraDato").isNull).isTrue
+            assertThat(get("fornavn").asText()).isEqualTo("TULLETE")
+            assertThat(get("etternavn").asText()).isEqualTo("TABBE")
+            assertThat(get("oppfolgingsenhet").asText()).isEqualTo("0318")
+            assertThat(get("kvalifiseringsgruppe").asText()).isEqualTo("BATT")
+            assertThat(get("rettighetsgruppe").asText()).isEqualTo("AAP")
+            assertThat(get("hovedmaal").asText()).isEqualTo("BEHOLDEA")
+            assertThat(get("sikkerhetstiltakType").isNull).isTrue
+            assertThat(get("diskresjonskode").isNull).isTrue
+            assertThat(get("harOppfolgingssak").asBoolean()).isTrue
+            assertThat(get("sperretAnsatt").asBoolean()).isFalse
+            assertThat(get("erDoed").asBoolean()).isFalse
+            assertThat(get("doedFraDato").isNull).isTrue
+            assertThat(get("sistEndretDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
         }
     }
 
-    private fun oppfølgingsinformasjonMeldingFraEksterntTopic(aktørId: String) = """
+    private fun oppfølgingsinformasjonMeldingFraEksterntTopic() = """
         {
-            "aktoerid":"$aktørId",
-            "fodselsnr":"12312312312",
-            "formidlingsgruppekode":"1",
-            "iserv_fra_dato":"2020-12-21T10:58:19.023+01:00",
-            "etternavn":"Normann",
-            "fornavn":"Ola",
-            "nav_kontor":"123",
-            "kvalifiseringsgruppekode":"1",
-            "rettighetsgruppekode":"2",
-            "hovedmaalkode":"3",
-            "sikkerhetstiltak_type_kode":"4",
-            "fr_kode":"5",
-            "har_oppfolgingssak":"ja",
-            "sperret_ansatt":"nei",
-            "er_doed":"nei",
-            "doed_fra_dato":"2020-12-21T10:58:19.023+01:00",
-            "endret_dato":"2020-12-21T10:58:19.023+01:00"
+            "fodselsnummer": "12345678912",
+            "formidlingsgruppe": "IARBS",
+            "iservFraDato": null,
+            "fornavn": "TULLETE",
+            "etternavn": "TABBE",
+            "oppfolgingsenhet": "0318",
+            "kvalifiseringsgruppe": "BATT",
+            "rettighetsgruppe": "AAP",
+            "hovedmaal": "BEHOLDEA",
+            "sikkerhetstiltakType": null,
+            "diskresjonskode": null,
+            "harOppfolgingssak": true,
+            "sperretAnsatt": false,
+            "erDoed": false,
+            "doedFraDato": null,
+            "sistEndretDato": "2020-10-30T14:15:38+01:00"
         }
     """.trimIndent()
 }
