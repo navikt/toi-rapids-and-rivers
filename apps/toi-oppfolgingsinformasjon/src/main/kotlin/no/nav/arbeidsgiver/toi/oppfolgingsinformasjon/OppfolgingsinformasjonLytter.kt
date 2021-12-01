@@ -22,11 +22,14 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val melding = mapOf(
+            "fodselsnummer" to packet["fodselsnummer"],
             "oppfølgingsinformasjon" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "oppfølgingsinformasjon",
         )
-        val nyPacket = JsonMessage.newMessage(melding)
+
         log.info("Skal publisere oppfølgingsinformasjonmelding uten aktørId")
+
+        val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
     }
 

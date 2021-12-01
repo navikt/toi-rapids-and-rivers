@@ -9,9 +9,11 @@ class OppfolgingsinformasjonTest {
     @Test
     fun `Lesing av oppfølgingsinformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
         val testRapid = TestRapid()
+        val fødselsnummer = "123"
+
         OppfolgingsinformasjonLytter(testRapid)
 
-        testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic())
+        testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(fødselsnummer))
         Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
@@ -22,9 +24,12 @@ class OppfolgingsinformasjonTest {
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "oppfølgingsinformasjon",
+            "fodselsnummer",
             "system_read_count"
         )
+
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")
+        assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
 
         val oppfølgingsinformasjonJson = meldingJson.get("oppfølgingsinformasjon")
         assertThat(oppfølgingsinformasjonJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
@@ -45,8 +50,9 @@ class OppfolgingsinformasjonTest {
             "doedFraDato",
             "sistEndretDato"
         )
+
         meldingJson.get("oppfølgingsinformasjon").apply {
-            assertThat(get("fodselsnummer").asText()).isEqualTo("12345678912")
+            assertThat(get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
             assertThat(get("formidlingsgruppe").asText()).isEqualTo("IARBS")
             assertThat(get("iservFraDato").isNull).isTrue
             assertThat(get("fornavn").asText()).isEqualTo("TULLETE")
@@ -65,9 +71,9 @@ class OppfolgingsinformasjonTest {
         }
     }
 
-    private fun oppfølgingsinformasjonMeldingFraEksterntTopic() = """
+    private fun oppfølgingsinformasjonMeldingFraEksterntTopic(fødselsnummer: String) = """
         {
-            "fodselsnummer": "12345678912",
+            "fodselsnummer": "$fødselsnummer",
             "formidlingsgruppe": "IARBS",
             "iservFraDato": null,
             "fornavn": "TULLETE",
