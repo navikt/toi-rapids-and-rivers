@@ -162,10 +162,24 @@ class SammenstillTest {
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
 
-        Thread.sleep(1000)
+        Thread.sleep(300)
 
         val antallLagredeKandidater = testDatabase.hentAntallKandidater();
         assertThat(antallLagredeKandidater).isEqualTo(1)
+    }
+
+    @Test
+    fun `Objekter inne i sammenstiltKandidat-melding skal ikke være stringified`() {
+        val testRapid = TestRapid()
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(oppfølgingsinformasjonMelding("12141321"))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        val oppfølgingsinformasjonPåMelding = melding.get("oppfølgingsinformasjon")
+        assertThat(oppfølgingsinformasjonPåMelding.isObject).isTrue
     }
 
     private fun veilederMelding(aktørId: String) = """
