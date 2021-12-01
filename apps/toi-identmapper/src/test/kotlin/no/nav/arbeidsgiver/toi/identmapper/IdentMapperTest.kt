@@ -72,6 +72,58 @@ class IdentMapperTest {
         assertThat(meldingPåRapid.get("aktørId").asText()).isEqualTo(aktørId)
     }
 
+    @Test
+    fun `en melding som inneholder "aktørId" skal ikke publiseres på nytt`() {
+        val rapid = TestRapid()
+        val aktørIdKey = "aktørId"
+        val fødselsnummerKey = "fodselsnummer"
+        AktorIdPopulator(fødselsnummerKey, rapid) { "dummyAktørId" }
+
+        rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
+        Thread.sleep(300)
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `en melding som inneholder "aktorId" skal ikke publiseres på nytt`() {
+        val rapid = TestRapid()
+        val aktørIdKey = "aktorId"
+        val fødselsnummerKey = "fodselsnummer"
+        AktorIdPopulator(fødselsnummerKey, rapid) { "dummyAktørId" }
+
+        rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
+        Thread.sleep(300)
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `en melding som inneholder "aktoerId" skal ikke publiseres på nytt`() {
+        val rapid = TestRapid()
+        val aktørIdKey = "aktoerId"
+        val fødselsnummerKey = "fodselsnummer"
+        AktorIdPopulator(fødselsnummerKey, rapid) { "dummyAktørId" }
+
+        rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
+        Thread.sleep(300)
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `en melding som inneholder "AKTORID" skal ikke publiseres på nytt`() {
+        val rapid = TestRapid()
+        val aktørIdKey = "AKTORID"
+        val fødselsnummerKey = "fodselsnummer"
+        AktorIdPopulator(fødselsnummerKey, rapid) { "dummyAktørId" }
+
+        rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
+        Thread.sleep(300)
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
+    }
+
     fun meldingUtenAktørId(fødselsnummerKey: String, fødselsnummerValue: String) =
         """
             {
@@ -88,4 +140,19 @@ class IdentMapperTest {
             }
         """.trimIndent()
 
+    fun meldingMedAktørId(aktørIdKey: String) =
+        """
+            {
+                "$aktørIdKey": "1234566534",
+                "etAnnetFelt": false,
+                "etObjekt": {
+                    "enListe": [
+                        1,
+                        2,
+                        3,
+                        4
+                    ]
+                }
+            }
+        """.trimIndent()
 }
