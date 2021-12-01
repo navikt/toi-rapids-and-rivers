@@ -14,7 +14,6 @@ class SammenstillTest {
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(cvMelding(aktørId))
 
-        Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(2)
 
@@ -49,10 +48,8 @@ class SammenstillTest {
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(cvMelding(aktørId))
-        Thread.sleep(1000)
         testRapid.sendTestMessage(veilederMelding(aktørId))
 
-        Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(2)
 
@@ -94,7 +91,6 @@ class SammenstillTest {
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(cvMelding(aktørId))
 
-        Thread.sleep(1000)
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(1)
 
@@ -120,7 +116,6 @@ class SammenstillTest {
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(oppfølgingsinformasjonMelding(aktørId))
 
-        Thread.sleep(300)
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(1)
 
@@ -161,8 +156,6 @@ class SammenstillTest {
         testRapid.sendTestMessage(cvMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
-
-        Thread.sleep(300)
 
         val antallLagredeKandidater = testDatabase.hentAntallKandidater();
         assertThat(antallLagredeKandidater).isEqualTo(1)

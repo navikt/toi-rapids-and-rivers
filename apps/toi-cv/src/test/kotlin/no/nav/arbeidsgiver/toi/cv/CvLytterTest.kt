@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi.cv
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.arbeid.cv.avro.*
@@ -29,7 +28,7 @@ class CvLytterTest {
         mottaCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(400)
+        Thread.sleep(300)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 

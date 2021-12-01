@@ -15,7 +15,6 @@ class IdentMapperTest {
         AktorIdPopulator(fødselsnummerKey, rapid) { aktørId }
 
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
-        Thread.sleep(300)
 
         val inspektør = rapid.inspektør
         val meldingPåRapid = inspektør.message(0)
@@ -45,7 +44,6 @@ class IdentMapperTest {
         AktorIdPopulator(fødselsnummerKey, rapid) { aktørId }
 
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
-        Thread.sleep(300)
 
         val inspektør = rapid.inspektør
         val meldingPåRapid = inspektør.message(0)
@@ -63,7 +61,6 @@ class IdentMapperTest {
         AktorIdPopulator(fødselsnummerKey, rapid) { aktørId }
 
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
-        Thread.sleep(300)
 
         val inspektør = rapid.inspektør
         val meldingPåRapid = inspektør.message(0)
@@ -80,7 +77,6 @@ class IdentMapperTest {
         AktorIdPopulator(fødselsnummerKey, rapid) { "dummyAktørId" }
 
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
-        Thread.sleep(300)
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
     }
