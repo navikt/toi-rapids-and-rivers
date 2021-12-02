@@ -54,13 +54,21 @@ private object `har CV` : Synlighetsregel {
         !packet["cv"].isMissingNode
 }
 
+private object `har oppfølgingssak` : Synlighetsregel {
+    override fun erSynlig(packet: JsonMessage) =
+        `er ikke sperret ansatt`.harBeregningsgrunnlag(packet) && packet["oppfølgingsinformasjon"]["harOppfolgingssak"].asBoolean()
+
+    override fun harBeregningsgrunnlag(packet: JsonMessage) =
+        packet["oppfølgingsinformasjon"].has("harOppfolgingssak")
+}
+
 private object `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag` : Synlighetsregel {
     override fun erSynlig(packet: JsonMessage) = true
     override fun harBeregningsgrunnlag(packet: JsonMessage) = false
 }
 
 private val synlighetsregel =
-    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har CV` og
+    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har CV` og `har oppfølgingssak` og
             `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
 
 fun erSynlig(packet: JsonMessage) = synlighetsregel.erSynlig(packet)

@@ -24,13 +24,13 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person er død skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(erDoed = true)),
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(erDoed = true), cv = cv()),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
     @Test
     fun `om Person er sperret ansatt skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(sperretAnsatt = true)),
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(sperretAnsatt = true), cv = cv()),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
@@ -38,17 +38,20 @@ class SynlighetsmotorTest {
     fun `om Person er familie skal synlighet være false`(): Unit = TODO()
 
     @Test
-    fun `om Person er under oppfølging skal synlighet være false`(): Unit = TODO()
+    fun `om Person ikke er under oppfølging skal synlighet være false`() = testProgramMedHendelse(
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(harOppfolgingssak = false), cv = cv()),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
 
     @Test
-    fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`(): Unit = testProgramMedHendelse(
+    fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
         hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS"), cv = cv()),
         enHendelseErPublisertMedSynlighetsverdi(true)
     )
 
     @Test
-    fun `om Person har feil formidlingsgruppe skal synlighet være false`(): Unit = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS")),
+    fun `om Person har feil formidlingsgruppe skal synlighet være false`() = testProgramMedHendelse(
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS"), cv = cv()),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
@@ -66,7 +69,7 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(cv = manglendeCV()),
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(), cv = manglendeCV()),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
@@ -130,7 +133,8 @@ class SynlighetsmotorTest {
     private fun oppfølgingsinformasjon(
         erDoed: Boolean = false,
         sperretAnsatt: Boolean = false,
-        formidlingsgruppe: String = "IARBS"
+        formidlingsgruppe: String = "IARBS",
+        harOppfolgingssak: Boolean = true
     ) =
         """
             "oppfølgingsinformasjon": {
@@ -145,7 +149,7 @@ class SynlighetsmotorTest {
                     "hovedmaal": "BEHOLDEA",
                     "sikkerhetstiltakType": null,
                     "diskresjonskode": null,
-                    "harOppfolgingssak": true,
+                    "harOppfolgingssak": $harOppfolgingssak,
                     "sperretAnsatt": $sperretAnsatt,
                     "erDoed": $erDoed,
                     "doedFraDato": null,
