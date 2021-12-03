@@ -26,7 +26,11 @@ class AktorIdPopulator(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        packet[aktørIdKey] = hentAktørId(packet[fnrKey].asText())
+        val fødselsnummer = packet[fnrKey].asText()
+
+        log.info("Mottok melding med fødselsnummer $fødselsnummer")
+
+        packet[aktørIdKey] = hentAktørId(fødselsnummer)
         rapidsConnection.publish(packet.fjernMetadataOgKonverter().toString())
     }
 
@@ -34,6 +38,7 @@ class AktorIdPopulator(
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
         jsonNode.remove(metadataFelter)
+
         return jsonNode
     }
 }

@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
@@ -13,8 +14,8 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         val (_, _, result) = Fuel.post(pdlUrl)
             .header(Headers.CONTENT_TYPE, "application/json")
-            .header(Headers.AUTHORIZATION, "Bearer $accessToken")
             .header("Tema", "GEN")
+            .authentication().bearer(accessToken)
             .jsonBody(graphql)
             .responseObject<Respons>()
 

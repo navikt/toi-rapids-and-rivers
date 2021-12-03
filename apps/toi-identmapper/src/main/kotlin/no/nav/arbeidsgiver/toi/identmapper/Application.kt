@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
 import no.nav.helse.rapids_rivers.RapidApplication
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 fun main() {
     val env = System.getenv()
@@ -16,3 +18,6 @@ fun main() {
         }
     }.start()
 }
+
+val Any.log: Logger
+    get() = LoggerFactory.getLogger(this::class.java)

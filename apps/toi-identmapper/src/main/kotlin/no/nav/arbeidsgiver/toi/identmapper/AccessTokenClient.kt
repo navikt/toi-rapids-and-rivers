@@ -23,7 +23,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
     }
 
     private fun fetchAccessToken(): AccessTokenResponse {
-
+        log.info("Prøver å hente ny access token ...")
         val url = env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] ?: throw RuntimeException("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT ikke satt")
 
         val formData = listOf(
@@ -38,7 +38,11 @@ class AccessTokenClient(private val env: Map<String, String>) {
             .responseObject<AccessTokenResponse>()
 
         when (result) {
-             is Result.Success -> return result.get()
+             is Result.Success -> {
+                 log.info("Fikk tak i access token med lengde ${result.get().access_token.length}")
+                 return result.get()
+             }
+
              is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.getException())
         }
     }
