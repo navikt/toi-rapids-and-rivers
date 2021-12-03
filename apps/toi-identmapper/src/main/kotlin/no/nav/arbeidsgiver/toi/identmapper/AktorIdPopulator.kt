@@ -37,15 +37,7 @@ class AktorIdPopulator(
             }
         } else {
             packet[aktørIdKey] = aktørId
-            rapidsConnection.publish(packet.fjernMetadataOgKonverter().toString())
+            rapidsConnection.publish(packet.toJson())
         }
-    }
-
-    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        jsonNode.remove(metadataFelter)
-
-        return jsonNode
     }
 }

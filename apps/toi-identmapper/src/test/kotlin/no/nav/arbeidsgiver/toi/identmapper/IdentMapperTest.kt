@@ -25,7 +25,9 @@ class IdentMapperTest {
             "fodselsnummer",
             "aktørId",
             "etAnnetFelt",
-            "etObjekt"
+            "etObjekt",
+            "@event_name",
+            "system_read_count"
         )
 
         assertThat(meldingPåRapid.get(fødselsnummerKey).asText()).isEqualTo(fødselsnummer)
@@ -145,6 +147,7 @@ class IdentMapperTest {
         """
             {
                 "$fødselsnummerKey": "$fødselsnummerValue",
+                "@event_name": "eventName",
                 "etAnnetFelt": false,
                 "etObjekt": {
                     "enListe": [
@@ -161,6 +164,7 @@ class IdentMapperTest {
         """
             {
                 "$aktørIdKey": "1234566534",
+                "@event_name": "eventName",
                 "etAnnetFelt": false,
                 "etObjekt": {
                     "enListe": [
