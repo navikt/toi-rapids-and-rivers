@@ -8,7 +8,7 @@ import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
-    fun aktørIdFor(fødselsnummer: String): String {
+    fun hentAktørId(fødselsnummer: String): String? {
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(fødselsnummer)
 
@@ -21,10 +21,16 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         when (result) {
             is Result.Success -> return result.get().data.hentIdenter?.identer?.first()?.ident
-                    ?: throw RuntimeException("Klarte ikke å hente identer fra PDL-respons: ${result.get().errors}")
+                    ?: behandleErrorFraPDL(result.get().errors)
 
             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av aktørId: ", result.getException())
         }
+    }
+
+    private fun behandleErrorFraPDL(errors: List<Error>?): String? {
+        log.warn("Klarte ikke å hente identer fra PDL-respons: $errors")
+
+        return null;
     }
 
     private fun lagGraphQLSpørring(fødselsnummer: String): String {

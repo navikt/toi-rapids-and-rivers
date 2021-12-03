@@ -11,10 +11,11 @@ fun main() {
         val accessTokenClient = AccessTokenClient(env)
 
         val pdlUrl = env["PDL_URL"]!!
+        val cluster = env["NAIS_CLUSTER_NAME"]!!
         val pdlKlient = PdlKlient(pdlUrl, accessTokenClient)
 
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
-            AktorIdPopulator(fnrKey, rapidsConnection, pdlKlient::aktørIdFor)
+            AktorIdPopulator(fnrKey, rapidsConnection, cluster, pdlKlient::hentAktørId)
         }
     }.start()
 }
