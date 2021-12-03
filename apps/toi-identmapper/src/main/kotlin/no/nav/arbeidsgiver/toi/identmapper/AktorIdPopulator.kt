@@ -28,7 +28,7 @@ class AktorIdPopulator(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fødselsnummer = packet[fnrKey].asText()
 
-        log.info("Mottok melding med fødselsnummer $fødselsnummer")
+        log.info("Mottok melding med fødselsnummer")
 
         packet[aktørIdKey] = hentAktørId(fødselsnummer)
         rapidsConnection.publish(packet.fjernMetadataOgKonverter().toString())
