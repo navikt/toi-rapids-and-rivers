@@ -23,7 +23,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
     }
 
     private fun fetchAccessToken(): AccessTokenResponse {
-        log.info("Prøver å hente ny access token ...")
+        log.info("Prøver å hente nytt access token ...")
         val url = env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] ?: throw RuntimeException("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT ikke satt")
 
         val formData = listOf(
