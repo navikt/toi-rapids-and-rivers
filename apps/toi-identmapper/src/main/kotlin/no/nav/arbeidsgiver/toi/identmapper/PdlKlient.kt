@@ -12,7 +12,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(fødselsnummer)
 
-        val (_, _, result) = Fuel.post(pdlUrl)
+        val (_, respons, result) = Fuel.post(pdlUrl)
             .header(Headers.CONTENT_TYPE, "application/json")
             .header("Tema", "GEN")
             .authentication().bearer(accessToken)
@@ -20,7 +20,9 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             .responseObject<Respons>()
 
         when (result) {
-            is Result.Success -> return  result.get().data.hentIdenter.identer.first().ident
+            is Result.Success -> result.get().data.hentIdenter?.identer?.first()?.ident
+                    ?: throw RuntimeException("Klarte ikke å hente identer fra PDL-respons: ${result.get().data.errors}")
+
             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av aktørId: ", result.getException())
         }
     }
@@ -42,7 +44,8 @@ private data class Respons(
 )
 
 private data class Data(
-    val hentIdenter: HentIdenter,
+    val hentIdenter: HentIdenter?,
+    val errors: List<Error>?,
 )
 
 private data class HentIdenter(
@@ -51,4 +54,8 @@ private data class HentIdenter(
 
 private data class Identer(
     val ident: String
+)
+
+private data class Error(
+    val message: String,
 )
