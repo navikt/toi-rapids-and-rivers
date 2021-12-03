@@ -20,7 +20,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             .responseObject<Respons>()
 
         when (result) {
-            is Result.Success -> result.get().data.hentIdenter?.identer?.first()?.ident
+            is Result.Success -> return result.get().data.hentIdenter?.identer?.first()?.ident
                     ?: throw RuntimeException("Klarte ikke å hente identer fra PDL-respons: ${result.get().data.errors}")
 
             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av aktørId: ", result.getException())
