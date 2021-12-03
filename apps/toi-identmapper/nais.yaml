@@ -37,6 +37,8 @@ spec:
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
+    - name: KAFKA_RESET_POLICY
+      value: "earliest"
     - name: PDL_SCOPE
       value: {{ pdl_scope }}
     - name: PDL_URL
