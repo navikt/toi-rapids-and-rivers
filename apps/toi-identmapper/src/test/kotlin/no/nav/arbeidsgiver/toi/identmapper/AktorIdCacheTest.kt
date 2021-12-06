@@ -23,7 +23,7 @@ class AktorIdCacheTest {
         val aktørIdCache = AktorIdCache(repository) { aktørIdFraPdl }
 
         assertThat(repository.hentIdentMappinger(fødselsnummer)).isEmpty()
-        assertThat(aktørIdCache.hentAktørId(fødselsnummer)).isEqualTo(aktørIdCache)
+        assertThat(aktørIdCache.hentAktørId(fødselsnummer)).isEqualTo(aktørIdFraPdl)
 
         val mappinger = repository.hentIdentMappinger(fødselsnummer)
 
