@@ -13,8 +13,7 @@ class AktorIdPopulator(
     private val rapidsConnection: RapidsConnection,
     private val cluster: String,
     private val hentAktørId: (fødselsnummer: String) -> String?,
-) :
-    River.PacketListener {
+) : River.PacketListener {
     private val aktørIdKey = "aktørId"
 
     init {
