@@ -14,7 +14,7 @@ fun main() {
         val cluster = env["NAIS_CLUSTER_NAME"]!!
         val pdlKlient = PdlKlient(pdlUrl, accessTokenClient)
         val repository = Repository(hentDatabasekonfigurasjon(env))
-        val aktørIdCache = AktorIdCache(pdlKlient, repository)
+        val aktørIdCache = AktorIdCache(repository, pdlKlient::hentAktørId)
 
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
             AktorIdPopulator(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)

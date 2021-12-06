@@ -42,22 +42,21 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun hentIdentMappinger(fødselsnummer: String): List<IdentMapping> {
-        return dataSource.connection.use {
+        dataSource.connection.use {
             val resultSet = it.prepareStatement("SELECT * FROM $tabell WHERE $fødselsnummerKolonne = ?").apply {
                 setString(1, fødselsnummer)
             }.executeQuery()
 
-            generateSequence {
-                if (resultSet.next()) resultSet.tilIdentMapping()
-                else null
+            return generateSequence {
+                if (resultSet.next()) tilIdentMapping(resultSet) else null
             }.toList()
         }
     }
 
-    private fun ResultSet.tilIdentMapping() = IdentMapping(
-        aktørId = this.getString(aktørIdKolonne),
-        fødselsnummer = this.getString(fødselsnummerKolonne),
-        cachetTidspunkt = this.getTimestamp(cachetTidspunktKolonne).toLocalDateTime()
+    private fun tilIdentMapping(resultSet: ResultSet) = IdentMapping(
+        aktørId = resultSet.getString(aktørIdKolonne),
+        fødselsnummer = resultSet.getString(fødselsnummerKolonne),
+        cachetTidspunkt = resultSet.getTimestamp(cachetTidspunktKolonne).toLocalDateTime()
     )
 
     private fun kjørFlywayMigreringer() {

@@ -1,14 +1,14 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
 class AktorIdCache(
-    private val pdlKlient: PdlKlient,
-    private val repository: Repository
+    private val repository: Repository,
+    private val hentAktørId: (String) -> (String?)
 ) {
     fun hentAktørId(fødselsnummer: String): String? {
         var aktørId = hentCachetAktørId(fødselsnummer)
 
         if (aktørId == null) {
-            aktørId = pdlKlient.hentAktørId(fødselsnummer)?.also { nyAktørId ->
+            aktørId = hentAktørId(fødselsnummer)?.also { nyAktørId ->
                 cacheAktørId(
                     aktørId = nyAktørId,
                     fødselsnummer = fødselsnummer
