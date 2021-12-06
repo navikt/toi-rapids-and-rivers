@@ -71,12 +71,14 @@ class AktorIdCacheTest {
                 cachetTidspunkt = LocalDateTime.now()
             )
         )
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
 
         // Act
         val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
 
         // Assert
         assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
     }
 
 
