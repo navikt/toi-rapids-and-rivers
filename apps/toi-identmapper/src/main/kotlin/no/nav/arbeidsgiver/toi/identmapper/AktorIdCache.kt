@@ -24,7 +24,7 @@ class AktorIdCache(
     }
 
     private fun hentCachetAktørId(fødselsnummer: String): String? {
-        val identMapping = repository.hentAktørId(fødselsnummer)
+        val identMapping = repository.hentIdentMappinger(fødselsnummer)
         // TODO: Refresh aktørId hvis eldre enn n dager ...
 
         return identMapping.aktørId
