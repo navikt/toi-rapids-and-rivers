@@ -1,0 +1,4 @@
+kafka_pool: nav-prod
+kafka_consumer_group_id: toi-identmapper-rapidconsumer-4
+pdl_scope: api://prod-fss.pdl.pdl-api/.default
+pdl_url: https://pdl-api.prod-fss-pub.nais.io/graphql

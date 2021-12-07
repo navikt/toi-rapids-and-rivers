@@ -1,0 +1,31 @@
+apiVersion: 'nais.io/v1'
+kind: 'Alert'
+metadata:
+  name: toi-identmapper
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  receivers:
+    slack:
+      channel: 'inkludering-alerts-prod'
+  alerts:
+    - alert: toi-identmapper
+      severity: danger
+      expr: sum(up{app="toi-identmapper", job="kubernetes-pods"}) == 0
+      for: 1s
+      description: Appen er nede (ingen Kubernetes-pods er oppe)
+      action: "https://logs.adeo.no/goto/ae738c40a2c97e0a27841b8896b1dc6a"
+
+    - alert: toi-identmapper
+      expr: sum(increase(logd_messages_total{log_app="toi-identmapper",log_level="Error"}[10m])) > 0
+      for: 1s
+      description: Appen har logget en error
+      action: "https://logs.adeo.no/goto/ae738c40a2c97e0a27841b8896b1dc6a"
+
+    - alert: toi-identmapper
+      severity: warning
+      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-identmapper",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-identmapper"}[5m]))) > 20
+      for: 5m
+      description: Økning i warnings
+      action: "https://logs.adeo.no/goto/ae738c40a2c97e0a27841b8896b1dc6a"
