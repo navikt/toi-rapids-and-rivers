@@ -74,11 +74,11 @@ data class IdentMapping(
 )
 
 fun hentDatabasekonfigurasjon(env: Map<String, String>): HikariDataSource {
-    val host = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_DB_HOST")
-    val port = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_DB_PORT")
-    val database = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_DB_DATABASE")
-    val user = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_DB_USERNAME")
-    val pw = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_DB_PASSWORD")
+    val host = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_IDENTMAPPING-DB_HOST")
+    val port = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_IDENTMAPPING-DB_PORT")
+    val database = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_IDENTMAPPING-DB_DATABASE")
+    val user = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_IDENTMAPPING-DB_USERNAME")
+    val pw = env.variable("NAIS_DATABASE_TOI_IDENTMAPPER_IDENTMAPPING-DB_PASSWORD")
 
     return HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://$host:$port/$database"
