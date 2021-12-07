@@ -16,7 +16,6 @@ class AktorIdCacheTest {
 
     @Test
     fun `Henting av aktørId skal returnere aktørId fra PDL når det ikke finnes i databasen`() {
-        // Arrange
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
 
@@ -25,25 +24,19 @@ class AktorIdCacheTest {
 
         assertThat(repository.hentIdentMappinger(fødselsnummer)).isEmpty()
 
-        // Act
         val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
-
-        // Assert
         assertThat(hentetAktørId).isEqualTo(aktørIdFraPdl)
     }
 
     @Test
     fun `Henting av aktørId fra PDL skal lagre identmapping i databasen`() {
-        // Arrange
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
         val repository = Repository(testDatabase.dataSource)
         val aktørIdCache = AktorIdCache(repository) { aktørIdFraPdl }
 
-        // Act
         aktørIdCache.hentAktørId(fødselsnummer)
 
-        // Assert
         val mappinger = repository.hentIdentMappinger(fødselsnummer)
 
         assertThat(mappinger.size).isEqualTo(1)
@@ -57,7 +50,6 @@ class AktorIdCacheTest {
 
     @Test
     fun `Henting av aktørId skal returnere aktørId-en som er lagret i databasen og ikke hente på nytt fra PDL`() {
-        // Arrange
         val fødselsnummer = "123"
         val aktørIdIDatabasen = "789"
 
@@ -73,18 +65,40 @@ class AktorIdCacheTest {
         )
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
 
-        // Act
         val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
 
-        // Assert
         assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+    }
+
+    @Test
+    fun `Henting av aktørId skal returnere aktørId fra PDL hvis siste mapping som er lagret i databasen er utgått`() {
+        val fødselsnummer = "123"
+        val aktørIdFraPdl = "456"
+        val aktørIdIDatabasen = "789"
+
+        val repository = Repository(testDatabase.dataSource)
+        val aktørIdCache = AktorIdCache(repository) { aktørIdFraPdl }
+
+        testDatabase.lagreIdentMapping(
+            IdentMapping(
+                fødselsnummer = fødselsnummer,
+                aktørId = aktørIdIDatabasen,
+                cachetTidspunkt = LocalDateTime.now().minusDays(31)
+            )
+        )
+
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+
+        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+
+        assertThat(hentetAktørId).isEqualTo(aktørIdFraPdl)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(2)
     }
 
 
     @Test
     fun `Henting av aktørId skal returnere nyeste når det finnes to eller flere ulike aktørId-er`() {
-        // Arrange
         val fødselsnummer = "123"
         val nyesteAktøridIDatabasen = "456"
         val eldsteAktørIdIDatabasen = "789"
@@ -105,10 +119,8 @@ class AktorIdCacheTest {
         testDatabase.lagreIdentMapping(nyesteIdentMapping)
         testDatabase.lagreIdentMapping(eldsteIdentMapping)
 
-        // Act
         val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
 
-        // Assert
         assertThat(hentetAktørId).isEqualTo(nyesteAktøridIDatabasen)
     }
 }

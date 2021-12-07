@@ -1,9 +1,13 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
+import java.time.LocalDateTime
+
 class AktorIdCache(
     private val repository: Repository,
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
+    private val varighetIDager = 30
+
     fun hentAktørId(fødselsnummer: String): String? {
         var aktørId = hentCachetAktørId(fødselsnummer)
 
@@ -25,9 +29,18 @@ class AktorIdCache(
 
     private fun hentCachetAktørId(fødselsnummer: String): String? {
         val identMappinger = repository.hentIdentMappinger(fødselsnummer)
-        val nyesteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
-        // TODO: Refresh aktørId hvis eldre enn n dager ...
+        val sisteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
 
-        return nyesteMapping?.aktørId
+        if (sisteMapping == null || mappingErUtgått(sisteMapping)) {
+            return null
+        }
+
+        return sisteMapping.aktørId
+    }
+
+    private fun mappingErUtgått(identMapping: IdentMapping): Boolean {
+        val sisteGyldigeTidspunktForMapping = LocalDateTime.now().minusDays(varighetIDager.toLong())
+
+        return identMapping.cachetTidspunkt.isBefore(sisteGyldigeTidspunktForMapping)
     }
 }
