@@ -33,6 +33,11 @@ spec:
         - host: pdl-api.dev-fss-pub.nais.io
   kafka:
     pool: {{ kafka_pool }}
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        databases:
+          - name: db
   azure:
     application:
       enabled: true
