@@ -37,7 +37,7 @@ spec:
     sqlInstances:
       - type: POSTGRES_12
         databases:
-          - name: db
+          - name: identmapping-db
   azure:
     application:
       enabled: true
