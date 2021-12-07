@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class AktorIdCacheTest {
-    val testDatabase: TestDatabase = TestDatabase()
+    private val testDatabase: TestDatabase = TestDatabase()
 
     @AfterEach
     fun slettDatabase() {
