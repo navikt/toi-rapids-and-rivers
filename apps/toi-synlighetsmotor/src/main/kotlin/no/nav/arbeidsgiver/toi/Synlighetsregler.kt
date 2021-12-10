@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.JsonMessage
+import java.time.ZonedDateTime
 
 private interface Synlighetsregel {
     fun erSynlig(packet: JsonMessage): Boolean
@@ -54,12 +55,24 @@ private object `har CV` : Synlighetsregel {
         !packet["cv"].isMissingNode
 }
 
-private object `har oppfølgingssak` : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage) =
-        `er ikke sperret ansatt`.harBeregningsgrunnlag(packet) && packet["oppfølgingsinformasjon"]["harOppfolgingssak"].asBoolean()
+private object `er under oppfølging` : Synlighetsregel {
+    override fun erSynlig(packet: JsonMessage): Boolean {
+        if (!harBeregningsgrunnlag(packet)) return false
+
+        val fraDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["fraDato"].asText())
+        val tilDato = if (packet["oppfølgingsperiode"].hasNonNull("tilDato")) {
+            ZonedDateTime.parse(packet["oppfølgingsperiode"]["tilDato"].asText())
+        } else {
+            null
+        }
+
+        val now = ZonedDateTime.now()
+
+        return fraDato.isBefore(now) && (tilDato == null || now.isBefore(tilDato))
+    }
 
     override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        packet["oppfølgingsinformasjon"].has("harOppfolgingssak")
+        packet.has("oppfølgingsperiode")
 }
 
 private object `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag` : Synlighetsregel {
@@ -68,8 +81,10 @@ private object `temporær placeholder-regel for å si fra om manglende behandlin
 }
 
 private val synlighetsregel =
-    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har CV` og `har oppfølgingssak` og
+    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har CV` og `er under oppfølging` og
             `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
 
 fun erSynlig(packet: JsonMessage) = synlighetsregel.erSynlig(packet)
 fun harBeregningsgrunnlag(packet: JsonMessage) = synlighetsregel.harBeregningsgrunnlag(packet)
+
+fun JsonMessage.has(key: String) = !this[key].isNull
