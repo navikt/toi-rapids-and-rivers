@@ -14,7 +14,6 @@ class OppfolgingsperiodeTest {
         OppfolgingsperiodeLytter(testRapid)
 
         testRapid.sendTestMessage(oppfølgingsperiodeMeldingFraEksterntTopic(aktørId))
-
         val inspektør = testRapid.inspektør
 
         assertThat(inspektør.size).isEqualTo(1)

@@ -15,7 +15,6 @@ class OppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnection) :
                 it.demandKey("uuid")
                 it.demandKey("aktorId")
                 it.demandKey("startDato")
-                it.demandKey("sluttDato")
                 it.rejectKey("@event_name")
             }
         }.register(this)
