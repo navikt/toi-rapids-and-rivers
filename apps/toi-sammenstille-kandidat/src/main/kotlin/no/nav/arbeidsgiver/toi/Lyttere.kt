@@ -53,3 +53,21 @@ class OppfølgingsinformasjonLytter(
         behandler.behandleHendelse(Hendelse(HendelseType.OPPFØLGINGSINFORMASJON, packet["aktørId"].asText(), packet))
     }
 }
+
+class OppfølgingsperiodeLytter(
+    rapidsConnection: RapidsConnection, private val behandler: Behandler
+) : River.PacketListener {
+    init {
+        River(rapidsConnection).apply {
+            validate {
+                it.demandValue("@event_name", "oppfølgingsperiode")
+                it.demandKey("oppfølgingsperiode")
+                it.demandKey("aktørId")
+            }
+        }.register(this)
+    }
+
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        behandler.behandleHendelse(Hendelse(HendelseType.OPPFØLGINGSPERIODE, packet["aktørId"].asText(), packet))
+    }
+}
