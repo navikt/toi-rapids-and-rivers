@@ -27,6 +27,9 @@ spec:
       application: toi-oppfolgingsinformasjon
       access: readwrite
     - team: toi
+      application: toi-oppfolgingsperiode
+      access: readwrite
+    - team: toi
       application: toi-sammenstille-kandidat
       access: readwrite
     - team: toi
