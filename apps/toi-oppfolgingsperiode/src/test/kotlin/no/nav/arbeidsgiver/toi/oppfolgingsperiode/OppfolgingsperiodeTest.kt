@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class OppfolgingsperiodeTest {
 
     @Test
-    fun `Lesing av oppfølgingsinformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
+    fun `Lesing av oppfølgingsperiodeMelding fra eksternt topic skal produsere ny melding på rapid`() {
         val testRapid = TestRapid()
         val aktørId = "100000001"
 
