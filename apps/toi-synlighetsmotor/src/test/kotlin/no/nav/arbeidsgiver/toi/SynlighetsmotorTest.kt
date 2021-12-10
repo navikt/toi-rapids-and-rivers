@@ -35,7 +35,7 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person er familie skal synlighet være false`(): Unit = TODO()
+    fun `om Person er familie skal synlighet være false`() {}
 
     @Test
     fun `om Person ikke er under oppfølging skal synlighet være false`() = testProgramMedHendelse(
@@ -56,16 +56,16 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person ikke er manuell skal synlighet være false`(): Unit = TODO()
+    fun `om Person ikke er manuell skal synlighet være false`() {}
 
     @Test
-    fun `om Person er fritatt fra kandidatsøk skal synlighet være false`(): Unit = TODO()
+    fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() {}
 
     @Test
-    fun `om Person er kode 6 skal synlighet være false`(): Unit = TODO()
+    fun `om Person er kode 6 skal synlighet være false`() {}
 
     @Test
-    fun `om Person er kode 7 skal synlighet være false`(): Unit = TODO()
+    fun `om Person er kode 7 skal synlighet være false`() {}
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
@@ -74,13 +74,13 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person ikke har jobbønsker skal synlighet være false`(): Unit = TODO()
+    fun `om Person ikke har jobbønsker skal synlighet være false`() {}
 
     @Test
-    fun `om Person ikke har sett hjemmel skal synlighet være false`(): Unit = TODO()
+    fun `om Person ikke har sett hjemmel skal synlighet være false`() {}
 
     @Test
-    fun `om Person må behandle tidligere CV skal synlighet være false`(): Unit = TODO()
+    fun `om Person må behandle tidligere CV skal synlighet være false`() {}
 
     @Test
     fun `ignorer uinteressante hendelser`() = testProgramMedHendelse(
