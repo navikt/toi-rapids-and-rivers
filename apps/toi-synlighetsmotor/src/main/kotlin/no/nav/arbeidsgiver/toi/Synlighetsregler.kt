@@ -1,84 +1,72 @@
 package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import java.time.ZonedDateTime
+import java.time.Instant
 
 private val synlighetsregel =
     `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har CV` og `er under oppfølging` og
             `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
 
-fun erSynlig(packet: JsonMessage) = synlighetsregel.erSynlig(packet)
+fun erSynlig(kandidat: Kandidat) = synlighetsregel.erSynlig(kandidat)
 
-fun harBeregningsgrunnlag(packet: JsonMessage) = synlighetsregel.harBeregningsgrunnlag(packet)
+fun harBeregningsgrunnlag(kandidat: Kandidat) = synlighetsregel.harBeregningsgrunnlag(kandidat)
 
 private object `er ikke død` : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage) =
-        harBeregningsgrunnlag(packet) && !packet["oppfølgingsinformasjon"]["erDoed"].asBoolean()
+    override fun erSynlig(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon?.erDoed == false
 
-    override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        packet["oppfølgingsinformasjon"].has("erDoed")
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon != null
 }
 
 private object `er ikke sperret ansatt` : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage) =
-        harBeregningsgrunnlag(packet) && !packet["oppfølgingsinformasjon"]["sperretAnsatt"].asBoolean()
+    override fun erSynlig(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon?.sperretAnsatt == false
 
-    override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        packet["oppfølgingsinformasjon"].has("sperretAnsatt")
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon != null
 }
 
 private object `har rett formidlingsgruppe` : Synlighetsregel {
-    private val godkjenteFormidlingsgrupper = listOf("ARBS", "IARBS")
-    override fun erSynlig(packet: JsonMessage) =
-        harBeregningsgrunnlag(packet) && packet["oppfølgingsinformasjon"]["formidlingsgruppe"].asText() in godkjenteFormidlingsgrupper
+    private val godkjenteFormidlingsgrupper = listOf(Formidlingsgruppe.ARBS, Formidlingsgruppe.IARBS)
 
-    override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        packet["oppfølgingsinformasjon"].has("formidlingsgruppe")
+    override fun erSynlig(kandidat: Kandidat) =
+        kandidat.oppfølgingsinformasjon?.formidlingsgruppe in godkjenteFormidlingsgrupper
+
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon != null
 }
 
 private object `har CV` : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage) =
-        harBeregningsgrunnlag(packet) && !packet["cv"].isNull
+    override fun erSynlig(kandidat: Kandidat) = kandidat.cv != null
 
-    override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        !packet["cv"].isMissingNode
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
 }
 
 private object `er under oppfølging` : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage): Boolean {
-        if (!harBeregningsgrunnlag(packet)) return false
+    override fun erSynlig(kandidat: Kandidat): Boolean {
+        if (kandidat.oppfølgingsperiode == null) return false
 
-        val now = ZonedDateTime.now()
-        val fraDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["startDato"].asText())
+        val now = Instant.now()
+        val startDato = kandidat.oppfølgingsperiode.startDato.toInstant()
+        val sluttDato = kandidat.oppfølgingsperiode.sluttDato?.toInstant() ?: Instant.MAX
 
-        return if (packet["oppfølgingsperiode"].hasNonNull("sluttDato")) {
-            val tilDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["sluttDato"].asText())
-
-            fraDato.isBefore(now) && tilDato.isAfter(now)
-        } else {
-            fraDato.isBefore(now)
-        }
+        return startDato.isBefore(now) && sluttDato.isAfter(now)
     }
 
-    override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        packet.has("oppfølgingsperiode")
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsperiode != null
 }
 
 private object `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag` : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage) = true
-    override fun harBeregningsgrunnlag(packet: JsonMessage) = false
+    override fun erSynlig(kandidat: Kandidat) = true
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = false
 }
 
 private interface Synlighetsregel {
-    fun erSynlig(packet: JsonMessage): Boolean
-    fun harBeregningsgrunnlag(packet: JsonMessage): Boolean
+    fun erSynlig(kandidat: Kandidat): Boolean
+    fun harBeregningsgrunnlag(kandidat: Kandidat): Boolean
     infix fun og(other: Synlighetsregel) = OgRegel(this, other)
 }
 
 private class OgRegel(private val regel1: Synlighetsregel, private val regel2: Synlighetsregel) : Synlighetsregel {
-    override fun erSynlig(packet: JsonMessage) = regel1.erSynlig(packet) && regel2.erSynlig(packet)
-    override fun harBeregningsgrunnlag(packet: JsonMessage) =
-        regel1.harBeregningsgrunnlag(packet) && regel2.harBeregningsgrunnlag(packet)
+    override fun erSynlig(kandidat: Kandidat) = regel1.erSynlig(kandidat) && regel2.erSynlig(kandidat)
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) =
+        regel1.harBeregningsgrunnlag(kandidat) && regel2.harBeregningsgrunnlag(kandidat)
 }
 
 fun JsonMessage.has(key: String) = !this[key].isNull

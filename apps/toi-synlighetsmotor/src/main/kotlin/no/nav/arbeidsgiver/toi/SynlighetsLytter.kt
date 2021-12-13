@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*
 
-class SynlighetsLytter(rapidsConnection: RapidsConnection): River.PacketListener {
+class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListener {
     private val interessanteFelt = listOf("oppfølgingsinformasjon", "cv", "oppfølgingsperiode")
 
     init {
@@ -21,7 +21,8 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection): River.PacketListener
         val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
         if (harIngenInteressanteFelter) return
 
-        packet["synlighet"] = Synlighet(erSynlig(packet),harBeregningsgrunnlag(packet))
+        val kandidat = Kandidat.fraJson(packet)
+        packet["synlighet"] = Synlighet(erSynlig(kandidat), harBeregningsgrunnlag(kandidat))
 
         publish(packet.toJson())
     }
