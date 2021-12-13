@@ -5,7 +5,7 @@ plugins {
 dependencies {
 
     implementation("no.nav.arbeid.pam:pam-cv-avro-cvmeldinger:51")
-    implementation("io.confluent:kafka-avro-serializer:5.0.0")
+    implementation("io.confluent:kafka-avro-serializer:7.0.0")
     implementation("org.codehaus.jackson:jackson-mapper-asl:1.9.13")
     /*
     </groupId>
