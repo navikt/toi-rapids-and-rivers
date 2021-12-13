@@ -81,7 +81,8 @@ data class Kandidat(
     val aktørId: String,
     val cv: JsonNode? = null,
     val veileder: JsonNode? = null,
-    val oppfølgingsinformasjon: JsonNode? = null
+    val oppfølgingsinformasjon: JsonNode? = null,
+    val oppfølgingsperiode:JsonNode? = null
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()
@@ -90,7 +91,8 @@ data class Kandidat(
             aktørId = json["aktørId"].asText(),
             cv = json["cv"],
             veileder = json["veileder"],
-            oppfølgingsinformasjon = json["oppfølgingsinformasjon"]
+            oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
+            oppfølgingsperiode = json["oppfølgingsperiode"]
         )
     }
 
