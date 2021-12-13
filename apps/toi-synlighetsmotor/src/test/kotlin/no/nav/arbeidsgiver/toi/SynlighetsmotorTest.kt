@@ -40,10 +40,8 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person ikke har aktiv oppfølgingsperiode skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(
-            oppfølgingsperiode = avsluttetOppfølgingsperiode(),
-            oppfølgingsinformasjon = oppfølgingsinformasjon(),
-            cv = cv()
+        komplettHendelseSomFørerTilSynlighetTrue(
+            oppfølgingsperiode = avsluttetOppfølgingsperiode()
         ),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
