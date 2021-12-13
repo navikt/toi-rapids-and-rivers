@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import java.time.Instant
-import java.time.ZoneId
 import java.time.ZonedDateTime
 
 private val synlighetsregel =
