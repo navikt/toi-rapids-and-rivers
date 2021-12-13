@@ -59,9 +59,9 @@ private object `er under oppfølging` : Synlighetsregel {
     override fun erSynlig(packet: JsonMessage): Boolean {
         if (!harBeregningsgrunnlag(packet)) return false
 
-        val fraDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["fraDato"].asText())
-        val tilDato = if (packet["oppfølgingsperiode"].hasNonNull("tilDato")) {
-            ZonedDateTime.parse(packet["oppfølgingsperiode"]["tilDato"].asText())
+        val fraDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["startDato"].asText())
+        val tilDato = if (packet["oppfølgingsperiode"].hasNonNull("sluttDato")) {
+            ZonedDateTime.parse(packet["oppfølgingsperiode"]["sluttDato"].asText())
         } else {
             null
         }

@@ -144,15 +144,12 @@ class SynlighetsmotorTest {
         cv: String? = null
     ) = """
             {
-                ${
-        listOfNotNull(
-            """"@event_name":"hendelse"""",
-            oppfølgingsinformasjon,
-            cv,
-            oppfølgingsperiode
-        ).joinToString()
-    }
-                
+                ${listOfNotNull(
+                    """"@event_name":"hendelse"""",
+                    oppfølgingsinformasjon,
+                    cv,
+                    oppfølgingsperiode
+                ).joinToString()}               
             }
             """.trimIndent()
 
@@ -194,7 +191,7 @@ class SynlighetsmotorTest {
                 "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
                 "aktorId": "123456789",
                 "startDato": "2020-10-30T14:15:38+01:00",
-                "sluttDato": null,
+                "sluttDato": null
             }
         """.trimIndent()
 
@@ -204,7 +201,7 @@ class SynlighetsmotorTest {
                 "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
                 "aktorId": "123456789",
                 "startDato": "2020-10-30T14:15:38+01:00",
-                "sluttDato": "2021-10-30T14:15:38+01:00",
+                "sluttDato": "2021-10-30T14:15:38+01:00"
             }
         """.trimIndent()
 
