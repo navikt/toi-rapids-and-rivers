@@ -13,24 +13,24 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `legg på synlighet ved oppfølgingsinformasjon`() = testProgramMedHendelse(
+    fun `kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
         hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
     @Test
-    fun `legg på synlighet ved cv`() = testProgramMedHendelse(
+    fun `kandidat med kun cv skal ikke være synlig`() = testProgramMedHendelse(
         hendelse(cv = cv()), enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
     @Test
     fun `om Person er død skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(erDoed = true), cv = cv()),
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(erDoed = true)),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
     @Test
     fun `om Person er sperret ansatt skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(sperretAnsatt = true), cv = cv()),
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(sperretAnsatt = true)),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
@@ -56,7 +56,7 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person har feil formidlingsgruppe skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS"), cv = cv()),
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS")),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
@@ -78,7 +78,7 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon(), cv = manglendeCV()),
+        komplettHendelseSomFørerTilSynlighetTrue(cv = manglendeCV()),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
