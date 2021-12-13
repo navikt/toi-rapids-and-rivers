@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.Instant
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 private val synlighetsregel =
@@ -9,6 +10,7 @@ private val synlighetsregel =
             `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
 
 fun erSynlig(packet: JsonMessage) = synlighetsregel.erSynlig(packet)
+
 fun harBeregningsgrunnlag(packet: JsonMessage) = synlighetsregel.harBeregningsgrunnlag(packet)
 
 private object `er ikke død` : Synlighetsregel {
@@ -48,16 +50,16 @@ private object `er under oppfølging` : Synlighetsregel {
     override fun erSynlig(packet: JsonMessage): Boolean {
         if (!harBeregningsgrunnlag(packet)) return false
 
-        val fraDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["startDato"].asText())
-        val tilDato = if (packet["oppfølgingsperiode"].hasNonNull("sluttDato")) {
-            ZonedDateTime.parse(packet["oppfølgingsperiode"]["sluttDato"].asText())
-        } else {
-            ZonedDateTime.from(Instant.MAX)
-        }
-
         val now = ZonedDateTime.now()
+        val fraDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["startDato"].asText())
 
-        return fraDato.isBefore(now) && tilDato.isAfter(now)
+        return if (packet["oppfølgingsperiode"].hasNonNull("sluttDato")) {
+            val tilDato = ZonedDateTime.parse(packet["oppfølgingsperiode"]["sluttDato"].asText())
+
+            fraDato.isBefore(now) && tilDato.isAfter(now)
+        } else {
+            fraDato.isBefore(now)
+        }
     }
 
     override fun harBeregningsgrunnlag(packet: JsonMessage) =

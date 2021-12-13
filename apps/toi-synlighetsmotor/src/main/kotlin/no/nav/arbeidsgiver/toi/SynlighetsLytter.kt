@@ -14,12 +14,17 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection): River.PacketListener
             }
         }.register(this)
     }
+
     private val publish: (String) -> Unit = rapidsConnection::publish
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if(interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)) return
+        val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
+        if (harIngenInteressanteFelter) return
+
         packet["synlighet"] = Synlighet(erSynlig(packet),harBeregningsgrunnlag(packet))
+
         publish(packet.toJson())
     }
+
     private class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)
 }
