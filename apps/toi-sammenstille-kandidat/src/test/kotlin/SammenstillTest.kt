@@ -165,7 +165,7 @@ class SammenstillTest {
 
         assertThat(oppfølgingsperiodePåMelding.get("uuid").asText()).isEqualTo("0b0e2261-343d-488e-a70f-807f4b151a2f")
         assertThat(oppfølgingsperiodePåMelding.get("aktorId").asText()).isEqualTo(aktørId)
-        assertThat(oppfølgingsperiodePåMelding.get("startDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
+        assertThat(oppfølgingsperiodePåMelding.get("startDato").asText()).isEqualTo("2021-12-01T18:18:00.435004+01:00")
         assertThat(oppfølgingsperiodePåMelding.get("sluttDato").isNull).isTrue
     }
 
@@ -182,7 +182,7 @@ class SammenstillTest {
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
 
-        val antallLagredeKandidater = testDatabase.hentAntallKandidater();
+        val antallLagredeKandidater = testDatabase.hentAntallKandidater()
         assertThat(antallLagredeKandidater).isEqualTo(1)
     }
 
@@ -264,7 +264,7 @@ class SammenstillTest {
             "oppfølgingsperiode": {
                 "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
                 "aktorId": "${aktørId}",
-                "startDato": "2020-10-30T14:15:38+01:00",
+                "startDato": "2021-12-01T18:18:00.435004+01:00",
                 "sluttDato": null 
             }   
         }
