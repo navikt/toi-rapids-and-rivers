@@ -8,5 +8,6 @@ include(
     "apps:toi-oppfolgingsinformasjon",
     "apps:toi-identmapper",
     "apps:toi-synlighetsmotor",
-    "apps:toi-oppfolgingsperiode"
+    "apps:toi-oppfolgingsperiode",
+    "apps:toi-fritatt-kandidatsok"
 )
