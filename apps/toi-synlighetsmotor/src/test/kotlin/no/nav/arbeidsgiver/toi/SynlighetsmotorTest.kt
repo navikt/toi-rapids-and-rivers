@@ -1,25 +1,10 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class SynlighetsmotorTest {
-
-    @Test
-    fun `kult`() {
-        val mapper = jacksonObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .registerModule(JavaTimeModule())
-
-        val kandidat = mapper.readValue(hendelse(oppfølgingsinformasjon()), Kandidat::class.java)
-
-        kandidat.cv
-    }
 
     @Test
     fun `legg på synlighet som sann om all data i hendelse tilsier det`() = testProgramMedHendelse(
