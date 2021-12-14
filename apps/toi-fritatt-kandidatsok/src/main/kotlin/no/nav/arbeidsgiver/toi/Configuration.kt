@@ -18,7 +18,7 @@ fun arenaCvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
 
     CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SASL_SSL",
     SaslConfigs.SASL_MECHANISM to "PLAIN",
-    SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"srv-toi-fritatt-kandidatsok\" password=\"${envs["TOI_FRITATT_KANDIDATSOK_SERVICEBRUKER_PASSORD"] ?: throw Exception("TOI_FRITATT_KANDIDATSOK_SERVICEBRUKER_PASSORD kunne ikke hentes fra k8s secrets")}\";",
+    SaslConfigs.SASL_JAAS_CONFIG to "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"srv-toi-fritatt-kand\" password=\"${envs["TOI_FRITATT_KANDIDATSOK_SERVICEBRUKER_PASSORD"] ?: throw Exception("TOI_FRITATT_KANDIDATSOK_SERVICEBRUKER_PASSORD kunne ikke hentes fra k8s secrets")}\";",
     SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to (envs["NAV_TRUSTSTORE_PATH"]?.let { File(it).absolutePath } ?: throw Exception("NAV_TRUSTSTORE_PATH er ikke definert")),
     SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to (envs["NAV_TRUSTSTORE_PASSWORD"] ?: throw Exception("NAV_TRUSTSTORE_PASSWORD er ikke definert")),
 
