@@ -38,6 +38,9 @@ spec:
     - team: toi
       application: toi-identmapper
       access: readwrite
+    - team: toi
+      application: toi-fritatt-kandidatsok
+      access: readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite
