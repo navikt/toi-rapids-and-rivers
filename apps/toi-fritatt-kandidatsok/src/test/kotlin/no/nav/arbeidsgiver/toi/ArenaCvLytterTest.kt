@@ -16,7 +16,7 @@ private val topicName = "arena-cv-topic"
 class ArenaCvLytterTest {
 
     @Test
-    fun  `Lesing av melding på Arena CV-topic skal føre til at en "fritatt kandidatsøk"-melding blir publisert på rapid`() {
+    fun  `Lesing av melding på Arena CV-topic skal føre til at en fritatt kandidatsøk-melding blir publisert på rapid`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer)
         val rapid = TestRapid()
@@ -48,7 +48,22 @@ class ArenaCvLytterTest {
 
     @Test
     fun `Skal ikke publisere fritatt kandidatsøk for personer med kode 6 eller 7`() {
+        val consumer = mockConsumer()
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer)
+        val rapid = TestRapid()
+        val fødselsnummer = "123"
+        val fritattKandidatsøk = true
 
+        val meldingMedKode6 = melding(fødselsnummer, fritattKandidatsøk, "6")
+        val meldingMedKode7 = melding(fødselsnummer, fritattKandidatsøk, "7")
+
+        mottaArenaCvMelding(consumer, meldingMedKode6)
+        mottaArenaCvMelding(consumer, meldingMedKode7)
+        arenaCvLytter.onReady(rapid)
+
+        Thread.sleep(300)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 }
 
@@ -75,7 +90,7 @@ private fun mottaArenaCvMelding(consumer: MockConsumer<String, CvEvent>, melding
 
 private val topic = TopicPartition(topicName, 0)
 
-private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean) = CvEvent().apply {
+private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean, frkode: String = "1") = CvEvent().apply {
     fodselsnummer = fødselsnummer
     fornavn = ""
     etternavn = ""
@@ -106,7 +121,7 @@ private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean) = CvEv
     fritattKandidatsok = fritattKandidatsøk
     fritattAgKandidatsok = true
     sperretAnsattEllerFamilie = false
-    frKode = ""
+    frKode = frkode
     erDoed = false
     utdanning = emptyList()
     yrkeserfaring = emptyList()
