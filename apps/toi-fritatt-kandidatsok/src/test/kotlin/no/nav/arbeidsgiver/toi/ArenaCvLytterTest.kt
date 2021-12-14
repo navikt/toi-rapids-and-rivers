@@ -11,19 +11,21 @@ import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
+private val topicName = "arena-cv-topic"
 
 class ArenaCvLytterTest {
 
     @Test
     fun  `Lesing av melding på Arena CV-topic skal føre til at en "fritatt kandidatsøk"-melding blir publisert på rapid`() {
-        /*
         val consumer = mockConsumer()
-        val arenaCvLytter = ArenaCvLytter(consumer)
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer)
         val rapid = TestRapid()
-        val aktørId = "123456789"
-        val melding = melding(aktørId)
+        val fødselsnummer = "123"
+        val fritattKandidatsøk = true
 
-        mottaCvMelding(consumer, melding)
+        val melding = melding(fødselsnummer, fritattKandidatsøk)
+
+        mottaArenaCvMelding(consumer, melding)
         arenaCvLytter.onReady(rapid)
 
         Thread.sleep(300)
@@ -40,7 +42,8 @@ class ArenaCvLytterTest {
         )
 
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk")
-        */
+        assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
+        assertThat(meldingJson.get("fritattKandidatsok").asBoolean()).isEqualTo(fritattKandidatsøk)
     }
 
     @Test
@@ -56,7 +59,7 @@ private fun mockConsumer() = MockConsumer<String, CvEvent>(OffsetResetStrategy.E
     }
 }
 
-private fun mottaCvMelding(consumer: MockConsumer<String, CvEvent>, melding: CvEvent, offset: Long = 0) {
+private fun mottaArenaCvMelding(consumer: MockConsumer<String, CvEvent>, melding: CvEvent, offset: Long = 0) {
     val record = ConsumerRecord(
         topic.topic(),
         topic.partition(),
@@ -70,31 +73,55 @@ private fun mottaCvMelding(consumer: MockConsumer<String, CvEvent>, melding: CvE
     }
 }
 
-private val topic = TopicPartition("dummy-topic", 0)
-/*
-private fun melding(aktørIdValue: String) = CvEvent().apply {
-    meldingstype = Meldingstype.OPPRETT
-    opprettCv = OpprettCv().apply {  cv = Cv().apply  {
-        aktoerId = aktørIdValue;
-        etternavn = "Testetternavn"
-        opprettet = Instant.now()
-        sistEndret = Instant.now().minus(Period.ofDays(1))
-    }}
-    opprettJobbprofil = OpprettJobbprofil().apply {
-        aktoerId = aktørIdValue;
-        jobbprofil = Jobbprofil().apply {
-            aktiv = true
-            kompetanser = listOf("testkompetanse")
-            opprettet = Instant.now()
-            sistEndret = Instant.now().minus(Period.ofDays(1))
-        } }
-    oppfolgingsinformasjon =  Oppfolgingsinformasjon().apply {
-        oppfolgingskontor = "testkontor"
-    }
-    aktoerId = aktørIdValue
-    sistEndret = Instant.now()
+private val topic = TopicPartition(topicName, 0)
+
+private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean) = CvEvent().apply {
+    fodselsnummer = fødselsnummer
+    fornavn = ""
+    etternavn = ""
+    fodselsdato = ""
+    fodselsdatoErDnr = false
+    formidlingsgruppekode = ""
+    epostadresse = ""
+    telefon = ""
+    mobiltelefon = ""
+    statsborgerskap = ""
+    arenaPersonId = 1L
+    arenaKandidatnr = ""
+    beskrivelse = ""
+    samtykkeStatus = ""
+    samtykkeDato = ""
+    adresselinje1 = ""
+    adresselinje2 = ""
+    adresselinje3 = ""
+    postnr = ""
+    poststed = ""
+    landkode = ""
+    kommunenr = 1
+    disponererBil = true
+    tidsstempel = ""
+    orgenhet = ""
+    kvalifiseringsgruppekode = ""
+    hovedmaalkode = ""
+    fritattKandidatsok = fritattKandidatsøk
+    fritattAgKandidatsok = true
+    sperretAnsattEllerFamilie = false
+    frKode = ""
+    erDoed = false
+    utdanning = emptyList()
+    yrkeserfaring = emptyList()
+    kompetanse = emptyList()
+    sertifikat = emptyList()
+    forerkort = emptyList()
+    sprak = emptyList()
+    kurs = emptyList()
+    verv = emptyList()
+    geografiJobbonsker = emptyList()
+    yrkeJobbonsker = emptyList()
+    heltidDeltidJobbonsker = emptyList()
+    ansettelsesforholdJobbonsker = emptyList()
+    arbeidstidsordningJobbonsker = emptyList()
 }
-*/
 
 private val objectMapper = ObjectMapper()
     .registerModule(JavaTimeModule())

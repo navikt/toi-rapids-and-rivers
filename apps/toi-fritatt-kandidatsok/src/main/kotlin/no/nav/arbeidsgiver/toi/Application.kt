@@ -12,7 +12,7 @@ fun main() {
     RapidApplication.create(envs).apply {
         val topicName = envs["ARENA_CV_KAFKA_TOPIC"] ?: throw Exception("ARENA_CV_KAFKA_TOPIC er ikke definert")
 
-        val consumerConfig = cvLytterConfig(envs)
+        val consumerConfig = arenaCvLytterConfig(envs)
         val consumer = KafkaConsumer<String, CvEvent>(consumerConfig)
 
         register(ArenaCvLytter(topicName, consumer))

@@ -9,7 +9,7 @@ import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.io.File
 
-fun cvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
+fun arenaCvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
     ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to (envs["KAFKA_BOOTSTRAP_SERVERS_ONPREM_URL"] ?: throw Exception("KAFKA_BOOTSTRAP_SERVERS_ONPREM_URL er ikke definert")),
     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java.canonicalName,
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
