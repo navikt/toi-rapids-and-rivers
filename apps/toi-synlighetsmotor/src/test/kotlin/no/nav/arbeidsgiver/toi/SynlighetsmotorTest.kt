@@ -63,8 +63,10 @@ class SynlighetsmotorTest {
     }
 
     @Test
-    fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() {
-    }
+    fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(fritattKandidatsøk = fritattKandidatsøk(true)),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
 
     @Test
     fun `om Person er kode 6 skal synlighet være false`() {
@@ -128,25 +130,29 @@ class SynlighetsmotorTest {
     private fun komplettHendelseSomFørerTilSynlighetTrue(
         oppfølgingsperiode: String = aktivOppfølgingsperiode(),
         oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
-        cv: String = cv()
+        cv: String = cv(),
+        fritattKandidatsøk: String = fritattKandidatsøk()
     ) =
         hendelse(
             oppfølgingsperiode = oppfølgingsperiode,
             oppfølgingsinformasjon = oppfølgingsinformasjon,
-            cv = cv
+            cv = cv,
+            fritattKandidatsøk = fritattKandidatsøk
         )
 
     private fun hendelse(
         oppfølgingsperiode: String? = null,
         oppfølgingsinformasjon: String? = null,
-        cv: String? = null
+        cv: String? = null,
+        fritattKandidatsøk: String? = null
     ) = """
             {
                 ${listOfNotNull(
                     """"@event_name":"hendelse"""",
                     oppfølgingsinformasjon,
                     cv,
-                    oppfølgingsperiode
+                    oppfølgingsperiode,
+                    fritattKandidatsøk
                 ).joinToString()}               
             }
             """.trimIndent()
@@ -213,5 +219,12 @@ class SynlighetsmotorTest {
     private fun manglendeCV() =
         """
             "cv": null
+        """.trimIndent()
+
+    private fun fritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
+        """
+            "fritattKandidatsøk" : {
+                "fritattKandidatsok" : $fritattKandidatsøk
+            }
         """.trimIndent()
 }

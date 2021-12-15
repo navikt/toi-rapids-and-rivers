@@ -10,6 +10,7 @@ data class Kandidat(
     val cv: Any?,
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
+    val fritattKandidatsøk: FritattKandidatsøk?
 ) {
     companion object {
         private val mapper = jacksonObjectMapper()
@@ -30,6 +31,9 @@ data class Oppfølgingsinformasjon(
     val erDoed: Boolean,
     val sperretAnsatt: Boolean,
     val formidlingsgruppe: Formidlingsgruppe?,
+)
+data class FritattKandidatsøk(
+    val fritattKandidatsok: Boolean
 )
 
 enum class Formidlingsgruppe {
