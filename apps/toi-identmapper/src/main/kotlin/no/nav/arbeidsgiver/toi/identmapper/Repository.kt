@@ -25,10 +25,14 @@ class Repository(private val dataSource: DataSource) {
 
         dataSource.connection.use {
             if (harSammeMapping) {
-                it.prepareStatement("UPDATE $tabell SET $cachetTidspunktKolonne = ? WHERE $aktørIdKolonne = ? $fødselsnummerKolonne = ?").apply {
+                it.prepareStatement(
+                    "UPDATE $tabell SET $cachetTidspunktKolonne = ? " +
+                            "WHERE $fødselsnummerKolonne = ? " +
+                            "AND $aktørIdKolonne ${if (aktørId != null) "= ?" else "is NULL"}"
+                ).apply {
                     setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
-                    setString(2, aktørId)
-                    setString(3, fødselsnummer)
+                    setString(2, fødselsnummer)
+                    if (aktørId!= null) setString(3, aktørId)
                 }
             } else {
                 it.prepareStatement("INSERT INTO $tabell($aktørIdKolonne, $fødselsnummerKolonne, $cachetTidspunktKolonne) VALUES (?, ?, ?)")

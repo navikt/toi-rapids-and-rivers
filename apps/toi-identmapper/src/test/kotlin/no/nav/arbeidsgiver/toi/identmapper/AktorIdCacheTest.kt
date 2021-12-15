@@ -14,19 +14,14 @@ class AktorIdCacheTest {
     fun slettDatabase() {
         testDatabase.slettAlt()
     }
-
-    @Test
-    fun failPlaceholder() {
-        fail()
-    }
-
+    
     @Test
     fun `Henting av aktørId skal returnere aktørId fra PDL når det ikke finnes i databasen`() {
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository) { aktørIdFraPdl }
+        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdFraPdl }
 
         assertThat(repository.hentIdentMappinger(fødselsnummer)).isEmpty()
 
@@ -39,7 +34,7 @@ class AktorIdCacheTest {
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository) { aktørIdFraPdl }
+        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdFraPdl }
 
         aktørIdCache.hentAktørId(fødselsnummer)
 
@@ -60,7 +55,7 @@ class AktorIdCacheTest {
         val aktørIdIDatabasen = "789"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
+        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -78,13 +73,117 @@ class AktorIdCacheTest {
     }
 
     @Test
+    fun `Henting av aktørId skal lagre null-aktørid i database for dev-gcp`() {
+        val fødselsnummer = "123"
+        val aktørIdIPDL = null
+
+        val repository = Repository(testDatabase.dataSource)
+        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { aktørIdIPDL }
+
+        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+
+        assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).first().aktørId).isNull()
+    }
+
+    @Test
+    fun `Henting av aktørId skal ikke lagre null-aktørid i database for prod-gcp`() {
+        val fødselsnummer = "123"
+        val aktørIdIPDL = null
+
+        val repository = Repository(testDatabase.dataSource)
+        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdIPDL }
+
+        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+
+        assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Henting av aktørId skal returnere aktørId-en som er lagret i databasen, selv om den er null`() {
+        val fødselsnummer = "123"
+        val aktørIdIDatabasen = null
+
+        val repository = Repository(testDatabase.dataSource)
+        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
+
+        testDatabase.lagreIdentMapping(
+            IdentMapping(
+                fødselsnummer = fødselsnummer,
+                aktørId = aktørIdIDatabasen,
+                cachetTidspunkt = LocalDateTime.now()
+            )
+        )
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+
+        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+
+        assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+    }
+
+    @Test
+    fun `Henting av aktørId skal oppdatere cachetTidspunkt for tidligere mapping`() {
+        val fødselsnummer = "123"
+        val aktørIdIDatabasen = "345"
+        val aktørIdIPDL = "345"
+
+        val repository = Repository(testDatabase.dataSource)
+        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { aktørIdIPDL }
+
+        val utdatertTidspunkt = LocalDateTime.now().minusYears(100)
+        testDatabase.lagreIdentMapping(
+            IdentMapping(
+                fødselsnummer = fødselsnummer,
+                aktørId = aktørIdIDatabasen,
+                cachetTidspunkt = utdatertTidspunkt
+            )
+        )
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+
+        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+
+        assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).first().cachetTidspunkt).isNotEqualTo(utdatertTidspunkt)
+    }
+
+    @Test
+    fun `Henting av aktørId skal oppdatere cachetTidspunkt for tidligere mapping med verdi null`() {
+        val fødselsnummer = "123"
+        val aktørIdIDatabasen = null
+        val aktørIdIPDL = null
+
+        val repository = Repository(testDatabase.dataSource)
+        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { aktørIdIPDL }
+
+        val utdatertTidspunkt = LocalDateTime.now().minusYears(100)
+        testDatabase.lagreIdentMapping(
+            IdentMapping(
+                fødselsnummer = fødselsnummer,
+                aktørId = aktørIdIDatabasen,
+                cachetTidspunkt = utdatertTidspunkt
+            )
+        )
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+
+        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+
+        assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappinger(fødselsnummer).first().cachetTidspunkt).isNotEqualTo(utdatertTidspunkt)
+    }
+
+    @Test
     fun `Henting av aktørId skal returnere aktørId fra PDL hvis siste mapping som er lagret i databasen er utgått`() {
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
         val aktørIdIDatabasen = "789"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository) { aktørIdFraPdl }
+        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdFraPdl }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -110,7 +209,7 @@ class AktorIdCacheTest {
         val eldsteAktørIdIDatabasen = "789"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository) { "dummyAktørIdSomIkkeSkalHentes" }
+        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { "dummyAktørIdSomIkkeSkalHentes" }
 
         val nyesteIdentMapping = IdentMapping(
             fødselsnummer = fødselsnummer,

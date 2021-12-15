@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 class AktorIdCache(
     private val repository: Repository,
+    private val cluster: String,
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
     private val varighetIDager = 30
@@ -14,10 +15,12 @@ class AktorIdCache(
         if (cachetAktørId.harHentetFraPdl) return cachetAktørId.verdi
 
         return hentAktørIdFraPdl(fødselsnummer).also { nyAktørId ->
-            cacheAktørId(
-                aktørId = nyAktørId,
-                fødselsnummer = fødselsnummer
-            )
+            if(nyAktørId != null || cluster == "dev-gcp") {
+                cacheAktørId(
+                    aktørId = nyAktørId,
+                    fødselsnummer = fødselsnummer
+                )
+            }
         }
     }
 
