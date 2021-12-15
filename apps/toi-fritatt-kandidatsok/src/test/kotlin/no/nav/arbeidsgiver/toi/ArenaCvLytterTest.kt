@@ -37,13 +37,15 @@ class ArenaCvLytterTest {
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "fodselsnummer",
-            "fritattKandidatsok",
+            "fritattKandidatsøk",
             "system_read_count"
         )
-
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk")
         assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
-        assertThat(meldingJson.get("fritattKandidatsok").asBoolean()).isEqualTo(fritattKandidatsøk)
+
+       val fritattMelding = meldingJson.get("fritattKandidatsøk")
+       assertThat(fritattMelding.fieldNames().asSequence().toList()).containsExactlyInAnyOrder("fritattKandidatsok")
+       assertThat(fritattMelding.get("fritattKandidatsok").asBoolean()).isEqualTo(fritattKandidatsøk)
     }
 
     @Test

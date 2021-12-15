@@ -42,8 +42,8 @@ class ArenaCvLytter(
                         consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, CvEvent>::value)
                             .filterNot(CvEvent::erKode6Eller7)
-                            .map(::FritattKandidatsok)
-                            .map(FritattKandidatsok::somString)
+                            .map(::FritattKandidatsokMelding)
+                            .map(FritattKandidatsokMelding::somString)
                             .onEach{
                                 log.info("Skal publisere hendelse")
                             }
