@@ -170,6 +170,29 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når fritattFraKandidatsøk har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+        val aktørId = "12141321"
+        val testRapid = TestRapid()
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(fritattFraKandidatsøkMelding(aktørId))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.fieldNames().asSequence().toList()).containsExactlyInAnyOrder("@event_name", "aktørId", "fodselsnummer", "fritattKandidatsok", "system_read_count")
+
+        assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+
+        val fritattKandidatsøkPåMelding = melding.get("fritattKandidatsøk")
+
+        assertThat(fritattKandidatsøkPåMelding.get("uuid").asText()).isEqualTo("0b0e2261-343d-488e-a70f-807f4b151a2f")
+//        assertThat(fritattKandidatsøkPåMelding.get("aktorId").asText()).isEqualTo(aktørId)
+//        assertThat(fritattKandidatsøkPåMelding.get("startDato").asText()).isEqualTo("2021-12-01T18:18:00.435004+01:00")
+    }
+
+    @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
@@ -269,4 +292,44 @@ class SammenstillTest {
             }   
         }
     """.trimIndent()
+
+    private fun fritattFraKandidatsøkMelding(aktørId: String) = """
+        {
+            "aktørId": "$aktørId",
+            "@event_name": "fritatt-kandidatsøk",
+            "fodselsnummer": "12345678912",
+            "fritattKandidatsok": true
+        }
+    """.trimIndent()
 }
+
+/*
+toi-fritatt-kandidatsok produserer en melding slik:
+
+{
+    "@event_name": "fritatt-kandidatsøk",
+    "fodselsnummer": "12345678912",
+    "fritattKandidatsok": true
+}
+
+dersom den skulle gjort det likt som CV, skulle meldingen vært slik:
+
+{
+    "@event_name": "fritatt-kandidatsøk",
+    "fodselsnummer": "12345678912",
+    "fritattKandidatsok": {
+        "fritattKandidatsok": true
+    }
+}
+
+sammenstilt melding vil ved førstnevnte bli:
+
+{
+    "@event_name": "xxx.sammenstilt",
+    "aktørId": "12434345",
+    "cv": {},
+    "veileder": {}
+    "fritattKandidatsok": true
+}
+
+ */

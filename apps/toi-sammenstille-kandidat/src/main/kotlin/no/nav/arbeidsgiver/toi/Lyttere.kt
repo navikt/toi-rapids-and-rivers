@@ -71,3 +71,21 @@ class OppfølgingsperiodeLytter(
         behandler.behandleHendelse(Hendelse(HendelseType.OPPFØLGINGSPERIODE, packet["aktørId"].asText(), packet))
     }
 }
+
+class FritattFraKandidatsøkLytter(
+    rapidsConnection: RapidsConnection, private val behandler: Behandler
+) : River.PacketListener {
+    init {
+        River(rapidsConnection).apply {
+            validate {
+                it.demandValue("@event_name", "fritatt-kandidatsøk")
+                it.demandKey("aktørId")
+                it.demandKey("fritattKandidatsok")
+            }
+        }.register(this)
+    }
+
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        behandler.behandleHendelse(Hendelse(HendelseType.FRITATT_KANDIDATSØK, packet["aktørId"].asText(), packet))
+    }
+}

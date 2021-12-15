@@ -19,7 +19,7 @@ fun startApp(
             CvLytter(rapid, behandler)
             OppfølgingsinformasjonLytter(rapid, behandler)
             OppfølgingsperiodeLytter(rapid, behandler)
-
+            FritattFraKandidatsøkLytter(rapid, behandler)
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
