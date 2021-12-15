@@ -15,11 +15,12 @@ fun startApp(
             val behandler = Behandler(
                 Repository(datasource), rapid::publish
             )
+
             VeilederLytter(rapid, behandler)
             CvLytter(rapid, behandler)
             OppfølgingsinformasjonLytter(rapid, behandler)
             OppfølgingsperiodeLytter(rapid, behandler)
-
+            FritattKandidatsøkLytter(rapid, behandler)
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)

@@ -180,9 +180,8 @@ class SammenstillTest {
     }
 
     @Test
-    @Disabled
     fun `Når fritattKandidatsøk har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
-        val aktørId = "12141321"
+        val aktørId = "123"
         val testRapid = TestRapid()
 
         startApp(TestDatabase().dataSource, testRapid)
@@ -194,7 +193,7 @@ class SammenstillTest {
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk.sammenstilt")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.get("fodselsnummer").asText()).isEqualTo(aktørId)
+        assertThat(melding.get("fodselsnummer").asText()).isEqualTo("123")
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("fritattKandidatsøk")
 
         val fritattKandidatsøkPåMelding = melding.get("fritattKandidatsøk")

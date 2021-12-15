@@ -10,6 +10,7 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
             HendelseType.VEILEDER -> kandidat.copy(veileder = hendelse.jsonMessage["veileder"])
             HendelseType.OPPFØLGINGSINFORMASJON -> kandidat.copy(oppfølgingsinformasjon = hendelse.jsonMessage["oppfølgingsinformasjon"])
             HendelseType.OPPFØLGINGSPERIODE -> kandidat.copy(oppfølgingsperiode = hendelse.jsonMessage["oppfølgingsperiode"])
+            HendelseType.FRITATT_KANDIDATSØK -> kandidat.copy(fritattKandidatsøk = hendelse.jsonMessage["fritattKandidatsøk"])
         }
 
         repository.lagreKandidat(oppdatertKandidat)
@@ -18,6 +19,7 @@ class Behandler(val repository: Repository, val publiserHendelse: (String) -> Un
         oppdatertKandidat.veileder?.let { hendelse.jsonMessage["veileder"] = it }
         oppdatertKandidat.oppfølgingsinformasjon?.let { hendelse.jsonMessage["oppfølgingsinformasjon"] = it }
         oppdatertKandidat.oppfølgingsperiode?.let { hendelse.jsonMessage["oppfølgingsperiode"] = it }
+        oppdatertKandidat.fritattKandidatsøk?.let { hendelse.jsonMessage["fritattKandidatsøk"] = it }
 
         hendelse.jsonMessage["@event_name"] = hendelse.jsonMessage["@event_name"].asText()+".sammenstilt"
         publiserHendelse(hendelse.jsonMessage.toJson())
