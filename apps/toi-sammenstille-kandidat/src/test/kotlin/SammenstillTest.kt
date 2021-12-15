@@ -1,10 +1,21 @@
+import com.fasterxml.jackson.databind.JsonNode
 import no.nav.arbeidsgiver.toi.startApp
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class SammenstillTest {
+    private val alleKandidatfelter = listOf(
+        "cv",
+        "veileder",
+        "oppfølgingsinformasjon",
+        "oppfølgingsperiode",
+        "fritattKandidatsøk",
+    )
+
+    private fun kunKandidatfelter(melding: JsonNode) = melding.fieldNames().asSequence().toList().filter{ fieldName -> alleKandidatfelter.contains(fieldName) }
 
     @Test
     fun `Når veileder og CV har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
@@ -56,7 +67,8 @@ class SammenstillTest {
         val førsteMelding = rapidInspektør.message(0)
         assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("cv.sammenstilt")
         assertThat(førsteMelding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(førsteMelding.has("veileder")).isFalse
+        assertThat(kunKandidatfelter(førsteMelding)).containsExactlyInAnyOrder("cv")
+
         assertThat(førsteMelding.get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
         assertTrue(førsteMelding.get("cv").get("oppfolgingsinformasjon").isNull)
         assertTrue(førsteMelding.get("cv").get("opprettCv").isNull)
@@ -97,7 +109,8 @@ class SammenstillTest {
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("@event_name").asText()).isEqualTo("cv.sammenstilt")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.has("veileder")).isFalse
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("cv")
+
         assertThat(melding.get("cv").get("meldingstype").asText()).isEqualTo("SLETT")
         assertTrue(melding.get("cv").get("oppfolgingsinformasjon").isNull)
         assertTrue(melding.get("cv").get("opprettCv").isNull)
@@ -123,8 +136,7 @@ class SammenstillTest {
         assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon.sammenstilt")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(melding.get("fodselsnummer").asText()).isEqualTo("12345678912")
-        assertThat(melding.has("veileder")).isFalse
-        assertThat(melding.has("cv")).isFalse
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("oppfølgingsinformasjon")
 
         val oppfølgingsinformasjonPåMelding = melding.get("oppfølgingsinformasjon")
         assertThat(oppfølgingsinformasjonPåMelding.get("formidlingsgruppe").asText()).isEqualTo("IARBS")
@@ -157,9 +169,7 @@ class SammenstillTest {
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsperiode.sammenstilt")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.has("veileder")).isFalse
-        assertThat(melding.has("cv")).isFalse
-        assertThat(melding.has("oppfølgingsinformasjon")).isFalse
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("oppfølgingsperiode")
 
         val oppfølgingsperiodePåMelding = melding.get("oppfølgingsperiode")
 
@@ -167,6 +177,28 @@ class SammenstillTest {
         assertThat(oppfølgingsperiodePåMelding.get("aktorId").asText()).isEqualTo(aktørId)
         assertThat(oppfølgingsperiodePåMelding.get("startDato").asText()).isEqualTo("2021-12-01T18:18:00.435004+01:00")
         assertThat(oppfølgingsperiodePåMelding.get("sluttDato").isNull).isTrue
+    }
+
+    @Test
+    @Disabled
+    fun `Når fritattKandidatsøk har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+        val aktørId = "12141321"
+        val testRapid = TestRapid()
+
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(fritattKandidatsøkMelding(aktørId, true))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(melding.get("fodselsnummer").asText()).isEqualTo(aktørId)
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("fritattKandidatsøk")
+
+        val fritattKandidatsøkPåMelding = melding.get("fritattKandidatsøk")
+        assertThat(fritattKandidatsøkPåMelding.get("fritattKandidatsok").asBoolean()).isTrue
     }
 
     @Test
@@ -263,10 +295,21 @@ class SammenstillTest {
             "@event_name": "oppfølgingsperiode",
             "oppfølgingsperiode": {
                 "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "aktorId": "${aktørId}",
+                "aktorId": "$aktørId",
                 "startDato": "2021-12-01T18:18:00.435004+01:00",
                 "sluttDato": null 
             }   
+        }
+    """.trimIndent()
+
+    private fun fritattKandidatsøkMelding(aktørId: String, fritattKandidatsøk: Boolean) = """
+        {
+            "aktørId": "$aktørId",
+            "fodselsnummer": "123",
+            "@event_name": "fritatt-kandidatsøk",
+            "fritattKandidatsøk": {
+                "fritattKandidatsok": $fritattKandidatsøk
+            }
         }
     """.trimIndent()
 }

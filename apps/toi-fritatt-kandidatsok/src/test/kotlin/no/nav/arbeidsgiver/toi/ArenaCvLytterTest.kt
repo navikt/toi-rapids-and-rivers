@@ -40,6 +40,7 @@ class ArenaCvLytterTest {
             "fritattKandidatsøk",
             "system_read_count"
         )
+
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk")
         assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
 
