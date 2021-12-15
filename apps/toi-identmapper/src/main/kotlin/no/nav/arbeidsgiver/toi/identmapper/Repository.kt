@@ -18,7 +18,7 @@ class Repository(private val dataSource: DataSource) {
     private val fødselsnummerKolonne = "fnr"
     private val cachetTidspunktKolonne = "cachet_tidspunkt"
 
-    fun lagreAktørId(aktørId: String, fødselsnummer: String) {
+    fun lagreAktørId(aktørId: String?, fødselsnummer: String) {
         val identMappingerBasertPåFødselsnummer = hentIdentMappinger(fødselsnummer)
 
         val harSammeMapping = identMappingerBasertPåFødselsnummer.any { it.aktørId == aktørId }
@@ -68,7 +68,7 @@ class Repository(private val dataSource: DataSource) {
 }
 
 data class IdentMapping(
-    val aktørId: String,
+    val aktørId: String?,
     val fødselsnummer: String,
     val cachetTidspunkt: LocalDateTime
 )

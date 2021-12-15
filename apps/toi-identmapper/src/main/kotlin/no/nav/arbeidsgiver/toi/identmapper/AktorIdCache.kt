@@ -9,33 +9,31 @@ class AktorIdCache(
     private val varighetIDager = 30
 
     fun hentAktørId(fødselsnummer: String): String? {
-        var aktørId = hentCachetAktørId(fødselsnummer)
+        val cachetAktørId = hentCachetAktørId(fødselsnummer)
 
-        if (aktørId == null) {
-            aktørId = hentAktørIdFraPdl(fødselsnummer)?.also { nyAktørId ->
-                cacheAktørId(
-                    aktørId = nyAktørId,
-                    fødselsnummer = fødselsnummer
-                )
-            }
+        if (cachetAktørId.harHentetFraPdl) return cachetAktørId.verdi
+
+        return hentAktørIdFraPdl(fødselsnummer).also { nyAktørId ->
+            cacheAktørId(
+                aktørId = nyAktørId,
+                fødselsnummer = fødselsnummer
+            )
         }
-
-        return aktørId
     }
 
-    private fun cacheAktørId(aktørId: String, fødselsnummer: String) {
+    private fun cacheAktørId(aktørId: String?, fødselsnummer: String) {
         repository.lagreAktørId(aktørId, fødselsnummer)
     }
 
-    private fun hentCachetAktørId(fødselsnummer: String): String? {
+    private fun hentCachetAktørId(fødselsnummer: String): CachetAktørId {
         val identMappinger = repository.hentIdentMappinger(fødselsnummer)
         val sisteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
 
         if (sisteMapping == null || mappingErUtgått(sisteMapping)) {
-            return null
+            return CachetAktørId(false, null)
         }
 
-        return sisteMapping.aktørId
+        return CachetAktørId(true, sisteMapping.aktørId)
     }
 
     private fun mappingErUtgått(identMapping: IdentMapping): Boolean {
@@ -43,4 +41,9 @@ class AktorIdCache(
 
         return identMapping.cachetTidspunkt.isBefore(sisteGyldigeTidspunktForMapping)
     }
+
+    private data class CachetAktørId(
+        val harHentetFraPdl: Boolean,
+        val verdi: String?
+    )
 }
