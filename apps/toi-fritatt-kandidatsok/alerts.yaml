@@ -15,17 +15,17 @@ spec:
       expr: sum(up{app="toi-fritatt-kandidatsok", job="kubernetes-pods"}) == 0
       for: 1s
       description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/13c4a44cae8c1b9db99c2676d752244b"
+      action: "https://logs.adeo.no/goto/e708400b7315d64a78f3122130bb3d56"
 
     - alert: toi-fritatt-kandidatsok
       expr: sum(increase(logd_messages_total{log_app="toi-fritatt-kandidatsok",log_level="Error"}[10m])) > 0
       for: 1s
       description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/13c4a44cae8c1b9db99c2676d752244b"
+      action: "https://logs.adeo.no/goto/e708400b7315d64a78f3122130bb3d56"
 
     - alert: toi-fritatt-kandidatsok
       severity: warning
       expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-fritatt-kandidatsok",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-fritatt-kandidatsok"}[5m]))) > 20
       for: 5m
       description: Økning i warnings
-      action: "https://logs.adeo.no/goto/13c4a44cae8c1b9db99c2676d752244b"
+      action: "https://logs.adeo.no/goto/e708400b7315d64a78f3122130bb3d56"
