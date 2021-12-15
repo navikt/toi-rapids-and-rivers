@@ -1,6 +1,6 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-fritatt-kandidatsok-reader-rapidconsumer-1
-arena_cv_kafka_group_id: toi-fritatt-kandidatsok-1
+arena_cv_kafka_group_id: toi-fritatt-kandidatsok-2
 arena_cv_kafka_topic: arbeid-arenaCvEndret-v2-q0
 kafka-bootstrap-on-prem-url: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
 schema-on-prem-url: https://kafka-schema-registry.nais-q.adeo.no
