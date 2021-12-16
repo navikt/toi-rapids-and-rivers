@@ -41,6 +41,9 @@ spec:
     - team: toi
       application: toi-fritatt-kandidatsok
       access: readwrite
+    - team: toi
+      application: toi-synlighetsmotor
+      access: readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite
