@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*
 
 class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListener {
-    private val interessanteFelt = listOf("oppfølgingsinformasjon", "cv", "oppfølgingsperiode")
+    private val interessanteFelt = listOf("oppfølgingsinformasjon", "cv", "oppfølgingsperiode", "fritattKandidatsøk")
 
     init {
         River(rapidsConnection).apply {
