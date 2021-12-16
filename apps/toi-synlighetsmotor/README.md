@@ -1,0 +1,1 @@
+# Leser meldinger som inneholder informasjon om kandidater og beregner synlighet

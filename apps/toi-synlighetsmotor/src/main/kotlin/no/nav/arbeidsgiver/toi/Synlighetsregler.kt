@@ -74,5 +74,3 @@ private class OgRegel(private val regel1: Synlighetsregel, private val regel2: S
     override fun harBeregningsgrunnlag(kandidat: Kandidat) =
         regel1.harBeregningsgrunnlag(kandidat) && regel2.harBeregningsgrunnlag(kandidat)
 }
-
-fun JsonMessage.has(key: String) = !this[key].isNull
