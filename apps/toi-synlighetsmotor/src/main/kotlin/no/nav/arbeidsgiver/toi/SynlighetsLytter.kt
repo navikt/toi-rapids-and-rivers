@@ -10,6 +10,7 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
         River(rapidsConnection).apply {
             validate {
                 it.interestedIn(*interessanteFelt.toTypedArray())
+                it.demandKey("system_participating_services")
                 it.rejectKey("synlighet")
             }
         }.register(this)
@@ -19,7 +20,11 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
-        if (harIngenInteressanteFelter) return
+        val erSammenstillt =  packet["system_participating_services"]
+            .map{it.get("service").asText()}
+            .contains("toi-sammenstille-kandidat")
+
+        if (harIngenInteressanteFelter || !erSammenstillt) return
 
         val kandidat = Kandidat.fraJson(packet)
         packet["synlighet"] = Synlighet(erSynlig(kandidat), harBeregningsgrunnlag(kandidat))
