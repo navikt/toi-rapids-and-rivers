@@ -181,20 +181,15 @@ class SynlighetsmotorTest {
             {
                 ${
         listOfNotNull(
-            """"@event_name":"hendelse"""",
-            oppfølgingsinformasjon,
+            """"@event_name": "hendelse"""",
             cv,
+            oppfølgingsinformasjon,
             oppfølgingsperiode,
             fritattKandidatsøk,
             participatingService
         ).joinToString()
-    }               
+    }
             }
-            """.trimIndent()
-
-    private fun manglendeOppfølgingsinformasjon() =
-        """
-            "oppfølgingsinformasjon": null
         """.trimIndent()
 
     private fun oppfølgingsinformasjon(
@@ -205,23 +200,23 @@ class SynlighetsmotorTest {
     ) =
         """
             "oppfølgingsinformasjon": {
-                    "fodselsnummer": "12345678912",
-                    "formidlingsgruppe": "$formidlingsgruppe",
-                    "iservFraDato": null,
-                    "fornavn": "TULLETE",
-                    "etternavn": "TABBE",
-                    "oppfolgingsenhet": "0318",
-                    "kvalifiseringsgruppe": "BATT",
-                    "rettighetsgruppe": "AAP",
-                    "hovedmaal": "BEHOLDEA",
-                    "sikkerhetstiltakType": null,
-                    "diskresjonskode": null,
-                    "harOppfolgingssak": $harOppfolgingssak,
-                    "sperretAnsatt": $sperretAnsatt,
-                    "erDoed": $erDoed,
-                    "doedFraDato": null,
-                    "sistEndretDato": "2020-10-30T14:15:38+01:00"
-                }
+                "fodselsnummer": "12345678912",
+                "formidlingsgruppe": "$formidlingsgruppe",
+                "iservFraDato": null,
+                "fornavn": "TULLETE",
+                "etternavn": "TABBE",
+                "oppfolgingsenhet": "0318",
+                "kvalifiseringsgruppe": "BATT",
+                "rettighetsgruppe": "AAP",
+                "hovedmaal": "BEHOLDEA",
+                "sikkerhetstiltakType": null,
+                "diskresjonskode": null,
+                "harOppfolgingssak": $harOppfolgingssak,
+                "sperretAnsatt": $sperretAnsatt,
+                "erDoed": $erDoed,
+                "doedFraDato": null,
+                "sistEndretDato": "2020-10-30T14:15:38+01:00"
+            }
         """.trimIndent()
 
     private fun aktivOppfølgingsperiode() =
@@ -267,7 +262,7 @@ class SynlighetsmotorTest {
         """
             "system_participating_services" : [{
                 "service":"$service",
-                "instance":"toi-fritatt-kandidatsok-74874ffcd7-mw8r6",
+                "instance":"$service-74874ffcd7-mw8r6",
                 "time":"2021-12-14T15:55:36.566399512"
             }]
         """.trimIndent()
