@@ -20,8 +20,8 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
-        val erSammenstillt =  packet["system_participating_services"]
-            .map{it.get("service").asText()}
+        val erSammenstillt = packet["system_participating_services"]
+            .map { it.get("service").asText() }
             .contains("toi-sammenstille-kandidat")
 
         if (harIngenInteressanteFelter || !erSammenstillt) return
