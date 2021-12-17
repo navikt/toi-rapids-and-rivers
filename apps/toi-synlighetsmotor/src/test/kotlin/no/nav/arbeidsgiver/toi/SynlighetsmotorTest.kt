@@ -105,6 +105,26 @@ class SynlighetsmotorTest {
         assertThat(size).isEqualTo(0)
     }
 
+    @Test
+    fun `produserer ny melding dersom sammenstiller er kjørt`() = testProgramMedHendelse(
+        oppfølgingsinformasjonHendelseMedParticipatingService(participatingService = participatingService("toi-sammenstille-kandidat")),
+        enHendelseErPublisertMedSynlighetsverdi(false),
+    )
+
+    @Test
+    fun `Ingen ny melding dersom sammenstiller ikke er kjørt`() = testProgramMedHendelse(
+        oppfølgingsinformasjonHendelseMedParticipatingService(
+            participatingService = participatingService("toi-cv")
+        ),
+        enHendelseErIkkePublisert()
+    )
+
+    private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
+        {
+            assertThat(size).isEqualTo(0)
+
+        }
+
     private fun enHendelseErPublisertMedSynlighetsverdi(synlighet: Boolean): TestRapid.RapidInspector.() -> Unit =
         {
             assertThat(size).isEqualTo(1)
@@ -131,35 +151,45 @@ class SynlighetsmotorTest {
         oppfølgingsperiode: String = aktivOppfølgingsperiode(),
         oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
         cv: String = cv(),
-        fritattKandidatsøk: String = fritattKandidatsøk()
+        fritattKandidatsøk: String = fritattKandidatsøk(),
+        participatingService: String? = participatingService("toi-sammenstille-kandidat")
     ) =
         hendelse(
             oppfølgingsperiode = oppfølgingsperiode,
             oppfølgingsinformasjon = oppfølgingsinformasjon,
             cv = cv,
-            fritattKandidatsøk = fritattKandidatsøk
+            fritattKandidatsøk = fritattKandidatsøk,
+            participatingService = participatingService
+        )
+
+    private fun oppfølgingsinformasjonHendelseMedParticipatingService(
+        oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
+        participatingService: String? = participatingService("toi-sammenstille-kandidat")
+    ) =
+        hendelse(
+            oppfølgingsinformasjon = oppfølgingsinformasjon,
+            participatingService = participatingService
         )
 
     private fun hendelse(
         oppfølgingsperiode: String? = null,
         oppfølgingsinformasjon: String? = null,
         cv: String? = null,
-        fritattKandidatsøk: String? = null
+        fritattKandidatsøk: String? = null,
+        participatingService: String? = participatingService("toi-sammenstille-kandidat")
     ) = """
             {
-                ${listOfNotNull(
-                    """"@event_name":"hendelse"""",
-                    oppfølgingsinformasjon,
-                    cv,
-                    oppfølgingsperiode,
-                    fritattKandidatsøk
-                ).joinToString()}               
+                ${
+        listOfNotNull(
+            """"@event_name": "hendelse"""",
+            cv,
+            oppfølgingsinformasjon,
+            oppfølgingsperiode,
+            fritattKandidatsøk,
+            participatingService
+        ).joinToString()
+    }
             }
-            """.trimIndent()
-
-    private fun manglendeOppfølgingsinformasjon() =
-        """
-            "oppfølgingsinformasjon": null
         """.trimIndent()
 
     private fun oppfølgingsinformasjon(
@@ -170,23 +200,23 @@ class SynlighetsmotorTest {
     ) =
         """
             "oppfølgingsinformasjon": {
-                    "fodselsnummer": "12345678912",
-                    "formidlingsgruppe": "$formidlingsgruppe",
-                    "iservFraDato": null,
-                    "fornavn": "TULLETE",
-                    "etternavn": "TABBE",
-                    "oppfolgingsenhet": "0318",
-                    "kvalifiseringsgruppe": "BATT",
-                    "rettighetsgruppe": "AAP",
-                    "hovedmaal": "BEHOLDEA",
-                    "sikkerhetstiltakType": null,
-                    "diskresjonskode": null,
-                    "harOppfolgingssak": $harOppfolgingssak,
-                    "sperretAnsatt": $sperretAnsatt,
-                    "erDoed": $erDoed,
-                    "doedFraDato": null,
-                    "sistEndretDato": "2020-10-30T14:15:38+01:00"
-                }
+                "fodselsnummer": "12345678912",
+                "formidlingsgruppe": "$formidlingsgruppe",
+                "iservFraDato": null,
+                "fornavn": "TULLETE",
+                "etternavn": "TABBE",
+                "oppfolgingsenhet": "0318",
+                "kvalifiseringsgruppe": "BATT",
+                "rettighetsgruppe": "AAP",
+                "hovedmaal": "BEHOLDEA",
+                "sikkerhetstiltakType": null,
+                "diskresjonskode": null,
+                "harOppfolgingssak": $harOppfolgingssak,
+                "sperretAnsatt": $sperretAnsatt,
+                "erDoed": $erDoed,
+                "doedFraDato": null,
+                "sistEndretDato": "2020-10-30T14:15:38+01:00"
+            }
         """.trimIndent()
 
     private fun aktivOppfølgingsperiode() =
@@ -226,5 +256,14 @@ class SynlighetsmotorTest {
             "fritattKandidatsøk" : {
                 "fritattKandidatsok" : $fritattKandidatsøk
             }
+        """.trimIndent()
+
+    private fun participatingService(service: String) =
+        """
+            "system_participating_services" : [{
+                "service":"$service",
+                "instance":"$service-74874ffcd7-mw8r6",
+                "time":"2021-12-14T15:55:36.566399512"
+            }]
         """.trimIndent()
 }
