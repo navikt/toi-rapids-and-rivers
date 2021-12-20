@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi
 
-import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.Instant
 
 private val synlighetsregel =
@@ -34,9 +33,12 @@ private object `har rett formidlingsgruppe` : Synlighetsregel {
 }
 
 private object `har CV` : Synlighetsregel {
-    override fun erSynlig(kandidat: Kandidat) = kandidat.cv != null
+    override fun erSynlig(kandidat: Kandidat): Boolean {
+        val meldingstype = kandidat.cv?.meldingstype ?: false
+        return meldingstype == CvMeldingstype.OPPRETT || meldingstype == CvMeldingstype.ENDRE
+    }
 
-    override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.cv != null
 }
 
 private object `er under oppfølging` : Synlighetsregel {

@@ -23,6 +23,18 @@ class SynlighetsmotorTest {
     )
 
     @Test
+    fun `om CV har meldingstype "SLETT" skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(cv = cv(CvMeldingstype.SLETT)),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
+
+    @Test
+    fun `om CV har meldingstype "ENDRE" skal synlighet være true`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(cv = cv(meldingstype = CvMeldingstype.ENDRE)),
+        enHendelseErPublisertMedSynlighetsverdi(true)
+    )
+
+    @Test
     fun `om Person er død skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(erDoed = true)),
         enHendelseErPublisertMedSynlighetsverdi(false)
@@ -239,11 +251,11 @@ class SynlighetsmotorTest {
             }
         """.trimIndent()
 
-    private fun cv(
-    ) =
+    private fun cv(meldingstype: CvMeldingstype = CvMeldingstype.OPPRETT) =
         """
             "cv": {
-                }
+                "meldingstype": "$meldingstype"    
+            }
         """.trimIndent()
 
     private fun manglendeCV() =
