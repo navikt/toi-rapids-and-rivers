@@ -6,8 +6,6 @@ env:
 
 on:
   push:
-    branches:
-      - main
     paths:
       - apps/toi-kandidatfeed/**
       - .github/workflows/deploy-toi-kandidatfeed.yaml
