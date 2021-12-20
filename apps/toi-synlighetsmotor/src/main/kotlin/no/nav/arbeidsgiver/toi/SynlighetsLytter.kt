@@ -10,6 +10,7 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
         River(rapidsConnection).apply {
             validate {
                 it.interestedIn(*interessanteFelt.toTypedArray())
+                it.interestedIn("aktørId")
                 it.demandKey("system_participating_services")
                 it.rejectKey("synlighet")
             }
