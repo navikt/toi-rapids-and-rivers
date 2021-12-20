@@ -14,17 +14,15 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-                it.interestedIn("veileder")
-                it.demandKey("cv")
+                it.demandKey("synlighet")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if (packet["cv"].isNull) {
-            val feilmelding = "cv kan ikke være null for aktørid ${packet["aktorId"]}"
-            log.error(feilmelding)
-            throw IllegalArgumentException(feilmelding)
+        if (!packet["synlighet"]["ferdigBeregnet"].asBoolean()) {
+            log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
+            return
         }
 
         val aktørId = packet["aktørId"].asText()
