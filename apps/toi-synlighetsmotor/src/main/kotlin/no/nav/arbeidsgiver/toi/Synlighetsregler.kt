@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi
 import java.time.Instant
 
 private val synlighetsregel =
-    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har CV` og `er under oppfølging` og
+    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har aktiv CV` og `er under oppfølging` og
             `er ikke fritatt fra kandidatsøk` og
             `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
 
@@ -32,7 +32,7 @@ private object `har rett formidlingsgruppe` : Synlighetsregel {
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon != null
 }
 
-private object `har CV` : Synlighetsregel {
+private object `har aktiv CV` : Synlighetsregel {
     override fun erSynlig(kandidat: Kandidat): Boolean {
         val meldingstype = kandidat.cv?.meldingstype ?: false
         return meldingstype == CvMeldingstype.OPPRETT || meldingstype == CvMeldingstype.ENDRE
