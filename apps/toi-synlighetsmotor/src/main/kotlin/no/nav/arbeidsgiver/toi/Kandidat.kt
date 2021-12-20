@@ -7,7 +7,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.ZonedDateTime
 
 data class Kandidat(
-    val cv: Any?,
+    val cv: Cv?,
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
     val fritattKandidatsøk: FritattKandidatsøk?
@@ -20,6 +20,16 @@ data class Kandidat(
 
         fun fraJson(jsonMessage: JsonMessage) = mapper.readValue(jsonMessage.toJson(), Kandidat::class.java)
     }
+}
+
+data class Cv(
+    val meldingstype: CvMeldingstype
+)
+
+enum class CvMeldingstype {
+    SLETT,
+    ENDRE,
+    OPPRETT
 }
 
 data class Oppfølgingsperiode(
