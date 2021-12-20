@@ -41,10 +41,6 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        jsonNode.remove(metadataFelter)
-        return jsonNode
+        return jsonNode.remove(metadataFelter)
     }
 }
-
-
-
