@@ -3,9 +3,12 @@ package no.nav.arbeidsgiver.toi
 import java.time.Instant
 
 private val synlighetsregel =
-    `er ikke død` og `er ikke sperret ansatt` og `har rett formidlingsgruppe` og `har aktiv CV` og `er under oppfølging` og
-            `er ikke fritatt fra kandidatsøk` og
-            `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag`
+    `er ikke død` og
+            `er ikke sperret ansatt` og
+            `har rett formidlingsgruppe` og
+            `har aktiv CV` og
+            `er under oppfølging` og
+            `er ikke fritatt fra kandidatsøk`
 
 fun erSynlig(kandidat: Kandidat) = synlighetsregel.erSynlig(kandidat)
 
@@ -56,13 +59,10 @@ private object `er under oppfølging` : Synlighetsregel {
 }
 
 private object `er ikke fritatt fra kandidatsøk` : Synlighetsregel {
-    override fun erSynlig(kandidat: Kandidat) = kandidat.fritattKandidatsøk?.fritattKandidatsok == false
-    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.fritattKandidatsøk != null
-}
+    override fun erSynlig(kandidat: Kandidat) =
+        if (kandidat.fritattKandidatsøk == null) true else !kandidat.fritattKandidatsøk.fritattKandidatsok
 
-private object `temporær placeholder-regel for å si fra om manglende behandlingsgrunnlag` : Synlighetsregel {
-    override fun erSynlig(kandidat: Kandidat) = true
-    override fun harBeregningsgrunnlag(kandidat: Kandidat) = false
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
 }
 
 private interface Synlighetsregel {

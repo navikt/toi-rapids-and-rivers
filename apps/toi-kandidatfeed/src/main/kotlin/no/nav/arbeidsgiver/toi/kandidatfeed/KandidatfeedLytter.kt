@@ -20,7 +20,9 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if (!packet["synlighet"]["ferdigBeregnet"].asBoolean()) {
+        val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
+
+        if (!synlighetErFerdigBeregnet) {
             log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
             return
         }
