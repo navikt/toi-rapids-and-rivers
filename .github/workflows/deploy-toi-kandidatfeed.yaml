@@ -7,11 +7,11 @@ env:
 on:
   push:
     branches:
-    - main
+      - main
     paths:
-    - apps/toi-kandidatfeed/**
-    - .github/workflows/deploy-toi-kandidatfeed.yaml
-    - buildSrc/**
+      - apps/toi-kandidatfeed/**
+      - .github/workflows/deploy-toi-kandidatfeed.yaml
+      - buildSrc/**
 
 jobs:
   build-and-publish:
