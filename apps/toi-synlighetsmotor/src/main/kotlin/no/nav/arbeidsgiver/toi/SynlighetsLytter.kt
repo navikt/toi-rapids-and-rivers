@@ -27,10 +27,14 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
         if (harIngenInteressanteFelter || !erSammenstillt) return
 
         val kandidat = Kandidat.fraJson(packet)
-        packet["synlighet"] = Synlighet(erSynlig(kandidat), harBeregningsgrunnlag(kandidat))
+        val synlighet = Synlighet(erSynlig(kandidat), harBeregningsgrunnlag(kandidat))
+
+        packet["synlighet"] = synlighet
+
+        log.info("Beregnet synlig for kandidat ${packet["aktørId"]}: $synlighet")
 
         publish(packet.toJson())
     }
 
-    private class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)
+    private data class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)
 }
