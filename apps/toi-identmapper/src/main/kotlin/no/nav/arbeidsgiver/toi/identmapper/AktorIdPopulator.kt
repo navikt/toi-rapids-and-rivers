@@ -26,8 +26,6 @@ class AktorIdPopulator(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        log.info("Mottok melding med fødselsnummer")
-
         val aktørId = hentAktørId(packet[fnrKey].asText())
 
         if (aktørId == null) {
@@ -35,6 +33,7 @@ class AktorIdPopulator(
                 throw RuntimeException("Klarte ikke å mappe melding fra fødselsnummer til aktørId")
             }
         } else {
+            log.info("Mappet fra fødselsnummer til aktørId: $aktørId")
             packet[aktørIdKey] = aktørId
             rapidsConnection.publish(packet.toJson())
         }
