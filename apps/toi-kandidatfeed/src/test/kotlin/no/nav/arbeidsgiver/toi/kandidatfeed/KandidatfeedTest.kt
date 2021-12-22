@@ -28,6 +28,7 @@ class KandidatfeedTest {
 
         assertThat(meldingPåRapid["aktørId"]).isEqualTo(meldingPåKafka["aktørId"])
         assertThat(meldingPåRapid["cv"]).isEqualTo(meldingPåKafka["cv"])
+        assertThat(meldingPåRapid["veileder"]).isEqualTo(meldingPåKafka["veileder"])
     }
 
     @Test
