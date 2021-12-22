@@ -6,12 +6,10 @@ env:
 
 on:
   push:
-    branches:
-    - main
     paths:
-    - apps/toi-kandidatfeed/**
-    - .github/workflows/deploy-toi-kandidatfeed.yaml
-    - buildSrc/**
+      - apps/toi-kandidatfeed/**
+      - .github/workflows/deploy-toi-kandidatfeed.yaml
+      - buildSrc/**
 
 jobs:
   build-and-publish:
@@ -44,7 +42,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/kul-feature'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/demand-synlighet-i-kandidatfeed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

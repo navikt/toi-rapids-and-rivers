@@ -7,24 +7,42 @@ import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val producer: Producer<String, String>) :
+class KandidatfeedLytter(
+    rapidsConnection: RapidsConnection,
+    private val producer: Producer<String, String>,
+    private val erProd: Boolean
+) :
     River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-                it.interestedIn("veileder")
-                it.demandKey("cv")
+
+                if (erProd) {
+                    it.demandKey("cv")
+                } else {
+                    it.demandKey("synlighet")
+                }
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if (packet["cv"].isNull) {
-            val feilmelding = "cv kan ikke være null for aktørid ${packet["aktorId"]}"
-            log.error(feilmelding)
-            throw IllegalArgumentException(feilmelding)
+        if (erProd) {
+            if (packet["cv"].isNull) {
+                val feilmelding = "CV kan ikke være null for aktørId ${packet["aktørId"]}"
+
+                log.error(feilmelding)
+                throw IllegalArgumentException(feilmelding)
+            }
+        } else {
+            val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
+
+            if (!synlighetErFerdigBeregnet) {
+                log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
+                return
+            }
         }
 
         val aktørId = packet["aktørId"].asText()
@@ -43,10 +61,6 @@ class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val produce
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        jsonNode.remove(metadataFelter)
-        return jsonNode
+        return jsonNode.remove(metadataFelter)
     }
 }
-
-
-

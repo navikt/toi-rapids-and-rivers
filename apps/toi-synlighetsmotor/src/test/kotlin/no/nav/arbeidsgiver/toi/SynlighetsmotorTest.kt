@@ -14,7 +14,9 @@ class SynlighetsmotorTest {
 
     @Test
     fun `kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdi(false)
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdi(
+            synlighet = false
+        )
     )
 
     @Test
@@ -91,7 +93,7 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = manglendeCV()),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
     )
 
     @Test
@@ -143,7 +145,6 @@ class SynlighetsmotorTest {
             assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
             field(0, "synlighet").apply {
                 assertThat(get("erSynlig").asBoolean()).apply { if (synlighet) isTrue else isFalse }
-                assertThat(get("ferdigBeregnet").asBoolean()).isFalse
             }
         }
 

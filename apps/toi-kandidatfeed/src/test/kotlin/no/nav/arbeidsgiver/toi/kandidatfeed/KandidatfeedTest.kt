@@ -10,11 +10,86 @@ import org.junit.jupiter.api.Test
 class KandidatfeedTest {
 
     @Test
-    fun `Lesing av melding med cv og veileder fra rapid skal produsere melding på nytt topic`() {
-        val rapidMelding = rapidMelding(cv, veileder)
+    fun `Hvis appen kjører i prod, skal melding med kun CV og aktørId produsere melding på kandidat-topic`() {
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
+
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
-        KandidatfeedLytter(testrapid, producer)
+
+        KandidatfeedLytter(testrapid, producer, erProd = true)
+
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        assertThat(producer.history().size).isEqualTo(1)
+        val melding = producer.history()[0]
+
+        val meldingPåRapid = jacksonObjectMapper().readTree(meldingMedKunCvOgAktørId)
+        val meldingPåKafka = jacksonObjectMapper().readTree(melding.value())
+
+        assertThat(meldingPåRapid["aktørId"]).isEqualTo(meldingPåKafka["aktørId"])
+        assertThat(meldingPåRapid["cv"]).isEqualTo(meldingPåKafka["cv"])
+        assertThat(meldingPåRapid["veileder"]).isEqualTo(meldingPåKafka["veileder"])
+    }
+
+    @Test
+    fun `Hvis appen kjører i dev, skal melding med kun CV og aktørId ikke produsere melding på kandidat-topic`() {
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer, erProd = false)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        assertThat(producer.history().size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Meldinger der synlighet er ferdig beregnet skal produsere melding på kandidat-topic`() {
+        val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true))
+        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet =  true))
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer, erProd = false)
+
+        testrapid.sendTestMessage(meldingSynlig)
+        testrapid.sendTestMessage(meldingUsynlig)
+
+        assertThat(producer.history().size).isEqualTo(2)
+        val melding = producer.history()[0]
+        val melding2 = producer.history()[1]
+
+        val json = jacksonObjectMapper().readTree(melding.value())["synlighet"]
+        val json2 = jacksonObjectMapper().readTree(melding2.value())["synlighet"]
+
+        assertThat(json["ferdigBeregnet"].asBoolean()).isTrue
+        assertThat(json2["ferdigBeregnet"].asBoolean()).isTrue
+        assertThat(json["erSynlig"].asBoolean()).isTrue
+        assertThat(json2["erSynlig"].asBoolean()).isFalse
+    }
+
+    @Test
+    fun `Meldinger der synlighet ikke er ferdig beregnet skal ikke produsere melding på kandidat-topic`() {
+        val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = false))
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer, erProd = false)
+        testrapid.sendTestMessage(meldingSynlig)
+
+        assertThat(producer.history().size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Informasjon om kandidaten skal sendes videre til kandidat-topic`() {
+        val rapidMelding = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true))
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer, erProd = false)
 
         testrapid.sendTestMessage(rapidMelding)
 
@@ -35,54 +110,18 @@ class KandidatfeedTest {
         assertThat(resultatJson.has("@event_name")).isFalse
     }
 
-    @Test
-    fun `Lesing av melding med cv og uten veileder fra rapid skal produsere melding på nytt topic`() {
-        val rapidMelding = rapidMelding(cv, "")
-        val testrapid = TestRapid()
-        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
-        KandidatfeedLytter(testrapid, producer)
+    private fun synlighet(erSynlig: Boolean = true, ferdigBeregnet: Boolean = true) = """
+        "synlighet": {
+            "erSynlig": "$erSynlig",
+            "ferdigBeregnet": "$ferdigBeregnet"
+        },
+    """.trimIndent()
 
-        testrapid.sendTestMessage(rapidMelding)
-
-        assertThat(producer.history().size).isEqualTo(1)
-        val melding = producer.history()[0]
-
-        assertThat(melding.key()).isEqualTo("123")
-
-        val resultatJson = jacksonObjectMapper().readTree(melding.value())
-        val forventetJson = jacksonObjectMapper().readTree(rapidMelding)
-
-        assertThat(resultatJson.get("cv")).isEqualTo(forventetJson.get("cv"))
-        assertThat(resultatJson.get("veileder")).isNull()
-        assertThat(resultatJson.get("aktørId")).isEqualTo(forventetJson.get("aktørId"))
-    }
-
-    @Test
-    fun `Lesing av melding med veileder og uten cv fra rapid skal ikke produsere melding på nytt topic`() {
-        val rapidMelding = rapidMelding("", veileder)
-        val testrapid = TestRapid()
-        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
-        KandidatfeedLytter(testrapid, producer)
-
-        testrapid.sendTestMessage(rapidMelding)
-
-        assertThat(producer.history().size).isEqualTo(0)
-    }
-
-    @Test
-    fun `Lesing av melding med veileder og cv uten verdi fra rapid skal ikke produsere melding på nytt topic`() {
-        val rapidMelding = rapidMelding(cvUtenVerdi, veileder)
-        val testrapid = TestRapid()
-        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
-        KandidatfeedLytter(testrapid, producer)
-
-        testrapid.sendTestMessage(rapidMelding)
-
-        assertThat(producer.history().size).isEqualTo(0)
-    }
-
-    private val cv = """
-        "cv": {
+    fun rapidMelding(synlighetJson: String?): String = """
+        {
+          "@event_name": "cv.sammenstilt",
+          "aktørId": "123",
+          "cv": {
             "meldingstype": "SLETT",
             "oppfolgingsinformasjon": null,
             "opprettCv": null,
@@ -93,27 +132,13 @@ class KandidatfeedTest {
             "slettJobbprofil": null,
             "aktoerId": "123",
             "sistEndret": 1637238150.172
-        },
-    """.trimIndent()
-
-    private val cvUtenVerdi = """
-        "cv": null,
-    """.trimIndent()
-
-    private val veileder = """
-        "veileder": {
+          },
+          "veileder": {
              "aktorId":"123",
              "veilederId":"A123123",
              "tilordnet":"2021-11-19T13:18:03.307756228"
-        },
-    """.trimIndent()
-
-    fun rapidMelding(cvJson: String?, veilederJson: String?): String = """
-        {
-          "aktørId": "123",
-          $cvJson
-          $veilederJson
-          "@event_name": "cv.sammenstilt",
+          },
+          $synlighetJson
           "system_read_count": 1,
           "system_participating_services": [
             {

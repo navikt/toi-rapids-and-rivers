@@ -6,8 +6,6 @@ env:
 
 on:
   push:
-    branches:
-      - main
     paths:
       - apps/toi-identmapper/**
       - .github/workflows/deploy-toi-identmapper.yaml
@@ -44,7 +42,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/identmapping-cache'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/demand-synlighet-i-kandidatfeed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
