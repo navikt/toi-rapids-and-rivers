@@ -7,24 +7,42 @@ import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-class KandidatfeedLytter(rapidsConnection: RapidsConnection, private val producer: Producer<String, String>) :
+class KandidatfeedLytter(
+    rapidsConnection: RapidsConnection,
+    private val producer: Producer<String, String>,
+    private val erProd: Boolean
+) :
     River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-                it.demandKey("synlighet")
+
+                if (erProd) {
+                    it.demandKey("cv")
+                } else {
+                    it.demandKey("synlighet")
+                }
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
+        if (erProd) {
+            if (packet["cv"].isNull) {
+                val feilmelding = "CV kan ikke være null for aktørId ${packet["aktørId"]}"
 
-        if (!synlighetErFerdigBeregnet) {
-            log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
-            return
+                log.error(feilmelding)
+                throw IllegalArgumentException(feilmelding)
+            }
+        } else {
+            val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
+
+            if (!synlighetErFerdigBeregnet) {
+                log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
+                return
+            }
         }
 
         val aktørId = packet["aktørId"].asText()

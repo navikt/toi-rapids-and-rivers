@@ -10,6 +10,40 @@ import org.junit.jupiter.api.Test
 class KandidatfeedTest {
 
     @Test
+    fun `Hvis appen kjører i prod, skal melding med kun CV og aktørId produsere melding på kandidat-topic`() {
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer, erProd = true)
+
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        assertThat(producer.history().size).isEqualTo(1)
+        val melding = producer.history()[0]
+
+        val meldingPåRapid = jacksonObjectMapper().readTree(meldingMedKunCvOgAktørId)
+        val meldingPåKafka = jacksonObjectMapper().readTree(melding.value())
+
+        assertThat(meldingPåRapid["aktørId"]).isEqualTo(meldingPåKafka["aktørId"])
+        assertThat(meldingPåRapid["cv"]).isEqualTo(meldingPåKafka["cv"])
+    }
+
+    @Test
+    fun `Hvis appen kjører i dev, skal melding med kun CV og aktørId ikke produsere melding på kandidat-topic`() {
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer, erProd = false)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        assertThat(producer.history().size).isEqualTo(0)
+    }
+
+    @Test
     fun `Meldinger der synlighet er ferdig beregnet skal produsere melding på kandidat-topic`() {
         val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true))
         val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet =  true))
@@ -17,7 +51,7 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        KandidatfeedLytter(testrapid, producer, erProd = false)
 
         testrapid.sendTestMessage(meldingSynlig)
         testrapid.sendTestMessage(meldingUsynlig)
@@ -42,7 +76,7 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        KandidatfeedLytter(testrapid, producer, erProd = false)
         testrapid.sendTestMessage(meldingSynlig)
 
         assertThat(producer.history().size).isEqualTo(0)
@@ -54,7 +88,7 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        KandidatfeedLytter(testrapid, producer, erProd = false)
 
         testrapid.sendTestMessage(rapidMelding)
 
