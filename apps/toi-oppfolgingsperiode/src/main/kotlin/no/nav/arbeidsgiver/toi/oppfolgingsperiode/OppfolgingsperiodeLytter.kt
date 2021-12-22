@@ -27,7 +27,7 @@ class OppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnection) :
             "@event_name" to "oppfølgingsperiode",
         )
 
-        log.info("Skal publisere oppfølgingsperiodemelding")
+        log.info("Skal publisere oppfølgingsperiodemelding for ${packet["aktorId"]}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
