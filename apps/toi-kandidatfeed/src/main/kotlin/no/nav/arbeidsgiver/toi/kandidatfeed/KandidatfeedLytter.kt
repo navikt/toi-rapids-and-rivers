@@ -18,12 +18,8 @@ class KandidatfeedLytter(
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-
-                if (erProd) {
-                    it.demandKey("cv")
-                } else {
-                    it.demandKey("synlighet")
-                }
+                it.demandKey("cv")
+                it.demandKey("synlighet")
             }
         }.register(this)
     }
