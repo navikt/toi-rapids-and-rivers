@@ -229,6 +229,23 @@ class SammenstillTest {
         assertThat(oppfølgingsinformasjonPåMelding.isObject).isTrue
     }
 
+    @Test
+    fun `metadata fra opprinnelig melding skal ikke fjernes når sammenstilleren publiserer ny melding på rapid`() {
+        val testRapid = TestRapid()
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+
+        val felterPåMelding = melding.fieldNames().asSequence().toList()
+        assertThat(felterPåMelding).contains("system_participating_services")
+        // TODO: Assert innhold i system_participating_services
+
+    }
+
     private fun veilederMelding(aktørId: String) = """
         {
             "@event_name": "veileder",
@@ -257,6 +274,32 @@ class SammenstillTest {
             "sistEndret": 1636718935.195
           },
           "@event_name": "cv"
+        }
+    """.trimIndent()
+
+    private fun cvMeldingMedSystemParticipatingServices() = """
+        {
+          "aktørId": "123",
+          "cv": {
+            "meldingstype": "SLETT",
+            "oppfolgingsinformasjon": null,
+            "opprettCv": null,
+            "endreCv": null,
+            "slettCv": null,
+            "opprettJobbprofil": null,
+            "endreJobbprofil": null,
+            "slettJobbprofil": null,
+            "aktoerId": "123",
+            "sistEndret": 1636718935.195
+          },
+          "@event_name": "cv",
+          "system_participating_services": [
+            {
+              "service": "toi-cv",
+              "instance": "toi-cv-58849d5f86-7qffs",
+              "time": "2021-11-19T10:53:59.163725026"
+            }
+          ]
         }
     """.trimIndent()
 
