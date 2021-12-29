@@ -2,90 +2,27 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.*
 
-class CvLytter(rapidsConnection: RapidsConnection, private val behandler: Behandler) : River.PacketListener {
+abstract class Lytter(rapidsConnection: RapidsConnection, private val behandler: Behandler, private val hendelseType: HendelseType, påkrevdeFelter: List<String>): River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("@event_name", "cv")
-                it.demandKey("aktørId")
-                it.interestedIn("cv")
+                it.demandValue("@event_name", hendelseType.eventNavn)
+                påkrevdeFelter.forEach { felt -> it.demandKey(felt) }
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.CV, packet["aktørId"].asText() , packet))
+        behandler.behandleHendelse(Hendelse(hendelseType, packet["aktørId"].asText() , packet))
     }
 }
 
-class VeilederLytter(
-    rapidsConnection: RapidsConnection, private val behandler: Behandler
-) : River.PacketListener {
-    init {
-        River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "veileder")
-                it.demandKey("veileder")
-                it.demandKey("aktørId")
-            }
-        }.register(this)
-    }
+class CvLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.CV, listOf("aktørId", "cv"))
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.VEILEDER, packet["aktørId"].asText(), packet))
-    }
-}
+class VeilederLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.VEILEDER, listOf("aktørId", "veileder"))
 
-class OppfølgingsinformasjonLytter(
-    rapidsConnection: RapidsConnection, private val behandler: Behandler
-) : River.PacketListener {
-    init {
-        River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "oppfølgingsinformasjon")
-                it.demandKey("oppfølgingsinformasjon")
-                it.demandKey("aktørId")
-            }
-        }.register(this)
-    }
+class OppfølgingsinformasjonLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.OPPFØLGINGSINFORMASJON, listOf("aktørId", "oppfølgingsinformasjon"))
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.OPPFØLGINGSINFORMASJON, packet["aktørId"].asText(), packet))
-    }
-}
+class OppfølgingsperiodeLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.OPPFØLGINGSPERIODE, listOf("aktørId", "oppfølgingsperiode"))
 
-class OppfølgingsperiodeLytter(
-    rapidsConnection: RapidsConnection, private val behandler: Behandler
-) : River.PacketListener {
-    init {
-        River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "oppfølgingsperiode")
-                it.demandKey("oppfølgingsperiode")
-                it.demandKey("aktørId")
-            }
-        }.register(this)
-    }
-
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.OPPFØLGINGSPERIODE, packet["aktørId"].asText(), packet))
-    }
-}
-
-class FritattKandidatsøkLytter(
-    rapidsConnection: RapidsConnection, private val behandler: Behandler
-) : River.PacketListener {
-    init {
-        River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "fritatt-kandidatsøk")
-                it.demandKey("fritattKandidatsøk")
-                it.demandKey("aktørId")
-            }
-        }.register(this)
-    }
-
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(HendelseType.FRITATT_KANDIDATSØK, packet["aktørId"].asText(), packet))
-    }
-}
+class FritattKandidatsøkLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.FRITATT_KANDIDATSØK, listOf("aktørId", "fritattKandidatsøk"))

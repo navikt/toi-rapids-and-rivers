@@ -8,10 +8,10 @@ data class Hendelse(val hendelseType: HendelseType, val aktørid: String, val js
     }
 }
 
-enum class HendelseType {
-    CV,
-    VEILEDER,
-    OPPFØLGINGSINFORMASJON,
-    OPPFØLGINGSPERIODE,
-    FRITATT_KANDIDATSØK
+enum class HendelseType(val eventNavn: String) {
+    CV("cv"),
+    VEILEDER("veileder"),
+    OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon"),
+    OPPFØLGINGSPERIODE("oppfølgingsperiode"),
+    FRITATT_KANDIDATSØK("fritatt-kandidatsøk")
 }
