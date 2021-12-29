@@ -12,21 +12,19 @@ fun startApp(
 ) {
     try {
         rapidsConnection.also { rapid ->
-            val behandler = Behandler(
-                Repository(datasource), rapid::publish
-            )
 
-            VeilederLytter(rapid, behandler)
-            CvLytter(rapid, behandler)
-            OppfølgingsinformasjonLytter(rapid, behandler)
-            OppfølgingsperiodeLytter(rapid, behandler)
-            FritattKandidatsøkLytter(rapid, behandler)
+            val repository = Repository(datasource)
+
+            VeilederLytter(rapid, repository)
+            CvLytter(rapid, repository)
+            OppfølgingsinformasjonLytter(rapid, repository)
+            OppfølgingsperiodeLytter(rapid, repository)
+            FritattKandidatsøkLytter(rapid, repository)
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
     }
 }
-
 
 fun datasource() = DatabaseKonfigurasjon(System.getenv()).lagDatasource();
 

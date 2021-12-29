@@ -1,10 +1,15 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageProblems
 import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
@@ -96,6 +101,11 @@ data class Kandidat(
             oppfølgingsperiode = json["oppfølgingsperiode"],
             fritattKandidatsøk = json["fritattKandidatsøk"]
         )
+    }
+
+    fun somJsonUtenNullFelt(): String {
+        val objectMapper = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        return objectMapper.writeValueAsString(this)
     }
 
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)

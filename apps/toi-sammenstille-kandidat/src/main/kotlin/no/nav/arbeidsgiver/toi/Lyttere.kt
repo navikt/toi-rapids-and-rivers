@@ -2,27 +2,80 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.*
 
-abstract class Lytter(rapidsConnection: RapidsConnection, private val behandler: Behandler, private val hendelseType: HendelseType, påkrevdeFelter: List<String>): River.PacketListener {
+abstract class Lytter(private val rapidsConnection: RapidsConnection, private val repository: Repository, eventNavn: String, feltSomSkalBehandles: String = eventNavn) :
+    River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("@event_name", hendelseType.eventNavn)
-                påkrevdeFelter.forEach { felt -> it.demandKey(felt) }
+                it.demandValue("@event_name", eventNavn)
+                it.demandKey("aktørId")
+                it.demandKey(feltSomSkalBehandles)
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        behandler.behandleHendelse(Hendelse(hendelseType, packet["aktørId"].asText() , packet))
+        behandleHendelse(packet["aktørId"].asText(), packet)
+    }
+
+    fun behandleOppdatertKandidat(oppdatertKandidat: Kandidat, pakke: JsonMessage) {
+        repository.lagreKandidat(oppdatertKandidat)
+        val nyPakke = JsonMessage(oppdatertKandidat.somJsonUtenNullFelt(), MessageProblems(""))
+        nyPakke["@event_name"] = pakke["@event_name"].asText() + ".sammenstilt"
+        rapidsConnection.publish(nyPakke.toJson())
+    }
+
+    protected fun hentKandidat(aktørId: String) = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
+
+    abstract fun behandleHendelse(aktørId: String, pakke: JsonMessage)
+}
+
+class CvLytter(rapidsConnection: RapidsConnection, repository: Repository) :
+    Lytter(rapidsConnection, repository,"cv") {
+
+    override fun behandleHendelse(aktørId: String, pakke: JsonMessage) {
+        val kandidat = hentKandidat(aktørId)
+        val oppdatertKandidat = kandidat.copy(cv = pakke["cv"])
+        behandleOppdatertKandidat(oppdatertKandidat, pakke)
     }
 }
 
-class CvLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.CV, listOf("aktørId", "cv"))
+class VeilederLytter(rapidsConnection: RapidsConnection, repository: Repository) :
+    Lytter(rapidsConnection, repository, "veileder") {
 
-class VeilederLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.VEILEDER, listOf("aktørId", "veileder"))
+    override fun behandleHendelse(aktørId: String, pakke: JsonMessage) {
+        val kandidat = hentKandidat(aktørId)
+        val oppdatertKandidat = kandidat.copy(veileder = pakke["veileder"])
+        behandleOppdatertKandidat(oppdatertKandidat, pakke)
+    }
+}
 
-class OppfølgingsinformasjonLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.OPPFØLGINGSINFORMASJON, listOf("aktørId", "oppfølgingsinformasjon"))
+class OppfølgingsinformasjonLytter(rapidsConnection: RapidsConnection, repository: Repository) :
+    Lytter(rapidsConnection, repository,  "oppfølgingsinformasjon") {
 
-class OppfølgingsperiodeLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.OPPFØLGINGSPERIODE, listOf("aktørId", "oppfølgingsperiode"))
+    override fun behandleHendelse(aktørId: String, pakke: JsonMessage) {
+        val kandidat = hentKandidat(aktørId)
+        val oppdatertKandidat = kandidat.copy(oppfølgingsinformasjon = pakke["oppfølgingsinformasjon"])
+        behandleOppdatertKandidat(oppdatertKandidat, pakke)
+    }
+}
 
-class FritattKandidatsøkLytter(rapidsConnection: RapidsConnection, behandler: Behandler): Lytter(rapidsConnection, behandler, HendelseType.FRITATT_KANDIDATSØK, listOf("aktørId", "fritattKandidatsøk"))
+class OppfølgingsperiodeLytter(rapidsConnection: RapidsConnection, repository: Repository) :
+    Lytter(rapidsConnection, repository, "oppfølgingsperiode") {
+
+    override fun behandleHendelse(aktørId: String, pakke: JsonMessage) {
+        val kandidat = hentKandidat(aktørId)
+        val oppdatertKandidat = kandidat.copy(oppfølgingsperiode = pakke["oppfølgingsperiode"])
+        behandleOppdatertKandidat(oppdatertKandidat, pakke)
+    }
+}
+
+class FritattKandidatsøkLytter(rapidsConnection: RapidsConnection, repository: Repository) :
+    Lytter(rapidsConnection, repository, "fritatt-kandidatsøk", "fritattKandidatsøk") {
+
+    override fun behandleHendelse(aktørId: String, pakke: JsonMessage) {
+        val kandidat = hentKandidat(aktørId)
+        val oppdatertKandidat = kandidat.copy(fritattKandidatsøk = pakke["fritattKandidatsøk"])
+        behandleOppdatertKandidat(oppdatertKandidat, pakke)
+    }
+}

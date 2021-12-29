@@ -135,7 +135,6 @@ class SammenstillTest {
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon.sammenstilt")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.get("fodselsnummer").asText()).isEqualTo("12345678912")
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("oppfølgingsinformasjon")
 
         val oppfølgingsinformasjonPåMelding = melding.get("oppfølgingsinformasjon")
@@ -193,7 +192,6 @@ class SammenstillTest {
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk.sammenstilt")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.get("fodselsnummer").asText()).isEqualTo("123")
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("fritattKandidatsøk")
 
         val fritattKandidatsøkPåMelding = melding.get("fritattKandidatsøk")
