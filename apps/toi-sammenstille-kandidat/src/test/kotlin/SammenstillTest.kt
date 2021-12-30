@@ -242,8 +242,7 @@ class SammenstillTest {
 
         val felterPåMelding = melding.fieldNames().asSequence().toList()
         assertThat(felterPåMelding).contains("system_participating_services")
-        // TODO: Assert innhold i system_participating_services
-
+        assertThat(felterPåMelding).contains("system_read_count")
     }
 
     private fun veilederMelding(aktørId: String) = """
