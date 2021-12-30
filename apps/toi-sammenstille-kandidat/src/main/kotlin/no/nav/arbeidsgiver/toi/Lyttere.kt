@@ -18,7 +18,8 @@ abstract class Lytter(private val rapidsConnection: RapidsConnection, private va
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
-        oppdaterKandidat(kandidat, packet)
+        val oppdatertKandidat = oppdatertKandidat(kandidat, packet)
+        behandleOppdatertKandidat(oppdatertKandidat, packet)
     }
 
     fun behandleOppdatertKandidat(oppdatertKandidat: Kandidat, packet: JsonMessage) {
@@ -30,50 +31,39 @@ abstract class Lytter(private val rapidsConnection: RapidsConnection, private va
         rapidsConnection.publish(nyPakke.toJson())
     }
 
-    abstract fun oppdaterKandidat(kandidat: Kandidat, pakke: JsonMessage)
+    abstract fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat
 }
 
 class CvLytter(rapidsConnection: RapidsConnection, repository: Repository) :
     Lytter(rapidsConnection, repository,"cv") {
 
-    override fun oppdaterKandidat(kandidat: Kandidat, pakke: JsonMessage) {
-        val oppdatertKandidat = kandidat.copy(cv = pakke["cv"])
-        behandleOppdatertKandidat(oppdatertKandidat, pakke)
-    }
+    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) = kandidat.copy(cv = packet["cv"])
 }
 
 class VeilederLytter(rapidsConnection: RapidsConnection, repository: Repository) :
     Lytter(rapidsConnection, repository, "veileder") {
 
-    override fun oppdaterKandidat(kandidat: Kandidat, pakke: JsonMessage) {
-        val oppdatertKandidat = kandidat.copy(veileder = pakke["veileder"])
-        behandleOppdatertKandidat(oppdatertKandidat, pakke)
-    }
+    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
+        kandidat.copy(veileder = packet["veileder"])
 }
 
 class OppfølgingsinformasjonLytter(rapidsConnection: RapidsConnection, repository: Repository) :
     Lytter(rapidsConnection, repository,  "oppfølgingsinformasjon") {
 
-    override fun oppdaterKandidat(kandidat: Kandidat, pakke: JsonMessage) {
-        val oppdatertKandidat = kandidat.copy(oppfølgingsinformasjon = pakke["oppfølgingsinformasjon"])
-        behandleOppdatertKandidat(oppdatertKandidat, pakke)
-    }
+    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
+        kandidat.copy(oppfølgingsinformasjon = packet["oppfølgingsinformasjon"])
 }
 
 class OppfølgingsperiodeLytter(rapidsConnection: RapidsConnection, repository: Repository) :
     Lytter(rapidsConnection, repository, "oppfølgingsperiode") {
 
-    override fun oppdaterKandidat(kandidat: Kandidat, pakke: JsonMessage) {
-        val oppdatertKandidat = kandidat.copy(oppfølgingsperiode = pakke["oppfølgingsperiode"])
-        behandleOppdatertKandidat(oppdatertKandidat, pakke)
-    }
+    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
+        kandidat.copy(oppfølgingsperiode = packet["oppfølgingsperiode"])
 }
 
 class FritattKandidatsøkLytter(rapidsConnection: RapidsConnection, repository: Repository) :
     Lytter(rapidsConnection, repository, "fritatt-kandidatsøk", "fritattKandidatsøk") {
 
-    override fun oppdaterKandidat(kandidat: Kandidat, pakke: JsonMessage) {
-        val oppdatertKandidat = kandidat.copy(fritattKandidatsøk = pakke["fritattKandidatsøk"])
-        behandleOppdatertKandidat(oppdatertKandidat, pakke)
-    }
+    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
+        kandidat.copy(fritattKandidatsøk = packet["fritattKandidatsøk"])
 }
