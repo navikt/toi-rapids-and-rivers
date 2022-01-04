@@ -17,7 +17,7 @@ fun main() {
         val aktørIdCache = AktorIdCache(repository, cluster, pdlKlient::hentAktørId)
 
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
-            AktorIdPopulator(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
+            Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
         }
     }.start()
 }

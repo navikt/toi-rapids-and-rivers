@@ -1,14 +1,11 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class AktorIdPopulator(
+class Lytter(
     private val fnrKey: String,
     private val rapidsConnection: RapidsConnection,
     private val cluster: String,
@@ -30,7 +27,8 @@ class AktorIdPopulator(
 
         if (aktørId == null) {
             if (cluster == "prod-gcp") {
-                throw RuntimeException("Klarte ikke å mappe melding fra fødselsnummer til aktørId")
+                val identtype = if (erDnr(packet[fnrKey].asText())) "D-nummer" else "fødselsnummer"
+                log.error("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }
         } else {
             log.info("Mappet fra fødselsnummer til aktørId: $aktørId")
@@ -39,3 +37,5 @@ class AktorIdPopulator(
         }
     }
 }
+
+fun erDnr(s: String) = s[0].digitToInt() > 3
