@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.*
 
-abstract class Lytter(private val rapidsConnection: RapidsConnection, private val repository: Repository, eventNavn: String, feltSomSkalBehandles: String = eventNavn) :
+class Lytter(private val rapidsConnection: RapidsConnection, private val repository: Repository, val eventNavn: String, val feltSomSkalBehandles: String = eventNavn) :
     River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -31,39 +31,13 @@ abstract class Lytter(private val rapidsConnection: RapidsConnection, private va
         rapidsConnection.publish(nyPakke.toJson())
     }
 
-    abstract fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat
-}
-
-class CvLytter(rapidsConnection: RapidsConnection, repository: Repository) :
-    Lytter(rapidsConnection, repository,"cv") {
-
-    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) = kandidat.copy(cv = packet["cv"])
-}
-
-class VeilederLytter(rapidsConnection: RapidsConnection, repository: Repository) :
-    Lytter(rapidsConnection, repository, "veileder") {
-
-    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
-        kandidat.copy(veileder = packet["veileder"])
-}
-
-class OppfølgingsinformasjonLytter(rapidsConnection: RapidsConnection, repository: Repository) :
-    Lytter(rapidsConnection, repository,  "oppfølgingsinformasjon") {
-
-    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
-        kandidat.copy(oppfølgingsinformasjon = packet["oppfølgingsinformasjon"])
-}
-
-class OppfølgingsperiodeLytter(rapidsConnection: RapidsConnection, repository: Repository) :
-    Lytter(rapidsConnection, repository, "oppfølgingsperiode") {
-
-    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
-        kandidat.copy(oppfølgingsperiode = packet["oppfølgingsperiode"])
-}
-
-class FritattKandidatsøkLytter(rapidsConnection: RapidsConnection, repository: Repository) :
-    Lytter(rapidsConnection, repository, "fritatt-kandidatsøk", "fritattKandidatsøk") {
-
-    override fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage) =
-        kandidat.copy(fritattKandidatsøk = packet["fritattKandidatsøk"])
+    fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat =
+        when(eventNavn) {
+            "cv" -> kandidat.copy(cv = packet[feltSomSkalBehandles])
+            "veileder" -> kandidat.copy(veileder = packet[feltSomSkalBehandles])
+            "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = packet[feltSomSkalBehandles])
+            "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = packet[feltSomSkalBehandles])
+            "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = packet[feltSomSkalBehandles])
+            else -> kandidat
+        }
 }

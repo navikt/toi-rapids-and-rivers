@@ -15,11 +15,11 @@ fun startApp(
 
             val repository = Repository(datasource)
 
-            VeilederLytter(rapid, repository)
-            CvLytter(rapid, repository)
-            OppfølgingsinformasjonLytter(rapid, repository)
-            OppfølgingsperiodeLytter(rapid, repository)
-            FritattKandidatsøkLytter(rapid, repository)
+            Lytter(rapid, repository, "cv")
+            Lytter(rapid, repository, "veileder")
+            Lytter(rapid, repository, "oppfølgingsinformasjon")
+            Lytter(rapid, repository, "oppfølgingsperiode")
+            Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
