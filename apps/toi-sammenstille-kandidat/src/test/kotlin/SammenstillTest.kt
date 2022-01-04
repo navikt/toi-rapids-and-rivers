@@ -3,7 +3,7 @@ import no.nav.arbeidsgiver.toi.startApp
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SammenstillTest {
@@ -16,6 +16,11 @@ class SammenstillTest {
     )
 
     private fun kunKandidatfelter(melding: JsonNode) = melding.fieldNames().asSequence().toList().filter{ fieldName -> alleKandidatfelter.contains(fieldName) }
+
+    @BeforeEach
+    fun setUp() {
+        modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
+    }
 
     @Test
     fun `Når veileder og CV har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
@@ -245,6 +250,37 @@ class SammenstillTest {
         assertThat(felterPåMelding).contains("system_read_count")
     }
 
+    @Test
+    fun `sammenstiller øker system_read_count med 1`() {
+        val testRapid = TestRapid()
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("system_read_count").asInt()).isEqualTo(2)
+    }
+
+    @Test
+    fun `sammenstiller legger til seg selv i system_participating_services`() {
+            val testRapid = TestRapid()
+            startApp(TestDatabase().dataSource, testRapid)
+            testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
+
+            val rapidInspektør = testRapid.inspektør
+            assertThat(rapidInspektør.size).isEqualTo(1)
+
+            val melding = rapidInspektør.message(0)
+
+            val systemParticipationServices =
+                melding.get("system_participating_services").elements().asSequence().toList()
+                    .map { it.get("service").asText() }
+            assertThat(systemParticipationServices).hasSize(2).containsExactly("toi-cv", "toi-sammenstiller")
+        }
+
+
     private fun veilederMelding(aktørId: String) = """
         {
             "@event_name": "veileder",
@@ -292,6 +328,7 @@ class SammenstillTest {
             "sistEndret": 1636718935.195
           },
           "@event_name": "cv",
+          "system_read_count": 1,
           "system_participating_services": [
             {
               "service": "toi-cv",
@@ -351,4 +388,12 @@ class SammenstillTest {
             }
         }
     """.trimIndent()
+
+    private val modifiserbareSystemVariabler: MutableMap<String, String>
+        get() {
+            val unmodifiableEnv = System.getenv()
+            val felt = unmodifiableEnv.javaClass.getDeclaredField("m")
+            felt.isAccessible = true
+            return felt.get(unmodifiableEnv) as MutableMap<String, String>
+        }
 }
