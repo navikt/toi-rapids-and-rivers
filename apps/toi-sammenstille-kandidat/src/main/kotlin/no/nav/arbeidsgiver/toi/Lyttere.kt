@@ -2,7 +2,12 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.helse.rapids_rivers.*
 
-class Lytter(private val rapidsConnection: RapidsConnection, private val repository: Repository, val eventNavn: String, val feltSomSkalBehandles: String = eventNavn) :
+class Lytter(
+    private val rapidsConnection: RapidsConnection,
+    private val repository: Repository,
+    val eventNavn: String,
+    val feltSomSkalBehandles: String = eventNavn
+) :
     River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -31,13 +36,12 @@ class Lytter(private val rapidsConnection: RapidsConnection, private val reposit
         rapidsConnection.publish(nyPakke.toJson())
     }
 
-    fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat =
-        when(eventNavn) {
-            "cv" -> kandidat.copy(cv = packet[feltSomSkalBehandles])
-            "veileder" -> kandidat.copy(veileder = packet[feltSomSkalBehandles])
-            "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = packet[feltSomSkalBehandles])
-            "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = packet[feltSomSkalBehandles])
-            "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = packet[feltSomSkalBehandles])
-            else -> kandidat
-        }
+    fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat = when (eventNavn) {
+        "cv" -> kandidat.copy(cv = packet[feltSomSkalBehandles])
+        "veileder" -> kandidat.copy(veileder = packet[feltSomSkalBehandles])
+        "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = packet[feltSomSkalBehandles])
+        "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = packet[feltSomSkalBehandles])
+        "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = packet[feltSomSkalBehandles])
+        else -> throw NotImplementedError("Mangler implementasjon for lytter for event ${eventNavn}")
+    }
 }
