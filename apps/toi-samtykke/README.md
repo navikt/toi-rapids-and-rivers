@@ -1,0 +1,1 @@
+# Henter ut samtykkeinformasjon og legger den på rapid
