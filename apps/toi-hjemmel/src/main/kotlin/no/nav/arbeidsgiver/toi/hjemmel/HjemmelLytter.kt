@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.samtykke
+package no.nav.arbeidsgiver.toi.hjemmel
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -8,12 +8,13 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class SamtykkeLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class HjemmelLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktoerId")
                 it.rejectKey("@event_name")
+                it.demandKey("ressurs")
             }
         }.register(this)
     }
@@ -21,12 +22,16 @@ class SamtykkeLytter(private val rapidsConnection: RapidsConnection) : River.Pac
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val melding = mapOf(
             "aktørId" to packet["aktoerId"].asText().replace(Regex("\\D+"), ""),
-            "samtykke" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "samtykke",
+            "hjemmel" to packet.fjernMetadataOgKonverter(),
+            "@event_name" to "hjemmel",
         )
-        val nyPacket = JsonMessage.newMessage(melding)
-        log.info("Skal publisere samtykkemelding")
-        rapidsConnection.publish(nyPacket.toJson())
+
+        val ressurs = packet["ressurs"].asText()
+        if(ressurs == "CV_HJEMMEL") {
+            log.info("Skal publisere hjemmelmelding")
+            val nyPacket = JsonMessage.newMessage(melding).toJson()
+            rapidsConnection.publish(nyPacket)
+        }
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

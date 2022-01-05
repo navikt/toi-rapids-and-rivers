@@ -10,5 +10,5 @@ include(
     "apps:toi-synlighetsmotor",
     "apps:toi-oppfolgingsperiode",
     "apps:toi-fritatt-kandidatsok",
-    "apps:toi-samtykke"
+    "apps:toi-hjemmel"
 )

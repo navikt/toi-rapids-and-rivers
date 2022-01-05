@@ -45,7 +45,7 @@ spec:
       application: toi-synlighetsmotor
       access: readwrite
     - team: toi
-      application: toi-samtykke
+      application: toi-hjemmel
       access: readwrite
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager

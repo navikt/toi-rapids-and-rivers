@@ -1,16 +1,16 @@
-name: toi-samtykke
+name: toi-hjemmel
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}/toi-samtykke:${{ github.sha }}
-  APP_NAME: toi-samtykke
+  IMAGE: ghcr.io/${{ github.repository }}/toi-hjemmel:${{ github.sha }}
+  APP_NAME: toi-hjemmel
 
 on:
   push:
     branches:
     - main
     paths:
-    - apps/toi-samtykke/**
-    - .github/workflows/deploy-toi-samtykke.yaml
+    - apps/toi-hjemmel/**
+    - .github/workflows/deploy-toi-hjemmel.yaml
     - buildSrc/**
 
 jobs:
