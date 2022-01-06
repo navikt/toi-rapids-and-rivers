@@ -54,7 +54,7 @@ data class FritattKandidatsøk(
 )
 
 data class Hjemmel(
-    val ressurs: Samtykkeressurs,
+    val ressurs: Samtykkeressurs?,
     val opprettetDato: ZonedDateTime?,
     val slettetDato: ZonedDateTime?,
 )

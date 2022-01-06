@@ -116,6 +116,17 @@ class SynlighetsmotorTest {
     )
 
     @Test
+    fun `om Person har hjemmel som er avsluttet skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(
+            hjemmel = hjemmel(
+                opprettetDato = ZonedDateTime.now().minusYears(2),
+                slettetDato = ZonedDateTime.now().minusYears(1)
+            )
+        ),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+    )
+
+    @Test
     fun `om Person må behandle tidligere CV skal synlighet være false`() {
     }
 
@@ -295,7 +306,7 @@ class SynlighetsmotorTest {
             "hjemmel": {
                 "ressurs": "$ressurs",
                 "opprettetDato": "$opprettetDato",
-                "slettetDato": ${if (slettetDato == null) null else "$slettetDato"},
+                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""}
             }
         """.trimIndent()
 
