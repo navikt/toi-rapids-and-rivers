@@ -59,12 +59,6 @@ data class Hjemmel(
     val slettetDato: ZonedDateTime?,
 )
 
-// Hvis opprettetDato er før i dag, og slettet er null -> synlig
-
-// Hvis opprettetDato er etter i dag -> ikke synlig
-// Hvis begge er null -> ikke synlig
-
-
 enum class Samtykkeressurs {
     CV_HJEMMEL
 }
