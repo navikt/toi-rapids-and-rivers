@@ -12,7 +12,6 @@ fun startApp(
 ) {
     try {
         rapidsConnection.also { rapid ->
-
             val repository = Repository(datasource)
 
             Lytter(rapid, repository, "cv")
@@ -20,6 +19,7 @@ fun startApp(
             Lytter(rapid, repository, "oppfølgingsinformasjon")
             Lytter(rapid, repository, "oppfølgingsperiode")
             Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
+            Lytter(rapid, repository, "hjemmel")
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)

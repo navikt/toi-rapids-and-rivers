@@ -13,6 +13,7 @@ class SammenstillTest {
         "oppfølgingsinformasjon",
         "oppfølgingsperiode",
         "fritattKandidatsøk",
+        "hjemmel"
     )
 
     private fun kunKandidatfelter(melding: JsonNode) = melding.fieldNames().asSequence().toList().filter{ fieldName -> alleKandidatfelter.contains(fieldName) }
@@ -204,6 +205,35 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når hjemmel har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(hjemmelMelding(aktørId))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("@event_name").asText()).isEqualTo("hjemmel.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("hjemmel")
+
+        val hjemmelmelding = melding.get("hjemmel")
+
+        assertThat(hjemmelmelding.get("samtykkeId").asInt()).isEqualTo(1)
+        assertThat(hjemmelmelding.get("aktoerId").asText()).isEqualTo("AktorId(aktorId=$aktørId)")
+        assertThat(hjemmelmelding.get("fnr").asText()).isEqualTo("27075349594")
+        assertThat(hjemmelmelding.get("ressurs").asText()).isEqualTo("CV_HJEMMEL")
+        assertThat(hjemmelmelding.get("opprettetDato").asText()).isEqualTo("2019-01-09T12:36:06+01:00")
+        assertThat(hjemmelmelding.get("slettetDato").isNull).isTrue
+        assertThat(hjemmelmelding.get("versjon").asInt()).isEqualTo(1)
+        assertThat(hjemmelmelding.get("versjonGjeldendeFra").isNull).isTrue
+        assertThat(hjemmelmelding.get("versjonGjeldendeTil").asText()).isEqualTo("2019-04-08")
+    }
+
+    @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
@@ -235,7 +265,7 @@ class SammenstillTest {
     }
 
     @Test
-    fun `metadata fra opprinnelig melding skal ikke fjernes når sammenstilleren publiserer ny melding på rapid`() {
+    fun `Metadata fra opprinnelig melding skal ikke fjernes når sammenstilleren publiserer ny melding på rapid`() {
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
@@ -251,7 +281,7 @@ class SammenstillTest {
     }
 
     @Test
-    fun `sammenstiller øker system_read_count med 1`() {
+    fun `Sammenstiller øker system_read_count med 1`() {
         val testRapid = TestRapid()
         startApp(TestDatabase().dataSource, testRapid)
         testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
@@ -264,7 +294,7 @@ class SammenstillTest {
     }
 
     @Test
-    fun `sammenstiller legger til seg selv i system_participating_services`() {
+    fun `Sammenstiller legger til seg selv i system_participating_services`() {
             val testRapid = TestRapid()
             startApp(TestDatabase().dataSource, testRapid)
             testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
@@ -385,6 +415,24 @@ class SammenstillTest {
             "@event_name": "fritatt-kandidatsøk",
             "fritattKandidatsøk": {
                 "fritattKandidatsok": $fritattKandidatsøk
+            }
+        }
+    """.trimIndent()
+
+    private fun hjemmelMelding(aktørId: String) = """
+        {
+            "aktørId": "$aktørId",
+            "@event_name": "hjemmel",
+            "hjemmel": {
+                "samtykkeId" : 1,
+                "aktoerId" : "AktorId(aktorId=$aktørId)",
+                "fnr" : "27075349594",
+                "ressurs" : "CV_HJEMMEL",
+                "opprettetDato" : "2019-01-09T12:36:06+01:00",
+                "slettetDato" : null,
+                "versjon" : 1,
+                "versjonGjeldendeFra" : null,
+                "versjonGjeldendeTil" : "2019-04-08"
             }
         }
     """.trimIndent()

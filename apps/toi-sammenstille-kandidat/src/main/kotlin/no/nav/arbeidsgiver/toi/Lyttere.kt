@@ -5,8 +5,8 @@ import no.nav.helse.rapids_rivers.*
 class Lytter(
     private val rapidsConnection: RapidsConnection,
     private val repository: Repository,
-    val eventNavn: String,
-    val feltSomSkalBehandles: String = eventNavn
+    private val eventNavn: String,
+    private val feltSomSkalBehandles: String = eventNavn
 ) :
     River.PacketListener {
     init {
@@ -23,25 +23,32 @@ class Lytter(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
-        val oppdatertKandidat = oppdatertKandidat(kandidat, packet)
+        val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
+
         behandleOppdatertKandidat(oppdatertKandidat, packet)
     }
 
-    fun behandleOppdatertKandidat(oppdatertKandidat: Kandidat, packet: JsonMessage) {
+    private fun behandleOppdatertKandidat(oppdatertKandidat: Kandidat, packet: JsonMessage) {
         repository.lagreKandidat(oppdatertKandidat)
         val nyPakke = JsonMessage(oppdatertKandidat.somJsonUtenNullFelt(), MessageProblems(""))
         nyPakke["@event_name"] = packet["@event_name"].asText() + ".sammenstilt"
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]
+
         rapidsConnection.publish(nyPakke.toJson())
     }
 
-    fun oppdatertKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat = when (eventNavn) {
-        "cv" -> kandidat.copy(cv = packet[feltSomSkalBehandles])
-        "veileder" -> kandidat.copy(veileder = packet[feltSomSkalBehandles])
-        "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = packet[feltSomSkalBehandles])
-        "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = packet[feltSomSkalBehandles])
-        "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = packet[feltSomSkalBehandles])
-        else -> throw NotImplementedError("Mangler implementasjon for lytter for event ${eventNavn}")
+    private fun oppdaterKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat {
+        val verdi = packet[feltSomSkalBehandles]
+
+        return when (eventNavn) {
+            "cv" -> kandidat.copy(cv = verdi)
+            "veileder" -> kandidat.copy(veileder = verdi)
+            "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = verdi)
+            "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = verdi)
+            "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = verdi)
+            "hjemmel" -> kandidat.copy(hjemmel = verdi)
+            else -> throw NotImplementedError("Mangler implementasjon for lytter for event $eventNavn")
+        }
     }
 }
