@@ -3,6 +3,9 @@ package no.nav.arbeidsgiver.toi
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
 
@@ -101,8 +104,27 @@ class SynlighetsmotorTest {
     }
 
     @Test
-    fun `om Person ikke har sett hjemmel skal synlighet være false`() {
-    }
+    fun `om Person ikke har sett hjemmel skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(hjemmel = manglendeHjemmel()),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+    )
+
+    @Test
+    fun `om Person har hjemmel for feil ressurs skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(hjemmel = hjemmel(ressurs = "CV_GENERELL")),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+    )
+
+    @Test
+    fun `om Person har hjemmel som er avsluttet skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(
+            hjemmel = hjemmel(
+                opprettetDato = ZonedDateTime.now().minusYears(2),
+                slettetDato = ZonedDateTime.now().minusYears(1)
+            )
+        ),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+    )
 
     @Test
     fun `om Person må behandle tidligere CV skal synlighet være false`() {
@@ -165,6 +187,7 @@ class SynlighetsmotorTest {
         oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
         cv: String = cv(),
         fritattKandidatsøk: String = fritattKandidatsøk(),
+        hjemmel: String = hjemmel(),
         participatingService: String? = participatingService("toi-sammenstille-kandidat")
     ) =
         hendelse(
@@ -172,6 +195,7 @@ class SynlighetsmotorTest {
             oppfølgingsinformasjon = oppfølgingsinformasjon,
             cv = cv,
             fritattKandidatsøk = fritattKandidatsøk,
+            hjemmel = hjemmel,
             participatingService = participatingService
         )
 
@@ -189,6 +213,7 @@ class SynlighetsmotorTest {
         oppfølgingsinformasjon: String? = null,
         cv: String? = null,
         fritattKandidatsøk: String? = null,
+        hjemmel: String? = null,
         participatingService: String? = participatingService("toi-sammenstille-kandidat")
     ) = """
             {
@@ -199,6 +224,7 @@ class SynlighetsmotorTest {
             oppfølgingsinformasjon,
             oppfølgingsperiode,
             fritattKandidatsøk,
+            hjemmel,
             participatingService
         ).joinToString()
     }
@@ -269,6 +295,24 @@ class SynlighetsmotorTest {
             "fritattKandidatsøk" : {
                 "fritattKandidatsok" : $fritattKandidatsøk
             }
+        """.trimIndent()
+
+    private fun hjemmel(
+        ressurs: String = "CV_HJEMMEL",
+        opprettetDato: ZonedDateTime? = ZonedDateTime.now().minusDays(1),
+        slettetDato: ZonedDateTime? = null
+    ) =
+        """
+            "hjemmel": {
+                "ressurs": "$ressurs",
+                "opprettetDato": "$opprettetDato",
+                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""}
+            }
+        """.trimIndent()
+
+    private fun manglendeHjemmel() =
+        """
+            "hjemmel": null
         """.trimIndent()
 
     private fun participatingService(service: String) =

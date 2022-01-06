@@ -10,7 +10,8 @@ data class Kandidat(
     val cv: Cv?,
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
-    val fritattKandidatsøk: FritattKandidatsøk?
+    val fritattKandidatsøk: FritattKandidatsøk?,
+    val hjemmel: Hjemmel?
 ) {
     companion object {
         private val mapper = jacksonObjectMapper()
@@ -42,11 +43,22 @@ data class Oppfølgingsinformasjon(
     val sperretAnsatt: Boolean,
     val formidlingsgruppe: Formidlingsgruppe?,
 )
-data class FritattKandidatsøk(
-    val fritattKandidatsok: Boolean
-)
 
 enum class Formidlingsgruppe {
     ARBS,
     IARBS
+}
+
+data class FritattKandidatsøk(
+    val fritattKandidatsok: Boolean
+)
+
+data class Hjemmel(
+    val ressurs: Samtykkeressurs?,
+    val opprettetDato: ZonedDateTime?,
+    val slettetDato: ZonedDateTime?,
+)
+
+enum class Samtykkeressurs {
+    CV_HJEMMEL
 }

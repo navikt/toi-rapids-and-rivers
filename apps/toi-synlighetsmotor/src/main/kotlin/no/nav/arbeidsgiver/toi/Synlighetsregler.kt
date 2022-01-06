@@ -8,7 +8,8 @@ private val synlighetsregel =
             `har rett formidlingsgruppe` og
             `har aktiv CV` og
             `er under oppfølging` og
-            `er ikke fritatt fra kandidatsøk`
+            `er ikke fritatt fra kandidatsøk` og
+            `har sett hjemmel`
 
 fun erSynlig(kandidat: Kandidat) = synlighetsregel.erSynlig(kandidat)
 
@@ -61,6 +62,22 @@ private object `er under oppfølging` : Synlighetsregel {
 private object `er ikke fritatt fra kandidatsøk` : Synlighetsregel {
     override fun erSynlig(kandidat: Kandidat) =
         if (kandidat.fritattKandidatsøk == null) true else !kandidat.fritattKandidatsøk.fritattKandidatsok
+
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
+}
+
+private object `har sett hjemmel`: Synlighetsregel {
+    override fun erSynlig(kandidat: Kandidat): Boolean {
+        return if (kandidat.hjemmel != null && kandidat.hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL) {
+            val now = Instant.now()
+            val opprettetDato = kandidat.hjemmel.opprettetDato?.toInstant() ?: Instant.MAX
+            val slettetDato = kandidat.hjemmel.slettetDato
+
+            opprettetDato.isBefore(now) && slettetDato == null
+        } else {
+            false
+        }
+    }
 
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
 }
