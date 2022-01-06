@@ -14,24 +14,23 @@ class HjemmelLytter(private val rapidsConnection: RapidsConnection) : River.Pack
             validate {
                 it.demandKey("aktoerId")
                 it.rejectKey("@event_name")
-                it.demandKey("ressurs")
+                it.demandValue("ressurs", "CV_HJEMMEL")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val aktørId = packet["aktoerId"].asText().extractDigits()
+
         val melding = mapOf(
-            "aktørId" to packet["aktoerId"].asText().replace(Regex("\\D+"), ""),
+            "aktørId" to aktørId,
             "hjemmel" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "hjemmel",
         )
 
-        val ressurs = packet["ressurs"].asText()
-        if(ressurs == "CV_HJEMMEL") {
-            log.info("Skal publisere hjemmelmelding")
-            val nyPacket = JsonMessage.newMessage(melding).toJson()
-            rapidsConnection.publish(nyPacket)
-        }
+        log.info("Skal publisere hjemmelmelding for aktørId $aktørId")
+        val nyPacket = JsonMessage.newMessage(melding).toJson()
+        rapidsConnection.publish(nyPacket)
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
@@ -41,3 +40,6 @@ class HjemmelLytter(private val rapidsConnection: RapidsConnection) : River.Pack
         return jsonNode
     }
 }
+
+fun String.extractDigits() =
+    replace(Regex("\\D+"), "")
