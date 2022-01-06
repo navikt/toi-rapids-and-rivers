@@ -22,19 +22,15 @@ class Lytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
+
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
         val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
-
-        behandleOppdatertKandidat(oppdatertKandidat, packet)
-    }
-
-    private fun behandleOppdatertKandidat(oppdatertKandidat: Kandidat, packet: JsonMessage) {
         repository.lagreKandidat(oppdatertKandidat)
+
         val nyPakke = JsonMessage(oppdatertKandidat.somJsonUtenNullFelt(), MessageProblems(""))
         nyPakke["@event_name"] = packet["@event_name"].asText() + ".sammenstilt"
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]
-
         rapidsConnection.publish(nyPakke.toJson())
     }
 
