@@ -24,7 +24,9 @@ data class Kandidat(
 }
 
 data class Cv(
-    val meldingstype: CvMeldingstype
+    val meldingstype: CvMeldingstype,
+    val opprettJobbprofil: Any?,
+    val endreJobbprofil: Any?
 )
 
 enum class CvMeldingstype {

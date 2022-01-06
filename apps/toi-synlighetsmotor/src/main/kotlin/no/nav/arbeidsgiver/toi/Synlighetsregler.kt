@@ -7,6 +7,7 @@ private val synlighetsregel =
             `er ikke sperret ansatt` og
             `har rett formidlingsgruppe` og
             `har aktiv CV` og
+            `har jobbprofil` og
             `er under oppfølging` og
             `er ikke fritatt fra kandidatsøk` og
             `har sett hjemmel`
@@ -45,6 +46,13 @@ private object `har aktiv CV` : Synlighetsregel {
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.cv != null
 }
 
+private object `har jobbprofil` : Synlighetsregel {
+    override fun erSynlig(kandidat: Kandidat) =
+        kandidat.cv?.endreJobbprofil != null || kandidat.cv?.opprettJobbprofil != null
+
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.cv != null
+}
+
 private object `er under oppfølging` : Synlighetsregel {
     override fun erSynlig(kandidat: Kandidat): Boolean {
         if (kandidat.oppfølgingsperiode == null) return false
@@ -66,7 +74,7 @@ private object `er ikke fritatt fra kandidatsøk` : Synlighetsregel {
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
 }
 
-private object `har sett hjemmel`: Synlighetsregel {
+private object `har sett hjemmel` : Synlighetsregel {
     override fun erSynlig(kandidat: Kandidat): Boolean {
         return if (kandidat.hjemmel != null && kandidat.hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL) {
             val now = Instant.now()

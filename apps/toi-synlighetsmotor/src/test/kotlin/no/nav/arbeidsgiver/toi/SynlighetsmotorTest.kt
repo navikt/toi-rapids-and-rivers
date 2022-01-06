@@ -100,8 +100,22 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person ikke har jobbønsker skal synlighet være false`() {
-    }
+    fun `om Person ikke har jobbprofil skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(cv = harCvManglerJobbprofil()),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+    )
+
+    @Test
+    fun `om Person har endrejobbprofil skal synlighet kunne være true`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(cv = harEndreJobbrofil()),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+    )
+
+    @Test
+    fun `om Person har opprettjobbprofil skal synlighet kunne være true`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(cv = harOpprettJobbrofil()),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+    )
 
     @Test
     fun `om Person ikke har sett hjemmel skal synlighet være false`() = testProgramMedHendelse(
@@ -281,13 +295,42 @@ class SynlighetsmotorTest {
     private fun cv(meldingstype: CvMeldingstype = CvMeldingstype.OPPRETT) =
         """
             "cv": {
-                "meldingstype": "$meldingstype"    
+                "meldingstype": "$meldingstype",
+                "opprettJobbprofil": {},
+                "endreJobbprofil": null
             }
         """.trimIndent()
 
     private fun manglendeCV() =
         """
             "cv": null
+        """.trimIndent()
+
+    private fun harCvManglerJobbprofil() =
+        """
+            "cv": {
+                "meldingstype": "${CvMeldingstype.OPPRETT}",
+                "opprettJobbprofil": null,
+                "endreJobbprofil": null
+            }
+        """.trimIndent()
+
+    private fun harEndreJobbrofil() =
+        """
+            "cv": {
+                "meldingstype": "${CvMeldingstype.OPPRETT}",
+                "opprettJobbprofil": null,
+                "endreJobbprofil": {}
+            }
+        """.trimIndent()
+
+    private fun harOpprettJobbrofil() =
+        """
+            "cv": {
+                "meldingstype": "${CvMeldingstype.OPPRETT}",
+                "opprettJobbprofil": {},
+                "endreJobbprofil": null
+            }
         """.trimIndent()
 
     private fun fritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
