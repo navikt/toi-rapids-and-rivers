@@ -28,7 +28,7 @@ class Lytter(
         if (aktørId == null) {
             if (cluster == "prod-gcp") {
                 val identtype = if (erDnr(packet[fnrKey].asText())) "D-nummer" else "fødselsnummer"
-                log.error("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
+                log.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }
         } else {
             log.info("Mappet fra fødselsnummer til aktørId: $aktørId")
