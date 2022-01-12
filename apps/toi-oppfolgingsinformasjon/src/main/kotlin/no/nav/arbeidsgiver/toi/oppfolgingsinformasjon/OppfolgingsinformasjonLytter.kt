@@ -15,6 +15,7 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
                 it.demandKey("fodselsnummer")
                 it.demandKey("oppfolgingsenhet")
                 it.demandKey("harOppfolgingssak")
+                it.interestedIn("sistEndretDato")
                 it.rejectKey("@event_name")
             }
         }.register(this)
@@ -27,7 +28,7 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
             "@event_name" to "oppfølgingsinformasjon",
         )
 
-        log.info("Skal publisere oppfølgingsinformasjonmelding uten aktørId")
+        log.info("Skal publisere oppfølgingsinformasjonmelding med sistEndretDato ${packet["sistEndretDato"]}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
