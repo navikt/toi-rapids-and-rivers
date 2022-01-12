@@ -33,7 +33,7 @@ class Lytter(
         } else {
             log.info("Mappet fra fødselsnummer til aktørId: $aktørId")
             packet[aktørIdKey] = aktørId
-            rapidsConnection.publish(packet.toJson())
+            rapidsConnection.publish(aktørId, packet.toJson())
         }
     }
 }

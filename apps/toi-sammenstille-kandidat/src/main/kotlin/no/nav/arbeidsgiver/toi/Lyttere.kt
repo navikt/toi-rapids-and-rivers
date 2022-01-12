@@ -31,7 +31,8 @@ class Lytter(
         nyPakke["@event_name"] = packet["@event_name"].asText() + ".sammenstilt"
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]
-        rapidsConnection.publish(nyPakke.toJson())
+
+        rapidsConnection.publish(aktørId, nyPakke.toJson())
     }
 
     private fun oppdaterKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat {

@@ -45,7 +45,7 @@ class ArenaCvLytter(
                             .map(::FritattKandidatsokMelding)
                             .map(FritattKandidatsokMelding::somString)
                             .onEach{
-                                log.info("Skal publisere hendelse")
+                                log.info("Skal publisere fritatt kandidatsøk-melding")
                             }
                             .map { JsonMessage(it, MessageProblems("{}")).toJson() }
                             .forEach(rapidsConnection::publish)

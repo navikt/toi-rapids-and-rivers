@@ -27,10 +27,11 @@ class OppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnection) :
             "@event_name" to "oppfølgingsperiode",
         )
 
-        log.info("Skal publisere oppfølgingsperiodemelding for ${packet["aktorId"]}")
+        val aktørId = packet["aktorId"].asText()
+        log.info("Skal publisere oppfølgingsperiodemelding for $aktørId")
 
         val nyPacket = JsonMessage.newMessage(melding)
-        rapidsConnection.publish(nyPacket.toJson())
+        rapidsConnection.publish(aktørId, nyPacket.toJson())
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
