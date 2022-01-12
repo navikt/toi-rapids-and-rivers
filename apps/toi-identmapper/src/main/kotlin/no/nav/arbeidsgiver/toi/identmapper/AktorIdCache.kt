@@ -12,10 +12,15 @@ class AktorIdCache(
     fun hentAktørId(fødselsnummer: String): String? {
         val cachetAktørId = hentCachetAktørId(fødselsnummer)
 
-        if (cachetAktørId.harHentetFraPdl) return cachetAktørId.verdi
+        if (cachetAktørId.harHentetFraPdl) {
+            log.info("Mappet fra fødselsnummer til aktørId ${cachetAktørId.verdi}, brukte cache")
+            return cachetAktørId.verdi
+        }
 
         return hentAktørIdFraPdl(fødselsnummer).also { nyAktørId ->
-            if(nyAktørId != null || cluster == "dev-gcp") {
+            log.info("Mappet fra fødselsnummer til aktørId $nyAktørId, hentet fra PDL")
+            
+            if (nyAktørId != null || cluster == "dev-gcp") {
                 cacheAktørId(
                     aktørId = nyAktørId,
                     fødselsnummer = fødselsnummer

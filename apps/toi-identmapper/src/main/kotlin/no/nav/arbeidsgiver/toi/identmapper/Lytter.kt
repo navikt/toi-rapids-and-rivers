@@ -31,7 +31,6 @@ class Lytter(
                 log.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }
         } else {
-            log.info("Mappet fra fødselsnummer til aktørId: $aktørId")
             packet[aktørIdKey] = aktørId
             rapidsConnection.publish(aktørId, packet.toJson())
         }
