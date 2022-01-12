@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*
 
-class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListener {
+class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     private val interessanteFelt = listOf(
         "cv",
         "oppfølgingsinformasjon",
@@ -23,8 +23,6 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
         }.register(this)
     }
 
-    private val publish: (String) -> Unit = rapidsConnection::publish
-
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
         val erSammenstillt = packet["system_participating_services"]
@@ -38,9 +36,10 @@ class SynlighetsLytter(rapidsConnection: RapidsConnection) : River.PacketListene
 
         packet["synlighet"] = synlighet
 
-        log.info("Beregnet synlig for kandidat ${packet["aktørId"]}: $synlighet")
+        val aktørId = packet["aktørId"].asText()
+        log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 
-        publish(packet.toJson())
+        rapidsConnection.publish(aktørId, packet.toJson())
     }
 
     private data class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)

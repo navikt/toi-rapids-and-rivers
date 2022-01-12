@@ -30,7 +30,7 @@ class HjemmelLytter(private val rapidsConnection: RapidsConnection) : River.Pack
 
         log.info("Skal publisere hjemmelmelding for aktørId $aktørId")
         val nyPacket = JsonMessage.newMessage(melding).toJson()
-        rapidsConnection.publish(nyPacket)
+        rapidsConnection.publish(aktørId, nyPacket)
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

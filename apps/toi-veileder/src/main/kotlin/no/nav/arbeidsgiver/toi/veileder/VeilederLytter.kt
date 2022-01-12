@@ -25,9 +25,12 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
             "veileder" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "veileder",
         )
+
         val nyPacket = JsonMessage.newMessage(melding)
-        log.info("Skal publisere veiledermelding")
-        rapidsConnection.publish(nyPacket.toJson())
+        val aktørId = packet["aktorId"].asText()
+
+        log.info("Skal publisere veiledermelding for aktørId $aktørId")
+        rapidsConnection.publish(aktørId, nyPacket.toJson())
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
