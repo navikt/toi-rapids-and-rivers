@@ -19,6 +19,8 @@ fun main() {
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
             Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
         }
+
+        PdlLytter(rapidsConnection, repository::lagreAktørId)
     }.start()
 }
 

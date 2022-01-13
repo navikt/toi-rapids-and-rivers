@@ -44,6 +44,10 @@ class AktorIdCache(
         return CachetAktørId(true, sisteMapping.aktørId)
     }
 
+    private fun lagre(aktørid: String, fnr: String) {
+        repository.lagreAktørId(aktørid, fnr)
+    }
+
     private fun mappingErUtgått(identMapping: IdentMapping): Boolean {
         val sisteGyldigeTidspunktForMapping = LocalDateTime.now().minusDays(varighetIDager.toLong())
 

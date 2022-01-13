@@ -42,6 +42,8 @@ spec:
     application:
       enabled: true
   env:
+    - name: KAFKA_EXTRA_TOPIC
+        value: "aapen-person-pdl-aktor-v1"
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
