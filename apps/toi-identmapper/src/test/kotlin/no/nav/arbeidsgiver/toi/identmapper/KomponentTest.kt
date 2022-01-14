@@ -19,6 +19,7 @@ class KomponentTest {
 
         val melding = aktor(testAktørId, testFnr)
 
+        repository.kjørFlywayMigreringer()
         PdlLytter(consumer, repository::lagreAktørId).onReady(testRapid)
 
         mottaAktorMelding(consumer, melding)

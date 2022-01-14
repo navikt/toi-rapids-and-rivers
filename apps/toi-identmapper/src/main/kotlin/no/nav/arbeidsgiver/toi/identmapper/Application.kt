@@ -13,6 +13,7 @@ import javax.sql.DataSource
 private fun pdlConsumerConfig() = pdlKafkaConsumerConfig(System.getenv())
 private fun pdlConsumer() = KafkaConsumer<String, Aktor>(pdlConsumerConfig())
 private val env = System.getenv()
+
 fun main() = startApp(
     env["PDL_URL"]!!,
     env["NAIS_CLUSTER_NAME"]!!,
@@ -35,9 +36,16 @@ fun startApp(
         val repository = Repository(dataSource)
         val aktørIdCache = AktorIdCache(repository, cluster == "dev-gcp", pdlKlient::hentAktørId)
 
+        rapidsConnection.register(object: RapidsConnection.StatusListener {
+            override fun onStartup(rapidsConnection: RapidsConnection) {
+                repository.kjørFlywayMigreringer()
+            }
+        })
+
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
             Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
         }
+
         rapidsConnection.register(PdlLytter(pdlConsumer, repository::lagreAktørId))
     }.start()
 }

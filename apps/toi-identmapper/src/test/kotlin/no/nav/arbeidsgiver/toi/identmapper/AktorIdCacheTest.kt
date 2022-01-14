@@ -3,12 +3,18 @@ package no.nav.arbeidsgiver.toi.identmapper
 import TestDatabase
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.time.LocalDateTime
 
 class AktorIdCacheTest {
     private val testDatabase: TestDatabase = TestDatabase()
+
+    @BeforeEach
+    fun kjørFlyway() {
+        Repository(testDatabase.dataSource).kjørFlywayMigreringer()
+    }
 
     @AfterEach
     fun slettDatabase() {

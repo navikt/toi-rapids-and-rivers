@@ -10,10 +10,6 @@ import java.time.LocalDateTime
 import javax.sql.DataSource
 
 class Repository(private val dataSource: DataSource) {
-    init {
-        kjørFlywayMigreringer()
-    }
-
     private val tabell = "identmapping"
     private val aktørIdKolonne = "aktor_id"
     private val fødselsnummerKolonne = "fnr"
@@ -74,7 +70,7 @@ class Repository(private val dataSource: DataSource) {
         cachetTidspunkt = resultSet.getTimestamp(cachetTidspunktKolonne).toLocalDateTime()
     )
 
-    private fun kjørFlywayMigreringer() {
+    fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
             .load()
