@@ -10,26 +10,21 @@ class KomponentTest {
     @Test
     fun `Når melding kommer fra pdl skal mapping lagres i database`() {
         val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
+        val datasource = TestDatabase().dataSource
+        val repository = Repository(datasource)
         val consumer = mockConsumer()
+
         val testAktørId = "123"
         val testFnr = "321"
 
-        startApp(
-            "http://pdl.klient.burde.ikke.ha.blitt.kalt.i.dette.tillfellet",
-            "dev-gcp",
-            testDatabase.dataSource,
-            testRapid,
-            consumer
-        )
-
         val melding = aktor(testAktørId, testFnr)
+
+        PdlLytter(consumer, repository::lagreAktørId).onReady(testRapid)
 
         mottaAktorMelding(consumer, melding)
 
-        Thread.sleep(300)
+        Thread.sleep(500)
 
-        val repository = Repository(testDatabase.dataSource)
         val identMappinger = repository.hentIdentMappinger(testFnr)
         assertThat(identMappinger).hasSize(1)
         assertThat(identMappinger.first().aktørId).isEqualTo(testAktørId)
