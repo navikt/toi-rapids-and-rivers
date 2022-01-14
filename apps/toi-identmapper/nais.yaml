@@ -60,3 +60,5 @@ spec:
       value: {{ pdl_url }}
     - name: PDL_KAFKA_GROUP_ID
       value: {{ pdl_kafka_group_id }}
+  envFrom:
+    - secret: toi-identmapper-servicebruker
