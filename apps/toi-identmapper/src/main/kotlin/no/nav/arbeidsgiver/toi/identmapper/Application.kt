@@ -46,7 +46,8 @@ fun startApp(
             Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
         }
 
-        rapidsConnection.register(PdlLytter(pdlConsumer, repository::lagreAktørId))
+        // TODO: Skru på PDL-topic
+        // rapidsConnection.register(PdlLytter(pdlConsumer, repository::lagreAktørId))
     }.start()
 }
 
