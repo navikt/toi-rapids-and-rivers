@@ -42,8 +42,6 @@ spec:
     application:
       enabled: true
   env:
-    - name: KAFKA_EXTRA_TOPIC
-        value: "aapen-person-pdl-aktor-v1"
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
@@ -54,7 +52,11 @@ spec:
       value: "1320000" # 6 sekunder per melding * 200 meldinger + 2 minutter ekstra
     - name: KAFKA_MAX_RECORDS
       value: "200"
+    - name: KAFKA_BOOTSTRAP_SERVERS_ONPREM_URL
+      value: {{ kafka_bootstrap_on_prem_url }}
     - name: PDL_SCOPE
       value: {{ pdl_scope }}
     - name: PDL_URL
       value: {{ pdl_url }}
+    - name: PDL_KAFKA_GROUP_ID
+      value: {{ pdl_kafka_group_id }}

@@ -1,6 +1,9 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
+import no.nav.arbeidsgiver.toi.cv.pdlKafkaConsumerConfig
 import no.nav.helse.rapids_rivers.RapidApplication
+import no.nav.person.pdl.aktor.v2.Aktor
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -20,7 +23,10 @@ fun main() {
             Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
         }
 
-        PdlLytter(rapidsConnection, repository::lagreAktørId)
+        val pdlConsumerConfig = pdlKafkaConsumerConfig(System.getenv())
+        val pdlConsumer = KafkaConsumer<String, Aktor>(pdlConsumerConfig)
+
+        rapidsConnection.register(PdlLytter(pdlConsumer, repository::lagreAktørId))
     }.start()
 }
 

@@ -1,25 +1,71 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import no.nav.arbeidsgiver.toi.cv.PdlLytterConfiguration
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import no.nav.person.pdl.aktor.v2.Aktor
+import no.nav.person.pdl.aktor.v2.Type
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.common.errors.RetriableException
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+import kotlin.coroutines.CoroutineContext
 
-class PdlLytter(rapidsConnection: RapidsConnection, private val lagre: (String?, String) -> Unit) :
-    River.PacketListener {
-    init {
-        River(rapidsConnection).apply {
-            validate {
-                it.demandKey("aktoerId")
-                it.demandKey("fnr")
-                it.rejectKey("@event_name")
+class PdlLytter(
+    private val consumer: Consumer<String, Aktor>,
+    private val lagreAktørId: (String?, String) -> Unit
+) : CoroutineScope, RapidsConnection.StatusListener {
+    private val job = Job()
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
+
+    override fun onReady(rapidsConnection: RapidsConnection) {
+        log.info("Rapiden er ready. Starter å lytte på PDL-topic")
+
+        job.invokeOnCompletion {
+            log.error("Shutting down rapid", it)
+            rapidsConnection.stop()
+        }
+
+        launch {
+            consumer.use { consumer ->
+                consumer.subscribe(listOf(PdlLytterConfiguration.topicName))
+                log.info("Har abonnert på PDL-topic")
+
+                while (job.isActive) {
+                    try {
+                        val meldinger = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+
+                        meldinger.forEach { melding ->
+                            behandleMelding(melding.value())
+                        }
+                    } catch (e: RetriableException) {
+                        log.warn("Had a retriable exception, retrying", e)
+                    }
+                }
             }
-        }.register(this)
+        }
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val aktørId = packet["aktoerId"].asText()
-        val fnr = packet["fnr"].asText()
-        lagre(aktørId, fnr)
+    private fun behandleMelding(aktør: Aktor) {
+        val identifikatorer = aktør.getIdentifikatorer()
+
+        val gjeldendeAktørId = identifikatorer
+            .filter { it.getType() == Type.AKTORID }
+            .find { it.getGjeldende() }?.getIdnummer()
+
+        val gjeldendeFnr = identifikatorer
+            .filter { it.getType() == Type.FOLKEREGISTERIDENT }
+            .find { it.getGjeldende() }?.getIdnummer()
+
+        if (gjeldendeAktørId == null || gjeldendeFnr == null) {
+            return
+        }
+
+        lagreAktørId(gjeldendeAktørId, gjeldendeFnr)
     }
 }

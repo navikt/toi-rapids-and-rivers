@@ -16,6 +16,7 @@ class PdllytterTest {
         testDatabase.slettAlt()
     }
 
+    /*
     @Test
     fun `Lesing av pdlMelding fra eksternt topic skal lagres i cache`() {
         val aktørId = "10000100000"
@@ -35,6 +36,7 @@ class PdllytterTest {
         val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørId }
         assertThat(aktørIdCache.hentAktørId(aktørId)).isEqualTo(aktørId)
     }
+    */
 
     private fun pdlMeldingFraEksterntTopic(aktørId: String, fnr: String) = """
         {
