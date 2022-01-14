@@ -66,6 +66,7 @@ class PdlLytter(
             return
         }
 
+        log.info("Behandler melding fra PDL-topic, lagret fnr for aktørId $gjeldendeAktørId")
         lagreAktørId(gjeldendeAktørId, gjeldendeFnr)
     }
 }
