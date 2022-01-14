@@ -19,8 +19,6 @@ class Repository(private val dataSource: DataSource) {
         val identMappingerBasertPåFødselsnummer = hentIdentMappinger(fødselsnummer)
         val harSammeMapping = identMappingerBasertPåFødselsnummer.any { it.aktørId == aktørId }
 
-        val startTime = LocalDateTime.now()
-
         dataSource.connection.use {
             if (harSammeMapping) {
                 it.prepareStatement(
@@ -41,22 +39,14 @@ class Repository(private val dataSource: DataSource) {
                         setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()))
                     }
             }.executeUpdate()
-
-            val duration = Duration.between(startTime, LocalDateTime.now()).toMillis()
-            log.info("Ytelse: ${if (harSammeMapping) "UPDATE i lagreAktørId" else "INSERT i lagreAktørId"}, $duration ms")
         }
     }
 
     fun hentIdentMappinger(fødselsnummer: String): List<IdentMapping> {
-        val startTime = LocalDateTime.now()
-
         dataSource.connection.use {
             val resultSet = it.prepareStatement("SELECT * FROM $tabell WHERE $fødselsnummerKolonne = ?").apply {
                 setString(1, fødselsnummer)
             }.executeQuery()
-
-            val duration = Duration.between(startTime, LocalDateTime.now()).toMillis()
-            log.info("Ytelse: hentIdentMappinger, $duration ms")
 
             return generateSequence {
                 if (resultSet.next()) tilIdentMapping(resultSet) else null
