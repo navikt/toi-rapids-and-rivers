@@ -1,14 +1,11 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-import java.time.LocalDateTime
 
 class AktorIdCache(
     private val repository: Repository,
-    private val cluster: String,
+    private val cacheNårAktørIdErNull: Boolean,
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
-    private val varighetIDager = 30
-
     fun hentAktørId(fødselsnummer: String): String? {
         val cachetAktørId = hentCachetAktørId(fødselsnummer)
 
@@ -19,8 +16,8 @@ class AktorIdCache(
 
         return hentAktørIdFraPdl(fødselsnummer).also { nyAktørId ->
             log.info("Mappet fra fødselsnummer til aktørId $nyAktørId, hentet fra PDL")
-            
-            if (nyAktørId != null || cluster == "dev-gcp") {
+
+            if (nyAktørId != null || cacheNårAktørIdErNull) {
                 cacheAktørId(
                     aktørId = nyAktørId,
                     fødselsnummer = fødselsnummer
@@ -37,17 +34,13 @@ class AktorIdCache(
         val identMappinger = repository.hentIdentMappinger(fødselsnummer)
         val sisteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
 
-        if (sisteMapping == null || mappingErUtgått(sisteMapping)) {
-            return CachetAktørId(false, null)
-        }
-
-        return CachetAktørId(true, sisteMapping.aktørId)
+        return if (sisteMapping == null) {
+            CachetAktørId(false, null)
+        } else CachetAktørId(true, sisteMapping.aktørId)
     }
 
-    private fun mappingErUtgått(identMapping: IdentMapping): Boolean {
-        val sisteGyldigeTidspunktForMapping = LocalDateTime.now().minusDays(varighetIDager.toLong())
-
-        return identMapping.cachetTidspunkt.isBefore(sisteGyldigeTidspunktForMapping)
+    private fun lagre(aktørid: String, fnr: String) {
+        repository.lagreAktørId(aktørid, fnr)
     }
 
     private data class CachetAktørId(

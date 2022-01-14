@@ -5,14 +5,11 @@ import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import java.sql.ResultSet
 import java.sql.Timestamp
+import java.time.Duration
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
 class Repository(private val dataSource: DataSource) {
-    init {
-        kjørFlywayMigreringer()
-    }
-
     private val tabell = "identmapping"
     private val aktørIdKolonne = "aktor_id"
     private val fødselsnummerKolonne = "fnr"
@@ -20,8 +17,9 @@ class Repository(private val dataSource: DataSource) {
 
     fun lagreAktørId(aktørId: String?, fødselsnummer: String) {
         val identMappingerBasertPåFødselsnummer = hentIdentMappinger(fødselsnummer)
-
         val harSammeMapping = identMappingerBasertPåFødselsnummer.any { it.aktørId == aktørId }
+
+        val startTime = LocalDateTime.now()
 
         dataSource.connection.use {
             if (harSammeMapping) {
@@ -35,6 +33,7 @@ class Repository(private val dataSource: DataSource) {
                     if (aktørId!= null) setString(3, aktørId)
                 }
             } else {
+
                 it.prepareStatement("INSERT INTO $tabell($aktørIdKolonne, $fødselsnummerKolonne, $cachetTidspunktKolonne) VALUES (?, ?, ?)")
                     .apply {
                         setString(1, aktørId)
@@ -42,14 +41,22 @@ class Repository(private val dataSource: DataSource) {
                         setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()))
                     }
             }.executeUpdate()
+
+            val duration = Duration.between(startTime, LocalDateTime.now()).toMillis()
+            log.info("Ytelse: ${if (harSammeMapping) "UPDATE i lagreAktørId" else "INSERT i lagreAktørId"}, $duration ms")
         }
     }
 
     fun hentIdentMappinger(fødselsnummer: String): List<IdentMapping> {
+        val startTime = LocalDateTime.now()
+
         dataSource.connection.use {
             val resultSet = it.prepareStatement("SELECT * FROM $tabell WHERE $fødselsnummerKolonne = ?").apply {
                 setString(1, fødselsnummer)
             }.executeQuery()
+
+            val duration = Duration.between(startTime, LocalDateTime.now()).toMillis()
+            log.info("Ytelse: hentIdentMappinger, $duration ms")
 
             return generateSequence {
                 if (resultSet.next()) tilIdentMapping(resultSet) else null
@@ -63,7 +70,7 @@ class Repository(private val dataSource: DataSource) {
         cachetTidspunkt = resultSet.getTimestamp(cachetTidspunktKolonne).toLocalDateTime()
     )
 
-    private fun kjørFlywayMigreringer() {
+    fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
             .load()

@@ -1,4 +1,7 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-identmapper-rapidconsumer-5
+kafka_bootstrap_on_prem_url: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
+kafka_schema_on_prem_url: https://kafka-schema-registry.nais-q.adeo.no
 pdl_scope: api://dev-fss.pdl.pdl-api/.default
 pdl_url: https://pdl-api.dev-fss-pub.nais.io/graphql
+pdl_kafka_group_id: toi-identmapper-1
