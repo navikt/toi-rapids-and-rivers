@@ -17,13 +17,6 @@ import java.time.LocalDateTime
 
 class PdllytterTest {
 
-    private val testDatabase: TestDatabase = TestDatabase()
-
-    @AfterEach
-    fun slettDatabase() {
-        testDatabase.slettAlt()
-    }
-
     @Test
     fun `Lesing av pdlMelding fra eksternt topic skal lagres i cache`() {
 
@@ -47,42 +40,5 @@ class PdllytterTest {
 
         Thread.sleep(300)
         assertThat(lagreFunksjonHarBlittKalt).isTrue()
-    }
-
-    private fun aktor(aktørId: String, fødselsnummer: String) = Aktor(listOf(
-        Identifikator(aktørId, Type.AKTORID, true),
-        Identifikator(fødselsnummer, Type.FOLKEREGISTERIDENT, true)
-    ))
-
-    private fun lagre(aktørId: String?, fnr: String) {
-        testDatabase.lagreIdentMapping(
-            IdentMapping(
-                aktørId = aktørId,
-                fødselsnummer = fnr,
-                cachetTidspunkt = LocalDateTime.now()
-            )
-        )
-    }
-}
-private fun mottaAktorMelding(consumer: MockConsumer<String, Aktor>, aktor: Aktor, offset: Long = 0) {
-    val record = ConsumerRecord(
-        topic.topic(),
-        topic.partition(),
-        offset,
-        aktor.getIdentifikatorer().filter { it.getType()==Type.AKTORID }.map { it.getIdnummer() }.first(),
-        aktor,
-    )
-
-    consumer.schedulePollTask {
-        consumer.addRecord(record)
-    }
-}
-
-private val topic = TopicPartition(PdlLytterConfiguration.topicName, 0)
-
-private fun mockConsumer() = MockConsumer<String, Aktor>(OffsetResetStrategy.EARLIEST).apply {
-    schedulePollTask {
-        rebalance(listOf(topic))
-        updateBeginningOffsets(mapOf(Pair(topic, 0)))
     }
 }

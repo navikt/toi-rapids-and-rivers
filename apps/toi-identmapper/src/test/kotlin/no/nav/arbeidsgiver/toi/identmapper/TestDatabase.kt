@@ -1,9 +1,7 @@
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.arbeidsgiver.toi.identmapper.IdentMapping
-import no.nav.arbeidsgiver.toi.identmapper.Repository
 import java.sql.Timestamp
-import java.time.LocalDateTime
 import javax.sql.DataSource
 
 class TestDatabase {

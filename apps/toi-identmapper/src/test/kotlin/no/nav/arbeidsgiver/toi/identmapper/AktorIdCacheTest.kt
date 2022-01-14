@@ -21,7 +21,7 @@ class AktorIdCacheTest {
         val aktørIdFraPdl = "456"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdFraPdl }
+        val aktørIdCache = AktorIdCache(repository, false) { aktørIdFraPdl }
 
         assertThat(repository.hentIdentMappinger(fødselsnummer)).isEmpty()
 
@@ -34,7 +34,7 @@ class AktorIdCacheTest {
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdFraPdl }
+        val aktørIdCache = AktorIdCache(repository, false) { aktørIdFraPdl }
 
         aktørIdCache.hentAktørId(fødselsnummer)
 
@@ -55,7 +55,7 @@ class AktorIdCacheTest {
         val aktørIdIDatabasen = "789"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
+        val aktørIdCache = AktorIdCache(repository, false) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -78,7 +78,7 @@ class AktorIdCacheTest {
         val aktørIdIPDL = null
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { aktørIdIPDL }
+        val aktørIdCache = AktorIdCache(repository, true) { aktørIdIPDL }
 
         val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
 
@@ -93,7 +93,7 @@ class AktorIdCacheTest {
         val aktørIdIPDL = null
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdIPDL }
+        val aktørIdCache = AktorIdCache(repository, false) { aktørIdIPDL }
 
         val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
 
@@ -107,7 +107,7 @@ class AktorIdCacheTest {
         val aktørIdIDatabasen = null
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
+        val aktørIdCache = AktorIdCache(repository, true) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -131,7 +131,7 @@ class AktorIdCacheTest {
         val aktørIdIPDL = "345"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { aktørIdIPDL }
+        val aktørIdCache = AktorIdCache(repository, true) { aktørIdIPDL }
 
         val utdatertTidspunkt = LocalDateTime.now().minusYears(100)
         testDatabase.lagreIdentMapping(
@@ -157,7 +157,7 @@ class AktorIdCacheTest {
         val aktørIdIPDL = null
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "dev-gcp") { aktørIdIPDL }
+        val aktørIdCache = AktorIdCache(repository, true) { aktørIdIPDL }
 
         val utdatertTidspunkt = LocalDateTime.now().minusYears(100)
         testDatabase.lagreIdentMapping(
@@ -183,7 +183,7 @@ class AktorIdCacheTest {
         val aktørIdIDatabasen = "789"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { aktørIdFraPdl }
+        val aktørIdCache = AktorIdCache(repository, false) { aktørIdFraPdl }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -209,7 +209,7 @@ class AktorIdCacheTest {
         val eldsteAktørIdIDatabasen = "789"
 
         val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, "prod-gcp") { "dummyAktørIdSomIkkeSkalHentes" }
+        val aktørIdCache = AktorIdCache(repository, false) { "dummyAktørIdSomIkkeSkalHentes" }
 
         val nyesteIdentMapping = IdentMapping(
             fødselsnummer = fødselsnummer,

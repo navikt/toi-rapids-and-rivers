@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 class AktorIdCache(
     private val repository: Repository,
-    private val cluster: String,
+    private val cacheNårAktørIdErNull: Boolean,
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
     private val varighetIDager = 30
@@ -20,7 +20,7 @@ class AktorIdCache(
         return hentAktørIdFraPdl(fødselsnummer).also { nyAktørId ->
             log.info("Mappet fra fødselsnummer til aktørId $nyAktørId, hentet fra PDL")
             
-            if (nyAktørId != null || cluster == "dev-gcp") {
+            if (nyAktørId != null || cacheNårAktørIdErNull) {
                 cacheAktørId(
                     aktørId = nyAktørId,
                     fødselsnummer = fødselsnummer
