@@ -39,6 +39,7 @@ class PdlLytter(
                 while (job.isActive) {
                     try {
                         val meldinger = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                        log.info("Konsumerer ${meldinger.count()} meldinger fra PDL-topic ...")
 
                         meldinger.forEach { melding ->
                             behandleMelding(melding.value())
