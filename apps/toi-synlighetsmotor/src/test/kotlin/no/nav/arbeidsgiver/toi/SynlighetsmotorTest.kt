@@ -141,8 +141,32 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person må behandle tidligere CV skal synlighet være false`() {
-    }
+    fun `om Person må behandle tidligere CV skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(
+            måBehandleTidligereCv = måBehandleTidligereCv(
+                maaBehandleTidligereCv = true
+            )
+        ),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+    )
+
+    @Test
+    fun `om Person spesifikt ikke må behandle tidligere CV skal synlighet være true`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(
+            måBehandleTidligereCv = måBehandleTidligereCv(
+                maaBehandleTidligereCv = false
+            )
+        ),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+    )
+
+    @Test
+    fun `om det er ukjent om en Person ikke må behandle tidligere CV skal synlighet være true`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(
+            måBehandleTidligereCv = null
+        ),
+        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+    )
 
     @Test
     fun `ignorer uinteressante hendelser`() = testProgramMedHendelse(
@@ -202,7 +226,8 @@ class SynlighetsmotorTest {
         cv: String = cv(),
         fritattKandidatsøk: String = fritattKandidatsøk(),
         hjemmel: String = hjemmel(),
-        participatingService: String? = participatingService("toi-sammenstille-kandidat")
+        participatingService: String? = participatingService("toi-sammenstille-kandidat"),
+        måBehandleTidligereCv: String? = null
     ) =
         hendelse(
             oppfølgingsperiode = oppfølgingsperiode,
@@ -210,7 +235,8 @@ class SynlighetsmotorTest {
             cv = cv,
             fritattKandidatsøk = fritattKandidatsøk,
             hjemmel = hjemmel,
-            participatingService = participatingService
+            participatingService = participatingService,
+            måBehandleTidligereCv = måBehandleTidligereCv
         )
 
     private fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -228,7 +254,8 @@ class SynlighetsmotorTest {
         cv: String? = null,
         fritattKandidatsøk: String? = null,
         hjemmel: String? = null,
-        participatingService: String? = participatingService("toi-sammenstille-kandidat")
+        participatingService: String? = participatingService("toi-sammenstille-kandidat"),
+        måBehandleTidligereCv: String? = null
     ) = """
             {
                 ${
@@ -239,7 +266,8 @@ class SynlighetsmotorTest {
             oppfølgingsperiode,
             fritattKandidatsøk,
             hjemmel,
-            participatingService
+            participatingService,
+            måBehandleTidligereCv
         ).joinToString()
     }
             }
@@ -350,6 +378,15 @@ class SynlighetsmotorTest {
                 "ressurs": "$ressurs",
                 "opprettetDato": "$opprettetDato",
                 "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""}
+            }
+        """.trimIndent()
+
+    private fun måBehandleTidligereCv(
+        maaBehandleTidligereCv: Boolean = false
+    ) =
+        """
+            "måBehandleTidligereCv": {
+                "maaBehandleTidligereCv": "$maaBehandleTidligereCv"
             }
         """.trimIndent()
 

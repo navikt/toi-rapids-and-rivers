@@ -11,7 +11,8 @@ data class Kandidat(
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
     val fritattKandidatsøk: FritattKandidatsøk?,
-    val hjemmel: Hjemmel?
+    val hjemmel: Hjemmel?,
+    val måBehandleTidligereCv: MåBehandleTidligereCv?,
 ) {
     companion object {
         private val mapper = jacksonObjectMapper()
@@ -64,3 +65,6 @@ data class Hjemmel(
 enum class Samtykkeressurs {
     CV_HJEMMEL
 }
+data class MåBehandleTidligereCv(
+    val maaBehandleTidligereCv: Boolean
+)
