@@ -20,13 +20,14 @@ fun startApp(
             Lytter(rapid, repository, "oppfølgingsperiode")
             Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
             Lytter(rapid, repository, "hjemmel")
+            Lytter(rapid, repository, "må-behandle-tidligere-cv","måBehandleTidligereCv")
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
     }
 }
 
-fun datasource() = DatabaseKonfigurasjon(System.getenv()).lagDatasource();
+fun datasource() = DatabaseKonfigurasjon(System.getenv()).lagDatasource()
 
 fun rapidsConnection() = RapidApplication.create(System.getenv())
 

@@ -90,6 +90,7 @@ data class Kandidat(
     val oppfølgingsperiode: JsonNode? = null,
     val fritattKandidatsøk: JsonNode? = null,
     val hjemmel: JsonNode? = null,
+    val måBehandleTidligereCv: JsonNode? = null
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()

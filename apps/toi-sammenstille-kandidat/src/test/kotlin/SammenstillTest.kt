@@ -13,7 +13,8 @@ class SammenstillTest {
         "oppfølgingsinformasjon",
         "oppfølgingsperiode",
         "fritattKandidatsøk",
-        "hjemmel"
+        "hjemmel",
+        "måBehandleTidligereCv"
     )
 
     private fun kunKandidatfelter(melding: JsonNode) = melding.fieldNames().asSequence().toList().filter{ fieldName -> alleKandidatfelter.contains(fieldName) }
@@ -234,6 +235,28 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når måBehandleTidligereCv har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+
+        startApp(TestDatabase().dataSource, testRapid)
+        testRapid.sendTestMessage(måBehandleTidligereCvMelding(aktørId))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("@event_name").asText()).isEqualTo("må-behandle-tidligere-cv.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("måBehandleTidligereCv")
+
+        val måBehandleTidligereCvmelding = melding.get("måBehandleTidligereCv")
+
+        assertThat(måBehandleTidligereCvmelding.get("aktorId").asText()).isEqualTo(aktørId)
+        assertThat(måBehandleTidligereCvmelding.get("maaBehandleTidligereCv").asBoolean()).isEqualTo(true)
+    }
+
+    @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
@@ -433,6 +456,17 @@ class SammenstillTest {
                 "versjon" : 1,
                 "versjonGjeldendeFra" : null,
                 "versjonGjeldendeTil" : "2019-04-08"
+            }
+        }
+    """.trimIndent()
+
+    private fun måBehandleTidligereCvMelding(aktørId: String) = """
+        {
+            "aktørId": "$aktørId",
+            "@event_name": "må-behandle-tidligere-cv",
+            "måBehandleTidligereCv": {
+              "aktorId" : "$aktørId",
+              "maaBehandleTidligereCv": true
             }
         }
     """.trimIndent()
