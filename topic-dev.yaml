@@ -50,3 +50,6 @@ spec:
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite
+    - team: toi
+      application: toi-maa-behandle-tidligere-cv
+      access: readwrite
