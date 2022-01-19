@@ -9,7 +9,8 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.P
         "oppfølgingsinformasjon",
         "oppfølgingsperiode",
         "fritattKandidatsøk",
-        "hjemmel"
+        "hjemmel",
+        "måBehandleTidligereCv"
     )
 
     init {

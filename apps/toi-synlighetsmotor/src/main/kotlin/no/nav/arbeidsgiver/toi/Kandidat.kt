@@ -65,6 +65,7 @@ data class Hjemmel(
 enum class Samtykkeressurs {
     CV_HJEMMEL
 }
+
 data class MåBehandleTidligereCv(
     val maaBehandleTidligereCv: Boolean
 )
