@@ -58,7 +58,7 @@ jobs:
   deploy-to-prod-gcp:
     name: Deploy to prod-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/endre-til-main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
