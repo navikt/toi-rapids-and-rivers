@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: kandidat-2
+  name: kandidat-3
   namespace: toi
   labels:
     team: toi

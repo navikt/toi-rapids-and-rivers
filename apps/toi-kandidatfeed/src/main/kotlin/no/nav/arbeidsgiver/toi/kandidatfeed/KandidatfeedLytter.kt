@@ -8,7 +8,7 @@ import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-const val topicName = "toi.kandidat-2"
+const val topicName = "toi.kandidat-3"
 
 class KandidatfeedLytter(
     rapidsConnection: RapidsConnection,
