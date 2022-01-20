@@ -215,7 +215,7 @@ class SynlighetsmotorTest {
         val rapid = TestRapid()
             .also(::SynlighetsLytter)
 
-        rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
+            ?.        rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
 
         rapid.inspektør.apply(assertion)
     }

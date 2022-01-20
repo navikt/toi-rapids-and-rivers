@@ -1,16 +1,18 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
+const val topicName = "toi.kandidat-2"
+
 class KandidatfeedLytter(
     rapidsConnection: RapidsConnection,
-    private val producer: Producer<String, String>,
-    private val erProd: Boolean
+    private val producer: Producer<String, String>
 ) :
     River.PacketListener {
 
@@ -18,36 +20,36 @@ class KandidatfeedLytter(
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-
-                if (erProd) {
-                    it.demandKey("cv")
-                } else {
-                    it.demandKey("synlighet")
-                }
+                it.demandKey("synlighet")
+                it.interestedIn("cv")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if (erProd) {
-            if (packet["cv"].isNull) {
-                val feilmelding = "CV kan ikke være null for aktørId ${packet["aktørId"]}"
+        val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
 
-                log.error(feilmelding)
-                throw IllegalArgumentException(feilmelding)
-            }
+        if (!synlighetErFerdigBeregnet) {
+            log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
+            return
         } else {
-            val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
+            val erSynlig = packet["synlighet"]["erSynlig"].asBoolean()
 
-            if (!synlighetErFerdigBeregnet) {
-                log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
-                return
+            val cvPacket = (
+                packet["cv"]["opprettCv"] ?:
+                packet["cv"]["endreCv"] ?:
+                packet["cv"]["slettCv"]
+            ).get("cv")
+
+            val synlighetFraArbeidsplassen = cvPacket?.get("synligForVeilederSok") ?: false
+            if (synlighetFraArbeidsplassen != erSynlig) {
+               log.warn("Synlighet for ${packet["aktørId"].asText()} er beregnet annerledes ($erSynlig) enn hos Arbeidsplassen ($synlighetFraArbeidsplassen)")
             }
         }
 
         val aktørId = packet["aktørId"].asText()
         val packetUtenMetadata = packet.fjernMetadataOgKonverter()
-        val melding = ProducerRecord("toi.kandidat-2", aktørId, packetUtenMetadata.toString())
+        val melding = ProducerRecord(topicName, aktørId, packetUtenMetadata.toString())
 
         producer.send(melding) { _, exception ->
             if (exception == null) {

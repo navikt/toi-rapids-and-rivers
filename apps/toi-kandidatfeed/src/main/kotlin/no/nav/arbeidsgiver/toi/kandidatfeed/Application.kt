@@ -6,11 +6,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    KandidatfeedLytter(rapidsConnection, KafkaProducer(producerConfig), erProd())
-    KandidatfeedLytter2(rapidsConnection, KafkaProducer(producerConfig), "toi.sammenstilt-kandidat")
+    KandidatfeedLytter(rapidsConnection, KafkaProducer(producerConfig))
 }.start()
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
-
-fun erProd() = System.getenv("NAIS_CLUSTER_NAME") == "prod-gcp"
