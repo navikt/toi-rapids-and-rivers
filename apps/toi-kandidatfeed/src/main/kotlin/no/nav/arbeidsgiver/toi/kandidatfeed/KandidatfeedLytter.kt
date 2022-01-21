@@ -34,6 +34,15 @@ class KandidatfeedLytter(
             return
         }
 
+        val erSynlig = packet["synlighet"]["erSynlig"].asBoolean()
+
+        val cvPacket = packet["cv"]["opprettCv"]["cv"] ?: packet["cv"]["endreCv"]["cv"] ?: packet["cv"]["slettCv"]["cv"]
+        val synlighetFraArbeidsplassen = cvPacket?.get("synligForVeilederSok")?.asBoolean() ?: false
+
+        if (synlighetFraArbeidsplassen && !erSynlig) {
+            log.warn("Synlig i følge Arbeidsplassen, men usynlig i følge oss: ${packet["aktørId"].asText()}")
+        }
+
         val aktørId = packet["aktørId"].asText()
         val packetUtenMetadata = packet.fjernMetadataOgKonverter()
         val melding = ProducerRecord(topicName, aktørId, packetUtenMetadata.toString())
