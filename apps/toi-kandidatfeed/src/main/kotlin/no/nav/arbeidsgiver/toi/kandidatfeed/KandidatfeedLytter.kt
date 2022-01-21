@@ -32,19 +32,6 @@ class KandidatfeedLytter(
         if (!synlighetErFerdigBeregnet) {
             log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
             return
-        } else {
-            val erSynlig = packet["synlighet"]["erSynlig"].asBoolean()
-
-            val cvPacket = (
-                packet["cv"]["opprettCv"] ?:
-                packet["cv"]["endreCv"] ?:
-                packet["cv"]["slettCv"]
-            ).get("cv")
-
-            val synlighetFraArbeidsplassen = cvPacket?.get("synligForVeilederSok") ?: false
-            if (synlighetFraArbeidsplassen != erSynlig) {
-               log.warn("Synlighet for ${packet["aktørId"].asText()} er beregnet annerledes ($erSynlig) enn hos Arbeidsplassen ($synlighetFraArbeidsplassen)")
-            }
         }
 
         val aktørId = packet["aktørId"].asText()
