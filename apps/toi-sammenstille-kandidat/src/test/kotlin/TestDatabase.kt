@@ -2,6 +2,8 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.arbeidsgiver.toi.Kandidat
 import no.nav.arbeidsgiver.toi.Repository
+import java.sql.Connection
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 class TestDatabase {
@@ -25,6 +27,23 @@ class TestDatabase {
                 "DELETE FROM sammenstiltkandidat"
             ).execute()
         }
+    }
+
+    fun hentAlleKandidater() =
+        dataSource.connection.prepareStatement("select * from sammenstiltkandidat")
+            .executeQuery()
+            .map { databaseRad ->
+                databaseRad.getString("kandidat")
+            }.map { it.somJsonNode() }
+
+    fun <T> ResultSet.map(mapper: (ResultSet) -> T): List<T> {
+        return generateSequence {
+            if (this.next()) {
+                mapper(this)
+            } else {
+                null
+            }
+        }.toList()
     }
 
     fun hentAntallKandidater() =

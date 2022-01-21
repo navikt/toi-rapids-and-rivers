@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.JsonNode
+import no.nav.arbeidsgiver.toi.Kandidat
 import no.nav.arbeidsgiver.toi.startApp
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
@@ -255,6 +256,24 @@ class SammenstillTest {
         assertThat(måBehandleTidligereCvmelding.get("aktorId").asText()).isEqualTo(aktørId)
         assertThat(måBehandleTidligereCvmelding.get("maaBehandleTidligereCv").asBoolean()).isEqualTo(true)
     }
+
+    @Test
+    fun `Når måBehandleTidligereCv har blitt mottatt skal meldingen lagres i databasen`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+        val testDatabase = TestDatabase()
+
+        startApp(testDatabase.dataSource, testRapid)
+        testRapid.sendTestMessage(måBehandleTidligereCvMelding(aktørId))
+
+        val lagredeKandidater = testDatabase.hentAlleKandidater()
+        assertThat(lagredeKandidater.size).isEqualTo(1)
+
+        val kandidatSomJson = lagredeKandidater.first()
+        val kandidat = Kandidat.fraJson(kandidatSomJson)
+        assertThat(kandidat.måBehandleTidligereCv).isNotNull
+    }
+
 
     @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {

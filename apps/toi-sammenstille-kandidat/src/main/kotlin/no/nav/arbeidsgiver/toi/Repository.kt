@@ -102,7 +102,8 @@ data class Kandidat(
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
             oppfølgingsperiode = json["oppfølgingsperiode"],
             fritattKandidatsøk = json["fritattKandidatsøk"],
-            hjemmel = json["hjemmel"]
+            hjemmel = json["hjemmel"],
+            måBehandleTidligereCv = json["måBehandleTidligereCv"]
         )
     }
 

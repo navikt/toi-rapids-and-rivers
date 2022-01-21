@@ -18,20 +18,20 @@ fun main(args: Array<String>) {
     println("Har koblet til databasen")
 
     // NB: Tar lang tid å lese alle rader uten begrensninger
-    val sql = "select kandidat from sammenstiltkandidat limit 20000 offset 950000"
+    val sql = "select kandidat from sammenstiltkandidat"
     val kandidatRader = hentKandidatRader(tilkobling, sql)
     println("Har hentet ut rader fra databasen")
 
     val kandidaterSomJsonNoder = kandidatRader.map { it.somJsonNode() }
 
     // Bruk
-    val fnrTilKandidaterMedOppfølgingsinformasjon = kandidaterSomJsonNoder.filter {
-        it.har("oppfølgingsinformasjon")
+    val antall = kandidaterSomJsonNoder.filter {
+        it.har("måBehandleTidligereCv")
     }.map {
-        it["oppfølgingsinformasjon"]["fodselsnummer"].asText()
-    }
-    println("Antall kandidater med oppfølgingsinformasjon: ${fnrTilKandidaterMedOppfølgingsinformasjon.size}")
-    println(fnrTilKandidaterMedOppfølgingsinformasjon)
+        it["fritattKandidatsøk"]["fritattKandidatsok"].asBoolean()
+    }.filter { it }.size
+
+    println("Antall kandidater med måBehandleTidligereCv true: ${antall}")
 }
 
 fun hentKandidatRader(databaseTilkobling: Connection, sql: String) =
