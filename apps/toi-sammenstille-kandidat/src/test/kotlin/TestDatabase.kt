@@ -35,6 +35,7 @@ class TestDatabase {
             .map { databaseRad ->
                 databaseRad.getString("kandidat")
             }.map { it.somJsonNode() }
+            .map { Kandidat.fraJson(it) }
 
     fun <T> ResultSet.map(mapper: (ResultSet) -> T): List<T> {
         return generateSequence {

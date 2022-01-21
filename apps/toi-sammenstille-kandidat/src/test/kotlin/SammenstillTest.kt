@@ -268,12 +268,8 @@ class SammenstillTest {
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
         assertThat(lagredeKandidater.size).isEqualTo(1)
-
-        val kandidatSomJson = lagredeKandidater.first()
-        val kandidat = Kandidat.fraJson(kandidatSomJson)
-        assertThat(kandidat.måBehandleTidligereCv).isNotNull
+        assertThat(lagredeKandidater.first().måBehandleTidligereCv).isNotNull
     }
-
 
     @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
