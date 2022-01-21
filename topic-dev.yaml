@@ -53,3 +53,6 @@ spec:
     - team: toi
       application: toi-maa-behandle-tidligere-cv
       access: readwrite
+    - team: toi
+      application: toi-organisasjonsenhet
+      access: readwrite
