@@ -1,1 +1,0 @@
-# Henter ut avledet informasjon og legger den på rapid

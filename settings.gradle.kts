@@ -12,5 +12,5 @@ include(
     "apps:toi-fritatt-kandidatsok",
     "apps:toi-hjemmel",
     "apps:toi-maa-behandle-tidligere-cv",
-    "apps:toi-avledet-informasjon"
+    "apps:toi-organisasjonsenhet"
 )

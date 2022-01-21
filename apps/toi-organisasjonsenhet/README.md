@@ -1,0 +1,1 @@
+# Henter ut organisasjonsenhet informasjon og legger den på rapid
