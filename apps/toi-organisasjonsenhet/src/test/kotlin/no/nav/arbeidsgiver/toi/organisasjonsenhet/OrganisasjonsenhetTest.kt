@@ -13,7 +13,7 @@ class OrganisasjonsenhetTest {
         val testRapid = TestRapid()
         OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
 
-        testRapid.sendTestMessage(behovsMelding("""["organisasjonsenhet"]"""))
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhet"]"""))
 
         val inspektør = testRapid.inspektør
 
@@ -25,7 +25,7 @@ class OrganisasjonsenhetTest {
         val testRapid = TestRapid()
         OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
 
-        testRapid.sendTestMessage(behovsMelding("""["hull", "organisasjonsenhet"]"""))
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["noeannet", "organisasjonsenhet"]"""))
 
         val inspektør = testRapid.inspektør
 
@@ -33,21 +33,63 @@ class OrganisasjonsenhetTest {
     }
 
     @Test
+    fun `legg på svar om andre behov er organisasjonsenhet, bare om første behov har en løsning`() {
+        val testRapid = TestRapid()
+        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["noeannet", "organisasjonsenhet"]""",
+            løsninger = """{"noeannet":{}}"""
+        ))
+
+        val inspektør = testRapid.inspektør
+
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+    }
+
+    @Test
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()
         OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
 
-        testRapid.sendTestMessage(behovsMelding("[]"))
+        testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
 
         val inspektør = testRapid.inspektør
 
         Assertions.assertThat(inspektør.size).isEqualTo(0)
     }
 
-    private fun behovsMelding(behovListe: String): String {
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på`() {
+        val testRapid = TestRapid()
+        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhet"]""", løsninger = """{"organisasjonsenhet":{}}"""))
+
+        val inspektør = testRapid.inspektør
+
+        Assertions.assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Legg til korrekt NAV-kontor-navn på populert melding`() {
+        val testRapid = TestRapid()
+        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhet"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        val meldingPåRapid = inspektør.message(0)
+        Assertions.assertThat(meldingPåRapid["@løsning"]["organisasjonsenhet"].asText()).isEqualTo("Andre kontor")
+    }
+
+    private fun behovsMelding(behovListe: String, løsninger: String? = null): String {
         return """
             {
-                "@behov":$behovListe
+                "@behov":$behovListe,
+                "feltmedorganisasjonsnummer":"0002"
+                ${if(løsninger!=null) """, "@løsning":$løsninger""" else ""}
             }
         """.trimIndent()
     }
