@@ -97,6 +97,7 @@ class KandidatfeedTest {
     fun rapidMelding(synlighetJson: String?): String = """
         {
           "@event_name": "cv.sammenstilt",
+          "@final": "true",
           "aktørId": "123",
           "cv": {
             "meldingstype": "SLETT",
