@@ -21,6 +21,7 @@ class KandidatfeedLytter(
             validate {
                 it.demandKey("aktørId")
                 it.demandKey("synlighet")
+                it.demandValue("@final", "true")
                 it.interestedIn("cv")
             }
         }.register(this)

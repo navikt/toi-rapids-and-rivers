@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
     KandidatfeedLytter(rapidsConnection, KafkaProducer(producerConfig))
+    UferdigKandidatLytter(rapidsConnection)
 }.start()
 
 val Any.log: Logger
