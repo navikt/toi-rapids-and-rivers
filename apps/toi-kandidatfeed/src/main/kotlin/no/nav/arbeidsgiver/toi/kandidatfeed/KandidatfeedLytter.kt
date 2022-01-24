@@ -49,7 +49,7 @@ class KandidatfeedLytter(
 
         producer.send(melding) { _, exception ->
             if (exception == null) {
-                log.info("Sendte kandidat med aktørId $aktørId")
+                log.info("Sendte kandidat med aktørId $aktørId, synlighet er $erSynlig")
             } else {
                 log.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
