@@ -24,7 +24,7 @@ class KandidatfeedTest {
     @Test
     fun `Meldinger der synlighet er ferdig beregnet skal produsere melding på kandidat-topic`() {
         val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true))
-        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet =  true))
+        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true))
 
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
@@ -87,6 +87,20 @@ class KandidatfeedTest {
         assertThat(resultatJson.has("@event_name")).isFalse
     }
 
+    @Test
+    fun `Meldinger uten final parameter skal sende behov til rapid`() {
+        val melding = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), erFinal(true))
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        KandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(melding)
+
+        assertThat(producer.history().size).isEqualTo(1)
+    }
+
     private fun synlighet(erSynlig: Boolean = true, ferdigBeregnet: Boolean = true) = """
         "synlighet": {
             "erSynlig": "$erSynlig",
@@ -94,10 +108,18 @@ class KandidatfeedTest {
         },
     """.trimIndent()
 
-    fun rapidMelding(synlighetJson: String?): String = """
+    private fun erFinal(erFinal: Boolean = true) =
+        if (erFinal) {
+            """
+                "@final": $erFinal,
+            """.trimIndent()
+        } else ""
+
+
+    fun rapidMelding(synlighetJson: String?, erFinal: String? = erFinal(true)): String = """
         {
           "@event_name": "cv.sammenstilt",
-          "@final": "true",
+          $erFinal
           "aktørId": "123",
           "cv": {
             "meldingstype": "SLETT",
