@@ -14,15 +14,13 @@ class UferdigKandidatLytter(
     rapidsConnection: RapidsConnection
 ) :
     River.PacketListener {
-
     init {
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
-                it.rejectKey("@final")
-                it.rejectKey("@behov.kandidatfeed")
+                it.rejectOnAll("@behov", behovsListe)
                 it.interestedIn("cv")
             }
         }.register(this)
@@ -30,13 +28,13 @@ class UferdigKandidatLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
-        packet["@behov.kandidatfeed"] = listOf("organisasjonsenhet")
+        packet["@behov"] = packet["@behov"].toSet() + behovsListe
         context.publish(aktørId, packet.toJson())
     }
+}
 
-    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        return jsonNode.remove(metadataFelter)
+private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = interestedIn(key) { node ->
+    if (!node.isMissingNode && node.isArray && node.map(JsonNode::asText).containsAll(values)) {
+        throw Exception("Behovene finnes allerede i meldingen")
     }
 }

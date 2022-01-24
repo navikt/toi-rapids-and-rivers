@@ -21,7 +21,7 @@ class KandidatfeedLytter(
             validate {
                 it.demandKey("aktørId")
                 it.demandKey("synlighet")
-                it.demandValue("@final", true)
+                behovsListe.forEach(it::interestedIn)
                 it.interestedIn("cv")
             }
         }.register(this)
@@ -36,6 +36,11 @@ class KandidatfeedLytter(
         }
 
         val erSynlig = packet["synlighet"]["erSynlig"].asBoolean()
+
+        if(erSynlig && behovsListe.any { packet[it].isMissingNode }) {
+            log.info("Ignorerer kandidat fordi dekte behov er ikke løst" + packet["aktørId"])
+            return
+        }
 
         val cvPacket = packet["cv"]["opprettCv"]["cv"] ?: packet["cv"]["endreCv"]["cv"] ?: packet["cv"]["slettCv"]["cv"]
         val synlighetFraArbeidsplassen = cvPacket?.get("synligForVeilederSok")?.asBoolean() ?: false
@@ -62,4 +67,9 @@ class KandidatfeedLytter(
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
         return jsonNode.remove(metadataFelter)
     }
+}
+
+private fun JsonMessage.medLøsninger(løsningsListe: List<String>) {
+    demandKey("@løsning")
+    get("@løsning").fieldNames().asSequence().toList().containsAll(løsningsListe)
 }
