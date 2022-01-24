@@ -15,7 +15,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
         testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
 
         assertThat(producer.history().size).isEqualTo(0)
@@ -28,7 +29,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
 
         testrapid.sendTestMessage(meldingSynlig)
 
@@ -42,7 +44,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
 
         testrapid.sendTestMessage(meldingUsynlig)
 
@@ -57,7 +60,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
 
         testrapid.sendTestMessage(meldingSynlig)
         testrapid.sendTestMessage(meldingUsynlig)
@@ -82,7 +86,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
         testrapid.sendTestMessage(meldingSynlig)
 
         assertThat(producer.history().size).isEqualTo(0)
@@ -94,7 +99,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        KandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
 
         testrapid.sendTestMessage(rapidMelding)
 

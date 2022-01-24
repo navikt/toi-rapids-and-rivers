@@ -8,9 +8,7 @@ import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-const val topicName = "toi.kandidat-3"
-
-class KandidatfeedLytter(
+class UsynligKandidatfeedLytter(
     rapidsConnection: RapidsConnection,
     private val producer: Producer<String, String>
 ) :
@@ -20,32 +18,18 @@ class KandidatfeedLytter(
         River(rapidsConnection).apply {
             validate {
                 it.demandKey("aktørId")
-                it.demandKey("synlighet")
-                behovsListe.forEach(it::interestedIn)
+                it.demandValue("synlighet.erSynlig", false)
+                it.demandValue("synlighet.ferdigBeregnet", true)
                 it.interestedIn("cv")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val synlighetErFerdigBeregnet = packet["synlighet"]["ferdigBeregnet"].asBoolean()
-
-        if (!synlighetErFerdigBeregnet) {
-            log.info("Ignorerer kandidat fordi synlighet ikke er ferdig beregnet" + packet["aktørId"])
-            return
-        }
-
-        val erSynlig = packet["synlighet"]["erSynlig"].asBoolean()
-
-        if(erSynlig && behovsListe.any { packet[it].isMissingNode }) {
-            log.info("Ignorerer kandidat fordi dekte behov er ikke løst" + packet["aktørId"])
-            return
-        }
-
         val cvPacket = packet["cv"]["opprettCv"]["cv"] ?: packet["cv"]["endreCv"]["cv"] ?: packet["cv"]["slettCv"]["cv"]
         val synlighetFraArbeidsplassen = cvPacket?.get("synligForVeilederSok")?.asBoolean() ?: false
 
-        if (synlighetFraArbeidsplassen && !erSynlig) {
+        if (synlighetFraArbeidsplassen) {
             log.warn("Synlig i følge Arbeidsplassen, men usynlig i følge oss: ${packet["aktørId"].asText()}")
         }
 
@@ -55,7 +39,7 @@ class KandidatfeedLytter(
 
         producer.send(melding) { _, exception ->
             if (exception == null) {
-                log.info("Sendte kandidat med aktørId $aktørId, synlighet er $erSynlig")
+                log.info("Sendte kandidat med aktørId $aktørId, synlighet er false")
             } else {
                 log.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
@@ -67,9 +51,4 @@ class KandidatfeedLytter(
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
         return jsonNode.remove(metadataFelter)
     }
-}
-
-private fun JsonMessage.medLøsninger(løsningsListe: List<String>) {
-    demandKey("@løsning")
-    get("@løsning").fieldNames().asSequence().toList().containsAll(løsningsListe)
 }

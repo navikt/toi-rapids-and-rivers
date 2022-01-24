@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory
 val behovsListe = listOf("organisasjonsenhetsnavn")
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    KandidatfeedLytter(rapidsConnection, KafkaProducer(producerConfig))
+    val kandidatfeedProducer = KafkaProducer<String, String>(producerConfig)
+    SynligKandidatfeedLytter(rapidsConnection, kandidatfeedProducer)
+    UsynligKandidatfeedLytter(rapidsConnection, kandidatfeedProducer)
     UferdigKandidatLytter(rapidsConnection)
 }.start()
 
