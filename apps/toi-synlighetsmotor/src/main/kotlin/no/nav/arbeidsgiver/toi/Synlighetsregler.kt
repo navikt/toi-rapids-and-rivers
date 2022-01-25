@@ -9,6 +9,7 @@ private val synlighetsregel =
             `har aktiv CV` og
             `har jobbprofil` og
             `er under oppfølging` og
+            `er ikke kode 6 eller 7` og
             `er ikke fritatt fra kandidatsøk` og
             `har sett hjemmel` og
             `må ikke behandle tidligere CV`
@@ -34,6 +35,19 @@ private object `har rett formidlingsgruppe` : Synlighetsregel {
 
     override fun erSynlig(kandidat: Kandidat) =
         kandidat.oppfølgingsinformasjon?.formidlingsgruppe in godkjenteFormidlingsgrupper
+
+    override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon != null
+}
+
+private object `er ikke kode 6 eller 7` : Synlighetsregel {
+    override fun erSynlig(kandidat: Kandidat): Boolean {
+        if (kandidat.oppfølgingsinformasjon == null) {
+            return false
+        }
+
+        val diskresjonskode = kandidat.oppfølgingsinformasjon.diskresjonskode ?: return true
+        return diskresjonskode != "6" && diskresjonskode != "7"
+    }
 
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = kandidat.oppfølgingsinformasjon != null
 }
@@ -91,13 +105,12 @@ private object `har sett hjemmel` : Synlighetsregel {
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
 }
 
-private object `må ikke behandle tidligere CV`: Synlighetsregel {
+private object `må ikke behandle tidligere CV` : Synlighetsregel {
     override fun erSynlig(kandidat: Kandidat) = kandidat.måBehandleTidligereCv?.maaBehandleTidligereCv != true
 
     override fun harBeregningsgrunnlag(kandidat: Kandidat) = true
 }
 
-// TODO Vi trenger å ta en gjennomgang av synlighestregler, og hva som eventuelt er beregningsgrunnlag for hver regel.
 private interface Synlighetsregel {
     fun erSynlig(kandidat: Kandidat): Boolean
     fun harBeregningsgrunnlag(kandidat: Kandidat): Boolean

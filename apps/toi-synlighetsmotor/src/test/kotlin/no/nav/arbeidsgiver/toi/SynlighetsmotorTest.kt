@@ -63,6 +63,13 @@ class SynlighetsmotorTest {
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
 
+
+    @Test
+    fun `om Person ikke har oppfølgingsinformasjon skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = null),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
+
     @Test
     fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS")),
@@ -76,6 +83,18 @@ class SynlighetsmotorTest {
     )
 
     @Test
+    fun `om Person har kode 6 skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(diskresjonskode = "6")),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
+
+    @Test
+    fun `om Person har kode 7 skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(diskresjonskode = "7")),
+        enHendelseErPublisertMedSynlighetsverdi(false)
+    )
+
+    @Test
     fun `om Person ikke er manuell skal synlighet være false`() {
     }
 
@@ -84,14 +103,6 @@ class SynlighetsmotorTest {
         komplettHendelseSomFørerTilSynlighetTrue(fritattKandidatsøk = fritattKandidatsøk(true)),
         enHendelseErPublisertMedSynlighetsverdi(false)
     )
-
-    @Test
-    fun `om Person er kode 6 skal synlighet være false`() {
-    }
-
-    @Test
-    fun `om Person er kode 7 skal synlighet være false`() {
-    }
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
@@ -221,7 +232,7 @@ class SynlighetsmotorTest {
 
     private fun komplettHendelseSomFørerTilSynlighetTrue(
         oppfølgingsperiode: String = aktivOppfølgingsperiode(),
-        oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
+        oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
         cv: String = cv(),
         fritattKandidatsøk: String = fritattKandidatsøk(),
         hjemmel: String = hjemmel(),
@@ -276,7 +287,8 @@ class SynlighetsmotorTest {
         erDoed: Boolean = false,
         sperretAnsatt: Boolean = false,
         formidlingsgruppe: String = "IARBS",
-        harOppfolgingssak: Boolean = true
+        harOppfolgingssak: Boolean = true,
+        diskresjonskode: String? = null
     ) =
         """
             "oppfølgingsinformasjon": {
@@ -290,7 +302,7 @@ class SynlighetsmotorTest {
                 "rettighetsgruppe": "AAP",
                 "hovedmaal": "BEHOLDEA",
                 "sikkerhetstiltakType": null,
-                "diskresjonskode": null,
+                "diskresjonskode": ${if (diskresjonskode == null) null else "\"$diskresjonskode\""},
                 "harOppfolgingssak": $harOppfolgingssak,
                 "sperretAnsatt": $sperretAnsatt,
                 "erDoed": $erDoed,

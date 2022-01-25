@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -45,7 +47,10 @@ data class Oppfølgingsinformasjon(
     val erDoed: Boolean,
     val sperretAnsatt: Boolean,
     val formidlingsgruppe: Formidlingsgruppe?,
+    val diskresjonskode: Diskresjonskode?,
 )
+
+typealias Diskresjonskode = String
 
 enum class Formidlingsgruppe {
     ARBS,
