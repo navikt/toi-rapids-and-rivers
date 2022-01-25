@@ -11,6 +11,7 @@ import com.zaxxer.hikari.HikariDataSource
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import org.flywaydb.core.Flyway
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
@@ -73,10 +74,14 @@ class Repository(private val dataSource: DataSource) {
         else null
     }
 
-    fun hentAlleAktørIder(): List<String> {
-        TODO("Implementer")
+    fun hentAlleAktørIderSortert(): List<String> {
+        dataSource.connection.use {
+            val statement =
+                it.prepareStatement("select $aktørIdKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne ASC")
+            val resultSet = statement.executeQuery()
+            return resultSet.map { it.getString(aktørIdKolonne) }
+        }
     }
-
     private fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
@@ -121,5 +126,17 @@ data class Kandidat(
 typealias AktøridHendelse = Pair<String, JsonMessage>
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
+
+
+internal fun <T> ResultSet.map(mapper: (ResultSet) -> T): List<T> {
+    return generateSequence {
+        if (this.next()) {
+            mapper(this)
+        } else {
+            null
+        }
+    }.toList()
+}
+
 
 
