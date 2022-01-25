@@ -71,7 +71,10 @@ class Repository(private val dataSource: DataSource) {
         if (resultSet.next())
             Kandidat.fraJson(resultSet.getString(1))
         else null
+    }
 
+    fun hentAlleAktørIder(): List<String> {
+        TODO("Implementer")
     }
 
     private fun kjørFlywayMigreringer() {
