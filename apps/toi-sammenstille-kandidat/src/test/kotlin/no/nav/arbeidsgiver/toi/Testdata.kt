@@ -1,3 +1,5 @@
+package no.nav.arbeidsgiver.toi
+
 fun veilederMelding(aktørId: String) = """
         {
             "@event_name": "veileder",

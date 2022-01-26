@@ -1,8 +1,7 @@
+package no.nav.arbeidsgiver.toi
+
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.arbeidsgiver.toi.Kandidat
-import no.nav.arbeidsgiver.toi.Repository
-import java.sql.Connection
 import java.sql.ResultSet
 import javax.sql.DataSource
 

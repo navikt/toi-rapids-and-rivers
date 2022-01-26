@@ -1,6 +1,6 @@
+package no.nav.arbeidsgiver.toi
+
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.arbeidsgiver.toi.Kandidat
-import no.nav.arbeidsgiver.toi.startApp
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
