@@ -42,7 +42,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sammenstill-oppfølgingsinfo'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/republisering'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

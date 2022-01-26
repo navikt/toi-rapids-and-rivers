@@ -74,14 +74,16 @@ class Repository(private val dataSource: DataSource) {
         else null
     }
 
-    fun hentAlleAktørIderSortert(): List<String> {
+    fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
         dataSource.connection.use {
-            val statement =
-                it.prepareStatement("select $aktørIdKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne ASC")
-            val resultSet = statement.executeQuery()
-            return resultSet.map { it.getString(aktørIdKolonne) }
-        }
+            it.prepareStatement("select * from ${sammenstiltkandidatTabell}")
+        }.executeQuery()
+            .foreachRowIndexed { resultSet, index ->
+                val kandidat = Kandidat.fraJson(resultSet.getString(1))
+                operasjon(kandidat, index)
+            }
     }
+
     private fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
@@ -129,16 +131,14 @@ typealias AktøridHendelse = Pair<String, JsonMessage>
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
 
+internal fun ResultSet.foreachRowIndexed(operation: (ResultSet, Int) -> Unit) {
+    var teller = 0
 
-internal fun <T> ResultSet.map(mapper: (ResultSet) -> T): List<T> {
-    return generateSequence {
+    generateSequence {
         if (this.next()) {
-            mapper(this)
-        } else {
-            null
+            operation(this, teller++)
         }
-    }.toList()
+    }
 }
-
 
 
