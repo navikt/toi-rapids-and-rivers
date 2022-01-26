@@ -76,7 +76,7 @@ class Repository(private val dataSource: DataSource) {
 
     fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
         dataSource.connection.use {
-            val statement = it.prepareStatement("select * from ${sammenstiltkandidatTabell}")
+            val statement = it.prepareStatement("select $kandidatKolonne from ${sammenstiltkandidatTabell}")
             val resultSet = statement.executeQuery()
 
             resultSet.foreachRowIndexed { resultSet, index ->
@@ -136,10 +136,8 @@ private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exc
 internal fun ResultSet.foreachRowIndexed(operation: (ResultSet, Int) -> Unit) {
     var teller = 0
 
-    generateSequence {
-        if (this.next()) {
-            operation(this, teller++)
-        }
+    while (this.next()) {
+        operation(this, teller++)
     }
 }
 
