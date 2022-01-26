@@ -36,7 +36,7 @@ class Republiserer(
         log.info("Skal republisere ${alleAktørIder.size} kandidater")
 
         alleAktørIder.forEachIndexed { index, aktørId ->
-            if (index > 0 && index % 100 == 0) {
+            if (index > 0 && index % 20000 == 0) {
                 log.info("Har republisert $index kandidater")
             }
 
