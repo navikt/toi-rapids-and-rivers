@@ -17,9 +17,14 @@ fun rapidMelding(
         {
           "@event_name": "cv.sammenstilt",
           "aktørId": "123",
+          "oppfolgingsinformasjon": {
+                "oppfolgingsenhet":"1234"
+          },
           "cv": {
             "meldingstype": "SLETT",
-            "oppfolgingsinformasjon": null,
+            "oppfolgingsinformasjon": {
+                "oppfolgingsenhet":"1234"
+            },
             "opprettCv": null,
             "endreCv": {
               "cv": {

@@ -3,10 +3,7 @@ package no.nav.arbeidsgiver.toi.kandidatfeed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
@@ -20,6 +17,7 @@ class UferdigKandidatLytter(
                 it.demandKey("aktørId")
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
+                it.requireKey("oppfolgingsinformasjon.oppfolgingsenhet")
                 it.rejectOnAll("@behov", behovsListe)
                 it.interestedIn("cv")
             }
@@ -31,6 +29,11 @@ class UferdigKandidatLytter(
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
         context.publish(aktørId, packet.toJson())
     }
+
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        log.error(problems.toString())
+    }
+
 }
 
 private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = interestedIn(key) { node ->
