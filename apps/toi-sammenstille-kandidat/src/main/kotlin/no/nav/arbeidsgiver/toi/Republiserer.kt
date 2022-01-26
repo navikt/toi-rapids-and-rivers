@@ -1,6 +1,10 @@
 package no.nav.arbeidsgiver.toi
 
 import io.javalin.Javalin
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 class Republiserer(
@@ -18,7 +22,11 @@ class Republiserer(
                 it.status(401)
             } else {
                 it.status(200)
-                republiserKandidater()
+                runBlocking {
+                    launch {
+                        republiserKandidater()
+                    }
+                }
             }
         }
     }
