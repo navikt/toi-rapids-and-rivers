@@ -2,9 +2,6 @@ package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -79,7 +76,7 @@ class Repository(private val dataSource: DataSource) {
             val statement = it.prepareStatement("select $aktørIdKolonne from ${sammenstiltkandidatTabell}")
             val resultSet = statement.executeQuery()
 
-            resultSet.foreachRowIndexed { resultSet, index ->
+            resultSet.forEachRowIndexed { resultSet, index ->
                 val aktørId = resultSet.getString(1)
                 val kandidat = hentKandidat(aktørId) ?: throw RuntimeException("Kandidat med aktørId $aktørId har forsvunnet fra databasen")
                 operasjon(kandidat, index)
@@ -134,7 +131,7 @@ typealias AktøridHendelse = Pair<String, JsonMessage>
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
 
-internal fun ResultSet.foreachRowIndexed(operation: (ResultSet, Int) -> Unit) {
+internal fun ResultSet.forEachRowIndexed(operation: (ResultSet, Int) -> Unit) {
     var teller = 0
 
     while (this.next()) {
