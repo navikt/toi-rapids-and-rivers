@@ -14,6 +14,7 @@ class Republiserer(
             val body = it.bodyAsClass(RepubliseringBody::class.java)
 
             if (body.passord != passord) {
+                log.warn("Mottok forsøk på å republisere kandidater uten riktig passord")
                 it.status(401)
             } else {
                 it.status(200)
