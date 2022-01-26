@@ -4,13 +4,12 @@ import io.javalin.Javalin
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 class Republiserer(
-    private val passord: String,
     private val repository: Repository,
-    private val rapidsConnection: RapidsConnection
+    private val rapidsConnection: RapidsConnection,
+    javalin: Javalin,
+    private val passord: String,
 ) {
     init {
-        val javalin = Javalin.create().start(9031)
-
         javalin.post("republiserKandidater") {
             val body = it.bodyAsClass(RepubliseringBody::class.java)
 
@@ -28,7 +27,7 @@ class Republiserer(
         log.info("Skal republisere ${alleAktørIder.size} kandidater")
 
         alleAktørIder.forEachIndexed { index, aktørId ->
-            if (index % 100 == 0) {
+            if (index > 0 && index % 100 == 0) {
                 log.info("Har republisert $index kandidater")
             }
 
