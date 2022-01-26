@@ -1,3 +1,2 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-organisasjonsenhet-rapidconsumer-1
-norg2_url: https://api-gw-q1.oera.no/norg2/api/v1/enhet/
