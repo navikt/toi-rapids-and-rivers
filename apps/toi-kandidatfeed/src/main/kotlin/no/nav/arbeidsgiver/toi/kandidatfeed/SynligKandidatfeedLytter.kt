@@ -29,13 +29,13 @@ class SynligKandidatfeedLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
 
-        val objectNode = jacksonObjectMapper().readTree(packet.toJson()) as ObjectNode
-
-        flyttOrganisasjonsenhetsnavn(objectNode)
+        var objectNode = konverterTilObjectNode(packet)
+            .apply {
+                flyttOrganisasjonsenhetsnavn(this)
+                fjernMetadataOgKonverter()
+            }
 
         val aktørId = objectNode["aktørId"].asText()
-       objectNode.fjernMetadataOgKonverter()
-
         val melding = ProducerRecord(topicName, aktørId, objectNode.toString())
 
         producer.send(melding) { _, exception ->
@@ -46,6 +46,9 @@ class SynligKandidatfeedLytter(
             }
         }
     }
+
+    private fun konverterTilObjectNode(packet: JsonMessage) =
+        jacksonObjectMapper().readTree(packet.toJson()) as ObjectNode
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
         log.error(problems.toString())
