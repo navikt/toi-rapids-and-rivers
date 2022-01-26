@@ -20,7 +20,7 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
 
         packet["organisasjonsenhetsnavn"] =
-            organisasjonsMap[enhetsnummer] ?: throw RuntimeException("Mangler mapping for enhet $enhetsnummer")
+            organisasjonsMap[enhetsnummer] ?: throw Exception("Mangler mapping for enhet $enhetsnummer")
 
         publish(packet.toJson())
     }

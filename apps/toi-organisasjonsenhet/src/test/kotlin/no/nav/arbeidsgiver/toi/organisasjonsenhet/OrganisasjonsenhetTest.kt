@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class OrganisasjonsenhetTest {
 
@@ -11,7 +12,7 @@ class OrganisasjonsenhetTest {
     @Test
     fun `legg på et eller annet svar om første behov er organisasjonsenhetsnavn`() {
         val testRapid = TestRapid()
-        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+        startApp(organisasjonsMap, testRapid)
 
         testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]"""))
 
@@ -23,7 +24,7 @@ class OrganisasjonsenhetTest {
     @Test
     fun `ikke legg på svar om andre behov enn organisasjonsenhetsnavn som ikke er løst`() {
         val testRapid = TestRapid()
-        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+        startApp(organisasjonsMap, testRapid)
 
         testRapid.sendTestMessage(behovsMelding(behovListe = """["noeannet", "organisasjonsenhetsnavn"]"""))
 
@@ -35,7 +36,7 @@ class OrganisasjonsenhetTest {
     @Test
     fun `legg på svar om behov nummer 2 er organisasjonsenhet, dersom første behov har en løsning`() {
         val testRapid = TestRapid()
-        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+        startApp(organisasjonsMap, testRapid)
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -55,7 +56,7 @@ class OrganisasjonsenhetTest {
     @Test
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()
-        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+        startApp(organisasjonsMap, testRapid)
 
         testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
 
@@ -67,7 +68,7 @@ class OrganisasjonsenhetTest {
      @Test
      fun `ikke legg på svar om svar allerede er lagt på`() {
          val testRapid = TestRapid()
-         OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+         startApp(organisasjonsMap, testRapid)
 
          testRapid.sendTestMessage(
              behovsMelding(
@@ -84,7 +85,7 @@ class OrganisasjonsenhetTest {
     @Test
     fun `Legg til korrekt NAV-kontor-navn på populert melding`() {
         val testRapid = TestRapid()
-        OrganisasjonsenhetLytter(organisasjonsMap, testRapid)
+        startApp(organisasjonsMap, testRapid)
 
         testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]"""))
 
@@ -95,15 +96,21 @@ class OrganisasjonsenhetTest {
         Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
     }
 
-    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList()): String {
-        return """
-            {
-                "@behov":$behovListe,
-                "oppfølgingsinformasjon": {
-                    "oppfolgingsenhet": "0002"
-                }
-                ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
-            }
-        """.trimIndent()
+    @Test
+    fun `Om mapping ikke finnes skal app crashes`() {
+        val testRapid = TestRapid()
+        startApp(organisasjonsMap, testRapid)
+
+        assertThrows<Exception> { testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]""",enhetsNr="ikke-eksisterende")) }
     }
+
+    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList(), enhetsNr: String = "0002") = """
+        {
+            "@behov":$behovListe,
+            "oppfølgingsinformasjon": {
+                "oppfolgingsenhet": "$enhetsNr"
+            }
+            ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
+        }
+    """.trimIndent()
 }
