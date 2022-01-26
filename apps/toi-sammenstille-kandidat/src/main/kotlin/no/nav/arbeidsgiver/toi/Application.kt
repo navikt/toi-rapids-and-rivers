@@ -11,6 +11,9 @@ fun startApp(
     rapidsConnection: RapidsConnection
 ) {
     try {
+        val passordForRepublisering = System.getenv("PASSORD_FOR_REPUBLISERING") ?:
+            throw Exception("PASSORD_FOR_REPUBLISERING kunne ikke hentes fra kubernetes secrets")
+
         rapidsConnection.also { rapid ->
             val repository = Repository(datasource)
 
@@ -21,6 +24,8 @@ fun startApp(
             Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
             Lytter(rapid, repository, "hjemmel")
             Lytter(rapid, repository, "må-behandle-tidligere-cv","måBehandleTidligereCv")
+
+            Republiserer(passordForRepublisering, repository, rapidsConnection)
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)

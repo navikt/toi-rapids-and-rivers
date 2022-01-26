@@ -37,6 +37,8 @@ spec:
   azure:
     application:
       enabled: true
+  envFrom:
+    - secret: passord-for-republisering
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
