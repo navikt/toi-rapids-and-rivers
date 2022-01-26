@@ -6,8 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main-endre-for-deploy
     paths:
     - apps/toi-organisasjonsenhet/**
     - .github/workflows/deploy-toi-organisasjonsenhet.yaml
