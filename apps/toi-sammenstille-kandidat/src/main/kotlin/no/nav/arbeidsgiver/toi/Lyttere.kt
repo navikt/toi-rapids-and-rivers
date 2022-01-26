@@ -27,7 +27,7 @@ class Lytter(
         val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
         repository.lagreKandidat(oppdatertKandidat)
 
-        val nyPakke = JsonMessage(oppdatertKandidat.somJsonUtenNullFelt(), MessageProblems(""))
+        val nyPakke = oppdatertKandidat.somJsonMessage()
         nyPakke["@event_name"] = packet["@event_name"].asText() + ".sammenstilt"
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]

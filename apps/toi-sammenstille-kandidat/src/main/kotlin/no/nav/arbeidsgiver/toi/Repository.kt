@@ -115,10 +115,12 @@ data class Kandidat(
         )
     }
 
-    fun somJsonUtenNullFelt(): String {
+    private fun somJsonUtenNullFelt(): String {
         val objectMapper = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
         return objectMapper.writeValueAsString(this)
     }
+
+    fun somJsonMessage() = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""))
 
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)
 }

@@ -17,7 +17,7 @@ class Rekjoring(private val repository: Repository, private val rapidsConnection
 
             val kandidat = repository.hentKandidat(aktørId)
                 ?: throw RuntimeException("Kandidat med aktørId $aktørId har forsvunnet fra databasen")
-            val pakke = JsonMessage(kandidat.somJsonUtenNullFelt(), MessageProblems(""))
+            val pakke = kandidat.somJsonMessage()
             pakke["@event_name"] = "rekjøring.sammenstilt"
 
             rapidsConnection.publish(aktørId, pakke.toJson())
