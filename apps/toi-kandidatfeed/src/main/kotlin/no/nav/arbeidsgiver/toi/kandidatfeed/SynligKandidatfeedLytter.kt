@@ -29,12 +29,14 @@ class SynligKandidatfeedLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
 
-         val flyttet = flyttOrganisasjonsenhetsnavn(packet)
+        val objectNode = jacksonObjectMapper().readTree(packet.toJson()) as ObjectNode
 
-        val aktørId = flyttet["aktørId"].asText()
-        val packetUtenMetadata = flyttet.fjernMetadataOgKonverter()
+        flyttOrganisasjonsenhetsnavn(objectNode)
 
-        val melding = ProducerRecord(topicName, aktørId, packetUtenMetadata.toString())
+        val aktørId = objectNode["aktørId"].asText()
+       objectNode.fjernMetadataOgKonverter()
+
+        val melding = ProducerRecord(topicName, aktørId, objectNode.toString())
 
         producer.send(melding) { _, exception ->
             if (exception == null) {
@@ -49,18 +51,15 @@ class SynligKandidatfeedLytter(
         log.error(problems.toString())
     }
 
-    private fun flyttOrganisasjonsenhetsnavn(packet: JsonMessage): ObjectNode {
+    private fun flyttOrganisasjonsenhetsnavn(packet: ObjectNode) {
         (packet["oppfolgingsinformasjon"] as ObjectNode)
             .set<JsonNode>("organisasjonsenhetsnavn", packet["organisasjonsenhetsnavn"])
 
-        val nynode = jacksonObjectMapper().readTree(packet.toJson()) as ObjectNode
-        nynode.remove("organisasjonsenhetsnavn")
-
-        return nynode
+        packet.remove("organisasjonsenhetsnavn")
     }
 
-    private fun ObjectNode.fjernMetadataOgKonverter(): ObjectNode {
+    private fun ObjectNode.fjernMetadataOgKonverter() {
         val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        return this.remove(metadataFelter)
+        this.remove(metadataFelter)
     }
 }
