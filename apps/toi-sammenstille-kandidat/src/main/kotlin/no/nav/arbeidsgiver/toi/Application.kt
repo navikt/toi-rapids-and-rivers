@@ -24,7 +24,7 @@ fun startApp(
             Lytter(rapid, repository, "hjemmel")
             Lytter(rapid, repository, "må-behandle-tidligere-cv","måBehandleTidligereCv")
 
-            val javalin = Javalin.create().start(9031)
+            val javalin = Javalin.create().start(9000)
             Republiserer(repository, rapidsConnection, javalin, passordForRepublisering)
         }.start()
     } catch (t: Throwable) {

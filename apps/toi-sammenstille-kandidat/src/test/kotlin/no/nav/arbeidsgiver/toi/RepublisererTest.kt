@@ -18,7 +18,7 @@ class RepublisererTest {
     @BeforeEach
     fun before() {
         modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
-        javalin = Javalin.create().start(9000)
+        javalin = Javalin.create().start(9001)
     }
 
     @AfterEach
@@ -36,7 +36,7 @@ class RepublisererTest {
         val lagredeKandidater = lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
 
-        val response = Fuel.post("http://localhost:9000/republiserKandidater")
+        val response = Fuel.post("http://localhost:9001/republiserKandidater")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
         assertThat(response.statusCode).isEqualTo(200)
@@ -60,7 +60,7 @@ class RepublisererTest {
         val feilPassord = "jalla"
         val body = Republiserer.RepubliseringBody(passord = feilPassord)
 
-        val response = Fuel.post("http://localhost:9000/republiserKandidater")
+        val response = Fuel.post("http://localhost:9001/republiserKandidater")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
         assertThat(response.statusCode).isEqualTo(401)
