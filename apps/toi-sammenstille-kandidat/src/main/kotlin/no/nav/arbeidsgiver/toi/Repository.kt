@@ -76,12 +76,14 @@ class Repository(private val dataSource: DataSource) {
 
     fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
         dataSource.connection.use {
-            it.prepareStatement("select * from ${sammenstiltkandidatTabell}")
-        }.executeQuery()
-            .foreachRowIndexed { resultSet, index ->
+            val statement = it.prepareStatement("select * from ${sammenstiltkandidatTabell}")
+            val resultSet = statement.executeQuery()
+
+            resultSet.foreachRowIndexed { resultSet, index ->
                 val kandidat = Kandidat.fraJson(resultSet.getString(1))
                 operasjon(kandidat, index)
             }
+        }
     }
 
     private fun kjørFlywayMigreringer() {
