@@ -14,7 +14,9 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
-    testImplementation("com.h2database:h2:$h2Version")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.javalin:javalin:4.1.1")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
+    testImplementation("com.github.kittinunf.fuel:fuel:2.2.3")
+    testImplementation("com.h2database:h2:$h2Version")
 }

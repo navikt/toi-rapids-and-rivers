@@ -1,12 +1,26 @@
 package no.nav.arbeidsgiver.toi
 
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
+import io.javalin.Javalin
 import no.nav.helse.rapids_rivers.RapidsConnection
 
-class Rekjoring(private val repository: Repository, private val rapidsConnection: RapidsConnection) {
+class KandidatRekjorer(private val rekjøringspassord: String, private val repository: Repository, private val rapidsConnection: RapidsConnection) {
 
-    fun rekjør() {
+    init {
+        val javalin = Javalin.create().start(9031)
+
+        javalin.post("republiser-kandidater") {
+            val body = it.bodyAsClass(RekjøringBody::class.java)
+
+            if (body.passord != rekjøringspassord) {
+                it.status(401)
+            } else {
+                it.status(200)
+                rekjørKandidater()
+            }
+        }
+    }
+
+    private fun rekjørKandidater() {
         val alleAktørIder = repository.hentAlleAktørIderSortert()
         log.info("Skal rekjøre ${alleAktørIder.size} kandidater")
 
@@ -24,4 +38,8 @@ class Rekjoring(private val repository: Repository, private val rapidsConnection
         }
         log.info("Ferdig med rekjøring av kandidatene")
     }
+
+    data class RekjøringBody(
+        val passord: String
+    )
 }
