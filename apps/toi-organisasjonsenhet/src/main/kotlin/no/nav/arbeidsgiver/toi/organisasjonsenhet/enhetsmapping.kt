@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
+// Kan oppdateres med å hente ut norg respons i browser console og kjøre
+// const res = svarfranorg.map(_ => `"${_.enhetNr}"  to  "${_.navn}"`).join(',')
+
 fun enhetsmapping() = mapOf(
     "0000" to "Andre",
     "0001" to "NAV Pensjon Utland",
