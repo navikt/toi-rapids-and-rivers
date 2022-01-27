@@ -80,7 +80,7 @@ class Repository(private val dataSource: DataSource) {
             do {
                 antallKandidater = 0
 
-                val statement = it.prepareStatement("select $kandidatKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne limit $pageSize offset $offset")
+                val statement = it.prepareStatement("select $kandidatKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne ASC limit $pageSize offset $offset")
                 val resultSet = statement.executeQuery()
 
                 resultSet.forEachRowIndexed { resultSetRow, index ->
