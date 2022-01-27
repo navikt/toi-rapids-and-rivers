@@ -30,7 +30,7 @@ class Republiserer(
     }
 
     private fun republiserKandidater() {
-        onRepubliseringStartet()
+//        onRepubliseringStartet()
         log.info("Skal republisere alle kandidater")
 
         repository.gjørOperasjonPåAlleKandidaterIndexed { kandidat, index ->
@@ -44,7 +44,7 @@ class Republiserer(
         }
 
         log.info("Ferdig med republisering av kandidatene")
-        onRepubliseringFerdig()
+//        onRepubliseringFerdig()
     }
 
     data class RepubliseringBody(

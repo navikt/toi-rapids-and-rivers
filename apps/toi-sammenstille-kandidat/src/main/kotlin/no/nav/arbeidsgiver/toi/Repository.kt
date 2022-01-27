@@ -72,7 +72,7 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
-        val pageSize = 100
+        val pageSize = 10
         var antallKandidater: Int
         var offset = 0
 
