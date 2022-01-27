@@ -34,8 +34,7 @@ fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, 
         rapid,
         javalin,
         passordForRepublisering,
-        { rapid.stop() },
-        { rapid.start() })
+    )
 
     startRapid(rapid, repository)
 }

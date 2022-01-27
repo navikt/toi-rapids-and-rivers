@@ -72,28 +72,17 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
-        val pageSize = 100
-        var antallKandidater: Int
-        var offset = 0
+        dataSource.connection.use { it ->
+            val statement = it.prepareStatement("select $aktørIdKolonne from $sammenstiltkandidatTabell", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).also { stmt ->
+                stmt.fetchSize = 1
+            }
+            val resultSet = statement.executeQuery()
 
-        dataSource.connection.use {
-            do {
-                antallKandidater = 0
-
-                val statement = it.prepareStatement("select $kandidatKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne limit $pageSize offset $offset")
-                val resultSet = statement.executeQuery()
-
-                resultSet.forEachRowIndexed { resultSetRow, index ->
-                    val kandidat = Kandidat.fraJson(resultSetRow.getString(1))
-                    operasjon(kandidat, index)
-
-                    if (resultSetRow.isLast) {
-                        antallKandidater = index + 1
-                    }
-                }
-
-                offset += antallKandidater
-            } while (antallKandidater == pageSize)
+            resultSet.forEachRowIndexed { resultSetRow, index ->
+                val aktørId = resultSetRow.getString(1)
+                val kandidat = hentKandidat(aktørId) ?: throw RuntimeException("Kandidat med aktørId $aktørId har forsvunnet fra databasen")
+                operasjon(kandidat, index)
+            }
         }
     }
 

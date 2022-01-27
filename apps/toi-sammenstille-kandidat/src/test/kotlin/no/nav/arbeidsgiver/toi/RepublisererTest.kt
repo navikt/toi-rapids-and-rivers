@@ -53,55 +53,21 @@ class RepublisererTest {
     @Test
     fun `Kall til republiseringsendepunkt skal fungere for flere hundre kandidater`() {
         val testRapid = TestRapid()
-        val repository = Repository(TestDatabase().dataSource)
+        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
+
         val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
 
-        startRapid(testRapid, repository)
+        val body = Republiserer.RepubliseringBody(passord = riktigPassord)
+        val response = Fuel.post("http://localhost:9000/republiserKandidater")
+            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+        assertThat(response.statusCode).isEqualTo(200)
 
-        val onRepubliseringStartet: () -> Unit = {
-            val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-            val response = Fuel.post("http://localhost:9000/republiserKandidater")
-                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+        Thread.sleep(2000)
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
-            assertThat(response.statusCode).isEqualTo(200)
-        }
-
-        val onRepubliseringFerdig: () -> Unit = {
-            val inspektør = testRapid.inspektør
-            assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
-
-            val aktørIderPåRapid = List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
-            assertThat(lagredeKandidater).containsExactlyInAnyOrder(*aktørIderPåRapid.toTypedArray())
-        }
-
-        Republiserer(repository, testRapid, javalin, riktigPassord, onRepubliseringStartet, onRepubliseringFerdig)
-    }
-
-    @Test
-    fun `Kall til republiseringsendepunkt skal fungere med akkurat 300 kandidater`() {
-        val testRapid = TestRapid()
-        val repository = Repository(TestDatabase().dataSource)
-        val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 300)
-
-        startRapid(testRapid, repository)
-
-        val onRepubliseringStartet: () -> Unit = {
-            val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-            val response = Fuel.post("http://localhost:9000/republiserKandidater")
-                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
-
-            assertThat(response.statusCode).isEqualTo(200)
-        }
-
-        val onRepubliseringFerdig: () -> Unit = {
-            val inspektør = testRapid.inspektør
-            assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
-
-            val aktørIderPåRapid = List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
-            assertThat(lagredeKandidater).containsExactlyInAnyOrder(*aktørIderPåRapid.toTypedArray())
-        }
-
-        Republiserer(repository, testRapid, javalin, riktigPassord, onRepubliseringStartet, onRepubliseringFerdig)
+        val aktørIderPåRapid = List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
+        assertThat(lagredeKandidater).containsExactlyInAnyOrder(*aktørIderPåRapid.toTypedArray())
     }
 
     @Test
@@ -120,41 +86,6 @@ class RepublisererTest {
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(0)
-    }
-
-    @Test
-    fun `Kall til republiseringsendepunkt skal stoppe rapid og starte den igjen når republisering er ferdig`() {
-        val testRapid = TestRapid()
-        val repository = Repository(testDatabase.dataSource)
-        lagre3KandidaterTilDatabasen(repository)
-
-        startRapid(testRapid, repository)
-
-        val stoppRapidOgSendTestmeldinger: () -> Unit = {
-            testRapid.stop()
-            val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-            val response = Fuel.post("http://localhost:9000/republiserKandidater")
-                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
-
-            assertThat(response.statusCode).isEqualTo(200)
-            assertThat(testRapid.inspektør.size).isEqualTo(0)
-        }
-
-        val startRapid: () -> Unit = {
-            testRapid.start()
-            testRapid.sendTestMessage(veilederMelding("111"))
-
-            assertThat(testRapid.inspektør.size).isEqualTo(4)
-        }
-
-        Republiserer(
-            repository,
-            testRapid,
-            javalin,
-            riktigPassord,
-            stoppRapidOgSendTestmeldinger,
-            startRapid
-        )
     }
 
     private fun lagre3KandidaterTilDatabasen(repository: Repository) =

@@ -9,9 +9,7 @@ class Republiserer(
     private val repository: Repository,
     private val rapidsConnection: RapidsConnection,
     javalin: Javalin,
-    private val passord: String,
-    private val onRepubliseringStartet: () -> Unit,
-    private val onRepubliseringFerdig: () -> Unit
+    private val passord: String
 ) {
     init {
         javalin.post("republiserKandidater") {
@@ -30,7 +28,6 @@ class Republiserer(
     }
 
     private fun republiserKandidater() {
-        onRepubliseringStartet()
         log.info("Skal republisere alle kandidater")
 
         repository.gjørOperasjonPåAlleKandidaterIndexed { kandidat, index ->
@@ -44,7 +41,6 @@ class Republiserer(
         }
 
         log.info("Ferdig med republisering av kandidatene")
-        onRepubliseringFerdig()
     }
 
     data class RepubliseringBody(
