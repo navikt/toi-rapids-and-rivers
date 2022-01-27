@@ -12,21 +12,17 @@ import org.junit.jupiter.api.*
 class RepublisererTest {
     private val riktigPassord = "passord"
     private val testDatabase = TestDatabase()
-    private val repository = Repository(testDatabase.dataSource)
     private lateinit var javalin: Javalin
 
     @BeforeEach
     fun before() {
         modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
-
-        if (this::javalin.isInitialized) {
-            javalin.stop()
-        }
         javalin = Javalin.create().start(9000)
     }
 
     @AfterEach
     fun after() {
+        javalin.stop()
         testDatabase.slettAlt()
     }
 
@@ -38,7 +34,7 @@ class RepublisererTest {
         val lagredeKandidater = lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
 
-        val response = Fuel.post("http://localhost:9001/republiserKandidater")
+        val response = Fuel.post("http://localhost:9000/republiserKandidater")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
         assertThat(response.statusCode).isEqualTo(200)
@@ -61,8 +57,7 @@ class RepublisererTest {
 
         val feilPassord = "jalla"
         val body = Republiserer.RepubliseringBody(passord = feilPassord)
-
-        val response = Fuel.post("http://localhost:9001/republiserKandidater")
+        val response = Fuel.post("http://localhost:9000/republiserKandidater")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
         assertThat(response.statusCode).isEqualTo(401)
@@ -75,23 +70,35 @@ class RepublisererTest {
     fun `Kall til republiseringsendepunkt skal stoppe rapid og starte den igjen når republisering er ferdig`() {
         val testRapid = TestRapid()
         val repository = Repository(testDatabase.dataSource)
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         lagre3KandidaterTilDatabasen(repository)
 
-        val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-        val response = Fuel.post("http://localhost:9002/republiserKandidater")
-            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
-        assertThat(response.statusCode).isEqualTo(200)
+        startRapid(testRapid, repository)
 
-        testRapid.sendTestMessage(veilederMelding("111"))
-        assertThat(testRapid.inspektør.size).isEqualTo(0)
+        val stoppRapidOgSendTestmeldinger: () -> Unit = {
+            testRapid.stop()
+            val body = Republiserer.RepubliseringBody(passord = riktigPassord)
+            val response = Fuel.post("http://localhost:9000/republiserKandidater")
+                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
-        // Jobben er ferdig
+            assertThat(response.statusCode).isEqualTo(200)
+            assertThat(testRapid.inspektør.size).isEqualTo(0)
+        }
 
+        val startRapid: () -> Unit = {
+            testRapid.start()
+            testRapid.sendTestMessage(veilederMelding("111"))
 
+            assertThat(testRapid.inspektør.size).isEqualTo(4)
+        }
 
-
+        Republiserer(
+            repository,
+            testRapid,
+            javalin,
+            riktigPassord,
+            stoppRapidOgSendTestmeldinger,
+            startRapid
+        )
     }
 
     private fun lagre3KandidaterTilDatabasen(repository: Repository) =

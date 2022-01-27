@@ -13,7 +13,6 @@ fun startRapid(
 ) {
     try {
         rapidsConnection.also { rapid ->
-
             Lytter(rapid, repository, "cv")
             Lytter(rapid, repository, "veileder")
             Lytter(rapid, repository, "oppfølgingsinformasjon")
@@ -21,7 +20,6 @@ fun startRapid(
             Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
             Lytter(rapid, repository, "hjemmel")
             Lytter(rapid, repository, "må-behandle-tidligere-cv", "måBehandleTidligereCv")
-
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
@@ -29,7 +27,6 @@ fun startRapid(
 }
 
 fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, passordForRepublisering: String) {
-
     val repository = Repository(datasource)
     startRapid(rapid, repository)
 
@@ -57,4 +54,3 @@ fun rapidsConnection() = RapidApplication.create(System.getenv())
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
-

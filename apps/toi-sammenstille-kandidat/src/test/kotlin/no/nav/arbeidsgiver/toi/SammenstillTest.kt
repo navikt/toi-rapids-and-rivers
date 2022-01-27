@@ -26,17 +26,14 @@ class SammenstillTest {
         melding.fieldNames().asSequence().toList().filter { fieldName -> alleKandidatfelter.contains(fieldName) }
 
     @BeforeEach
-    fun setUp() {
+    fun before() {
         modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
-
-        if (this::javalin.isInitialized) {
-            javalin.stop()
-        }
         javalin = Javalin.create().start(9000)
     }
 
     @AfterEach
-    fun slettDatabase() {
+    fun after() {
+        javalin.stop()
         TestDatabase().slettAlt()
     }
 
