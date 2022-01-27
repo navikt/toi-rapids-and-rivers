@@ -73,11 +73,11 @@ class Repository(private val dataSource: DataSource) {
 
     fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
         val pageSize = 100
-        var antallKandidater = 100
+        var antallKandidater: Int
         var offset = 0
 
         dataSource.connection.use {
-            while (antallKandidater == pageSize) {
+            do {
                 antallKandidater = 0
 
                 val statement = it.prepareStatement("select $kandidatKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne limit $pageSize offset $offset")
@@ -93,7 +93,7 @@ class Repository(private val dataSource: DataSource) {
                 }
 
                 offset += antallKandidater
-            }
+            } while (antallKandidater == pageSize)
         }
     }
 
