@@ -41,6 +41,7 @@ class RepublisererTest {
 
         assertThat(response.statusCode).isEqualTo(200)
 
+        Thread.sleep(200) // Pga. asynkron håndtering av republisering
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
