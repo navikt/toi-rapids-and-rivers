@@ -29,9 +29,9 @@ class SynligKandidatfeedLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
 
-        var objectNode = konverterTilObjectNode(packet)
+        val objectNode = konverterTilObjectNode(packet)
             .apply {
-                flyttOrganisasjonsenhetsnavn(this)
+                flyttOrganisasjonsenhetsnavn()
                 fjernMetadataOgKonverter()
             }
 
@@ -54,11 +54,11 @@ class SynligKandidatfeedLytter(
         log.error(problems.toString())
     }
 
-    private fun flyttOrganisasjonsenhetsnavn(packet: ObjectNode) {
-        (packet["oppfolgingsinformasjon"] as ObjectNode)
-            .set<JsonNode>("organisasjonsenhetsnavn", packet["organisasjonsenhetsnavn"])
+    private fun ObjectNode.flyttOrganisasjonsenhetsnavn() {
+        (this["oppfolgingsinformasjon"] as ObjectNode)
+            .set<JsonNode>("organisasjonsenhetsnavn", this["organisasjonsenhetsnavn"])
 
-        packet.remove("organisasjonsenhetsnavn")
+        this.remove("organisasjonsenhetsnavn")
     }
 
     private fun ObjectNode.fjernMetadataOgKonverter() {
