@@ -2,9 +2,6 @@ package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -74,14 +71,19 @@ class Repository(private val dataSource: DataSource) {
         else null
     }
 
-    fun hentAlleAktørIderSortert(): List<String> {
+    fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
         dataSource.connection.use {
-            val statement =
-                it.prepareStatement("select $aktørIdKolonne from $sammenstiltkandidatTabell order by $aktørIdKolonne ASC")
+            val statement = it.prepareStatement("select $aktørIdKolonne from $sammenstiltkandidatTabell")
             val resultSet = statement.executeQuery()
-            return resultSet.map { it.getString(aktørIdKolonne) }
+
+            resultSet.forEachRowIndexed { resultSetRow, index ->
+                val aktørId = resultSetRow.getString(1)
+                val kandidat = hentKandidat(aktørId) ?: throw RuntimeException("Kandidat med aktørId $aktørId har forsvunnet fra databasen")
+                operasjon(kandidat, index)
+            }
         }
     }
+
     private fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
@@ -129,16 +131,12 @@ typealias AktøridHendelse = Pair<String, JsonMessage>
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
 
+private fun ResultSet.forEachRowIndexed(operation: (ResultSet, Int) -> Unit) {
+    var teller = 0
 
-internal fun <T> ResultSet.map(mapper: (ResultSet) -> T): List<T> {
-    return generateSequence {
-        if (this.next()) {
-            mapper(this)
-        } else {
-            null
-        }
-    }.toList()
+    while (this.next()) {
+        operation(this, teller++)
+    }
 }
-
 
 
