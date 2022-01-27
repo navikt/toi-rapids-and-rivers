@@ -14,7 +14,7 @@ class Republiserer(
     private val onRepubliseringFerdig: () -> Unit
 ) {
     init {
-        javalin.post("/republiserKandidater") {
+        javalin.post("republiserKandidater") {
             val body = it.bodyAsClass(RepubliseringBody::class.java)
 
             if (body.passord != passord) {
