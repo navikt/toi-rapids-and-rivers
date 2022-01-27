@@ -28,7 +28,6 @@ fun startRapid(
 
 fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, passordForRepublisering: String) {
     val repository = Repository(datasource)
-    startRapid(rapid, repository)
 
     Republiserer(
         repository,
@@ -37,6 +36,8 @@ fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, 
         passordForRepublisering,
         { rapid.stop() },
         { rapid.start() })
+
+    startRapid(rapid, repository)
 }
 
 fun main() {
