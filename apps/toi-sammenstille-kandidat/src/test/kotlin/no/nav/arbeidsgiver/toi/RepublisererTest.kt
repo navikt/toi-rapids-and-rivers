@@ -7,6 +7,8 @@ import io.javalin.Javalin
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
+import java.util.*
+import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RepublisererTest {
@@ -46,6 +48,60 @@ class RepublisererTest {
         lagredeKandidater.forEachIndexed { index, kandidat ->
             assertThat(Kandidat.fraJson(inspektør.message(index)).toJson()).isEqualTo(kandidat.toJson())
         }
+    }
+
+    @Test
+    fun `Kall til republiseringsendepunkt skal fungere for flere hundre kandidater`() {
+        val testRapid = TestRapid()
+        val repository = Repository(TestDatabase().dataSource)
+        val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
+
+        startRapid(testRapid, repository)
+
+        val onRepubliseringStartet: () -> Unit = {
+            val body = Republiserer.RepubliseringBody(passord = riktigPassord)
+            val response = Fuel.post("http://localhost:9000/republiserKandidater")
+                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+
+            assertThat(response.statusCode).isEqualTo(200)
+        }
+
+        val onRepubliseringFerdig: () -> Unit = {
+            val inspektør = testRapid.inspektør
+            assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
+
+            val aktørIderPåRapid = List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
+            assertThat(lagredeKandidater).containsExactlyInAnyOrder(*aktørIderPåRapid.toTypedArray())
+        }
+
+        Republiserer(repository, testRapid, javalin, riktigPassord, onRepubliseringStartet, onRepubliseringFerdig)
+    }
+
+    @Test
+    fun `Kall til republiseringsendepunkt skal fungere med akkurat 300 kandidater`() {
+        val testRapid = TestRapid()
+        val repository = Repository(TestDatabase().dataSource)
+        val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 300)
+
+        startRapid(testRapid, repository)
+
+        val onRepubliseringStartet: () -> Unit = {
+            val body = Republiserer.RepubliseringBody(passord = riktigPassord)
+            val response = Fuel.post("http://localhost:9000/republiserKandidater")
+                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+
+            assertThat(response.statusCode).isEqualTo(200)
+        }
+
+        val onRepubliseringFerdig: () -> Unit = {
+            val inspektør = testRapid.inspektør
+            assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
+
+            val aktørIderPåRapid = List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
+            assertThat(lagredeKandidater).containsExactlyInAnyOrder(*aktørIderPåRapid.toTypedArray())
+        }
+
+        Republiserer(repository, testRapid, javalin, riktigPassord, onRepubliseringStartet, onRepubliseringFerdig)
     }
 
     @Test
@@ -107,4 +163,15 @@ class RepublisererTest {
             repository.lagreKandidat(kandidat)
             kandidat
         }
+
+    private fun lagreNKandidaterTilDatabasen(repository: Repository, n: Int): List<String> {
+        var count = 0
+        return generateSequence { (count++).takeIf { it < n } }
+            .toList()
+            .map {
+                val kandidat = Kandidat.fraJson(cvMelding(it.toString()))
+                repository.lagreKandidat(kandidat)
+                kandidat.aktørId
+            }
+    }
 }
