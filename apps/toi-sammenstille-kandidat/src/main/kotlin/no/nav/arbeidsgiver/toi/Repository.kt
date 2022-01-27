@@ -73,7 +73,7 @@ class Repository(private val dataSource: DataSource) {
 
     fun gjørOperasjonPåAlleKandidaterIndexed(operasjon: (Kandidat, Int) -> Unit) {
         dataSource.connection.use {
-            val statement = it.prepareStatement("select $aktørIdKolonne from ${sammenstiltkandidatTabell}")
+            val statement = it.prepareStatement("select $aktørIdKolonne from $sammenstiltkandidatTabell")
             val resultSet = statement.executeQuery()
 
             resultSet.forEachRowIndexed { resultSetRow, index ->
