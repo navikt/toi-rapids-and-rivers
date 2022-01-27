@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
+import io.javalin.Javalin
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -20,12 +20,19 @@ class SammenstillTest {
         "måBehandleTidligereCv"
     )
 
+    private lateinit var javalin: Javalin
+
     private fun kunKandidatfelter(melding: JsonNode) =
         melding.fieldNames().asSequence().toList().filter { fieldName -> alleKandidatfelter.contains(fieldName) }
 
     @BeforeEach
     fun setUp() {
         modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
+
+        if (this::javalin.isInitialized) {
+            javalin.stop()
+        }
+        javalin = Javalin.create().start(9000)
     }
 
     @AfterEach
@@ -37,7 +44,7 @@ class SammenstillTest {
     fun `Når veileder og CV har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(cvMelding(aktørId))
 
@@ -73,7 +80,7 @@ class SammenstillTest {
     fun `Når cv og veileder har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
 
@@ -116,7 +123,7 @@ class SammenstillTest {
     fun `Når bare CV har blitt mottatt for kandidat skal ny melding publiseres på rapid uten veileder`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMelding(aktørId))
 
         val rapidInspektør = testRapid.inspektør
@@ -142,7 +149,7 @@ class SammenstillTest {
     fun `Når oppfølgingsinformasjon har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(oppfølgingsinformasjonMelding(aktørId))
 
         val rapidInspektør = testRapid.inspektør
@@ -177,7 +184,7 @@ class SammenstillTest {
     fun `Når oppfølgingsperiode har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(oppfølgingsperiodeMelding(aktørId))
 
         val rapidInspektør = testRapid.inspektør
@@ -201,7 +208,7 @@ class SammenstillTest {
         val aktørId = "123"
         val testRapid = TestRapid()
 
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(fritattKandidatsøkMelding(aktørId, true))
 
         val rapidInspektør = testRapid.inspektør
@@ -221,7 +228,7 @@ class SammenstillTest {
         val aktørId = "123"
         val testRapid = TestRapid()
 
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(hjemmelMelding(aktørId))
 
         val rapidInspektør = testRapid.inspektør
@@ -250,7 +257,7 @@ class SammenstillTest {
         val aktørId = "123"
         val testRapid = TestRapid()
 
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(måBehandleTidligereCvMelding(aktørId))
 
         val rapidInspektør = testRapid.inspektør
@@ -273,7 +280,8 @@ class SammenstillTest {
         val testRapid = TestRapid()
         val testDatabase = TestDatabase()
 
-        startApp(testDatabase.dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
+
         testRapid.sendTestMessage(måBehandleTidligereCvMelding(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
@@ -286,7 +294,7 @@ class SammenstillTest {
         val aktørId = "12141321"
         val testRapid = TestRapid()
         val testDatabase = TestDatabase()
-        startApp(testDatabase.dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(cvMelding(aktørId))
@@ -301,7 +309,7 @@ class SammenstillTest {
     @Test
     fun `Objekter inne i sammenstiltKandidat-melding skal ikke være stringified`() {
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(oppfølgingsinformasjonMelding("12141321"))
 
         val rapidInspektør = testRapid.inspektør
@@ -315,7 +323,7 @@ class SammenstillTest {
     @Test
     fun `Metadata fra opprinnelig melding skal ikke fjernes når sammenstilleren publiserer ny melding på rapid`() {
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
 
         val rapidInspektør = testRapid.inspektør
@@ -331,7 +339,7 @@ class SammenstillTest {
     @Test
     fun `Sammenstiller øker system_read_count med 1`() {
         val testRapid = TestRapid()
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
 
         val rapidInspektør = testRapid.inspektør
@@ -345,7 +353,7 @@ class SammenstillTest {
     fun `Sammenstiller legger til seg selv i system_participating_services`() {
         val testRapid = TestRapid()
 
-        startApp(TestDatabase().dataSource, testRapid, "dummy")
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
 
         val rapidInspektør = testRapid.inspektør
