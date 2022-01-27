@@ -10,9 +10,11 @@ class Republiserer(
     private val rapidsConnection: RapidsConnection,
     javalin: Javalin,
     private val passord: String,
+    private val onRepubliseringStartet: () -> Unit,
+    private val onRepubliseringFerdig: () -> Unit
 ) {
     init {
-        javalin.post("republiserKandidater") {
+        javalin.post("/republiserKandidater") {
             val body = it.bodyAsClass(RepubliseringBody::class.java)
 
             if (body.passord != passord) {
@@ -28,6 +30,7 @@ class Republiserer(
     }
 
     private fun republiserKandidater() {
+        onRepubliseringStartet()
         log.info("Skal republisere alle kandidater")
 
         repository.gjørOperasjonPåAlleKandidaterIndexed { kandidat, index ->
@@ -41,6 +44,7 @@ class Republiserer(
         }
 
         log.info("Ferdig med republisering av kandidatene")
+        onRepubliseringFerdig()
     }
 
     data class RepubliseringBody(
