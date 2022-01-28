@@ -1,19 +1,33 @@
 # Sammenstiller kandidatinformasjon
 
-## Henter ut cv og veilederinformasjon, lagrer i database, og legger sammenstillt kandidatinformasjon tilbake på rapid
+Henter ut cv og veilederinformasjon, lagrer i database, og legger sammenstillt kandidatinformasjon tilbake på rapid
 
-### Hvordan koble seg til MongoDB
-* List opp alle pod'er:
+# Republisering
 
-    kubectl get pods -n=toi
-* Gå inn en av mongodb-pod'ene:
-  
-    kubectl exec -it toi-sammenstille-kandidat-mongodb-0 /bin/bash -n=toi
+Passord for republisering hentes fra NAIS: `kubectl get secret passord-for-republisering -n toi -o jsonpath="{ .data['PASSORD_FOR_REPUBLISERING']}" | base64 -d`
 
-* Start MongoShell:
+### Republisering av alle kandidater
+Republisering for alle kandidater leser alle radene i databasetabellen og legger de som meldinger på rapid.
 
-    mongosh
+Gjør en POST-request til 
+ - dev: `https://toi-sammenstille-kandidat.dev.intern.nav.no/republiser`
+ - prod: `https://toi-sammenstille-kandidat.intern.nav.no/republiser`
+ 
+Med følgende body:
 
-* Se MongoShells dokumentasjon for kommandoer: https://docs.mongodb.com/mongodb-shell/run-commands/
+    {
+	  "passord": "<passord>"
+    }
 
+### Republisering av én kandidat
+Republisering av én kandidat henter den aktuelle kandidaten fra databasen og republiserer på rapid. Endepunktet gir 404 ved ugyldig aktørId.
 
+Gjør en POST-request til
+- dev: `https://toi-sammenstille-kandidat.dev.intern.nav.no/republiser/<aktørid>`
+- prod: `https://toi-sammenstille-kandidat.intern.nav.no/republiser/<aktørid>`
+
+Med følgende body:
+
+    {
+	  "passord": "<passord>"
+    }

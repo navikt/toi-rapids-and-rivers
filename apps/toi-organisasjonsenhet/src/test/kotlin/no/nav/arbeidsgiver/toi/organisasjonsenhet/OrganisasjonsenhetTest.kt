@@ -97,19 +97,23 @@ class OrganisasjonsenhetTest {
     }
 
     @Test
-    fun `Om mapping ikke finnes skal app crashes`() {
+    fun `Om mapping ikke finnes skal vi bruke tom streng`() {
         val testRapid = TestRapid()
-        startApp(organisasjonsMap, testRapid)
+        startApp(emptyMap(), testRapid)
 
-        assertThrows<Exception> { testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]""",enhetsNr="ikke-eksisterende")) }
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]"""))
+
+        val inspektør = testRapid.inspektør
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("")
     }
 
-    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList(), enhetsNr: String = "0002") = """
+    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList()) = """
         {
             "aktørId":"123",
             "@behov":$behovListe,
             "oppfølgingsinformasjon": {
-                "oppfolgingsenhet": "$enhetsNr"
+                "oppfolgingsenhet": "0002"
             }
             ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
         }

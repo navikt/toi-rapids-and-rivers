@@ -20,9 +20,13 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
         val aktørid: String = packet["aktørId"].asText()
 
-        packet["organisasjonsenhetsnavn"] =
-            organisasjonsMap[enhetsnummer] ?: throw Exception("Mangler mapping for enhet $enhetsnummer")
-
+        val orgnavn = organisasjonsMap[enhetsnummer]
+        if(orgnavn == null) {
+            log.error("Mangler mapping for enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
+            packet["organisasjonsenhetsnavn"] = ""
+        } else {
+            packet["organisasjonsenhetsnavn"] = orgnavn
+        }
         log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${organisasjonsMap[enhetsnummer]}")
 
         context.publish(aktørid, packet.toJson())
