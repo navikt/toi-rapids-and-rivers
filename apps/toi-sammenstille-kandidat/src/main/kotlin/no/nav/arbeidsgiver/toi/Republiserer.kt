@@ -45,6 +45,7 @@ class Republiserer(
         if (kandidat == null) {
             context.status(404)
         } else {
+            log.info("Skal republisere $aktørId")
             val pakke = lagPakke(kandidat)
             rapidsConnection.publish(aktørId, pakke.toJson())
             context.status(200)
