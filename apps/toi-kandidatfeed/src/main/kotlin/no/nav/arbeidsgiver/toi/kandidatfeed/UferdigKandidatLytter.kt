@@ -39,6 +39,8 @@ class UferdigKandidatLytter(
 
 private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = interestedIn(key) { node ->
     if (!node.isMissingNode && node.isArray && node.map(JsonNode::asText).containsAll(values)) {
-        throw Exception("Behovene finnes allerede i meldingen")
+        demand(key) {
+            throw Exception("Behovene finnes allerede i meldingen")
+        }
     }
 }
