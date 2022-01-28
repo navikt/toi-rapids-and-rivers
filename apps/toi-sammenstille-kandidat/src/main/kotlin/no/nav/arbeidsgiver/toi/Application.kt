@@ -13,6 +13,12 @@ fun startRapid(
 ) {
     try {
         rapidsConnection.also { rapid ->
+            rapid.register(object: RapidsConnection.StatusListener {
+                override fun onStartup(rapidsConnection: RapidsConnection) {
+                    repository.kjørFlywayMigreringer()
+                }
+            })
+
             Lytter(rapid, repository, "cv")
             Lytter(rapid, repository, "veileder")
             Lytter(rapid, repository, "oppfølgingsinformasjon")

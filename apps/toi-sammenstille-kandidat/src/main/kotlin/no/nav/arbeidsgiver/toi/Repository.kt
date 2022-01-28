@@ -37,10 +37,6 @@ class Repository(private val dataSource: DataSource) {
     private val kandidatKolonne = "kandidat"
     private val sammenstiltkandidatTabell = "sammenstiltkandidat"
 
-    init {
-        kjørFlywayMigreringer()
-    }
-
     fun lagreKandidat(kandidat: Kandidat) {
         val kandidatFinnes = hentKandidat(kandidat.aktørId) != null
 
@@ -89,7 +85,7 @@ class Repository(private val dataSource: DataSource) {
         }
     }
 
-    private fun kjørFlywayMigreringer() {
+    fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
             .load()
