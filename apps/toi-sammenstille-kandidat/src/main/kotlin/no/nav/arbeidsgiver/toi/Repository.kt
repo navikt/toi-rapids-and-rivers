@@ -76,7 +76,7 @@ class Repository(private val dataSource: DataSource) {
 
         connection.autoCommit = false
 
-        connection.use { it ->
+        connection.use {
             val statement = it.prepareStatement("select $kandidatKolonne from $sammenstiltkandidatTabell", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).also { stmt ->
                 stmt.fetchSize = 10
             }
