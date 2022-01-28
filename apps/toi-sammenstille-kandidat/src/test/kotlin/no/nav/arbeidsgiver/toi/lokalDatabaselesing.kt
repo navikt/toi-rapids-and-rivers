@@ -38,6 +38,7 @@ fun gjørOperasjonPåAlleKandidaterIndexed(connection: Connection, operasjon: (K
             operasjon(kandidat, index)
         }
     }
+    connection.autoCommit = true
 }
 
 private fun ResultSet.forEachRowIndexed(operation: (ResultSet, Int) -> Unit) {
