@@ -7,8 +7,6 @@ import io.javalin.Javalin
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
-import java.util.*
-import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RepublisererTest {
@@ -36,7 +34,7 @@ class RepublisererTest {
         val lagredeKandidater = lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
 
-        val response = Fuel.post("http://localhost:9000/republiserKandidater")
+        val response = Fuel.post("http://localhost:9000/republiser")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
         assertThat(response.statusCode).isEqualTo(200)
@@ -47,6 +45,7 @@ class RepublisererTest {
 
         lagredeKandidater.forEachIndexed { index, kandidat ->
             assertThat(Kandidat.fraJson(inspektør.message(index)).toJson()).isEqualTo(kandidat.toJson())
+            assertThat(inspektør.message(index).get("@event_name").asText()).isEqualTo("republisert.sammenstilt")
         }
     }
 
@@ -58,7 +57,7 @@ class RepublisererTest {
         val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
 
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-        val response = Fuel.post("http://localhost:9000/republiserKandidater")
+        val response = Fuel.post("http://localhost:9000/republiser")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
         assertThat(response.statusCode).isEqualTo(200)
 
@@ -71,6 +70,42 @@ class RepublisererTest {
     }
 
     @Test
+    fun `Kall til republiseringsendepunkt for én kandidat skal sende kandidaten på rapid`() {
+        val testRapid = TestRapid()
+        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
+
+        val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
+        val aktørIdTilKandidatSomSkalRepubliseres = lagredeKandidater[13]
+
+        val body = Republiserer.RepubliseringBody(passord = riktigPassord)
+        val response = Fuel.post("http://localhost:9000/republiser/$aktørIdTilKandidatSomSkalRepubliseres")
+            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+        assertThat(response.statusCode).isEqualTo(200)
+
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        assertThat(Kandidat.fraJson(inspektør.message(0)).aktørId).isEqualTo(aktørIdTilKandidatSomSkalRepubliseres)
+        assertThat(inspektør.message(0).get("@event_name").asText()).isEqualTo("republisert.sammenstilt")
+    }
+
+    @Test
+    fun `Kall til republiseringsendepunkt for en kandidat som ikke finnes returnerer 404 og sender ikke melding på rapid`() {
+        val testRapid = TestRapid()
+        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
+
+        lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
+        val ugyldigAktørId = "enUgyldigAktørId"
+
+        val body = Republiserer.RepubliseringBody(passord = riktigPassord)
+        val response = Fuel.post("http://localhost:9000/republiser/$ugyldigAktørId")
+            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+        assertThat(response.statusCode).isEqualTo(404)
+
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
     fun `Kall til republiseringsendepunkt med feil passord skal returnere 401 og ikke republisere noen kandidater`() {
         val testRapid = TestRapid()
         startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
@@ -79,7 +114,7 @@ class RepublisererTest {
 
         val feilPassord = "jalla"
         val body = Republiserer.RepubliseringBody(passord = feilPassord)
-        val response = Fuel.post("http://localhost:9000/republiserKandidater")
+        val response = Fuel.post("http://localhost:9000/republiser")
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
         assertThat(response.statusCode).isEqualTo(401)

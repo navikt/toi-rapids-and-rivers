@@ -1,8 +1,13 @@
 package no.nav.arbeidsgiver.toi
 
 import io.javalin.Javalin
+import io.javalin.apibuilder.ApiBuilder.path
+import io.javalin.apibuilder.ApiBuilder.post
+import io.javalin.http.Context
+import io.javalin.http.UnauthorizedResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 class Republiserer(
@@ -12,35 +17,63 @@ class Republiserer(
     private val passord: String
 ) {
     init {
-        javalin.post("republiserKandidater") {
-            val body = it.bodyAsClass(RepubliseringBody::class.java)
-
-            if (body.passord != passord) {
-                log.warn("Mottok forsøk på å republisere kandidater uten riktig passord")
-                it.status(401)
-            } else {
-                it.status(200)
-                GlobalScope.launch {
-                    republiserKandidater()
+        javalin
+            .before(::autentiserPassord)
+            .routes {
+                path("republiser") {
+                    post(::republiserAlleKandidater)
+                    path("{aktørId}") {
+                        post(::republiserEnKandidat)
+                    }
                 }
             }
+    }
+
+    fun autentiserPassord(context: Context) {
+        val body = context.bodyAsClass(RepubliseringBody::class.java)
+
+        if (body.passord != passord) {
+            log.warn("Mottok forsøk på å republisere kandidater uten riktig passord")
+            throw UnauthorizedResponse()
         }
     }
 
-    private fun republiserKandidater() {
-        log.info("Skal republisere alle kandidater")
+    fun republiserEnKandidat(context: Context) {
+        val aktørId = context.pathParam("aktørId")
+        val kandidat = repository.hentKandidat(aktørId)
 
-        repository.gjørOperasjonPåAlleKandidaterIndexed { kandidat, index ->
-            if (index > 0 && index % 20000 == 0) {
-                log.info("Har republisert $index kandidater")
+        if (kandidat == null) {
+            context.status(404)
+        } else {
+            val pakke = lagPakke(kandidat)
+            rapidsConnection.publish(aktørId, pakke.toJson())
+            context.status(200)
+        }
+    }
+
+    fun republiserAlleKandidater(context: Context) {
+        context.status(200)
+
+        GlobalScope.launch {
+            log.info("Skal republisere alle kandidater")
+
+            repository.gjørOperasjonPåAlleKandidaterIndexed { kandidat, index ->
+                if (index > 0 && index % 20000 == 0) {
+                    log.info("Har republisert $index kandidater")
+                }
+
+                val pakke = lagPakke(kandidat)
+                rapidsConnection.publish(kandidat.aktørId, pakke.toJson())
             }
 
-            val pakke = kandidat.somJsonMessage()
-            pakke["@event_name"] = "republisert.sammenstilt"
-            rapidsConnection.publish(kandidat.aktørId, pakke.toJson())
+            log.info("Ferdig med republisering av kandidatene")
         }
+    }
 
-        log.info("Ferdig med republisering av kandidatene")
+    private fun lagPakke(kandidat: Kandidat): JsonMessage {
+        val pakke = kandidat.somJsonMessage()
+        pakke["@event_name"] = "republisert.sammenstilt"
+        return pakke
     }
 
     data class RepubliseringBody(
