@@ -6,8 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main-endre-for-deploy
     paths:
     - apps/toi-organisasjonsenhet/**
     - .github/workflows/deploy-toi-organisasjonsenhet.yaml
@@ -44,7 +42,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ny-app-avledet-informasjon'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/behov-i-kandidatfeed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
