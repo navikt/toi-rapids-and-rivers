@@ -120,8 +120,8 @@ class KandidatfeedTest {
         assertThat(resultatJson.has("system_participating_services")).isFalse
         assertThat(resultatJson.has("@event_name")).isFalse
 
-        assertThat(resultatJson.get("oppfolgingsinformasjon").get("oppfolgingsenhet").asText()).isEqualTo("1234")
-        assertThat(resultatJson.get("oppfolgingsinformasjon").get("organisasjonsenhetsnavn").asText()).isEqualTo("NAV et kontor")
+        assertThat(resultatJson.get("oppfølgingsinformasjon").get("oppfolgingsenhet").asText()).isEqualTo("1234")
+        assertThat(resultatJson.get("oppfølgingsinformasjon").get("organisasjonsenhetsnavn").asText()).isEqualTo("NAV et kontor")
         assertThat(resultatJson.get("organisasjonsenhetsnavn")).isNull()
 
     }

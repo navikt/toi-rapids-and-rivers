@@ -17,7 +17,7 @@ class UferdigKandidatLytter(
                 it.demandKey("aktørId")
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
-                it.requireKey("oppfolgingsinformasjon.oppfolgingsenhet")
+                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
                 it.rejectOnAll("@behov", behovsListe)
                 it.interestedIn("cv")
             }
@@ -27,6 +27,7 @@ class UferdigKandidatLytter(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
+        log.info("Sender behov for $aktørId")
         context.publish(aktørId, packet.toJson())
     }
 

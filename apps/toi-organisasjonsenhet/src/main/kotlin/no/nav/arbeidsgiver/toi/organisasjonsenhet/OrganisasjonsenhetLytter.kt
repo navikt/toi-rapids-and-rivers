@@ -22,6 +22,8 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         packet["organisasjonsenhetsnavn"] =
             organisasjonsMap[enhetsnummer] ?: throw Exception("Mangler mapping for enhet $enhetsnummer")
 
+        log.info("Sender løsning på behov $enhetsnummer: ${organisasjonsMap[enhetsnummer]}")
+
         publish(packet.toJson())
     }
 

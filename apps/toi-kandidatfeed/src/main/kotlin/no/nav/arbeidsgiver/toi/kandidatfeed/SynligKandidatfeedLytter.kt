@@ -21,7 +21,7 @@ class SynligKandidatfeedLytter(
                 it.demandKey("aktørId")
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
-                it.requireKey("oppfolgingsinformasjon")
+                it.requireKey("oppfølgingsinformasjon")
                 behovsListe.forEach(it::demandKey)
             }
         }.register(this)
@@ -55,7 +55,7 @@ class SynligKandidatfeedLytter(
     }
 
     private fun ObjectNode.flyttOrganisasjonsenhetsnavn() {
-        (this["oppfolgingsinformasjon"] as ObjectNode)
+        (this["oppfølgingsinformasjon"] as ObjectNode)
             .set<JsonNode>("organisasjonsenhetsnavn", this["organisasjonsenhetsnavn"])
 
         this.remove("organisasjonsenhetsnavn")
