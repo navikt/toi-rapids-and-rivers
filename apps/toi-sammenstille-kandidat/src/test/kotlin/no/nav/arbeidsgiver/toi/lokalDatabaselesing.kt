@@ -19,22 +19,35 @@ fun main(args: Array<String>) {
     val tilkobling = databasetilkobling(databasebruker, databasepassord)
     println("Har koblet til databasen")
 
-    // NB: Tar lang tid å lese alle rader uten begrensninger
-    val sql = "select kandidat from sammenstiltkandidat"
-    val kandidatRader = hentKandidatRader(tilkobling, sql)
-    println("Har hentet ut rader fra databasen")
-
-    val kandidaterSomJsonNoder = kandidatRader.map { it.somJsonNode() }
-
-    // Bruk
-    val antall = kandidaterSomJsonNoder.filter {
-        it.har("måBehandleTidligereCv")
-    }.map {
-        it["fritattKandidatsøk"]["fritattKandidatsok"].asBoolean()
-    }.filter { it }.size
-
-    println("Antall kandidater med måBehandleTidligereCv true: ${antall}")
+    gjørOperasjonPåAlleKandidaterIndexed(tilkobling) { kandidat, i ->
+        println("Hentet ut kandidat nr. $i")
+    }
 }
+
+fun gjørOperasjonPåAlleKandidaterIndexed(connection: Connection, operasjon: (Kandidat, Int) -> Unit) {
+    connection.autoCommit = false
+
+    connection.use { it ->
+        val statement = it.prepareStatement("select kandidat from sammenstiltkandidat", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY).also { stmt ->
+            stmt.fetchSize = 1
+        }
+        val resultSet = statement.executeQuery()
+
+        resultSet.forEachRowIndexed { resultSetRow, index ->
+            val kandidat = Kandidat.fraJson(resultSetRow.getString(1))
+            operasjon(kandidat, index)
+        }
+    }
+}
+
+private fun ResultSet.forEachRowIndexed(operation: (ResultSet, Int) -> Unit) {
+    var teller = 0
+
+    while (this.next()) {
+        operation(this, teller++)
+    }
+}
+
 
 fun hentKandidatRader(databaseTilkobling: Connection, sql: String) =
     databaseTilkobling.prepareStatement(sql)
