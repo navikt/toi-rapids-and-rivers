@@ -121,8 +121,7 @@ class KandidatfeedTest {
         assertThat(resultatJson.has("@event_name")).isFalse
 
         assertThat(resultatJson.get("oppfølgingsinformasjon").get("oppfolgingsenhet").asText()).isEqualTo("1234")
-        assertThat(resultatJson.get("oppfølgingsinformasjon").get("organisasjonsenhetsnavn").asText()).isEqualTo("NAV et kontor")
-        assertThat(resultatJson.get("organisasjonsenhetsnavn")).isNull()
+        assertThat(resultatJson.get("organisasjonsenhetsnavn").asText()).isEqualTo("NAV et kontor")
 
     }
 }

@@ -31,7 +31,6 @@ class SynligKandidatfeedLytter(
 
         val objectNode = konverterTilObjectNode(packet)
             .apply {
-                flyttOrganisasjonsenhetsnavn()
                 fjernMetadataOgKonverter()
             }
 
@@ -52,13 +51,6 @@ class SynligKandidatfeedLytter(
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
         log.error(problems.toString())
-    }
-
-    private fun ObjectNode.flyttOrganisasjonsenhetsnavn() {
-        (this["oppfølgingsinformasjon"] as ObjectNode)
-            .set<JsonNode>("organisasjonsenhetsnavn", this["organisasjonsenhetsnavn"])
-
-        this.remove("organisasjonsenhetsnavn")
     }
 
     private fun ObjectNode.fjernMetadataOgKonverter() {
