@@ -21,7 +21,7 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         val aktørid: String = packet["aktørId"].asText()
 
         val orgnavn = organisasjonsMap[enhetsnummer]
-        if(orgnavn == null) {
+        if (orgnavn == null) {
             log.error("Mangler mapping for enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
             packet["organisasjonsenhetsnavn"] = ""
         } else {

@@ -65,22 +65,22 @@ class OrganisasjonsenhetTest {
         Assertions.assertThat(inspektør.size).isEqualTo(0)
     }
 
-     @Test
-     fun `ikke legg på svar om svar allerede er lagt på`() {
-         val testRapid = TestRapid()
-         startApp(organisasjonsMap, testRapid)
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på`() {
+        val testRapid = TestRapid()
+        startApp(organisasjonsMap, testRapid)
 
-         testRapid.sendTestMessage(
-             behovsMelding(
-                 behovListe = """["organisasjonsenhetsnavn"]""",
-                 løsninger = listOf("organisasjonsenhetsnavn" to """"svar"""")
-             )
-         )
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["organisasjonsenhetsnavn"]""",
+                løsninger = listOf("organisasjonsenhetsnavn" to """"svar"""")
+            )
+        )
 
-         val inspektør = testRapid.inspektør
+        val inspektør = testRapid.inspektør
 
-         Assertions.assertThat(inspektør.size).isEqualTo(0)
-     }
+        Assertions.assertThat(inspektør.size).isEqualTo(0)
+    }
 
     @Test
     fun `Legg til korrekt NAV-kontor-navn på populert melding`() {
