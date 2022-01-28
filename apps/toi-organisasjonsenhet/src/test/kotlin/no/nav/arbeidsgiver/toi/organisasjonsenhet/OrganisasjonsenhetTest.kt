@@ -106,6 +106,7 @@ class OrganisasjonsenhetTest {
 
     private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList(), enhetsNr: String = "0002") = """
         {
+            "aktørId":"123",
             "@behov":$behovListe,
             "oppfølgingsinformasjon": {
                 "oppfolgingsenhet": "$enhetsNr"

@@ -12,17 +12,19 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
             validate {
                 it.demandAtFørstkommendeUløsteBehovEr("organisasjonsenhetsnavn")
                 it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
+                it.requireKey("aktørId")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
+        val aktørid: String = packet["aktørId"].asText()
 
         packet["organisasjonsenhetsnavn"] =
             organisasjonsMap[enhetsnummer] ?: throw Exception("Mangler mapping for enhet $enhetsnummer")
 
-        log.info("Sender løsning på behov $enhetsnummer: ${organisasjonsMap[enhetsnummer]}")
+        log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${organisasjonsMap[enhetsnummer]}")
 
         publish(packet.toJson())
     }
