@@ -5,7 +5,6 @@ import no.nav.helse.rapids_rivers.*
 
 class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>, rapidsConnection: RapidsConnection) :
     River.PacketListener {
-    private val publish: (String) -> Unit = rapidsConnection::publish
 
     init {
         River(rapidsConnection).apply {
@@ -26,7 +25,7 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
 
         log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${organisasjonsMap[enhetsnummer]}")
 
-        publish(packet.toJson())
+        context.publish(aktørid, packet.toJson())
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
