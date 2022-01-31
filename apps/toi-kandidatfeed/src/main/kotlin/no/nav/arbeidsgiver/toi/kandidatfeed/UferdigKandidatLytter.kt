@@ -18,13 +18,15 @@ class UferdigKandidatLytter(
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
                 it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
-                it.rejectOnAll("@behov", behovsListe)
+                it.interestedIn("@behov")
                 it.interestedIn("cv")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        if(packet.rejectOnAll("@behov", behovsListe)) return
+
         val aktørId = packet["aktørId"].asText()
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
         log.info("Sender behov for $aktørId")
@@ -37,10 +39,6 @@ class UferdigKandidatLytter(
 
 }
 
-private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = interestedIn(key) { node ->
-    if (!node.isMissingNode && node.isArray && node.map(JsonNode::asText).containsAll(values)) {
-        demand(key) {
-            throw Exception("Behovene finnes allerede i meldingen")
-        }
-    }
+private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = get(key).let { node ->
+    !node.isMissingNode && node.isArray && node.map(JsonNode::asText).containsAll(values)
 }
