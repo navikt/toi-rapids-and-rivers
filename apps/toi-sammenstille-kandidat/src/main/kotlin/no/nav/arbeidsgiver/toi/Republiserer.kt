@@ -16,11 +16,14 @@ class Republiserer(
     javalin: Javalin,
     private val passord: String
 ) {
+
+    private val republiseringspath = "republiser"
+
     init {
         javalin
-            .before(::autentiserPassord)
+            .before(republiseringspath, ::autentiserPassord)
             .routes {
-                path("republiser") {
+                path(republiseringspath) {
                     post(::republiserAlleKandidater)
                     path("{aktørId}") {
                         post(::republiserEnKandidat)
