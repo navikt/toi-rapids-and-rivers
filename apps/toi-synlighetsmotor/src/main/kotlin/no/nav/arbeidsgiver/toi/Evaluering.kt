@@ -10,5 +10,12 @@ data class Evaluering (
     val harRiktigFormidlingsgruppe: Boolean? = null,
     val erIkkeKode6eller7: Boolean? = null,
     val erIkkeSperretAnsatt: Boolean? = null,
-    val erIkkeDoed:  Boolean? = null
-)
+    val erIkkeDoed:  Boolean? = null,
+
+) {
+    fun beregningsgrunnlag() = harAktivCv != null && harJobbprofil != null && erUnderOppfølging != null
+
+    fun erSynlig() = beregningsgrunnlag() && (harAktivCv) &&
+
+}
+
