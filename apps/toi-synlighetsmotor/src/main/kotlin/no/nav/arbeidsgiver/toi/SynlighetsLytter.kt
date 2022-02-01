@@ -43,7 +43,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         packet["synlighet"] = synlighet
         val aktørId = packet["aktørId"].asText()
-        val fødselsnummer = packet["fødselsnummer"].asText()
+        val fødselsnummer = packet["oppfølgingsinformasjon"]["fodselsnummer"].asText() //TODO: sjekke flere steder for fødselsnummer
 
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 

@@ -16,6 +16,7 @@ class TestDatabase {
         })
 
     init {
+        Repository(dataSource)
         slettAlt()
     }
 

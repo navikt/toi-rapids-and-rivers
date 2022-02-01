@@ -202,11 +202,10 @@ class SynlighetsmotorTest {
 
     @Test
     fun `sjekkDatabase`() {
-        testProgramMedHendelse(
+        val repository = testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
         )
-        val repository = Repository(TestDatabase().dataSource)
         val evalueringFraDb = repository.hent(aktorId = "123456789")
         assertThat(evalueringFraDb).isEqualTo(Evaluering(
             true,
@@ -246,13 +245,15 @@ class SynlighetsmotorTest {
     private fun testProgramMedHendelse(
         oppfølgingsinformasjonHendelse: String,
         assertion: TestRapid.RapidInspector.() -> Unit
-    ) {
+    ): Repository {
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
             .also { SynlighetsLytter(it, repository) }
 
         rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
         rapid.inspektør.apply(assertion)
+
+        return repository // TODO, fikse struktur på testene med repo
     }
 
     private fun komplettHendelseSomFørerTilSynlighetTrue(
