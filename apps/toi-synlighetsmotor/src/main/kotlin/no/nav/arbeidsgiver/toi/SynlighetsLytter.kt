@@ -6,7 +6,8 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
+    River.PacketListener {
     private val interessanteFelt = listOf(
         "cv",
         "oppfølgingsinformasjon",
@@ -42,8 +43,11 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.P
 
         packet["synlighet"] = synlighet
         val aktørId = packet["aktørId"].asText()
+        val fødselsnummer = packet["fødselsnummer"].asText()
 
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
+
+        repository.lagre(evaluering = synlighetsevaluering, aktørId = aktørId, fødselsnummer = fødselsnummer)
 
         rapidsConnection.publish(aktørId, packet.toJson())
     }

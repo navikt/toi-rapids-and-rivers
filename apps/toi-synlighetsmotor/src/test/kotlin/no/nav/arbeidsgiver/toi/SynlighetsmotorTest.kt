@@ -3,8 +3,6 @@ package no.nav.arbeidsgiver.toi
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
@@ -17,7 +15,8 @@ class SynlighetsmotorTest {
 
     @Test
     fun `kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
             synlighet = false, ferdigBeregnet = false
         )
     )
@@ -168,12 +167,13 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om det er ukjent om en Person ikke må behandle tidligere CV skal synlighet være true`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(
-            måBehandleTidligereCv = null
-        ),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
-    )
+    fun `om det er ukjent om en Person ikke må behandle tidligere CV skal synlighet være true`() =
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                måBehandleTidligereCv = null
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
+        )
 
     @Test
     fun `ignorer uinteressante hendelser`() = testProgramMedHendelse(
@@ -200,13 +200,40 @@ class SynlighetsmotorTest {
         enHendelseErIkkePublisert()
     )
 
+    @Test
+    fun `sjekkDatabase`() {
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
+        )
+        val repository = Repository(TestDatabase().dataSource)
+        val evalueringFraDb = repository.hent(aktorId = "123456789")
+        assertThat(evalueringFraDb).isEqualTo(Evaluering(
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ))
+    }
+
+
     private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
         {
             assertThat(size).isEqualTo(0)
 
         }
 
-    private fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet: Boolean, ferdigBeregnet: Boolean): TestRapid.RapidInspector.() -> Unit =
+    private fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+        synlighet: Boolean,
+        ferdigBeregnet: Boolean
+    ): TestRapid.RapidInspector.() -> Unit =
         {
             assertThat(size).isEqualTo(1)
             assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
@@ -220,8 +247,9 @@ class SynlighetsmotorTest {
         oppfølgingsinformasjonHendelse: String,
         assertion: TestRapid.RapidInspector.() -> Unit
     ) {
+        val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
-            .also(::SynlighetsLytter)
+            .also { SynlighetsLytter(it, repository) }
 
         rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
         rapid.inspektør.apply(assertion)
