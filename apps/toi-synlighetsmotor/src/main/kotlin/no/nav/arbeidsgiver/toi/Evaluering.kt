@@ -10,22 +10,22 @@ data class Evaluering(
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeKode6eller7: Boolean,
     val erIkkeSperretAnsatt: Boolean,
-    val erIkkeDoed: Boolean
+    val erIkkeDoed: Boolean,
+    val erFerdigBeregnet: Boolean
 
-    ) {
+) {
 
-    fun altOk() = listOf(
-        harAktivCv,
-        harJobbprofil,
-        harSettHjemmel,
-        maaIkkeBehandleTidligereCv,
-        erIkkefritattKandidatsøk,
-        erUnderOppfoelging,
-        harRiktigFormidlingsgruppe,
-        erIkkeKode6eller7,
-        erIkkeSperretAnsatt,
-        erIkkeDoed
-    ).all { it ?: true }
+    fun erSynlig() = harAktivCv &&
+            harJobbprofil &&
+            harSettHjemmel &&
+            maaIkkeBehandleTidligereCv &&
+            erIkkefritattKandidatsøk &&
+            erUnderOppfoelging &&
+            harRiktigFormidlingsgruppe &&
+            erIkkeKode6eller7 &&
+            erIkkeSperretAnsatt &&
+            erIkkeDoed &&
+            erFerdigBeregnet
 
 
 }

@@ -2,11 +2,6 @@ package no.nav.arbeidsgiver.toi
 
 import java.time.Instant
 
-fun beregningsgrunnlag(kandidat: Kandidat) =
-    kandidat.cv != null &&
-            (kandidat.cv?.endreJobbprofil != null || kandidat.cv?.opprettJobbprofil != null) &&
-            kandidat.oppfølgingsperiode != null
-
 fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
     Evaluering(
         harAktivCv = kandidat.cv?.meldingstype.let {
@@ -23,7 +18,8 @@ fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
         ),
         erIkkeKode6eller7 = erIkkeKode6EllerKode7(kandidat),
         erIkkeSperretAnsatt = kandidat.oppfølgingsinformasjon?.sperretAnsatt == false,
-        erIkkeDoed = kandidat.oppfølgingsinformasjon?.erDoed == false
+        erIkkeDoed = kandidat.oppfølgingsinformasjon?.erDoed == false,
+        erFerdigBeregnet = beregningsgrunnlag(kandidat)
     )
 
 private fun harSettHjemmel(kandidat: Kandidat): Boolean {
@@ -48,10 +44,15 @@ private fun erUnderOppfølging(kandidat: Kandidat): Boolean {
     return startDato.isBefore(now) && sluttDato.isAfter(now)
 }
 
-fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
+private fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
     kandidat.oppfølgingsinformasjon != null &&
             (kandidat.oppfølgingsinformasjon.diskresjonskode == null
                     || kandidat.oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
+
+private fun beregningsgrunnlag(kandidat: Kandidat) =
+    kandidat.cv != null &&
+            (kandidat.cv.endreJobbprofil != null || kandidat.cv.opprettJobbprofil != null) &&
+            kandidat.oppfølgingsperiode != null
 
 
 

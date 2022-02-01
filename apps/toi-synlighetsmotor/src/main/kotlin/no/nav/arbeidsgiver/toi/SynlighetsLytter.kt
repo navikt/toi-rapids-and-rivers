@@ -41,7 +41,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.P
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 
         val evalueringsgrunnlag = lagEvalueringsGrunnlag(kandidat)
-        val erSynligFraEvalueringsgrunnlag = evalueringsgrunnlag.altOk() && beregningsgrunnlag(kandidat)
+        val erSynligFraEvalueringsgrunnlag = evalueringsgrunnlag.erSynlig()
         if(erSynligFraEvalueringsgrunnlag != synlighet.erSynlig) {
             throw Exception("Ny evalueringsmetode har ulikt synlighetsresultat fra gammel evalueringskode, gammel: ${synlighet.erSynlig}, ny:${erSynligFraEvalueringsgrunnlag}")
         }
