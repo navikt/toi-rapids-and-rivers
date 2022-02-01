@@ -1,14 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-fun lagEvalueringsGrunnlag(kandidat: Kandidat) : Evaluering =
+fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
     Evaluering(
-        harAktivCv = kandidat.cv?.meldingstype.let {  })
-
-fun beregningsgrunnlag(kandidat: Kandidat) : Boolean{
-    harcv har jpobbr
-}
-
-fun erSynlig(evaluering: Evaluering, )
-
-val meldingstype = kandidat.cv?.meldingstype ?: false
-return meldingstype == CvMeldingstype.OPPRETT || meldingstype == CvMeldingstype.ENDRE
+        harAktivCv = kandidat.cv?.meldingstype.let {
+            listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
+        },
+        harJobbprofil = 
