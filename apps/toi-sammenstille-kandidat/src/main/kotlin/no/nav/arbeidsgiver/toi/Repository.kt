@@ -87,7 +87,6 @@ class Repository(private val dataSource: DataSource) {
                 operasjon(kandidat, index)
             }
         }
-        connection.autoCommit = true
     }
 
     private fun kjørFlywayMigreringer() {
