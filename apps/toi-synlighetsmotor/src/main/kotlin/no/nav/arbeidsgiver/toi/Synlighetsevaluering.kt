@@ -49,10 +49,8 @@ private fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
             (kandidat.oppfølgingsinformasjon.diskresjonskode == null
                     || kandidat.oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
 
-private fun beregningsgrunnlag(kandidat: Kandidat) =
-    kandidat.cv != null &&
-            (kandidat.cv.endreJobbprofil != null || kandidat.cv.opprettJobbprofil != null) &&
-            kandidat.oppfølgingsperiode != null
+fun beregningsgrunnlag(kandidat: Kandidat) =
+    kandidat.cv != null && kandidat.oppfølgingsperiode != null && kandidat.oppfølgingsinformasjon != null
 
 
 

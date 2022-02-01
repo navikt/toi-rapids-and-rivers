@@ -1,7 +1,10 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.helse.rapids_rivers.*
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
 
 class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     private val interessanteFelt = listOf(
@@ -42,10 +45,16 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.P
 
         val evalueringsgrunnlag = lagEvalueringsGrunnlag(kandidat)
         val erSynligFraEvalueringsgrunnlag = evalueringsgrunnlag.erSynlig()
-        if(erSynligFraEvalueringsgrunnlag != synlighet.erSynlig) {
+
+        if (erSynligFraEvalueringsgrunnlag != synlighet.erSynlig) {
             throw Exception("Ny evalueringsmetode har ulikt synlighetsresultat fra gammel evalueringskode, gammel: ${synlighet.erSynlig}, ny:${erSynligFraEvalueringsgrunnlag}")
         }
 
+        val nyttBeregningsgrunnlag = beregningsgrunnlag(kandidat)
+        if (nyttBeregningsgrunnlag != synlighet.ferdigBeregnet) {
+            throw Exception("Feil i nytt beregningsgrunnlag, gammel: ${synlighet.ferdigBeregnet}, ny:${nyttBeregningsgrunnlag}")
+        }
+        
         rapidsConnection.publish(aktørId, packet.toJson())
     }
 

@@ -12,43 +12,43 @@ class SynlighetsmotorTest {
     @Test
     fun `legg på synlighet som sann om all data i hendelse tilsier det`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(),
-        enHendelseErPublisertMedSynlighetsverdi(true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
     )
 
     @Test
     fun `kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdi(
-            synlighet = false
+        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()), enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+            synlighet = false, ferdigBeregnet = false
         )
     )
 
     @Test
     fun `kandidat med kun cv skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(cv = cv()), enHendelseErPublisertMedSynlighetsverdi(false)
+        hendelse(cv = cv()), enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
     )
 
     @Test
     fun `om CV har meldingstype "SLETT" skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = cv(CvMeldingstype.SLETT)),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
     fun `om CV har meldingstype "ENDRE" skal synlighet være true`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = cv(meldingstype = CvMeldingstype.ENDRE)),
-        enHendelseErPublisertMedSynlighetsverdi(true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
     )
 
     @Test
     fun `om Person er død skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(erDoed = true)),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
     fun `om Person er sperret ansatt skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(sperretAnsatt = true)),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
@@ -60,84 +60,80 @@ class SynlighetsmotorTest {
         komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode = avsluttetOppfølgingsperiode()
         ),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
 
     @Test
     fun `om Person ikke har oppfølgingsinformasjon skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = null),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
     )
 
     @Test
     fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS")),
-        enHendelseErPublisertMedSynlighetsverdi(true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
     )
 
     @Test
     fun `om Person har feil formidlingsgruppe skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS")),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
     fun `om Person har kode 6 skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(diskresjonskode = "6")),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
     fun `om Person har kode 7 skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(diskresjonskode = "7")),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
-
-    @Test
-    fun `om Person ikke er manuell skal synlighet være false`() {
-    }
 
     @Test
     fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(fritattKandidatsøk = fritattKandidatsøk(true)),
-        enHendelseErPublisertMedSynlighetsverdi(false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = manglendeCV()),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, false)
     )
 
     @Test
     fun `om Person ikke har jobbprofil skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = harCvManglerJobbprofil()),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
     )
 
     @Test
     fun `om Person har endrejobbprofil skal synlighet kunne være true`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = harEndreJobbrofil()),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
     )
 
     @Test
     fun `om Person har opprettjobbprofil skal synlighet kunne være true`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(cv = harOpprettJobbrofil()),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
     )
 
     @Test
     fun `om Person ikke har sett hjemmel skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(hjemmel = manglendeHjemmel()),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
     )
 
     @Test
     fun `om Person har hjemmel for feil ressurs skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(hjemmel = hjemmel(ressurs = "CV_GENERELL")),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
     )
 
     @Test
@@ -148,7 +144,7 @@ class SynlighetsmotorTest {
                 slettetDato = ZonedDateTime.now().minusYears(1)
             )
         ),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
     )
 
     @Test
@@ -158,7 +154,7 @@ class SynlighetsmotorTest {
                 maaBehandleTidligereCv = true
             )
         ),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
     )
 
     @Test
@@ -168,7 +164,7 @@ class SynlighetsmotorTest {
                 maaBehandleTidligereCv = false
             )
         ),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
     )
 
     @Test
@@ -176,7 +172,7 @@ class SynlighetsmotorTest {
         komplettHendelseSomFørerTilSynlighetTrue(
             måBehandleTidligereCv = null
         ),
-        enHendelseErPublisertMedSynlighetsverdi(synlighet = true)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
     )
 
     @Test
@@ -193,7 +189,7 @@ class SynlighetsmotorTest {
     @Test
     fun `produserer ny melding dersom sammenstiller er kjørt`() = testProgramMedHendelse(
         oppfølgingsinformasjonHendelseMedParticipatingService(participatingService = participatingService("toi-sammenstille-kandidat")),
-        enHendelseErPublisertMedSynlighetsverdi(false),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false),
     )
 
     @Test
@@ -210,12 +206,13 @@ class SynlighetsmotorTest {
 
         }
 
-    private fun enHendelseErPublisertMedSynlighetsverdi(synlighet: Boolean): TestRapid.RapidInspector.() -> Unit =
+    private fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet: Boolean, ferdigBeregnet: Boolean): TestRapid.RapidInspector.() -> Unit =
         {
             assertThat(size).isEqualTo(1)
             assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
             field(0, "synlighet").apply {
                 assertThat(get("erSynlig").asBoolean()).apply { if (synlighet) isTrue else isFalse }
+                assertThat(get("ferdigBeregnet").asBoolean()).apply { if (ferdigBeregnet) isTrue else isFalse }
             }
         }
 
