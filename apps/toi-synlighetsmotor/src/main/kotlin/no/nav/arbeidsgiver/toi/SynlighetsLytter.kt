@@ -40,6 +40,12 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.P
         val aktørId = packet["aktørId"].asText()
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 
+        val evalueringsgrunnlag = lagEvalueringsGrunnlag(kandidat)
+        val erSynligFraEvalueringsgrunnlag = evalueringsgrunnlag.altOk() && beregningsgrunnlag(kandidat)
+        if(erSynligFraEvalueringsgrunnlag != synlighet.erSynlig) {
+            throw Exception("Ny evalueringsmetode har ulikt synlighetsresultat fra gammel evalueringskode, gammel: ${synlighet.erSynlig}, ny:${erSynligFraEvalueringsgrunnlag}")
+        }
+
         rapidsConnection.publish(aktørId, packet.toJson())
     }
 

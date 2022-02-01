@@ -1,27 +1,26 @@
 package no.nav.arbeidsgiver.toi
 
 data class Evaluering(
-    val harAktivCv: Boolean? = null,
-    val harJobbprofil: Boolean? = null,
-    val harSettHjemmel: Boolean? = null,
-    val måIkkeBehandleTidligereCv: Boolean? = null,
-    val erIkkefritattKandidatsøk: Boolean? = null,
-    val erUnderOppfølging: Boolean? = null,
-    val harRiktigFormidlingsgruppe: Boolean? = null,
-    val erIkkeKode6eller7: Boolean? = null,
-    val erIkkeSperretAnsatt: Boolean? = null,
-    val erIkkeDoed: Boolean? = null,
+    val harAktivCv: Boolean,
+    val harJobbprofil: Boolean,
+    val harSettHjemmel: Boolean,
+    val maaIkkeBehandleTidligereCv: Boolean,
+    val erIkkefritattKandidatsøk: Boolean,
+    val erUnderOppfoelging: Boolean,
+    val harRiktigFormidlingsgruppe: Boolean,
+    val erIkkeKode6eller7: Boolean,
+    val erIkkeSperretAnsatt: Boolean,
+    val erIkkeDoed: Boolean
 
     ) {
-    fun beregningsgrunnlag() = harAktivCv != null && harJobbprofil != null && erUnderOppfølging != null
 
-    fun erSynlig() = beregningsgrunnlag() && listOf(
+    fun altOk() = listOf(
         harAktivCv,
         harJobbprofil,
         harSettHjemmel,
-        måIkkeBehandleTidligereCv,
+        maaIkkeBehandleTidligereCv,
         erIkkefritattKandidatsøk,
-        erUnderOppfølging,
+        erUnderOppfoelging,
         harRiktigFormidlingsgruppe,
         erIkkeKode6eller7,
         erIkkeSperretAnsatt,
