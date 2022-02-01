@@ -26,8 +26,6 @@ data class Evaluering(
             erIkkeSperretAnsatt &&
             erIkkeDoed &&
             erFerdigBeregnet
-
-
 }
 
 

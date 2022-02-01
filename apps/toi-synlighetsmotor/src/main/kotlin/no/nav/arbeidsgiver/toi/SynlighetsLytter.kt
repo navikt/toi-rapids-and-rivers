@@ -36,25 +36,15 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection) : River.P
         if (harIngenInteressanteFelter || !erSammenstillt) return
 
         val kandidat = Kandidat.fraJson(packet)
-        val synlighet = Synlighet(erSynlig(kandidat), harBeregningsgrunnlag(kandidat))
+
+        val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
+        val synlighet = Synlighet(synlighetsevaluering.erSynlig(), synlighetsevaluering.erFerdigBeregnet)
 
         packet["synlighet"] = synlighet
-
         val aktørId = packet["aktørId"].asText()
+
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 
-        val evalueringsgrunnlag = lagEvalueringsGrunnlag(kandidat)
-        val erSynligFraEvalueringsgrunnlag = evalueringsgrunnlag.erSynlig()
-
-        if (erSynligFraEvalueringsgrunnlag != synlighet.erSynlig) {
-            throw Exception("Ny evalueringsmetode har ulikt synlighetsresultat fra gammel evalueringskode, gammel: ${synlighet.erSynlig}, ny:${erSynligFraEvalueringsgrunnlag}")
-        }
-
-        val nyttBeregningsgrunnlag = beregningsgrunnlag(kandidat)
-        if (nyttBeregningsgrunnlag != synlighet.ferdigBeregnet) {
-            throw Exception("Feil i nytt beregningsgrunnlag, gammel: ${synlighet.ferdigBeregnet}, ny:${nyttBeregningsgrunnlag}")
-        }
-        
         rapidsConnection.publish(aktørId, packet.toJson())
     }
 
