@@ -4,9 +4,9 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val repository = Repository(datasource())
+fun repository() = Repository(datasource())
 
-fun main() = RapidApplication.create(System.getenv()).also { SynlighetsLytter(it, repository) }.start()
+fun main() = RapidApplication.create(System.getenv()).also { SynlighetsLytter(it, repository()) }.start()
 
 fun datasource() = DatabaseKonfigurasjon(System.getenv()).lagDatasource()
 
