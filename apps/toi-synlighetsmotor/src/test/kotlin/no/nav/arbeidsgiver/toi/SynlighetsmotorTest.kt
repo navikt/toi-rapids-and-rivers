@@ -207,19 +207,21 @@ class SynlighetsmotorTest {
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
         )
         val evalueringFraDb = repository.hent(aktorId = "123456789")
-        assertThat(evalueringFraDb).isEqualTo(Evaluering(
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-        ))
+        assertThat(evalueringFraDb).isEqualTo(
+            Evaluering(
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+            )
+        )
     }
 
 
@@ -263,7 +265,10 @@ class SynlighetsmotorTest {
         fritattKandidatsøk: String = fritattKandidatsøk(),
         hjemmel: String = hjemmel(),
         participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-        måBehandleTidligereCv: String? = null
+        måBehandleTidligereCv: String? = null,
+        aktørId: String = """
+            "aktørId": "123456789"
+        """.trimIndent()
     ) =
         hendelse(
             oppfølgingsperiode = oppfølgingsperiode,
@@ -272,7 +277,8 @@ class SynlighetsmotorTest {
             fritattKandidatsøk = fritattKandidatsøk,
             hjemmel = hjemmel,
             participatingService = participatingService,
-            måBehandleTidligereCv = måBehandleTidligereCv
+            måBehandleTidligereCv = måBehandleTidligereCv,
+            aktørId = aktørId
         )
 
     private fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -291,7 +297,8 @@ class SynlighetsmotorTest {
         fritattKandidatsøk: String? = null,
         hjemmel: String? = null,
         participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-        måBehandleTidligereCv: String? = null
+        måBehandleTidligereCv: String? = null,
+        aktørId: String? = null
     ) = """
             {
                 ${
@@ -303,7 +310,8 @@ class SynlighetsmotorTest {
             fritattKandidatsøk,
             hjemmel,
             participatingService,
-            måBehandleTidligereCv
+            måBehandleTidligereCv,
+            aktørId
         ).joinToString()
     }
             }
