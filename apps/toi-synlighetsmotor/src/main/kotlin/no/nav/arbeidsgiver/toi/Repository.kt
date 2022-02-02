@@ -29,7 +29,7 @@ class Repository(val dataSource: DataSource) {
     private val tabell = "evaluering"
     private val aktøridKolonne = "aktor_id"
 
-    private val fødselsnummerkolonne = "fodselsnummer"
+    private val fødselsnummerKolonne = "fodselsnummer"
     private val harAktivCvKolonne = "har_aktiv_cv"
     private val harJobbprofilkolonne = "har_jobbprofil"
     private val harSettHjemmelKolonne = "har_sett_hjemmel"
@@ -56,7 +56,7 @@ class Repository(val dataSource: DataSource) {
                 databaseMap.values.forEachIndexed { index, any ->
                     this.setObject(index + 1, any)
                 }
-            }.executeQuery()
+            }.execute()
         }
     }
 
@@ -94,14 +94,14 @@ class Repository(val dataSource: DataSource) {
 
         return mapOf(
             aktøridKolonne to aktørId,
-            fødselsnummerkolonne to fødselsnummer,
+            fødselsnummerKolonne to fødselsnummer,
             harAktivCvKolonne to harAktivCv,
             harJobbprofilkolonne to harJobbprofil,
             harSettHjemmelKolonne to harSettHjemmel,
             måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv,
             ikkeFritattFraKandidatsøkKolonne to erIkkefritattKandidatsøk,
             erIkkeUnderOppfølgingKolonne to erUnderOppfoelging,
-            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppeKolonne,
+            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe,
             erIkkeKode6Eller7Kolonne to erIkkeKode6eller7,
             erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt,
             erIkkeDødKolonne to erIkkeDoed,
