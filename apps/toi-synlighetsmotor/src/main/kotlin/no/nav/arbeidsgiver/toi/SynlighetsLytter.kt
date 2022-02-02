@@ -1,10 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.*
 
 class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
     River.PacketListener {
@@ -43,13 +40,39 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         packet["synlighet"] = synlighet
         val aktørId = packet["aktørId"].asText()
-        val fødselsnummer = packet["oppfølgingsinformasjon"]["fodselsnummer"].asText() //TODO: sjekke flere steder for fødselsnummer
+        val fødselsnummer = finnFødselsnummer(packet)
 
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 
         repository.lagre(evaluering = synlighetsevaluering, aktørId = aktørId, fødselsnummer = fødselsnummer)
 
         rapidsConnection.publish(aktørId, packet.toJson())
+    }
+
+    private fun finnFødselsnummer(packet: JsonMessage) : String? {
+        if(packet["cv"]  != null) {
+            if(packet["cv"]["endreCv"] != null) {
+                if(packet["cv"]["endreCv"]["fodselsnummer"] != null) {
+                    return packet["cv"]["endreCv"]["fodselsnummer"].asText()
+                }
+            }
+            if(packet["cv"]["endreCv"] != null) {
+                if(packet["cv"]["opprettCv"]["fodselsnummer"] != null) {
+                    return packet["cv"]["opprettCv"]["fodselsnummer"].asText()
+                }
+            }
+        }
+        if(packet["hjemmel"] != null) {
+            if(packet["hjemmel"]["fnr"] != null) {
+                return packet["hjemmel"]["fnr"].asText()
+            }
+        }
+        if(packet["oppfølgingsinformasjon"] != null){
+            if(packet["oppfølgingsinformasjon"]["fodselsnummer"] != null) {
+                return packet["oppfølgingsinformasjon"]["fodselsnummer"].asText()
+            }
+        }
+        return null
     }
 
     private data class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)

@@ -1,6 +1,6 @@
 CREATE TABLE evaluering (
     aktor_id VARCHAR(20) PRIMARY KEY,
-    fodselsnummer VARCHAR(11) NOT NULL,
+    fodselsnummer VARCHAR(11),
     har_aktiv_cv BOOLEAN NOT NULL DEFAULT FALSE,
     har_jobbprofil BOOLEAN NOT NULL DEFAULT FALSE,
     har_sett_hjemmel BOOLEAN NOT NULL DEFAULT FALSE,

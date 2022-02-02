@@ -46,7 +46,7 @@ class Repository(val dataSource: DataSource) {
         kjørFlywayMigreringer()
     }
 
-    fun lagre(evaluering: Evaluering, aktørId: String, fødselsnummer: String) {
+    fun lagre(evaluering: Evaluering, aktørId: String, fødselsnummer: String?) {
         val databaseMap = evaluering.databaseMap(aktørId, fødselsnummer)
         val kolonneString = kolonneString(databaseMap.keys.toList())
         val verdiString = verdiString(databaseMap.values.toList())
@@ -87,10 +87,10 @@ class Repository(val dataSource: DataSource) {
     private fun kolonneString(kolonner: List<String>) =
         kolonner.joinToString(prefix = "(", separator = ",", postfix = ")")
 
-    private fun verdiString(verdier: List<Any>) =
+    private fun verdiString(verdier: List<Any?>) =
         verdier.map { "?" }.joinToString(prefix = "(", separator = ",", postfix = ")")
 
-    private fun Evaluering.databaseMap(aktørId: String, fødselsnummer: String): Map<String, Any> {
+    private fun Evaluering.databaseMap(aktørId: String, fødselsnummer: String?): Map<String, Any?> {
 
         return mapOf(
             aktøridKolonne to aktørId,
