@@ -239,6 +239,19 @@ class SynlighetsmotorTest {
         assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue())
     }
 
+    @Test
+    fun `Prøv å hentvia api med fnr som ikke finnes i db`() {
+        val repository = Repository(TestDatabase().dataSource)
+        val rapid = TestRapid()
+
+        App(repository, javalin(), rapid).startup()
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
+
+        val response = Fuel.get("http://localhost:9000/evaluering/12345678912").response().second
+        assertThat(response.statusCode).isEqualTo(404)
+    }
+
     private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
         {
             assertThat(size).isEqualTo(0)
