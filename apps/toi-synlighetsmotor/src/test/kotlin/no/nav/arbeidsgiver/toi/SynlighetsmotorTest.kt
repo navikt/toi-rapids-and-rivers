@@ -176,14 +176,17 @@ class SynlighetsmotorTest {
         )
 
     @Test
-    fun `ignorer uinteressante hendelser`() = testProgramMedHendelse(
-        """
-        {
-            "@event_name":"uinteressant_hendelse"
-        }
-        """.trimIndent()
-    ) {
-        assertThat(size).isEqualTo(0)
+    fun `ignorer uinteressante hendelser`() {
+        testProgramMedHendelse(
+            oppfølgingsinformasjonHendelse = """
+                    {
+                        "@event_name":"uinteressant_hendelse"
+                    }
+                    """.trimIndent(),
+            assertion = {
+                assertThat(size).isZero()
+            }
+        )
     }
 
     @Test
@@ -201,10 +204,12 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `sjekkDatabase`() {
-        val repository = testProgramMedHendelse(
+    fun `sjekkDatabaseNårAlleparamertereErSynlig`() {
+        val repository = Repository(TestDatabase().dataSource)
+        testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true),
+            repository
         )
         val evalueringFraDb = repository.hent(aktorId = "123456789")
         assertThat(evalueringFraDb).isEqualTo(
@@ -246,16 +251,14 @@ class SynlighetsmotorTest {
 
     private fun testProgramMedHendelse(
         oppfølgingsinformasjonHendelse: String,
-        assertion: TestRapid.RapidInspector.() -> Unit
-    ): Repository {
-        val repository = Repository(TestDatabase().dataSource)
+        assertion: TestRapid.RapidInspector.() -> Unit,
+        repository: Repository = Repository(TestDatabase().dataSource)
+    ) {
         val rapid = TestRapid()
             .also { SynlighetsLytter(it, repository) }
 
         rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
-        rapid.inspektør.apply(assertion)
-
-        return repository // TODO, fikse struktur på testene med repo
+        rapid.inspektør.assertion()
     }
 
     private fun komplettHendelseSomFørerTilSynlighetTrue(
