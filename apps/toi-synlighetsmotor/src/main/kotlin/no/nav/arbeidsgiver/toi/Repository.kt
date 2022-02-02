@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
@@ -60,28 +61,41 @@ class Repository(val dataSource: DataSource) {
         }
     }
 
-    fun hent(aktorId: String): Evaluering? =
+    fun hentMedAktørid(aktorId: String): Evaluering? =
         dataSource.connection.use {
             val resultset = it.prepareStatement("select * from $tabell where $aktøridKolonne = ?").apply {
                 setString(1, aktorId)
             }.executeQuery()
             if (resultset.next()) {
-                return Evaluering(
-                    harAktivCv = resultset.getBoolean(harAktivCvKolonne),
-                    harJobbprofil = resultset.getBoolean(harJobbprofilkolonne),
-                    harSettHjemmel = resultset.getBoolean(harSettHjemmelKolonne),
-                    maaIkkeBehandleTidligereCv = resultset.getBoolean(måIkkeBehandleTidligereCvKolonne),
-                    erIkkefritattKandidatsøk = resultset.getBoolean(ikkeFritattFraKandidatsøkKolonne),
-                    erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne),
-                    harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne),
-                    erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne),
-                    erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne),
-                    erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne),
-                    erFerdigBeregnet = resultset.getBoolean(erFerdigBeregnetKolonne),
-                )
-
+                return evalueringFraDB(resultset)
             } else null
         }
+
+    fun hentMedFnr(aktorId: String): Evaluering? =
+        dataSource.connection.use {
+            val resultset = it.prepareStatement("select * from $tabell where $fødselsnummerKolonne = ?").apply {
+                setString(1, aktorId)
+            }.executeQuery()
+            if (resultset.next()) {
+                return evalueringFraDB(resultset)
+            } else null
+        }
+
+
+
+    private fun evalueringFraDB(resultset: ResultSet) = Evaluering(
+        harAktivCv = resultset.getBoolean(harAktivCvKolonne),
+        harJobbprofil = resultset.getBoolean(harJobbprofilkolonne),
+        harSettHjemmel = resultset.getBoolean(harSettHjemmelKolonne),
+        maaIkkeBehandleTidligereCv = resultset.getBoolean(måIkkeBehandleTidligereCvKolonne),
+        erIkkefritattKandidatsøk = resultset.getBoolean(ikkeFritattFraKandidatsøkKolonne),
+        erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne),
+        harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne),
+        erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne),
+        erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne),
+        erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne),
+        erFerdigBeregnet = resultset.getBoolean(erFerdigBeregnetKolonne),
+    )
 
 
     private fun kolonneString(kolonner: List<String>) =

@@ -204,14 +204,14 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `sjekkDatabaseNårAlleparamertereErSynlig`() {
+    fun `sjekkDatabaseNårAlleParamertereErSynlig`() {
         val repository = Repository(TestDatabase().dataSource)
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true),
             repository
         )
-        val evalueringFraDb = repository.hent(aktorId = "123456789")
+        val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
         assertThat(evalueringFraDb).isEqualTo(
             Evaluering(
                 true,
@@ -228,6 +228,8 @@ class SynlighetsmotorTest {
             )
         )
     }
+
+
 
 
     private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
