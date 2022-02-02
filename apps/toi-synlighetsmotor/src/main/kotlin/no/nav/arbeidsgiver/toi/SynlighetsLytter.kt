@@ -50,7 +50,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
     }
 
     private fun finnFødselsnummer(packet: JsonMessage) : String? {
-        if(packet["cv"]  != null) {
+        if(!packet["cv"].isMissingOrNull()) {
             if(packet["cv"]["endreCv"] != null) {
                 if(packet["cv"]["endreCv"]["fodselsnummer"] != null) {
                     return packet["cv"]["endreCv"]["fodselsnummer"].asText()
@@ -62,12 +62,12 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
                 }
             }
         }
-        if(packet["hjemmel"] != null) {
+        if(!packet["hjemmel"].isMissingOrNull()) {
             if(packet["hjemmel"]["fnr"] != null) {
                 return packet["hjemmel"]["fnr"].asText()
             }
         }
-        if(packet["oppfølgingsinformasjon"] != null){
+        if(!packet["oppfølgingsinformasjon"].isMissingOrNull()){
             if(packet["oppfølgingsinformasjon"]["fodselsnummer"] != null) {
                 return packet["oppfølgingsinformasjon"]["fodselsnummer"].asText()
             }

@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.github.kittinunf.fuel.Fuel
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -213,24 +216,28 @@ class SynlighetsmotorTest {
         )
         val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
         assertThat(evalueringFraDb).isEqualTo(
-            Evaluering(
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true
-            )
+            evalueringMedAltTrue()
         )
     }
 
+    @Test
+    fun `Lagre evaluering og deretter hent via api skal returnere riktig evaluering`() {
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
+        val repository = Repository(TestDatabase().dataSource)
+        val rapid = TestRapid()
 
+        App(repository, javalin(), rapid).startup()
+
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        assertThat(rapid.inspektør.size).isEqualTo(1)
+
+        val response = Fuel.get("http://localhost:9000/evaluering/12345678912").response().second
+        assertThat(response.statusCode).isEqualTo(200)
+        val responseJson = response.body().asString("application/json")
+        val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
+        assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue())
+    }
 
     private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
         {
@@ -453,4 +460,18 @@ class SynlighetsmotorTest {
                 "time":"2021-12-14T15:55:36.566399512"
             }]
         """.trimIndent()
+
+    private fun evalueringMedAltTrue() = Evaluering(
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    )
 }
