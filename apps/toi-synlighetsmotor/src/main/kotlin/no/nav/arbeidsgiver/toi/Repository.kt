@@ -104,11 +104,11 @@ class Repository(private val dataSource: DataSource) {
 }
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
-    private val host = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_HOST")
-    private val port = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_PORT")
-    private val database = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_DATABASE")
-    private val user = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_USERNAME")
-    private val pw = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_PASSWORD")
+    private val host = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_SYNLIGHETSMOTOR_DB_HOST")
+    private val port = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_SYNLIGHETSMOTOR_DB_PORT")
+    private val database = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_SYNLIGHETSMOTOR_DB_DATABASE")
+    private val user = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_SYNLIGHETSMOTOR_DB_USERNAME")
+    private val pw = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_SYNLIGHETSMOTOR_DB_PASSWORD")
 
     fun lagDatasource() = HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://$host:$port/$database"

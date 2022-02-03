@@ -38,7 +38,7 @@ spec:
     sqlInstances:
       - type: POSTGRES_12
         databases:
-          - name: evaluering-db
+          - name: synlighetsmotor-db
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
