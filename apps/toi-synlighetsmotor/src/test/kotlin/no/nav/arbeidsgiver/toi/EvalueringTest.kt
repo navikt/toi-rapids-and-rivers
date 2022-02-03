@@ -1,9 +1,9 @@
+package no.nav.arbeidsgiver.toi
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.kittinunf.fuel.Fuel
 import io.javalin.Javalin
-import no.nav.arbeidsgiver.toi.*
-import no.nav.arbeidsgiver.toi.Testdata.Companion.evalueringMedAltTrue
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions
@@ -30,7 +30,10 @@ class EvalueringTest {
 
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+                synlighet = true,
+                ferdigBeregnet = true
+            ),
             repository
         )
 
@@ -72,3 +75,17 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(404)
     }
 }
+
+private fun evalueringMedAltTrue() = Evaluering(
+    harAktivCv = true,
+    harJobbprofil = true,
+    harSettHjemmel = true,
+    maaIkkeBehandleTidligereCv = true,
+    erIkkefritattKandidatsøk = true,
+    erUnderOppfoelging = true,
+    harRiktigFormidlingsgruppe = true,
+    erIkkeKode6eller7 = true,
+    erIkkeSperretAnsatt = true,
+    erIkkeDoed = true,
+    erFerdigBeregnet = true
+)

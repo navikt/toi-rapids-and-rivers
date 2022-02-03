@@ -29,6 +29,11 @@ fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
         }
     }
 
+fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
+    {
+        Assertions.assertThat(size).isEqualTo(0)
+    }
+
 class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
@@ -221,19 +226,5 @@ class Testdata {
                 "time":"2021-12-14T15:55:36.566399512"
             }]
         """.trimIndent()
-
-        fun evalueringMedAltTrue() = Evaluering(
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-        )
     }
 }

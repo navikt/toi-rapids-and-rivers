@@ -15,7 +15,6 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendelseMedParticipatingService
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -65,17 +64,12 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person er familie skal synlighet være false`() {
-    }
-
-    @Test
     fun `om Person ikke har aktiv oppfølgingsperiode skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode = avsluttetOppfølgingsperiode()
         ),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
-
 
     @Test
     fun `om Person ikke har oppfølgingsinformasjon skal synlighet være false`() = testProgramMedHendelse(
@@ -192,11 +186,7 @@ class SynlighetsmotorTest {
     @Test
     fun `ignorer uinteressante hendelser`() {
         testProgramMedHendelse(
-            oppfølgingsinformasjonHendelse = """
-                    {
-                        "@event_name":"uinteressant_hendelse"
-                    }
-                    """.trimIndent(),
+            oppfølgingsinformasjonHendelse = """{ "@event_name":"uinteressant_hendelse" }""",
             assertion = {
                 assertThat(size).isZero()
             }
@@ -216,10 +206,4 @@ class SynlighetsmotorTest {
         ),
         enHendelseErIkkePublisert()
     )
-
-    private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
-        {
-            assertThat(size).isEqualTo(0)
-
-        }
 }
