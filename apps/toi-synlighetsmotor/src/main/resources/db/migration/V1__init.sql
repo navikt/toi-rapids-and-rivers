@@ -6,7 +6,7 @@ CREATE TABLE evaluering (
     har_sett_hjemmel BOOLEAN NOT NULL DEFAULT FALSE,
     maa_ikke_behandle_tidligere_cv BOOLEAN NOT NULL DEFAULT FALSE,
     ikke_fritatt_kandidatsok BOOLEAN NOT NULL DEFAULT FALSE,
-    er_under_oppfoelging BOOLEAN NOT NULL DEFAULT FALSE,
+    er_under_oppfolging BOOLEAN NOT NULL DEFAULT FALSE,
     har_riktig_formidlingsgruppe BOOLEAN NOT NULL DEFAULT FALSE,
     er_ikke_kode6_eller_kode7 BOOLEAN NOT NULL DEFAULT FALSE,
     er_ikke_sperret_ansatt BOOLEAN NOT NULL DEFAULT FALSE,

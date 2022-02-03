@@ -16,7 +16,7 @@ class Repository(private val dataSource: DataSource) {
     private val harSettHjemmelKolonne = "har_sett_hjemmel"
     private val måIkkeBehandleTidligereCvKolonne = "maa_ikke_behandle_tidligere_cv"
     private val ikkeFritattFraKandidatsøkKolonne = "ikke_fritatt_kandidatsok"
-    private val erIkkeUnderOppfølgingKolonne = "er_under_oppfoelging"
+    private val erIkkeUnderOppfølgingKolonne = "er_under_oppfolging"
     private val harRiktigFormidlingsgruppeKolonne = "har_riktig_formidlingsgruppe"
     private val erIkkeKode6Eller7Kolonne = "er_ikke_kode6_eller_kode7"
     private val erIkkeSperretAnsattKolonne = "er_ikke_sperret_ansatt"
