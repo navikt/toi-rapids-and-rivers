@@ -223,11 +223,10 @@ class SynlighetsmotorTest {
     @Test
     fun `Lagre evaluering og deretter hent via api skal returnere riktig evaluering`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
-
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
 
-        App(repository, javalin(), rapid).startup()
+        startApp(repository, javalin(), rapid)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -244,7 +243,7 @@ class SynlighetsmotorTest {
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
 
-        App(repository, javalin(), rapid).startup()
+        startApp(repository, javalin(), rapid)
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
 
