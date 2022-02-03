@@ -34,6 +34,11 @@ spec:
   azure:
     application:
       enabled: true
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        databases:
+          - name: evaluering-db
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
