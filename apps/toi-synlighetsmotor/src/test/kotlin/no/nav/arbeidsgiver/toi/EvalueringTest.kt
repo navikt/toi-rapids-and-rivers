@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.kittinunf.fuel.Fuel
 import io.javalin.Javalin
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelse
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
+import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendelseMedParticipatingService
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
@@ -60,6 +62,32 @@ class EvalueringTest {
         val responseJson = response.body().asString("application/json")
         val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue())
+    }
+
+    @Test
+    fun `GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val repository = Repository(TestDatabase().dataSource)
+        val rapid = TestRapid()
+
+        startApp(repository, javalin, rapid)
+
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fritattKandidatsøk = """
+            "fritattKandidatsøk" : {
+                "fritattKandidatsok" : true
+            }
+        """))
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
+
+
+        val response = Fuel.get("http://localhost:9000/evaluering/12345678912").response().second
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json")
+        val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue().copy(erIkkefritattKandidatsøk = false))
     }
 
     @Test

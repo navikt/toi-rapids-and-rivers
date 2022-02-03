@@ -27,14 +27,35 @@ class Repository(private val dataSource: DataSource) {
         val databaseMap = evaluering.databaseMap(aktørId, fødselsnummer)
         val kolonneString = kolonneString(databaseMap.keys.toList())
         val verdiString = verdiString(databaseMap.values.toList())
+        val updateString = updateString(databaseMap)
 
-        dataSource.connection.use {
-            it.prepareStatement("insert into $tabell $kolonneString values $verdiString").apply {
-                databaseMap.values.forEachIndexed { index, any ->
-                    this.setObject(index + 1, any)
-                }
-            }.execute()
+        val evaluering = hentMedAktørid(aktørId)
+        if (evaluering != null) {
+            dataSource.connection.use {
+                it.prepareStatement(
+                    "update $tabell set $updateString where $aktøridKolonne = '$aktørId'"
+                ).apply {
+                    databaseMap.filterKeys { it != aktøridKolonne }.values
+                        .forEachIndexed() { index, any ->
+                        this.setObject((index + 1), any)
+                    }
+                }.execute()
+            }
+        } else {
+            dataSource.connection.use {
+                it.prepareStatement("insert into $tabell $kolonneString values $verdiString").apply {
+                    databaseMap.values.forEachIndexed { index, any ->
+                        this.setObject(index + 1, any)
+                    }
+                }.execute()
+            }
         }
+    }
+
+    private fun updateString(data: Map<String, Any?>): String {
+        return data.entries
+            .filter { it.key != aktøridKolonne  }
+            .joinToString(transform = { "${it.key} = ?" }, separator = ",")
     }
 
     fun hentMedAktørid(aktorId: String): Evaluering? =
