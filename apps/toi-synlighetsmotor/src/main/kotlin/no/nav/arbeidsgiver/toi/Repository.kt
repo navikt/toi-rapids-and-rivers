@@ -6,26 +6,7 @@ import org.flywaydb.core.Flyway
 import java.sql.ResultSet
 import javax.sql.DataSource
 
-class DatabaseKonfigurasjon(env: Map<String, String>) {
-    private val host = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_HOST")
-    private val port = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_PORT")
-    private val database = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_DATABASE")
-    private val user = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_USERNAME")
-    private val pw = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_PASSWORD")
-
-    fun lagDatasource() = HikariConfig().apply {
-        jdbcUrl = "jdbc:postgresql://$host:$port/$database"
-        minimumIdle = 1
-        maximumPoolSize = 2
-        driverClassName = "org.postgresql.Driver"
-        initializationFailTimeout = 5000
-        username = user
-        password = pw
-        validate()
-    }.let(::HikariDataSource)
-}
-
-class Repository(val dataSource: DataSource) {
+class Repository(private val dataSource: DataSource) {
     private val tabell = "evaluering"
     private val aktøridKolonne = "aktor_id"
     private val fødselsnummerKolonne = "fodselsnummer"
@@ -41,10 +22,6 @@ class Repository(val dataSource: DataSource) {
     private val erIkkeSperretAnsattKolonne = "er_ikke_sperret_ansatt"
     private val erIkkeDødKolonne = "er_ikke_doed"
     private val erFerdigBeregnetKolonne = "er_ferdig_beregnet"
-
-    init {
-        kjørFlywayMigreringer()
-    }
 
     fun lagre(evaluering: Evaluering, aktørId: String, fødselsnummer: String?) {
         val databaseMap = evaluering.databaseMap(aktørId, fødselsnummer)
@@ -101,7 +78,6 @@ class Repository(val dataSource: DataSource) {
         verdier.map { "?" }.joinToString(prefix = "(", separator = ",", postfix = ")")
 
     private fun Evaluering.databaseMap(aktørId: String, fødselsnummer: String?): Map<String, Any?> {
-
         return mapOf(
             aktøridKolonne to aktørId,
             fødselsnummerKolonne to fødselsnummer,
@@ -119,12 +95,31 @@ class Repository(val dataSource: DataSource) {
         )
     }
 
-    private fun kjørFlywayMigreringer() {
+    fun kjørFlywayMigreringer() {
         Flyway.configure()
             .dataSource(dataSource)
             .load()
             .migrate()
     }
+}
+
+class DatabaseKonfigurasjon(env: Map<String, String>) {
+    private val host = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_HOST")
+    private val port = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_PORT")
+    private val database = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_DATABASE")
+    private val user = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_USERNAME")
+    private val pw = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_EVALUERING_DB_PASSWORD")
+
+    fun lagDatasource() = HikariConfig().apply {
+        jdbcUrl = "jdbc:postgresql://$host:$port/$database"
+        minimumIdle = 1
+        maximumPoolSize = 2
+        driverClassName = "org.postgresql.Driver"
+        initializationFailTimeout = 5000
+        username = user
+        password = pw
+        validate()
+    }.let(::HikariDataSource)
 }
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")

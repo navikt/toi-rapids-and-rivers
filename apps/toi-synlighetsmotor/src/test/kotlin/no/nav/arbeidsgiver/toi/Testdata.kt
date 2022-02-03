@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import io.javalin.Javalin
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions
 import java.time.ZonedDateTime
@@ -10,7 +11,8 @@ fun testProgramMedHendelse(
     repository: Repository = Repository(TestDatabase().dataSource)
 ) {
     val rapid = TestRapid()
-        .also { SynlighetsLytter(it, repository) }
+
+    startApp(repository, Javalin.create(), rapid)
 
     rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
     rapid.inspektør.assertion()

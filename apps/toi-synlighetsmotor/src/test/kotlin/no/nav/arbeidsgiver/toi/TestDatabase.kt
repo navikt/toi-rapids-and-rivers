@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
 import java.sql.ResultSet
 import javax.sql.DataSource
 
@@ -15,11 +16,12 @@ class TestDatabase {
         })
 
     init {
-        Repository(dataSource)
+        val repository = Repository(dataSource)
+        repository.kjørFlywayMigreringer()
         slettAlt()
     }
 
-    fun slettAlt() {
+    private fun slettAlt() {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
                 "DELETE FROM evaluering"

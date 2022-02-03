@@ -13,7 +13,10 @@ fun startApp(
     javalin: Javalin,
     rapidsConnection: RapidsConnection
 ) {
-    rapidsConnection.also { SynlighetsLytter(it, repository) }.start()
+    rapidsConnection.also {
+        SynlighetsLytter(it, repository)
+    }.start()
+
     javalin.routes {
         path("evaluering") {
             path("{fnr}") {
@@ -33,15 +36,20 @@ fun startApp(
 }
 
 fun main() {
-    val datasource = DatabaseKonfigurasjon(System.getenv()).lagDatasource()
+    val env = System.getenv()
+    val datasource = DatabaseKonfigurasjon(env).lagDatasource()
     val repository = Repository(datasource)
     val javalin = Javalin.create().start(9000)
 
-    startApp(
-        repository,
-        javalin,
-        rapidsConnection = RapidApplication.create(System.getenv())
-    )
+    val rapidsConnection = RapidApplication.create(env).apply {
+        this.register(object: RapidsConnection.StatusListener {
+            override fun onStartup(rapidsConnection: RapidsConnection) {
+                repository.kjørFlywayMigreringer()
+            }
+        })
+    }
+
+    startApp(repository, javalin, rapidsConnection)
 }
 
 val Any.log: Logger
