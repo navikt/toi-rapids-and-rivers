@@ -1,15 +1,26 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.kittinunf.fuel.Fuel
+import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
+import no.nav.arbeidsgiver.toi.Testdata.Companion.cv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.fritattKandidatsøk
+import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
+import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
+import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelse
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
+import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
+import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeCV
+import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeHjemmel
+import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
+import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendelseMedParticipatingService
+import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
-
     @Test
     fun `legg på synlighet som sann om all data i hendelse tilsier det`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(),
@@ -206,284 +217,9 @@ class SynlighetsmotorTest {
         enHendelseErIkkePublisert()
     )
 
-    @Test
-    fun `sjekkDatabaseNårAlleParamertereErSynlig`() {
-        val repository = Repository(TestDatabase().dataSource)
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true),
-            repository
-        )
-        val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
-        assertThat(evalueringFraDb).isEqualTo(
-            evalueringMedAltTrue()
-        )
-    }
-
-    @Test
-    fun `Lagre evaluering og deretter hent via api skal returnere riktig evaluering`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
-        val repository = Repository(TestDatabase().dataSource)
-        val rapid = TestRapid()
-
-        startApp(repository, javalin(), rapid)
-
-        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
-        assertThat(rapid.inspektør.size).isEqualTo(1)
-
-        val response = Fuel.get("http://localhost:9000/evaluering/12345678912").response().second
-        assertThat(response.statusCode).isEqualTo(200)
-        val responseJson = response.body().asString("application/json")
-        val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
-        assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue())
-    }
-
-    @Test
-    fun `Prøv å hentvia api med fnr som ikke finnes i db`() {
-        val repository = Repository(TestDatabase().dataSource)
-        val rapid = TestRapid()
-
-        startApp(repository, javalin(), rapid)
-
-        assertThat(rapid.inspektør.size).isEqualTo(0)
-
-        val response = Fuel.get("http://localhost:9000/evaluering/12345678912").response().second
-        assertThat(response.statusCode).isEqualTo(404)
-    }
-
     private fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
         {
             assertThat(size).isEqualTo(0)
 
         }
-
-    private fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
-        synlighet: Boolean,
-        ferdigBeregnet: Boolean
-    ): TestRapid.RapidInspector.() -> Unit =
-        {
-            assertThat(size).isEqualTo(1)
-            assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
-            field(0, "synlighet").apply {
-                assertThat(get("erSynlig").asBoolean()).apply { if (synlighet) isTrue else isFalse }
-                assertThat(get("ferdigBeregnet").asBoolean()).apply { if (ferdigBeregnet) isTrue else isFalse }
-            }
-        }
-
-    private fun testProgramMedHendelse(
-        oppfølgingsinformasjonHendelse: String,
-        assertion: TestRapid.RapidInspector.() -> Unit,
-        repository: Repository = Repository(TestDatabase().dataSource)
-    ) {
-        val rapid = TestRapid()
-            .also { SynlighetsLytter(it, repository) }
-
-        rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
-        rapid.inspektør.assertion()
-    }
-
-    private fun komplettHendelseSomFørerTilSynlighetTrue(
-        oppfølgingsperiode: String = aktivOppfølgingsperiode(),
-        oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
-        cv: String = cv(),
-        fritattKandidatsøk: String = fritattKandidatsøk(),
-        hjemmel: String = hjemmel(),
-        participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-        måBehandleTidligereCv: String? = null,
-        aktørId: String = """
-            "aktørId": "123456789"
-        """.trimIndent()
-    ) =
-        hendelse(
-            oppfølgingsperiode = oppfølgingsperiode,
-            oppfølgingsinformasjon = oppfølgingsinformasjon,
-            cv = cv,
-            fritattKandidatsøk = fritattKandidatsøk,
-            hjemmel = hjemmel,
-            participatingService = participatingService,
-            måBehandleTidligereCv = måBehandleTidligereCv,
-            aktørId = aktørId
-        )
-
-    private fun oppfølgingsinformasjonHendelseMedParticipatingService(
-        oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
-        participatingService: String? = participatingService("toi-sammenstille-kandidat")
-    ) =
-        hendelse(
-            oppfølgingsinformasjon = oppfølgingsinformasjon,
-            participatingService = participatingService
-        )
-
-    private fun hendelse(
-        oppfølgingsperiode: String? = null,
-        oppfølgingsinformasjon: String? = null,
-        cv: String? = null,
-        fritattKandidatsøk: String? = null,
-        hjemmel: String? = null,
-        participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-        måBehandleTidligereCv: String? = null,
-        aktørId: String? = null
-    ) = """
-            {
-                ${
-        listOfNotNull(
-            """"@event_name": "hendelse"""",
-            cv,
-            oppfølgingsinformasjon,
-            oppfølgingsperiode,
-            fritattKandidatsøk,
-            hjemmel,
-            participatingService,
-            måBehandleTidligereCv,
-            aktørId
-        ).joinToString()
-    }
-            }
-        """.trimIndent()
-
-    private fun oppfølgingsinformasjon(
-        erDoed: Boolean = false,
-        sperretAnsatt: Boolean = false,
-        formidlingsgruppe: String = "IARBS",
-        harOppfolgingssak: Boolean = true,
-        diskresjonskode: String? = null
-    ) =
-        """
-            "oppfølgingsinformasjon": {
-                "fodselsnummer": "12345678912",
-                "formidlingsgruppe": "$formidlingsgruppe",
-                "iservFraDato": null,
-                "fornavn": "TULLETE",
-                "etternavn": "TABBE",
-                "oppfolgingsenhet": "0318",
-                "kvalifiseringsgruppe": "BATT",
-                "rettighetsgruppe": "AAP",
-                "hovedmaal": "BEHOLDEA",
-                "sikkerhetstiltakType": null,
-                "diskresjonskode": ${if (diskresjonskode == null) null else "\"$diskresjonskode\""},
-                "harOppfolgingssak": $harOppfolgingssak,
-                "sperretAnsatt": $sperretAnsatt,
-                "erDoed": $erDoed,
-                "doedFraDato": null,
-                "sistEndretDato": "2020-10-30T14:15:38+01:00"
-            }
-        """.trimIndent()
-
-    private fun aktivOppfølgingsperiode() =
-        """
-            "oppfølgingsperiode": {
-                "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "aktorId": "123456789",
-                "startDato": "2020-10-30T14:15:38+01:00",
-                "sluttDato": null
-            }
-        """.trimIndent()
-
-    private fun avsluttetOppfølgingsperiode() =
-        """
-            "oppfølgingsperiode": {
-                "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "aktorId": "123456789",
-                "startDato": "2020-10-30T14:15:38+01:00",
-                "sluttDato": "2021-10-30T14:15:38+01:00"
-            }
-        """.trimIndent()
-
-    private fun cv(meldingstype: CvMeldingstype = CvMeldingstype.OPPRETT) =
-        """
-            "cv": {
-                "meldingstype": "$meldingstype",
-                "opprettJobbprofil": {},
-                "endreJobbprofil": null
-            }
-        """.trimIndent()
-
-    private fun manglendeCV() =
-        """
-            "cv": null
-        """.trimIndent()
-
-    private fun harCvManglerJobbprofil() =
-        """
-            "cv": {
-                "meldingstype": "${CvMeldingstype.OPPRETT}",
-                "opprettJobbprofil": null,
-                "endreJobbprofil": null
-            }
-        """.trimIndent()
-
-    private fun harEndreJobbrofil() =
-        """
-            "cv": {
-                "meldingstype": "${CvMeldingstype.OPPRETT}",
-                "opprettJobbprofil": null,
-                "endreJobbprofil": {}
-            }
-        """.trimIndent()
-
-    private fun harOpprettJobbrofil() =
-        """
-            "cv": {
-                "meldingstype": "${CvMeldingstype.OPPRETT}",
-                "opprettJobbprofil": {},
-                "endreJobbprofil": null
-            }
-        """.trimIndent()
-
-    private fun fritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
-        """
-            "fritattKandidatsøk" : {
-                "fritattKandidatsok" : $fritattKandidatsøk
-            }
-        """.trimIndent()
-
-    private fun hjemmel(
-        ressurs: String = "CV_HJEMMEL",
-        opprettetDato: ZonedDateTime? = ZonedDateTime.now().minusDays(1),
-        slettetDato: ZonedDateTime? = null
-    ) =
-        """
-            "hjemmel": {
-                "ressurs": "$ressurs",
-                "opprettetDato": "$opprettetDato",
-                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""}
-            }
-        """.trimIndent()
-
-    private fun måBehandleTidligereCv(
-        maaBehandleTidligereCv: Boolean = false
-    ) =
-        """
-            "måBehandleTidligereCv": {
-                "maaBehandleTidligereCv": "$maaBehandleTidligereCv"
-            }
-        """.trimIndent()
-
-    private fun manglendeHjemmel() =
-        """
-            "hjemmel": null
-        """.trimIndent()
-
-    private fun participatingService(service: String) =
-        """
-            "system_participating_services" : [{
-                "service":"$service",
-                "instance":"$service-74874ffcd7-mw8r6",
-                "time":"2021-12-14T15:55:36.566399512"
-            }]
-        """.trimIndent()
-
-    private fun evalueringMedAltTrue() = Evaluering(
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-    )
 }

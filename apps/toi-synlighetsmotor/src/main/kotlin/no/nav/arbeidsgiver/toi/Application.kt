@@ -32,12 +32,10 @@ fun startApp(
     }
 }
 
-fun javalin(): Javalin = Javalin.create().start(9000)
-
 fun main() {
     val datasource = DatabaseKonfigurasjon(System.getenv()).lagDatasource()
     val repository = Repository(datasource)
-    val javalin = javalin()
+    val javalin = Javalin.create().start(9000)
 
     startApp(
         repository,
