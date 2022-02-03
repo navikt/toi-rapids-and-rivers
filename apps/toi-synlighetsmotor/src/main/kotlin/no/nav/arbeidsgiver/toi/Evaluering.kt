@@ -14,7 +14,6 @@ data class Evaluering(
     val erFerdigBeregnet: Boolean
 
 ) {
-
     fun erSynlig() = harAktivCv &&
             harJobbprofil &&
             harSettHjemmel &&
@@ -27,6 +26,3 @@ data class Evaluering(
             erIkkeDoed &&
             erFerdigBeregnet
 }
-
-
-

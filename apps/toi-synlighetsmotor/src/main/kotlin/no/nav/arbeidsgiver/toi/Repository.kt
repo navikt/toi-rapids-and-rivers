@@ -26,10 +26,8 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
 }
 
 class Repository(val dataSource: DataSource) {
-
     private val tabell = "evaluering"
     private val aktøridKolonne = "aktor_id"
-
     private val fødselsnummerKolonne = "fodselsnummer"
     private val harAktivCvKolonne = "har_aktiv_cv"
     private val harJobbprofilkolonne = "har_jobbprofil"
@@ -81,8 +79,6 @@ class Repository(val dataSource: DataSource) {
             } else null
         }
 
-
-
     private fun evalueringFraDB(resultset: ResultSet) = Evaluering(
         harAktivCv = resultset.getBoolean(harAktivCvKolonne),
         harJobbprofil = resultset.getBoolean(harJobbprofilkolonne),
@@ -96,7 +92,6 @@ class Repository(val dataSource: DataSource) {
         erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne),
         erFerdigBeregnet = resultset.getBoolean(erFerdigBeregnetKolonne),
     )
-
 
     private fun kolonneString(kolonner: List<String>) =
         kolonner.joinToString(prefix = "(", separator = ",", postfix = ")")
@@ -129,7 +124,6 @@ class Repository(val dataSource: DataSource) {
             .load()
             .migrate()
     }
-
 }
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")

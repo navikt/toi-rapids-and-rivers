@@ -51,12 +51,3 @@ private fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
 
 fun beregningsgrunnlag(kandidat: Kandidat) =
     kandidat.cv != null && kandidat.oppfølgingsperiode != null && kandidat.oppfølgingsinformasjon != null
-
-
-
-
-
-
-
-
-
