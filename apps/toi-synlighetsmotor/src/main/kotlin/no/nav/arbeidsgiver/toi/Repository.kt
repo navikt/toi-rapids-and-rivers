@@ -7,11 +7,11 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
-    private val host = env.variable("NAIS_DATABASE_TOI_SYNIGHETSMOTOR_DB_HOST")
-    private val port = env.variable("NAIS_DATABASE_TOI_SYNIGHETSMOTOR_DB_PORT")
-    private val database = env.variable("NAIS_DATABASE_TOI_SYNIGHETSMOTOR_DB_DATABASE")
-    private val user = env.variable("NAIS_DATABASE_TOI_SYNIGHETSMOTOR_DB_USERNAME")
-    private val pw = env.variable("NAIS_DATABASE_TOI_SYNIGHETSMOTOR_DB_PASSWORD")
+    private val host = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_HOST")
+    private val port = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_PORT")
+    private val database = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_DATABASE")
+    private val user = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_USERNAME")
+    private val pw = env.variable("NAIS_DATABASE_TOI_SYNLIGHETSMOTOR_DB_PASSWORD")
 
     fun lagDatasource() = HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://$host:$port/$database"
@@ -29,6 +29,7 @@ class Repository(val dataSource: DataSource) {
     private val tabell = "evaluering"
     private val aktøridKolonne = "aktor_id"
     private val fødselsnummerKolonne = "fodselsnummer"
+
     private val harAktivCvKolonne = "har_aktiv_cv"
     private val harJobbprofilkolonne = "har_jobbprofil"
     private val harSettHjemmelKolonne = "har_sett_hjemmel"
