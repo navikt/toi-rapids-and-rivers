@@ -32,7 +32,7 @@ fun startApp(
 
     javalin.routes {
         path("/evaluering/{fnr}") {
-            get(evaluerKandidat, Rolle.VEILEDER)
+            get("/", evaluerKandidat, Rolle.VEILEDER)
         }
     }
 }
