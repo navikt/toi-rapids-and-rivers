@@ -31,10 +31,8 @@ fun startApp(
     }
 
     javalin.routes {
-        path("/evaluering") {
-            path("{fnr}") {
-                get(evaluerKandidat, Rolle.VEILEDER)
-            }
+        path("/evaluering/{fnr}") {
+            get(evaluerKandidat, Rolle.VEILEDER)
         }
     }
 }
@@ -54,7 +52,7 @@ fun main() {
     val javalin = opprettJavalinMedTilgangskontroll(issuerProperties)
 
     val rapidsConnection = RapidApplication.create(env).apply {
-        this.register(object: RapidsConnection.StatusListener {
+        this.register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 repository.kjørFlywayMigreringer()
             }
