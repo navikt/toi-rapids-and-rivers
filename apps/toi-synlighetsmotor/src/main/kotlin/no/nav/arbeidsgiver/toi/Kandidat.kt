@@ -74,7 +74,7 @@ data class Hjemmel(
     val ressurs: Samtykkeressurs?,
     val opprettetDato: ZonedDateTime?,
     val slettetDato: ZonedDateTime?,
-    val fnr: String
+    val fnr: String?
 )
 
 enum class Samtykkeressurs {
