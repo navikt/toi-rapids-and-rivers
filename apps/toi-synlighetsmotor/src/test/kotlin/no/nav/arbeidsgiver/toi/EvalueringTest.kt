@@ -77,7 +77,7 @@ class EvalueringTest {
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
-        val response = Fuel.get("http://localhost:9000/evaluering/12345678912")
+        val response = Fuel.get("http://localhost:8301/evaluering/12345678912")
             .authentication().bearer(token.serialize())
             .response().second
 
@@ -107,7 +107,7 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
 
-        val response = Fuel.get("http://localhost:9000/evaluering/12345678912")
+        val response = Fuel.get("http://localhost:8301/evaluering/12345678912")
             .authentication().bearer(token.serialize())
             .response().second
 
@@ -128,7 +128,7 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
-        val response = Fuel.get("http://localhost:9000/evaluering/12345678912")
+        val response = Fuel.get("http://localhost:8301/evaluering/12345678912")
             .authentication().bearer(token.serialize())
             .response().second
 
