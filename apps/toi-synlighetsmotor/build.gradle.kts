@@ -6,7 +6,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.2.18")
     implementation("org.flywaydb:flyway-core:7.5.3")
     implementation("com.zaxxer:HikariCP:4.0.2")
-    implementation("io.javalin:javalin:4.1.1")
+    implementation("io.javalin:javalin:4.3.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     implementation("no.nav.security:token-validation-core:1.3.9")
 
