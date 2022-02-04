@@ -153,12 +153,12 @@ class Testdata {
                 "endreJobbprofil": null,
                 "opprettCv": {
                     "cv": {
-                        "fodselsnummer": "01018065432"
+                        "fodselsnummer": "12345678912"
                     }
                 },
                 "endreCv": {
                     "cv": {
-                        "fodselsnummer": "01018065432"
+                        "fodselsnummer": "12345678912"
                     }
                 }
             }
@@ -213,7 +213,7 @@ class Testdata {
                 "ressurs": "$ressurs",
                 "opprettetDato": "$opprettetDato",
                 "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""},
-                "fnr": "01018065321"
+                "fnr": "12345678912"
             }
         """.trimIndent()
 

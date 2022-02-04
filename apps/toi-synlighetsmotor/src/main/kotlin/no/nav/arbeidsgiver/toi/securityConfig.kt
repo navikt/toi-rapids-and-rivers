@@ -1,4 +1,4 @@
-package no.nav.toi.kandidatesproxy
+package no.nav.arbeidsgiver.toi
 
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import java.net.URL

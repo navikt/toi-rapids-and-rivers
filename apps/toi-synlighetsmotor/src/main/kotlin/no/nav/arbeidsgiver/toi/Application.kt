@@ -3,13 +3,12 @@ package no.nav.arbeidsgiver.toi
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.path
+import io.javalin.http.Context
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.security.token.support.core.configuration.IssuerProperties
-import no.nav.toi.kandidatesproxy.styrTilgang
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URL
 
 fun startApp(
     repository: Repository,
@@ -20,38 +19,38 @@ fun startApp(
         SynlighetsLytter(it, repository)
     }.start()
 
-    javalin.routes {
-        get("evaluering/{fnr}"){ context ->
-            /* val fnr = context.pathParam("fnr")
-             val evaluering = repository.hentMedFnr(fnr)
+    val evaluerKandidat: (Context) -> Unit = { context ->
+        val fnr = context.pathParam("fnr")
+        val evaluering = repository.hentMedFnr(fnr)
 
-             if (evaluering == null) {
-                 context.status(404)
-             } else {
-                 context.json(evaluering).status(200)
-             }*/
-            context.json("kun til test").status(200)
+        if (evaluering == null) {
+            context.status(404)
+        } else {
+            context.json(evaluering).status(200)
+        }
+    }
+
+    javalin.routes {
+        path("evaluering") {
+            path("{fnr}") {
+                get(evaluerKandidat, Rolle.VEILEDER)
+            }
         }
     }
 }
 
-fun hentIssuerProperties(envs: Map<String, String>) =
-    listOf(
-        IssuerProperties(
-            URL(envs["AZURE_APP_WELL_KNOWN_URL"]),
-            listOf(envs["AZURE_APP_CLIENT_ID"]),
-            envs["AZURE_OPENID_CONFIG_ISSUER"]
-        )
-    )
+fun opprettJavalinMedTilgangskontroll(issuerProperties: List<IssuerProperties>): Javalin =
+    Javalin.create {
+        it.defaultContentType = "application/json"
+        it.accessManager(styrTilgang(issuerProperties))
+    }.start(9000)
 
 fun main() {
     val env = System.getenv()
     val datasource = DatabaseKonfigurasjon(env).lagDatasource()
     val repository = Repository(datasource)
-    val javalin = Javalin.create {
-        it.defaultContentType = "application/json"
-        it.accessManager(styrTilgang(hentIssuerProperties(System.getenv())))
-    }.start(9000)
+    val issuerProperties = hentIssuerProperties(System.getenv())
+    val javalin = opprettJavalinMedTilgangskontroll(issuerProperties)
 
     val rapidsConnection = RapidApplication.create(env).apply {
         this.register(object: RapidsConnection.StatusListener {

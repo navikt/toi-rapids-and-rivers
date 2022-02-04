@@ -1,4 +1,4 @@
-package no.nav.toi.kandidatesproxy
+package no.nav.arbeidsgiver.toi
 
 import io.javalin.core.security.RouteRole
 import io.javalin.http.Context
