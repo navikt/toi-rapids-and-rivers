@@ -18,20 +18,16 @@ fun startApp(
     }.start()
 
     javalin.routes {
-        path("evaluering") {
-            path("{fnr}") {
-                get { context ->
-                   /* val fnr = context.pathParam("fnr")
-                    val evaluering = repository.hentMedFnr(fnr)
+        get("evaluering/{fnr}"){ context ->
+            /* val fnr = context.pathParam("fnr")
+             val evaluering = repository.hentMedFnr(fnr)
 
-                    if (evaluering == null) {
-                        context.status(404)
-                    } else {
-                        context.json(evaluering).status(200)
-                    }*/
-                    context.json("kun til test").status(200)
-                }
-            }
+             if (evaluering == null) {
+                 context.status(404)
+             } else {
+                 context.json(evaluering).status(200)
+             }*/
+            context.json("kun til test").status(200)
         }
     }
 }
