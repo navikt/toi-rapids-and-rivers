@@ -21,14 +21,14 @@ fun startApp(
         path("evaluering") {
             path("{fnr}") {
                 get { context ->
-                    val fnr = context.pathParam("fnr")
+                   /* val fnr = context.pathParam("fnr")
                     val evaluering = repository.hentMedFnr(fnr)
 
                     if (evaluering == null) {
                         context.status(404)
                     } else {
                         context.json(evaluering).status(200)
-                    }
+                    }*/
                 }
             }
         }

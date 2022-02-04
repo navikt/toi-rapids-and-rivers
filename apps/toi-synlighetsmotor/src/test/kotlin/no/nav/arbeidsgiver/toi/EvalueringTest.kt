@@ -26,7 +26,7 @@ class EvalueringTest {
         javalin.stop()
     }
 
-    @Test
+   /* @Test
     fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
 
@@ -101,7 +101,7 @@ class EvalueringTest {
 
         val response = Fuel.get("http://localhost:9000/evaluering/12345678912").response().second
         Assertions.assertThat(response.statusCode).isEqualTo(404)
-    }
+    }*/
 }
 
 private fun evalueringMedAltTrue() = Evaluering(
