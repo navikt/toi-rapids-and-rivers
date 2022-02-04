@@ -36,7 +36,7 @@ class Repository(private val dataSource: DataSource) {
                     "update $tabell set $updateString where $aktøridKolonne = '$aktørId'"
                 ).apply {
                     databaseMap.filterKeys { it != aktøridKolonne }.values
-                        .forEachIndexed() { index, any ->
+                        .forEachIndexed { index, any ->
                         this.setObject((index + 1), any)
                     }
                 }.execute()
