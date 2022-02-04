@@ -7,7 +7,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.ZonedDateTime
 
 data class Kandidat(
-    val cv: Cv?,
+    val cv: CvMelding?,
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
     val fritattKandidatsøk: FritattKandidatsøk?,
@@ -24,10 +24,16 @@ data class Kandidat(
     }
 }
 
-data class Cv(
+data class CvMelding(
     val meldingstype: CvMeldingstype,
+    val opprettCv: Cv?,
+    val endreCv: Cv?,
     val opprettJobbprofil: Any?,
     val endreJobbprofil: Any?
+)
+
+data class Cv(
+    val fodselsnummer: String
 )
 
 enum class CvMeldingstype {
@@ -46,6 +52,7 @@ data class Oppfølgingsinformasjon(
     val sperretAnsatt: Boolean,
     val formidlingsgruppe: Formidlingsgruppe?,
     val diskresjonskode: Diskresjonskode?,
+    val fodselsnummer: String
 )
 
 typealias Diskresjonskode = String
@@ -63,6 +70,7 @@ data class Hjemmel(
     val ressurs: Samtykkeressurs?,
     val opprettetDato: ZonedDateTime?,
     val slettetDato: ZonedDateTime?,
+    val fnr: String
 )
 
 enum class Samtykkeressurs {

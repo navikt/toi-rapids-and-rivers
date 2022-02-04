@@ -40,7 +40,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         packet["synlighet"] = synlighet
         val aktørId = packet["aktørId"].asText()
-        val fødselsnummer = finnFødselsnummer(packet)
+        val fødselsnummer = finnFødselsnummer(kandidat)
 
         log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
 
@@ -49,31 +49,11 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         rapidsConnection.publish(aktørId, packet.toJson())
     }
 
-    private fun finnFødselsnummer(packet: JsonMessage) : String? {
-        if(!packet["cv"].isMissingOrNull()) {
-            if(packet["cv"]["endreCv"] != null) {
-                if(packet["cv"]["endreCv"]["fodselsnummer"] != null) {
-                    return packet["cv"]["endreCv"]["fodselsnummer"].asText()
-                }
-            }
-            if(packet["cv"]["endreCv"] != null) {
-                if(packet["cv"]["opprettCv"]["fodselsnummer"] != null) {
-                    return packet["cv"]["opprettCv"]["fodselsnummer"].asText()
-                }
-            }
-        }
-        if(!packet["hjemmel"].isMissingOrNull()) {
-            if(packet["hjemmel"]["fnr"] != null) {
-                return packet["hjemmel"]["fnr"].asText()
-            }
-        }
-        if(!packet["oppfølgingsinformasjon"].isMissingOrNull()){
-            if(packet["oppfølgingsinformasjon"]["fodselsnummer"] != null) {
-                return packet["oppfølgingsinformasjon"]["fodselsnummer"].asText()
-            }
-        }
-        return null
-    }
+    private fun finnFødselsnummer(kandidat: Kandidat): String? =
+        kandidat.cv?.opprettCv?.fodselsnummer ?:
+        kandidat.cv?.endreCv?.fodselsnummer ?:
+        kandidat.hjemmel?.fnr ?:
+        kandidat.oppfølgingsinformasjon?.fodselsnummer
 
     private data class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)
 }

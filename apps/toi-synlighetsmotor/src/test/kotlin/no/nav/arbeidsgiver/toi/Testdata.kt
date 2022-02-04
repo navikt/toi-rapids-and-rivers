@@ -150,7 +150,13 @@ class Testdata {
             "cv": {
                 "meldingstype": "$meldingstype",
                 "opprettJobbprofil": {},
-                "endreJobbprofil": null
+                "endreJobbprofil": null,
+                "opprettCv": {
+                    "fodselsnummer": "01018065432"
+                },
+                "endreCv": {
+                    "fodselsnummer": "01018065432"
+                }
             }
         """.trimIndent()
 
@@ -202,7 +208,8 @@ class Testdata {
             "hjemmel": {
                 "ressurs": "$ressurs",
                 "opprettetDato": "$opprettetDato",
-                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""}
+                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""},
+                "fnr": "01018065321"
             }
         """.trimIndent()
 
