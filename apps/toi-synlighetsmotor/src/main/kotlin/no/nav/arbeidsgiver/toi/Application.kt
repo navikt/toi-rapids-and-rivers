@@ -43,6 +43,7 @@ fun opprettJavalinMedTilgangskontroll(issuerProperties: List<IssuerProperties>):
     Javalin.create {
         it.defaultContentType = "application/json"
         it.accessManager(styrTilgang(issuerProperties))
+        it.enableDevLogging()
     }.start(9000)
 
 fun main() {
