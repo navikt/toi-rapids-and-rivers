@@ -50,8 +50,8 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
     }
 
     private fun finnFødselsnummer(kandidat: Kandidat): String? =
-        kandidat.cv?.opprettCv?.fodselsnummer ?:
-        kandidat.cv?.endreCv?.fodselsnummer ?:
+        kandidat.cv?.opprettCv?.cv?.fodselsnummer ?:
+        kandidat.cv?.endreCv?.cv?.fodselsnummer ?:
         kandidat.hjemmel?.fnr ?:
         kandidat.oppfølgingsinformasjon?.fodselsnummer
 

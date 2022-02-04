@@ -26,10 +26,14 @@ data class Kandidat(
 
 data class CvMelding(
     val meldingstype: CvMeldingstype,
-    val opprettCv: Cv?,
-    val endreCv: Cv?,
+    val opprettCv: OpprettEllerEndreCv?,
+    val endreCv: OpprettEllerEndreCv?,
     val opprettJobbprofil: Any?,
     val endreJobbprofil: Any?
+)
+
+data class OpprettEllerEndreCv(
+    val cv: Cv
 )
 
 data class Cv(

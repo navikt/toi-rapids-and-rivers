@@ -29,7 +29,7 @@ fun startApp(
                     } else {
                         context.json(evaluering).status(200)
                     }*/
-                    context.json("kun til ping").status(200)
+                    context.json("kun til test").status(200)
                 }
             }
         }

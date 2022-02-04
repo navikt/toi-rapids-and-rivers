@@ -152,10 +152,14 @@ class Testdata {
                 "opprettJobbprofil": {},
                 "endreJobbprofil": null,
                 "opprettCv": {
-                    "fodselsnummer": "01018065432"
+                    "cv": {
+                        "fodselsnummer": "01018065432"
+                    }
                 },
                 "endreCv": {
-                    "fodselsnummer": "01018065432"
+                    "cv": {
+                        "fodselsnummer": "01018065432"
+                    }
                 }
             }
         """.trimIndent()

@@ -109,7 +109,7 @@ data class Kandidat(
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()
-        fun fraJson(json: String) = fraJson(objectMapper.readTree(json))
+        fun fraJson(json: String): Kandidat = fraJson(objectMapper.readTree(json))
         fun fraJson(json: JsonNode) = Kandidat(
             aktørId = json["aktørId"].asText(),
             cv = json["cv"],
