@@ -27,9 +27,7 @@ fun startApp(
     }
 
     javalin.routes {
-        path("/evaluering/{fnr}") {
-            get("/", evaluerKandidat, Rolle.VEILEDER)
-        }
+        get("/evaluering/{fnr}", evaluerKandidat, Rolle.VEILEDER)
     }
 
     rapidsConnection.also {
@@ -41,7 +39,6 @@ fun opprettJavalinMedTilgangskontroll(issuerProperties: List<IssuerProperties>):
     Javalin.create {
         it.defaultContentType = "application/json"
         it.accessManager(styrTilgang(issuerProperties))
-        it.enableDevLogging()
     }.start(8301)
 
 fun main() {
