@@ -15,10 +15,6 @@ fun startApp(
     javalin: Javalin,
     rapidsConnection: RapidsConnection
 ) {
-    rapidsConnection.also {
-        SynlighetsLytter(it, repository)
-    }.start()
-
     val evaluerKandidat: (Context) -> Unit = { context ->
         val fnr = context.pathParam("fnr")
         val evaluering = repository.hentMedFnr(fnr)
@@ -35,6 +31,10 @@ fun startApp(
             get("/", evaluerKandidat, Rolle.VEILEDER)
         }
     }
+
+    rapidsConnection.also {
+        SynlighetsLytter(it, repository)
+    }.start()
 }
 
 fun opprettJavalinMedTilgangskontroll(issuerProperties: List<IssuerProperties>): Javalin =
