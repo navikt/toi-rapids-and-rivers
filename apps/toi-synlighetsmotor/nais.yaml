@@ -44,6 +44,12 @@ spec:
       - type: POSTGRES_12
         databases:
           - name: synlighetsmotor-db
+  accessPolicy:
+    inbound:
+      rules:
+        - application: rekrutteringsbistand-kandidat-api
+          cluster: {{ on-prem-cluster }}
+          namespace: toi
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
