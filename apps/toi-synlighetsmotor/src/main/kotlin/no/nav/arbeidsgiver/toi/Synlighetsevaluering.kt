@@ -10,7 +10,7 @@ fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
         harJobbprofil = kandidat.cv?.endreJobbprofil != null || kandidat.cv?.opprettJobbprofil != null,
         harSettHjemmel = harSettHjemmel(kandidat),
         maaIkkeBehandleTidligereCv = kandidat.måBehandleTidligereCv?.maaBehandleTidligereCv != true,
-        erIkkefritattKandidatsøk = kandidat.fritattKandidatsøk == null || !kandidat.fritattKandidatsøk.fritattKandidatsok,
+        erIkkeFritattKandidatsøk = kandidat.fritattKandidatsøk == null || !kandidat.fritattKandidatsøk.fritattKandidatsok,
         erUnderOppfoelging = erUnderOppfølging(kandidat),
         harRiktigFormidlingsgruppe = kandidat.oppfølgingsinformasjon?.formidlingsgruppe in listOf(
             Formidlingsgruppe.ARBS,

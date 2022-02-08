@@ -5,7 +5,7 @@ data class Evaluering(
     val harJobbprofil: Boolean,
     val harSettHjemmel: Boolean,
     val maaIkkeBehandleTidligereCv: Boolean,
-    val erIkkefritattKandidatsøk: Boolean,
+    val erIkkeFritattKandidatsøk: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeKode6eller7: Boolean,
@@ -18,7 +18,7 @@ data class Evaluering(
             harJobbprofil &&
             harSettHjemmel &&
             maaIkkeBehandleTidligereCv &&
-            erIkkefritattKandidatsøk &&
+            erIkkeFritattKandidatsøk &&
             erUnderOppfoelging &&
             harRiktigFormidlingsgruppe &&
             erIkkeKode6eller7 &&

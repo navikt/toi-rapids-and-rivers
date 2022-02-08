@@ -115,7 +115,7 @@ class EvalueringTest {
 
         val responseJson = response.body().asString("application/json")
         val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
-        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue().copy(erIkkefritattKandidatsøk = false))
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
     }
 
     @Test
@@ -153,7 +153,7 @@ private fun evalueringMedAltTrue() = Evaluering(
     harJobbprofil = true,
     harSettHjemmel = true,
     maaIkkeBehandleTidligereCv = true,
-    erIkkefritattKandidatsøk = true,
+    erIkkeFritattKandidatsøk = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
     erIkkeKode6eller7 = true,
