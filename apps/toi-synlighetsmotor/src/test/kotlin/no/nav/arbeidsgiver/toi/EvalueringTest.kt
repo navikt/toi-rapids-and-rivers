@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
 import io.javalin.Javalin
@@ -84,8 +85,8 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
         val responseJson = response.body().asString("application/json")
-        val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
-        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue())
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskode::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
 
     @Test
@@ -114,12 +115,12 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
         val responseJson = response.body().asString("application/json")
-        val responeEvaluering = objectmapper.readValue(responseJson, Evaluering::class.java)
-        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskode::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt skal returnere 404 for fødselsnummer som ikke finnes i databasen`() {
+    fun `GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
         val token = hentToken(mockOAuth2Server)
@@ -132,7 +133,11 @@ class EvalueringTest {
             .authentication().bearer(token.serialize())
             .response().second
 
-        Assertions.assertThat(response.statusCode).isEqualTo(404)
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json")
+        val responeEvaluering = jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskode::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
     }
 }
 
@@ -160,4 +165,31 @@ private fun evalueringMedAltTrue() = Evaluering(
     erIkkeSperretAnsatt = true,
     erIkkeDoed = true,
     erFerdigBeregnet = true
+)
+
+
+private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjonskode(
+    harAktivCv = true,
+    harJobbprofil = true,
+    harSettHjemmel = true,
+    maaIkkeBehandleTidligereCv = true,
+    erIkkeFritattKandidatsøk = true,
+    erUnderOppfoelging = true,
+    harRiktigFormidlingsgruppe = true,
+    erIkkeSperretAnsatt = true,
+    erIkkeDoed = true,
+    erFerdigBeregnet = true
+)
+
+private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjonskode(
+    harAktivCv = false,
+    harJobbprofil = false,
+    harSettHjemmel = false,
+    maaIkkeBehandleTidligereCv = false,
+    erIkkeFritattKandidatsøk = false,
+    erUnderOppfoelging = false,
+    harRiktigFormidlingsgruppe = false,
+    erIkkeSperretAnsatt = false,
+    erIkkeDoed = false,
+    erFerdigBeregnet = false
 )

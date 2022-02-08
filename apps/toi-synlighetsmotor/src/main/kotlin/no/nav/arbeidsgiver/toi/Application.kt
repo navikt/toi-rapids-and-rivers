@@ -15,19 +15,8 @@ fun startApp(
     javalin: Javalin,
     rapidsConnection: RapidsConnection
 ) {
-    val evaluerKandidat: (Context) -> Unit = { context ->
-        val fnr = context.pathParam("fnr")
-        val evaluering = repository.hentMedFnr(fnr)
-
-        if (evaluering == null) {
-            context.status(404)
-        } else {
-            context.json(evaluering).status(200)
-        }
-    }
-
     javalin.routes {
-        get("/evaluering/{fnr}", evaluerKandidat, Rolle.VEILEDER)
+        get("/evaluering/{fnr}", evaluerKandidat(repository::hentMedFnr), Rolle.VEILEDER)
     }
 
     rapidsConnection.also {
