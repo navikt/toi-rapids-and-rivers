@@ -1,0 +1,51 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: toi-tilretteleggingsbehov
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: /isalive
+  readiness:
+    path: /isready
+  prometheus:
+    enabled: true
+    path: /metrics
+  replicas:
+    min: 1
+    max: 1
+  resources:
+    limits:
+      cpu: 3000m
+      memory: 2048Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  secureLogs:
+    enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: kafka-schema-registry.nais.adeo.no
+  kafka:
+    pool: {{ kafka_pool }}
+  azure:
+    application:
+      enabled: true
+  env:
+    - name: KAFKA_RAPID_TOPIC
+      value: toi.rapid-1
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: {{ kafka_consumer_group_id }}
+    - name: KANDIDAT_ENDRET_GROUP_ID
+      value: {{ kandidat_endret_group_id }}
+    - name: KANDIDAT_ENDRET_KAFKA_TOPIC
+      value: {{ kandidat_endret_kafka_topic }}
+    - name: KAFKA_BOOTSTRAP_SERVERS_ONPREM_URL
+      value: {{ kafka-bootstrap-on-prem-url }}
+  envFrom:
+    - secret: toi-tilretteleggingsbehov-servicebruker
