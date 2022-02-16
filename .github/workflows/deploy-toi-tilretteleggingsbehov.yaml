@@ -6,8 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
     paths:
     - apps/toi-tilretteleggingsbehov/**
     - .github/workflows/deploy-toi-tilretteleggingsbehov.yaml
