@@ -23,9 +23,10 @@ class KandidatEndretLytterTest {
         val harTilretteleggingsbehov = true
         val behov = listOf("behov1", "behov2")
 
-        val melding = melding(aktoerId, harTilretteleggingsbehov)
+        val melding = melding(aktoerId, harTilretteleggingsbehov, behov)
 
         mottaArenaCvMelding(consumer, aktoerId, melding)
+
         arenaCvLytter.onReady(rapid)
 
         Thread.sleep(300)
@@ -41,14 +42,11 @@ class KandidatEndretLytterTest {
         )
 
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("tilretteleggingsbehov-endret")
-        assertThat(meldingJson.get("aktoerId").asText()).isEqualTo(aktoerId)
-        assertThat(meldingJson.get("behov").toList()).isEqualTo(behov)
+
         val tilretteleggingsbehovJson = meldingJson.get("tilretteleggingsbehov")
-        assertThat(tilretteleggingsbehovJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "aktoerId",
-            "harTilretteleggingsbehov",
-            "behov",
-        )
+        assertThat(tilretteleggingsbehovJson.get("behov").map { it.asText() }.toList()).containsExactly(*behov.toTypedArray())
+        assertThat(tilretteleggingsbehovJson.get("aktoerId").asText()).isEqualTo(aktoerId)
+        assertThat(tilretteleggingsbehovJson.get("harTilretteleggingsbehov").asBoolean()).isEqualTo(harTilretteleggingsbehov)
     }
 }
 

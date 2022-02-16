@@ -40,6 +40,7 @@ class KandidatEndretLytter(
                     try {
                         consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, String>::value)
+                            .map(::utgåendeMelding)
                             .onEach{
                                 log.info("Skal publisere kandidat endret-melding")
                             }
@@ -52,4 +53,12 @@ class KandidatEndretLytter(
             }
         }
     }
+
+    fun utgåendeMelding(inkommendeMelding: String) : String =
+        """
+            {
+                "@event_name": "tilretteleggingsbehov-endret",
+                "tilretteleggingsbehov": $inkommendeMelding
+            }
+        """.trimIndent()
 }
