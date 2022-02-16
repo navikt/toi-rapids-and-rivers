@@ -37,11 +37,12 @@ class KandidatEndretLytterTest {
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
+            "aktørId",
             "tilretteleggingsbehov",
             "system_read_count"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("tilretteleggingsbehov-endret")
+        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("tilretteleggingsbehov")
 
         val tilretteleggingsbehovJson = meldingJson.get("tilretteleggingsbehov")
         assertThat(tilretteleggingsbehovJson.get("behov").map { it.asText() }.toList()).containsExactly(*behov.toTypedArray())

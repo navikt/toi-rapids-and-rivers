@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,8 +58,11 @@ class KandidatEndretLytter(
     fun utgåendeMelding(inkommendeMelding: String) : String =
         """
             {
-                "@event_name": "tilretteleggingsbehov-endret",
+                "@event_name": "tilretteleggingsbehov",
+                "aktørId": ${inkommendeMelding.hentUtAktørid()},
                 "tilretteleggingsbehov": $inkommendeMelding
             }
         """.trimIndent()
 }
+
+private fun String.hentUtAktørid() = jacksonObjectMapper().readTree(this).get("aktoerId").asText()
