@@ -41,12 +41,12 @@ class KandidatEndretLytter(
                     try {
                         consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, String>::value)
-                            .map(::utgåendeMelding)
-                            .onEach{
+                            .map { aktørIdMedUtgåendeMelding(it) }
+                            .onEach {
                                 log.info("Skal publisere kandidat endret-melding")
                             }
-                            .map { JsonMessage(it, MessageProblems("{}")).toJson() }
-                            .forEach(rapidsConnection::publish)
+                            .map { it.first to JsonMessage(it.second, MessageProblems("{}")).toJson() }
+                            .forEach { rapidsConnection.publish(it.first, it.second) }
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
                     }
@@ -55,11 +55,14 @@ class KandidatEndretLytter(
         }
     }
 
-    fun utgåendeMelding(inkommendeMelding: String) : String =
+    private fun aktørIdMedUtgåendeMelding(it: String) =
+        it.hentUtAktørid().let { aktørId -> aktørId to utgåendeMelding(aktørId, it) }
+
+    fun utgåendeMelding(aktørId: String, inkommendeMelding: String): String =
         """
             {
                 "@event_name": "tilretteleggingsbehov",
-                "aktørId": ${inkommendeMelding.hentUtAktørid()},
+                "aktørId": $aktørId,
                 "tilretteleggingsbehov": $inkommendeMelding
             }
         """.trimIndent()
