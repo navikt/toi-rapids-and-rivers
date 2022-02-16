@@ -15,9 +15,9 @@ private val topicName = "aapen-tag-kandidatEndret-v1-default"
 class KandidatEndretLytterTest {
 
     @Test
-    fun  `Lesing av melding på Arena CV-topic skal føre til at en fritatt kandidatsøk-melding blir publisert på rapid`() {
+    fun  `Lesing av melding på Kandidat Endret-topic skal føre til at en tilretteleggingsbehov-endret-melding blir publisert på rapid`() {
         val consumer = mockConsumer()
-        val arenaCvLytter = KandidatEndretLytter(topicName, consumer)
+        val kandidatEndretLytter = KandidatEndretLytter(topicName, consumer)
         val rapid = TestRapid()
         val aktoerId = "123"
         val harTilretteleggingsbehov = true
@@ -25,9 +25,9 @@ class KandidatEndretLytterTest {
 
         val melding = melding(aktoerId, harTilretteleggingsbehov, behov)
 
-        mottaArenaCvMelding(consumer, aktoerId, melding)
+        mottaKandidatEndretMelding(consumer, aktoerId, melding)
 
-        arenaCvLytter.onReady(rapid)
+        kandidatEndretLytter.onReady(rapid)
 
         Thread.sleep(300)
         val inspektør = rapid.inspektør
@@ -57,7 +57,7 @@ private fun mockConsumer() = MockConsumer<String, String>(OffsetResetStrategy.EA
     }
 }
 
-private fun mottaArenaCvMelding(consumer: MockConsumer<String, String>, key: String, melding: String, offset: Long = 0) {
+private fun mottaKandidatEndretMelding(consumer: MockConsumer<String, String>, key: String, melding: String, offset: Long = 0) {
     val record = ConsumerRecord(
         topic.topic(),
         topic.partition(),
