@@ -56,3 +56,6 @@ spec:
     - team: toi
       application: toi-organisasjonsenhet
       access: readwrite
+    - team: toi
+      application: toi-tilretteleggingsbehov
+      access: readwrite
