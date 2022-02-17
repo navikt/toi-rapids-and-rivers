@@ -287,6 +287,21 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når tilretteleggingsbehov-endret har blitt mottatt skal meldingen lagres i databasen`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+        val testDatabase = TestDatabase()
+
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
+
+        testRapid.sendTestMessage(tilretteleggingsbehovEndretMelding(aktørId))
+
+        val lagredeKandidater = testDatabase.hentAlleKandidater()
+        assertThat(lagredeKandidater.size).isEqualTo(1)
+        assertThat(lagredeKandidater.first().tilretteleggingsbehov).isNotNull
+    }
+
+    @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()

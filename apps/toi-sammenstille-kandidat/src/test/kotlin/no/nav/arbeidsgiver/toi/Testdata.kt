@@ -137,6 +137,18 @@ fun måBehandleTidligereCvMelding(aktørId: String) = """
         }
     """.trimIndent()
 
+fun tilretteleggingsbehovEndretMelding(aktørId: String) = """
+        {
+            "@event_name": "tilretteleggingsbehov",
+            "aktørId": "$aktørId",
+            "tilretteleggingsbehov": {
+                "aktoerId": "$aktørId",
+                "harTilretteleggingsbehov": false,
+                "behov": ["behov1"]
+            }
+        }
+    """.trimIndent()
+
 val modifiserbareSystemVariabler: MutableMap<String, String>
     get() {
         val unmodifiableEnv = System.getenv()
