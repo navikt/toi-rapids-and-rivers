@@ -43,7 +43,7 @@ class KandidatEndretLytter(
                             .map(ConsumerRecord<String, String>::value)
                             .map { aktørIdMedUtgåendeMelding(it) }
                             .onEach {
-                                log.info("Skal publisere kandidat endret-melding")
+                                log.info("Skal publisere kandidat endret-melding ${it.second}")
                             }
                             .map { it.first to JsonMessage(it.second, MessageProblems("{}")).toJson() }
                             .forEach { rapidsConnection.publish(it.first, it.second) }
