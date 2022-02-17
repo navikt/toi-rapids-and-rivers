@@ -1,5 +1,5 @@
 kafka_pool: nav-prod
 kafka_consumer_group_id: toi-tilretteleggingsbehov-reader-rapidconsumer-1
-kandidat_endret_group_id: toi-tilretteleggingsbehov-1
+kandidat_endret_group_id: toi-tilretteleggingsbehov-2
 kandidat_endret_kafka_topic: aapen-tag-kandidatEndret-v1-default
 kafka-bootstrap-on-prem-url: SSL://a01apvl00145.adeo.no:8443, SSL://a01apvl00146.adeo.no:8443, SSL://a01apvl00147.adeo.no:8443, SSL://a01apvl00148.adeo.no:8443, SSL://a01apvl00149.adeo.no:8443, SSL://a01apvl00150.adeo.no:8443
