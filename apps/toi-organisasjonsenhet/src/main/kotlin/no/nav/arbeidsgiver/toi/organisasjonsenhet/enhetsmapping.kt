@@ -1,6 +1,9 @@
 package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 // Kan oppdateres med å hente ut norg respons i browser console og kjøre
+// fra Chrome SKSS
+// kall mot URL: https://norg2.intern.nav.no/norg2/api/v1/enhet/
+// const svarfranorg = <resultat-json>
 // const res = svarfranorg.map(_ => `"${_.enhetNr}"  to  "${_.navn}"`).join(',')
 
 fun enhetsmapping() = mapOf(
@@ -786,7 +789,7 @@ fun enhetsmapping() = mapOf(
     "4716" to "NAV Hjelpemiddelsentral Trøndelag",
     "4717" to "NAV Hjelpemiddelsentral Nord-Trøndelag",
     "4718" to "NAV Hjelpemiddelsentral Nordland",
-    "4719" to "NAV Hjelpemiddelsentral Troms og Finnmark-Tromsø",
+    "4719" to "NAV Hjelpemiddelsentral Troms og Finnmark",
     "4720" to "NAV Hjelpemiddelsentral Troms og Finnmark-Lakselv",
     "4740" to "NAV Sikte - Senter for IKT-hjelpemidler",
     "4750" to "Fagsenter for NAV Hjelpemidler og tilrettelegging",
