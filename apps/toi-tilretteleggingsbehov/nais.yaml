@@ -39,13 +39,11 @@ spec:
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
+    - name: KAFKA_EXTRA_TOPIC
+      value: "toi.tillretteleggingsbehov-1"
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
-    - name: KANDIDAT_ENDRET_GROUP_ID
-      value: {{ kandidat_endret_group_id }}
-    - name: KANDIDAT_ENDRET_KAFKA_TOPIC
-      value: {{ kandidat_endret_kafka_topic }}
-    - name: KAFKA_BOOTSTRAP_SERVERS_ONPREM_URL
-      value: {{ kafka-bootstrap-on-prem-url }}
+    - name: KAFKA_RESET_POLICY
+      value: "earliest"
   envFrom:
     - secret: toi-tilretteleggingsbehov-servicebruker
