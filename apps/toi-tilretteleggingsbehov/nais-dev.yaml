@@ -1,5 +1,2 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-tilretteleggingsbehov-reader-rapidconsumer-1
-kandidat_endret_group_id: toi-tilretteleggingsbehov-2
-kandidat_endret_kafka_topic: aapen-tag-kandidatEndret-v1-default
-kafka-bootstrap-on-prem-url: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443

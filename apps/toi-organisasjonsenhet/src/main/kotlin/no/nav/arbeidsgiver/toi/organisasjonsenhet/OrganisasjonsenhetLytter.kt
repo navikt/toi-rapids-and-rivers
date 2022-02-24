@@ -27,7 +27,7 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         } else {
             packet["organisasjonsenhetsnavn"] = orgnavn
         }
-        log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${organisasjonsMap[enhetsnummer]}")
+        log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${organisasjonsMap[enhetsnummer]?:""}")
 
         context.publish(aktørid, packet.toJson())
     }
