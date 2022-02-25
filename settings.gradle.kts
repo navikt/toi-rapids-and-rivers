@@ -13,5 +13,6 @@ include(
     "apps:toi-hjemmel",
     "apps:toi-maa-behandle-tidligere-cv",
     "apps:toi-organisasjonsenhet",
-    "apps:toi-tilretteleggingsbehov"
+    "apps:toi-tilretteleggingsbehov",
+    "apps:toi-helseapp"
 )
