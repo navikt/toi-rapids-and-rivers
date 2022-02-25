@@ -72,7 +72,7 @@ fun consumerOffset(groupId: String, envs: Map<String, String>): Long {
 }
 
 fun sisteOffset(envs: Map<String, String>): Long {
-    val kafkaConsumer = KafkaConsumer(consumerProperties(envs,"toi-helseapp"), StringDeserializer(), StringDeserializer())
+    val kafkaConsumer = KafkaConsumer(consumerProperties(envs,envs["KAFKA_CONSUMER_GROUP_ID"]?:"toi-helseapp"), StringDeserializer(), StringDeserializer())
 
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     kafkaConsumer.assign(listOf(topicPartition))

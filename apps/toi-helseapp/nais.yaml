@@ -26,7 +26,9 @@ spec:
       cpu: 200m
       memory: 512Mi
   kafka:
-    pool: {{ kafka_pool }}
+     pool: nav-prod
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: toi-helseapp-rapidconsumer-1
