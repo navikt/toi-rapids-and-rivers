@@ -1,3 +1,5 @@
+package no.nav.arbeidsgiver.toi
+
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.delay
