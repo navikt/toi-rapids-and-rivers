@@ -61,4 +61,4 @@ spec:
       access: readwrite
     - team: toi
       application: toi-helseapp
-      access: read
+      access: readwrite

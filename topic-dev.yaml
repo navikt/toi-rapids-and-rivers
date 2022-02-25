@@ -59,6 +59,3 @@ spec:
     - team: arbeidsgiver-inkludering
       application: arbeidsgiver-inkludering-kafkamanager
       access: readwrite
-    - team: toi
-      application: toi-helseapp
-      access: read
