@@ -1,9 +1,11 @@
 package no.nav.arbeidsgiver.toi
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.delay
 import no.nav.helse.rapids_rivers.RapidApplication
+import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -18,46 +20,64 @@ import java.util.*
 
 fun main() {
     try {
-        runBlocking {
-            val envs = System.getenv()
-            launch { RapidApplication.create(envs).start() }
-            val listOfGroupIds = listOf(
-                "toi-cv" to "toi-arbeidsplassen-cv-reader-rapidconsumer-1",
-                "toi-fritatt-kandidatsøk" to "toi-arena-cv-reader-rapidconsumer-1",
-                "toi-hjemmel" to "toi-hjemmel-rapidconsumer-1",
-                "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
-                "toi-kandidatfeed" to "toi-kandidatfeed-rapidconsumer-6",
-                "toi-maa-behandle-tidligere-cv" to "toi-maa-behandle-tidligere-cv-rapidconsumer-4",
-                "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-3",
-                "toi-oppfolgingsperiode" to "toi-oppfølgingsperiode-rapidconsumer-1",
-                "toi-organisasjonsenhet" to "toi-organisasjonsenhet-rapidconsumer-1",
-                "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
-                "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
-                "toi-tilretteleggingsbehov" to "toi-tilretteleggingsbehov-reader-rapidconsumer-1",
-                "toi-veileder" to "toi-veileder-rapidconsumer-9",
-            )
-            while (true) {
-                val sisteOffset = sisteOffset(envs)
-                val resultsPerApplication = listOfGroupIds.map { (application, groupId) ->
-                    val consumerOffset = consumerOffset(groupId, envs)
-                    ResultsPerApplication(application, consumerOffset, sisteOffset - consumerOffset)
-                }.sortedByDescending(ResultsPerApplication::behind)
-                val result = """
+        var offsetJob: Job? = null
+        val envs = System.getenv()
+        RapidApplication.create(envs)
+            .apply {
+                register(
+                    object : RapidsConnection.StatusListener {
+                        override fun onStartup(rapidsConnection: RapidsConnection) {
+                            offsetJob = GlobalScope.launch { sjekkOffsets(envs) }
+                            offsetJob?.invokeOnCompletion { rapidsConnection.stop() }
+                        }
+
+                        override fun onShutdown(rapidsConnection: RapidsConnection) {
+                            offsetJob?.cancel()
+                        }
+                    }
+                )
+            }
+            .start()
+
+    } catch (e: Exception) {
+        log.error(e.message, e)
+    }
+}
+
+suspend fun sjekkOffsets(envs: Map<String, String>) {
+    val listOfGroupIds = listOf(
+        "toi-cv" to "toi-arbeidsplassen-cv-reader-rapidconsumer-1",
+        "toi-fritatt-kandidatsøk" to "toi-arena-cv-reader-rapidconsumer-1",
+        "toi-hjemmel" to "toi-hjemmel-rapidconsumer-1",
+        "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
+        "toi-kandidatfeed" to "toi-kandidatfeed-rapidconsumer-6",
+        "toi-maa-behandle-tidligere-cv" to "toi-maa-behandle-tidligere-cv-rapidconsumer-4",
+        "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-3",
+        "toi-oppfolgingsperiode" to "toi-oppfølgingsperiode-rapidconsumer-1",
+        "toi-organisasjonsenhet" to "toi-organisasjonsenhet-rapidconsumer-1",
+        "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
+        "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
+        "toi-tilretteleggingsbehov" to "toi-tilretteleggingsbehov-reader-rapidconsumer-1",
+        "toi-veileder" to "toi-veileder-rapidconsumer-9",
+    )
+    while (true) {
+        val sisteOffset = sisteOffset(envs)
+        val resultsPerApplication = listOfGroupIds.map { (application, groupId) ->
+            val consumerOffset = consumerOffset(groupId, envs)
+            ResultsPerApplication(application, consumerOffset, sisteOffset - consumerOffset)
+        }.sortedByDescending(ResultsPerApplication::behind)
+        val result = """
                     ${
-                    resultsPerApplication.joinToString(
-                        separator = "\n",
-                        transform = ResultsPerApplication::printFriendly
-                    )
-                }
+            resultsPerApplication.joinToString(
+                separator = "\n",
+                transform = ResultsPerApplication::printFriendly
+            )
+        }
                     
                     Siste offset er $sisteOffset
                 """.trimIndent()
-                log.info(result)
-                delay(Duration.ofSeconds(10))
-            }
-        }
-    } catch (e: Exception) {
-        log.error(e.message, e)
+        log.info(result)
+        delay(Duration.ofSeconds(10))
     }
 }
 
@@ -67,12 +87,17 @@ data class ResultsPerApplication(val name: String, val offset: Long, val behind:
 
 fun consumerOffset(groupId: String, envs: Map<String, String>): Long {
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
-    val consumer = KafkaConsumer(consumerProperties(envs,groupId), StringDeserializer(), StringDeserializer())
-    return consumer.committed(setOf(topicPartition))[topicPartition]?.offset() ?: throw Exception("Fant ingen offset for groupId: $groupId")
+    val consumer = KafkaConsumer(consumerProperties(envs, groupId), StringDeserializer(), StringDeserializer())
+    return consumer.committed(setOf(topicPartition))[topicPartition]?.offset()
+        ?: throw Exception("Fant ingen offset for groupId: $groupId")
 }
 
 fun sisteOffset(envs: Map<String, String>): Long {
-    val kafkaConsumer = KafkaConsumer(consumerProperties(envs,envs["KAFKA_CONSUMER_GROUP_ID"]?:"toi-helseapp"), StringDeserializer(), StringDeserializer())
+    val kafkaConsumer = KafkaConsumer(
+        consumerProperties(envs, envs["KAFKA_CONSUMER_GROUP_ID"] ?: "toi-helseapp"),
+        StringDeserializer(),
+        StringDeserializer()
+    )
 
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     kafkaConsumer.assign(listOf(topicPartition))
