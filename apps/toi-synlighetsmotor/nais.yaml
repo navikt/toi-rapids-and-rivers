@@ -47,8 +47,8 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: rekrutteringsbistand-kandidat-api
-          cluster: {{ on-prem-cluster }}
+        - application: rekrutteringsbistand-container
+          cluster: {{ cluster }}
           namespace: toi
   env:
     - name: KAFKA_RAPID_TOPIC

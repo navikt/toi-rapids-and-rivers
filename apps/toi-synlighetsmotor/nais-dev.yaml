@@ -1,4 +1,4 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-synlighetsmotor-rapidconsumer-3
 ingress: https://toi-synlighetsmotor.dev.intern.nav.no
-on-prem-cluster: dev-fss
+cluster: dev-gcp
