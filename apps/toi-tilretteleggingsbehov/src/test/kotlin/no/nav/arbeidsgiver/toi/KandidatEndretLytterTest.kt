@@ -39,7 +39,7 @@ class KandidatEndretLytterTest {
         assertThat(tilretteleggingsbehovJson.get("harTilretteleggingsbehov").asBoolean()).isEqualTo(harTilretteleggingsbehov)
     }
 }
-
+ 
 private fun melding(aktoerId: String, harTilretteleggingsbehov: Boolean, behov: List<String> = emptyList()) = """
     {
         "aktoerId":"$aktoerId",

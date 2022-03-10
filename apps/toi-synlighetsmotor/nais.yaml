@@ -39,6 +39,9 @@ spec:
   azure:
     application:
       enabled: true
+      claims:
+        extra:
+          - NAVident
   gcp:
     sqlInstances:
       - type: POSTGRES_12
