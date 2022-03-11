@@ -13,7 +13,7 @@ data class Evaluering(
     val erIkkeDoed: Boolean,
     val erFerdigBeregnet: Boolean
 ) {
-    fun erSynlig() = harAktivCv &&
+    private fun erSynlig() = harAktivCv &&
             harJobbprofil &&
             harSettHjemmel &&
             maaIkkeBehandleTidligereCv &&
@@ -34,10 +34,29 @@ data class Evaluering(
         erUnderOppfoelging = erUnderOppfoelging,
         harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe,
         erIkkeSperretAnsatt = erIkkeSperretAnsatt,
-        erIkkeDoed = erIkkeDoed,
-        erFerdigBeregnet = erFerdigBeregnet
+        erIkkeDoed = erIkkeDoed
     )
+
+    companion object {
+        fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
+            if (this != null && erIkkeKode6eller7) {
+                tilEvalueringUtenDiskresjonskode()
+            } else {
+                EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
+            }
+
+        operator fun Evaluering?.invoke() =
+            lagEvalueringSomObfuskererKandidaterMedDiskresjonskode().let { obfuskertEvaluering ->
+                Synlighet(this?.erSynlig() ?: false, this?.erFerdigBeregnet ?: false, obfuskertEvaluering)
+            }
+    }
 }
+
+data class Synlighet(
+    val erSynlig: Boolean,
+    val ferdigBeregnet: Boolean,
+    val evalueringUtenDiskresjonskode: EvalueringUtenDiskresjonskode
+)
 
 data class EvalueringUtenDiskresjonskode(
     val harAktivCv: Boolean,
@@ -48,8 +67,7 @@ data class EvalueringUtenDiskresjonskode(
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
-    val erIkkeDoed: Boolean,
-    val erFerdigBeregnet: Boolean
+    val erIkkeDoed: Boolean
 ) {
     companion object {
         fun medAlleVerdierFalse() = EvalueringUtenDiskresjonskode(
@@ -61,8 +79,7 @@ data class EvalueringUtenDiskresjonskode(
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
-            erIkkeDoed = false,
-            erFerdigBeregnet = false
+            erIkkeDoed = false
         )
     }
 }

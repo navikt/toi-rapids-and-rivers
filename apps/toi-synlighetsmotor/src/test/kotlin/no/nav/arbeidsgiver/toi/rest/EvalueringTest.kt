@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.rest
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
 import io.javalin.Javalin
+import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -47,25 +48,6 @@ class EvalueringTest {
         mockOAuth2Server.shutdown()
     }
 
-   @Test
-    fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
-        val repository = Repository(TestDatabase().dataSource)
-
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
-                synlighet = true,
-                ferdigBeregnet = true
-            ),
-            repository
-        )
-
-        val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
-        Assertions.assertThat(evalueringFraDb).isEqualTo(
-            evalueringMedAltTrue()
-        )
-    }
-
     @Test
     fun `GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
@@ -85,7 +67,7 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
         val responseJson = response.body().asString("application/json")
-        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskode::class.java)
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
 
@@ -115,7 +97,7 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
         val responseJson = response.body().asString("application/json")
-        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskode::class.java)
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
     }
 
@@ -136,7 +118,7 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
         val responseJson = response.body().asString("application/json")
-        val responeEvaluering = jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskode::class.java)
+        val responeEvaluering = jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
     }
 }
@@ -153,22 +135,7 @@ private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.iss
     )
 )
 
-private fun evalueringMedAltTrue() = Evaluering(
-    harAktivCv = true,
-    harJobbprofil = true,
-    harSettHjemmel = true,
-    maaIkkeBehandleTidligereCv = true,
-    erIkkeFritattKandidatsøk = true,
-    erUnderOppfoelging = true,
-    harRiktigFormidlingsgruppe = true,
-    erIkkeKode6eller7 = true,
-    erIkkeSperretAnsatt = true,
-    erIkkeDoed = true,
-    erFerdigBeregnet = true
-)
-
-
-private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjonskode(
+private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = true,
     harJobbprofil = true,
     harSettHjemmel = true,
@@ -181,7 +148,7 @@ private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjon
     erFerdigBeregnet = true
 )
 
-private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjonskode(
+private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = false,
     harJobbprofil = false,
     harSettHjemmel = false,

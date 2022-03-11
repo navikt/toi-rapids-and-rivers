@@ -66,20 +66,20 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
             val consumerOffset = consumerOffset(groupId, envs)
             ResultsPerApplication(application, consumerOffset, sisteOffset - consumerOffset)
         }.sortedByDescending(ResultsPerApplication::behind)
-        val result = """
-                    ${
-            resultsPerApplication.joinToString(
-                separator = "\n",
-                transform = ResultsPerApplication::printFriendly
-            )
-        }
-                    
-                    Siste offset er $sisteOffset
-                """.trimIndent()
+        val result = formatResults(resultsPerApplication, sisteOffset)
         log.info(result)
         delay(Duration.ofSeconds(10))
     }
 }
+
+private fun formatResults(
+    resultsPerApplication: List<ResultsPerApplication>,
+    sisteOffset: Long
+) = """
+                    ${resultsPerApplication.joinToString(separator = "\n",transform = ResultsPerApplication::printFriendly)}
+
+                    Siste offset er $sisteOffset
+""".trimIndent()
 
 data class ResultsPerApplication(val name: String, val offset: Long, val behind: Long) {
     fun printFriendly() = "$name is on offset: $offset ( $behind behind last offset)"

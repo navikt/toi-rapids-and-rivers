@@ -2,8 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.get
-import io.javalin.apibuilder.ApiBuilder.path
-import io.javalin.http.Context
+import no.nav.arbeidsgiver.toi.rest.evaluerKandidatFraContext
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.security.token.support.core.configuration.IssuerProperties
@@ -16,11 +15,12 @@ fun startApp(
     rapidsConnection: RapidsConnection
 ) {
     javalin.routes {
-        get("/evaluering/{fnr}", evaluerKandidat(repository::hentMedFnr), Rolle.VEILEDER)
+        get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
     }
 
     rapidsConnection.also {
         SynlighetsLytter(it, repository)
+        BehovForSynlighetLytter(it, repository::hentMedFnr)
     }.start()
 }
 

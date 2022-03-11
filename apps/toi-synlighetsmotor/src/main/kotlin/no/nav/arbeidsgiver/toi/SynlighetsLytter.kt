@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
+import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
 import no.nav.helse.rapids_rivers.*
 
 class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
@@ -36,7 +37,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         val kandidat = Kandidat.fraJson(packet)
 
         val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
-        val synlighet = Synlighet(synlighetsevaluering.erSynlig(), synlighetsevaluering.erFerdigBeregnet)
+        val synlighet = synlighetsevaluering()
 
         packet["synlighet"] = synlighet
         val aktørId = packet["aktørId"].asText()
@@ -54,6 +55,4 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         kandidat.cv?.endreCv?.cv?.fodselsnummer ?:
         kandidat.hjemmel?.fnr ?:
         kandidat.oppfølgingsinformasjon?.fodselsnummer
-
-    private data class Synlighet(val erSynlig: Boolean, val ferdigBeregnet: Boolean)
 }

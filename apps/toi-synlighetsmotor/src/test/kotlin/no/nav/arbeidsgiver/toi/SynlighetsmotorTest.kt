@@ -15,11 +15,31 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendelseMedParticipatingService
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
+    @Test
+    fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
+        val repository = Repository(TestDatabase().dataSource)
+
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+                synlighet = true,
+                ferdigBeregnet = true
+            ),
+            repository
+        )
+
+        val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
+        Assertions.assertThat(evalueringFraDb).isEqualTo(
+            evalueringMedAltTrue()
+        )
+    }
+
     @Test
     fun `legg på synlighet som sann om all data i hendelse tilsier det`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(),
@@ -207,3 +227,17 @@ class SynlighetsmotorTest {
         enHendelseErIkkePublisert()
     )
 }
+
+private fun evalueringMedAltTrue() = Evaluering(
+    harAktivCv = true,
+    harJobbprofil = true,
+    harSettHjemmel = true,
+    maaIkkeBehandleTidligereCv = true,
+    erIkkeFritattKandidatsøk = true,
+    erUnderOppfoelging = true,
+    harRiktigFormidlingsgruppe = true,
+    erIkkeKode6eller7 = true,
+    erIkkeSperretAnsatt = true,
+    erIkkeDoed = true,
+    erFerdigBeregnet = true
+)
