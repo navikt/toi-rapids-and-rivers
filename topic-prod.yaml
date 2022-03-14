@@ -62,3 +62,6 @@ spec:
     - team: toi
       application: toi-helseapp
       access: readwrite
+    - team: toi
+    application: toi-hull-i-cv
+    access: readwrite
