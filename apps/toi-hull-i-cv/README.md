@@ -1,0 +1,1 @@
+# Henter ut inaktive perioder for en kandidat(hull i cv), og legger dette på rapid

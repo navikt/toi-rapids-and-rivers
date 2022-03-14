@@ -1,9 +1,8 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi.hullicv
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class OrganisasjonsenhetTest {
 

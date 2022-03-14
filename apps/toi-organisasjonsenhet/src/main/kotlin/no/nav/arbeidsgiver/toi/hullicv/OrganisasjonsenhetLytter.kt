@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi.hullicv
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*

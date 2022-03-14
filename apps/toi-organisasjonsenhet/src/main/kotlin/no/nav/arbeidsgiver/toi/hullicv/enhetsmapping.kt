@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi.hullicv
 
 // Kan oppdateres med å hente ut norg respons i browser console og kjøre
 // fra Chrome SKSS

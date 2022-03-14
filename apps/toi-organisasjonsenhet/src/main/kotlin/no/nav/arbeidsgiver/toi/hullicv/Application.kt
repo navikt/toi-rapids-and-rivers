@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi.hullicv
 
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
