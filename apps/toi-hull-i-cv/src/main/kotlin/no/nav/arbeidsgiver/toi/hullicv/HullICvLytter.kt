@@ -22,19 +22,24 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
 
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext ) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørid: String = packet["aktørId"].asText()
         val cvPacket = packet["cv"]["opprettCv"]["cv"] ?: packet["cv"]["endreCv"]["cv"]
+        packet[HullICv] =
+            if (cvPacket == null) håndterIkkeOpprettEllerEndreCv(packet, aktørid)
+            else objectMapper.treeToValue(cvPacket, Cv::class.java).tilPerioderMedInaktivitet()
 
-        if (cvPacket == null) {
-            log.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har data for opprett cv eller endre cv")
-            return
-        }
-
-        val cv = objectMapper.treeToValue(cvPacket, Cv::class.java);
-
-        packet[HullICv] = cv.tilPerioderMedInaktivitet()
         context.publish(aktørid, packet.toJson())
+    }
+
+    private fun håndterIkkeOpprettEllerEndreCv(
+        packet: JsonMessage,
+        aktørid: String
+    ): PerioderMedInaktivitet {
+        if (packet["cv"]["slettCv"]["cv"] == null) {
+            log.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har cv")
+        }
+        return PerioderMedInaktivitet(null, emptyList())
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
