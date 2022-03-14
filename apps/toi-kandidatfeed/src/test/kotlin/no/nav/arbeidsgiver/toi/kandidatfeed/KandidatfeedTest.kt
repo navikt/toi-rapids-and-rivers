@@ -54,8 +54,17 @@ class KandidatfeedTest {
 
     @Test
     fun `Meldinger der synlighet er ferdig beregnet og har dekte behov skal produsere melding på kandidat-topic`() {
-        val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor")
-        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor")
+        val hullJson = """{}"""
+        val meldingSynlig = rapidMelding(
+            synlighet(erSynlig = true, ferdigBeregnet = true),
+            organisasjonsenhetsnavn = "NAV et kontor",
+            hullICv = hullJson
+        )
+        val meldingUsynlig = rapidMelding(
+            synlighet(erSynlig = false, ferdigBeregnet = true),
+            organisasjonsenhetsnavn = "NAV et kontor",
+            hullICv = hullJson
+        )
 
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
@@ -95,7 +104,8 @@ class KandidatfeedTest {
 
     @Test
     fun `Informasjon om kandidaten skal sendes videre til kandidat-topic`() {
-        val rapidMelding = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor")
+        val rapidMelding =
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}")
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
