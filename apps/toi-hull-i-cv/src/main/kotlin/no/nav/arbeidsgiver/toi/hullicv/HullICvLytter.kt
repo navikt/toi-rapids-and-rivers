@@ -1,15 +1,18 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.*
 
 class HullICvLytter(rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
+    private val HullICv = "hullICv"
+
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandAtFørstkommendeUløsteBehovEr("hullICv")
+                it.demandAtFørstkommendeUløsteBehovEr(HullICv)
                 it.requireKey("cv")
                 it.requireKey("aktørId")
             }
@@ -18,10 +21,17 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørid: String = packet["aktørId"].asText()
-        val cv = packet["cv"]
+        val cvPacket = packet["cv"]["opprettCv"]["cv"] ?: packet["cv"]["endreCv"]["cv"]
 
+        if (cvPacket == null) {
+            log.error("Hull i cv for aktørid ${aktørid} har mottatt melding som ikke har data for opprett cv eller endre cv")
+            return
+        }
 
-        //context.publish(aktørid, packet.toJson())
+        val cv = jacksonObjectMapper().treeToValue(cvPacket, Cv::class.java);
+
+        packet[HullICv] = cv.tilPerioderMedInaktivitet()
+        context.publish(aktørid, packet.toJson())
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {

@@ -24,7 +24,7 @@ class Cv (
         val inaktivePerioderEtterEnVissAlder =
             inaktivePerioderEtterEnVissAlder(inaktivePerioderMedVarighetToÅrEllerMer, foedselsdato)
 
-        return esPerioderMedInaktivitet(førsteDagIInneværendeInaktivePeriode, inaktivePerioderEtterEnVissAlder)
+        return perioderMedInaktivitet(førsteDagIInneværendeInaktivePeriode, inaktivePerioderEtterEnVissAlder)
     }
 
     private fun perioderMedAktivitet() =
@@ -142,7 +142,7 @@ private fun perioderMedInaktivitet(aktivePerioder: List<AktivPeriode>): Pair<Loc
 }
 
 
-private fun esPerioderMedInaktivitet(
+private fun perioderMedInaktivitet(
     førsteDagIInneværendeInaktivePeriode: LocalDate,
     inaktivePerioder: List<InaktivPeriode>
 ): PerioderMedInaktivitet {
