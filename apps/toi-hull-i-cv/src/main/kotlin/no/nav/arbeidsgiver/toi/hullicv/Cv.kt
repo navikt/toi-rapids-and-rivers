@@ -32,8 +32,8 @@ class Cv (
 }
 
 class CVPeriode(
-    private val fraTidspunkt: LocalDate?,
-    private val tilTidspunkt: Long?
+    val fraTidspunkt: LocalDate?,
+    val tilTidspunkt: Long?
 ) {
     fun tilAktivPeriode() = AktivPeriode(
         fraTidspunkt ?: LocalDate.MIN,
