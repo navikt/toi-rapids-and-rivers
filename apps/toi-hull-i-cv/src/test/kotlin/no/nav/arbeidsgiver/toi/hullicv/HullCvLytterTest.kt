@@ -274,6 +274,7 @@ class HullCvLytterTest {
             "cv": {
                 "opprettCv": {
                     "cv": {
+                        "uviktigfelt": true,
                         "utdannelse": ${utdannelse.tilJsonString()},
                         "arbeidserfaring": ${arbeidserfaring.tilJsonString()},
                         "foedselsdato": ${fødselsDato.tilIntList().tilJsonString()}

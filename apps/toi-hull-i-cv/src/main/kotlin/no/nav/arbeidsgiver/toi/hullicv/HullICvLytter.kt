@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -21,6 +22,8 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
     }
 
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørid: String = packet["aktørId"].asText()
