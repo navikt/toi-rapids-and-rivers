@@ -18,6 +18,7 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørid: String = packet["aktørId"].asText()
+        val cv = packet["cv"]
 
 
         //context.publish(aktørid, packet.toJson())
