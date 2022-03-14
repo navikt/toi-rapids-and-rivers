@@ -20,7 +20,6 @@ fun startApp(
 
     rapidsConnection.also {
         SynlighetsLytter(it, repository)
-        BehovForSynlighetLytter(it, repository::hentMedFnr)
     }.start()
 }
 
