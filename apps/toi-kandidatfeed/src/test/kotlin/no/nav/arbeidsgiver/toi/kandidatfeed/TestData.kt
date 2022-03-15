@@ -12,7 +12,8 @@ fun synlighet(erSynlig: Boolean = true, ferdigBeregnet: Boolean = true) = """
 fun rapidMelding(
     synlighetJson: String?,
     behovsListe: List<String>? = null,
-    organisasjonsenhetsnavn: String? = null
+    organisasjonsenhetsnavn: String? = null,
+    hullICv: String? = null
 ): String = """
         {
           "@event_name": "cv.sammenstilt",
@@ -54,6 +55,7 @@ fun rapidMelding(
     },"""
 }
           ${organisasjonsenhetsnavn?.let { """"organisasjonsenhetsnavn": "$it",""" } ?: ""}
+          ${hullICv?.let { """"hullICv": "$it",""" } ?: ""}
           "system_read_count": 1,
           "system_participating_services": [
             {

@@ -5,7 +5,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val behovsListe = listOf("organisasjonsenhetsnavn")
+val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv")
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
     val kandidatfeedProducer = KafkaProducer<String, String>(producerConfig)
