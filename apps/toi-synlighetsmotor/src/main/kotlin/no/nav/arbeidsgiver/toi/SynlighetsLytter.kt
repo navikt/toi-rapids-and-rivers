@@ -43,8 +43,6 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         val aktørId = packet["aktørId"].asText()
         val fødselsnummer = finnFødselsnummer(kandidat)
 
-        log.info("Beregnet synlighet for kandidat $aktørId: $synlighet")
-
         repository.lagre(evaluering = synlighetsevaluering, aktørId = aktørId, fødselsnummer = fødselsnummer)
 
         rapidsConnection.publish(aktørId, packet.toJson())
