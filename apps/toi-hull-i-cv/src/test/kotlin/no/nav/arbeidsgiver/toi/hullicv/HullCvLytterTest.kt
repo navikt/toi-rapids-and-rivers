@@ -407,6 +407,38 @@ class HullCvLytterTest {
     }
 
     @Test
+    fun spesiellPerson() {
+        val yrkeserfaringer = listOf(
+            "2017-10-31" to "2021-04-30",
+            "2016-01-31" to "2017-10-31",
+            "2009-07-31" to "2012-12-31",
+            "2009-01-31" to "2014-03-31",
+            "2006-10-31" to "2016-01-31",
+            "2004-05-31" to "2006-11-30",
+            "2003-06-30" to "2004-05-31",
+            "2001-12-31" to "2003-06-30",
+            "1999-04-30" to "2000-11-30"
+        ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
+            .map { CVPeriode(it.first,localDateTilEpochMS(it.second)) }
+        val utdanninger = listOf(
+            "2013-07-31" to "2014-05-31",
+            "1999-07-31" to "2000-05-31",
+            "1995-07-31" to "1998-05-31",
+            "1985-07-31" to "1995-05-31"
+        ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
+            .map { CVPeriode(it.first,localDateTilEpochMS(it.second)) }
+
+        val melding = lagBehovmeldingMedErfaring(
+            arbeidserfaring = yrkeserfaringer,
+            utdannelse = utdanninger,
+            fødselsDato = LocalDate.of(1984,3,16)
+        )
+
+        assertThat(melding.sluttdatoerForInaktivePerioder).isEmpty()
+        assertThat(melding.førsteDagIInneværendeInaktivePeriode).isEqualTo(LocalDate.of(2021,5,1))
+    }
+
+    @Test
     fun skalIgnorereAvsluttetInaktivitetOppTilEnVissAlder_gittAktivperiodeSlutterFørDenVisseAlderen() {
         val fødselsdato = LocalDate.of(1989, 6, 20)
         val aktivFraOgMed = LocalDate.of(fødselsdato.year + 6, 8, 14)

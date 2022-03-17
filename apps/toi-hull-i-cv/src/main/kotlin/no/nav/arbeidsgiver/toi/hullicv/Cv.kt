@@ -58,7 +58,7 @@ data class AktivPeriode(val førsteDag: LocalDate, val sisteDag: LocalDate) {
         dato.isAfterOrEqual(førsteDag) && dato.isBeforeOrEqual(sisteDag)
 
     fun overlapperMed(other: AktivPeriode): Boolean =
-        inneholder(other.sisteDag) || inneholder(other.førsteDag)
+        inneholder(other.sisteDag) || inneholder(other.førsteDag) || other.inneholder(sisteDag) || other.inneholder(førsteDag)
 }
 
 
@@ -76,23 +76,17 @@ private data class InaktivPeriode(val førsteDag: LocalDate, val sisteDag: Local
 private fun flattened(potensieltOverlappendePerioder: Collection<AktivPeriode>): List<AktivPeriode> {
     val aktivePerioder: MutableSet<AktivPeriode> = mutableSetOf()
 
-    fun max(d1: LocalDate, d2: LocalDate): LocalDate =
-        if (d1.isAfter(d2)) d1 else d2
-
-    fun min(d1: LocalDate, d2: LocalDate): LocalDate =
-        if (d1.isBefore(d2)) d1 else d2
-
     fun add(ny: AktivPeriode) {
         val overlappendeGammel =
-            aktivePerioder.find { it.overlapperMed(ny) }
-        if (overlappendeGammel == null) {
+            aktivePerioder.filter { it.overlapperMed(ny) }
+        if (overlappendeGammel.isEmpty()) {
             aktivePerioder.add(ny)
         } else {
-            aktivePerioder.remove(overlappendeGammel)
+            aktivePerioder.removeAll(overlappendeGammel)
             aktivePerioder.add(
                 AktivPeriode(
-                    min(overlappendeGammel.førsteDag, ny.førsteDag),
-                    max(overlappendeGammel.sisteDag, ny.sisteDag)
+                    (overlappendeGammel.map(AktivPeriode::førsteDag) + ny.førsteDag).minOrNull() ?: throw Exception(),
+                    (overlappendeGammel.map(AktivPeriode::sisteDag) + ny.sisteDag).maxOrNull() ?: throw Exception()
                 )
             )
 
