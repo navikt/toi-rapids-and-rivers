@@ -117,7 +117,7 @@ private fun consumerProperties(envs: Map<String, String>, groupId: String) = Pro
     put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, envs["KAFKA_KEYSTORE_PATH"])
     put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, envs["KAFKA_CREDSTORE_PASSWORD"])
     put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
-    put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-toi-helseapp")
+    put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-toi-helseapp-$groupId")
     put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
     put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "200")
     put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "${Duration.ofSeconds(60 + 200 * 2.toLong()).toMillis()}")
