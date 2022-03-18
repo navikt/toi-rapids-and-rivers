@@ -89,13 +89,15 @@ data class ResultsPerApplication(val name: String, val offset: Long, val behind:
 fun consumerOffset(groupId: String, envs: Map<String, String>): Long {
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     val consumer = KafkaConsumer(consumerProperties(envs, groupId), StringDeserializer(), StringDeserializer())
-    return consumer.committed(setOf(topicPartition))[topicPartition]?.offset()
-        ?: throw Exception("Fant ingen offset for groupId: $groupId")
+    val res = (consumer.committed(setOf(topicPartition))[topicPartition]?.offset()
+        ?: throw Exception("Fant ingen offset for groupId: $groupId"))
+    consumer.close()
+    return res
 }
 
 fun sisteOffset(envs: Map<String, String>): Long {
     val kafkaConsumer = KafkaConsumer(
-        consumerProperties(envs, envs["KAFKA_CONSUMER_GROUP_ID"] ?: "toi-helseapp"),
+        consumerProperties(envs, envs["KAFKA_CONSUMER_GROUP_ID"]!!, clientId = "toi-helseapp"),
         StringDeserializer(),
         StringDeserializer()
     )
@@ -104,11 +106,11 @@ fun sisteOffset(envs: Map<String, String>): Long {
     kafkaConsumer.assign(listOf(topicPartition))
     kafkaConsumer.seekToEnd(listOf(topicPartition))
     val position = kafkaConsumer.position(topicPartition)
-    kafkaConsumer.close(Duration.ZERO)
+    kafkaConsumer.close()
     return position
 }
 
-private fun consumerProperties(envs: Map<String, String>, groupId: String) = Properties().apply {
+private fun consumerProperties(envs: Map<String, String>, groupId: String, clientId: String = "consumer-toi-helseapp-$groupId") = Properties().apply {
     put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, envs["KAFKA_BROKERS"])
     put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
     put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
@@ -119,7 +121,7 @@ private fun consumerProperties(envs: Map<String, String>, groupId: String) = Pro
     put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, envs["KAFKA_KEYSTORE_PATH"])
     put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, envs["KAFKA_CREDSTORE_PASSWORD"])
     put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
-    put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-toi-helseapp-$groupId")
+    put(ConsumerConfig.CLIENT_ID_CONFIG, clientId)
     put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false)
     put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
     put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "200")
