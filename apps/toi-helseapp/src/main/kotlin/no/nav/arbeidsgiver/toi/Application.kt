@@ -103,7 +103,9 @@ fun sisteOffset(envs: Map<String, String>): Long {
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     kafkaConsumer.assign(listOf(topicPartition))
     kafkaConsumer.seekToEnd(listOf(topicPartition))
-    return kafkaConsumer.position(topicPartition)
+    val position = kafkaConsumer.position(topicPartition)
+    kafkaConsumer.close()
+    return position
 }
 
 private fun consumerProperties(envs: Map<String, String>, groupId: String) = Properties().apply {
