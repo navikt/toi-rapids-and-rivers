@@ -104,7 +104,7 @@ fun sisteOffset(envs: Map<String, String>): Long {
     kafkaConsumer.assign(listOf(topicPartition))
     kafkaConsumer.seekToEnd(listOf(topicPartition))
     val position = kafkaConsumer.position(topicPartition)
-    kafkaConsumer.close()
+    kafkaConsumer.close(Duration.ZERO)
     return position
 }
 
@@ -120,6 +120,7 @@ private fun consumerProperties(envs: Map<String, String>, groupId: String) = Pro
     put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, envs["KAFKA_CREDSTORE_PASSWORD"])
     put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
     put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-toi-helseapp-$groupId")
+    put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false)
     put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
     put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "200")
     put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "${Duration.ofSeconds(60 + 200 * 2.toLong()).toMillis()}")
