@@ -27,5 +27,5 @@ spec:
       application: rekrutteringsbistand-kandidat-indekser
       access: read
     - team: team-ai
-      application: team-ai-cv-consumer
+      application: cv-consumer
       access: read
