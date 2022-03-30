@@ -1,5 +1,10 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
+val kjenteProblematiskeEnheter = listOf(
+    "1279", // NAV Marked Hordaland, opprettet kun i Arena
+    "1476", // NAV Sjukefåvær Sunnfjord, virtuell enhet
+)
+
 // Kan oppdateres med å hente ut norg respons i browser console og kjøre
 // fra Chrome SKSS
 // kall mot URL: https://norg2.intern.nav.no/norg2/api/v1/enhet/
