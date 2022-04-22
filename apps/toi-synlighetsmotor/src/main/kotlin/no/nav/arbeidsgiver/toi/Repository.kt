@@ -37,8 +37,8 @@ class Repository(private val dataSource: DataSource) {
                 ).apply {
                     databaseMap.filterKeys { it != aktøridKolonne }.values
                         .forEachIndexed { index, any ->
-                        this.setObject((index + 1), any)
-                    }
+                            this.setObject((index + 1), any)
+                        }
                 }.execute()
             }
         } else {
@@ -54,7 +54,7 @@ class Repository(private val dataSource: DataSource) {
 
     private fun updateString(data: Map<String, Any?>): String {
         return data.entries
-            .filter { it.key != aktøridKolonne  }
+            .filter { it.key != aktøridKolonne }
             .joinToString(transform = { "${it.key} = ?" }, separator = ",")
     }
 
@@ -77,6 +77,25 @@ class Repository(private val dataSource: DataSource) {
                 return evalueringFraDB(resultset)
             } else null
         }
+
+    fun hentEvalueringer(fødselsnummerliste: List<String>): Map<String, Evaluering> {
+        dataSource.connection.use {
+            val resultset = it.prepareStatement("select * from $tabell where $fødselsnummerKolonne IN (?)").apply {
+                setArray(1, connection.createArrayOf("VARCHAR", fødselsnummerliste.toTypedArray()))
+            }.executeQuery()
+
+            return sequence {
+                while (resultset.next()) {
+                    resultset.getString(1).let { fnr ->
+                        if (fnr != null) {
+                            yield(fnr to evalueringFraDB(resultset))
+                        }
+                    }
+                }
+            }.toMap()
+        }
+    }
+
 
     private fun evalueringFraDB(resultset: ResultSet) = Evaluering(
         harAktivCv = resultset.getBoolean(harAktivCvKolonne),

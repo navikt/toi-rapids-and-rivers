@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi.rest
 import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.Evaluering
 
-val evaluerKandidatFraContext: ((String) -> Evaluering?) -> (Context) -> Unit = { hentMedFødselsnummer ->
+val evaluerKandidatFraContext: ((String) ->  Evaluering?) -> (Context) -> Unit = { hentMedFødselsnummer ->
     { context ->
         val fnr = context.pathParam("fnr")
 
