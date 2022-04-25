@@ -13,7 +13,7 @@ data class Evaluering(
     val erIkkeDoed: Boolean,
     val erFerdigBeregnet: Boolean
 ) {
-    private fun erSynlig() = harAktivCv &&
+    fun erSynlig() = harAktivCv &&
             harJobbprofil &&
             harSettHjemmel &&
             maaIkkeBehandleTidligereCv &&

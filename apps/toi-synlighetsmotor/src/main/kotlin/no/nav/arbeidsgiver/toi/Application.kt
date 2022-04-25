@@ -2,7 +2,9 @@ package no.nav.arbeidsgiver.toi
 
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.get
+import io.javalin.apibuilder.ApiBuilder.post
 import no.nav.arbeidsgiver.toi.rest.evaluerKandidatFraContext
+import no.nav.arbeidsgiver.toi.rest.hentSynlighetForKandidater
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.security.token.support.core.configuration.IssuerProperties
@@ -16,6 +18,7 @@ fun startApp(
 ) {
     javalin.routes {
         get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
+        post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.VEILEDER)
     }
 
     rapidsConnection.also {
