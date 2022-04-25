@@ -14,6 +14,9 @@ val hentSynlighetForKandidater: (HentEvalueringForKandidater) -> (Context) -> Un
                 it.value.erSynlig()
             }
 
-        context.json(synlighetForKandidater).status(200)
+        val kandidaterSomIkkeFinnes = kandidater.filter { !synlighetForKandidater.containsKey(it) }
+        val synlighetForKandidaterSomIkkeFinnes = kandidaterSomIkkeFinnes.associateWith { false }
+
+        context.json(synlighetForKandidater + synlighetForKandidaterSomIkkeFinnes).status(200)
     }
 }

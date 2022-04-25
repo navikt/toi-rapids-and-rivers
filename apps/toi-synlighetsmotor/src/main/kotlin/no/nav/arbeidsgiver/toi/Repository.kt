@@ -80,8 +80,8 @@ class Repository(private val dataSource: DataSource) {
 
     fun hentEvalueringer(fødselsnummerliste: List<String>): Map<String, Evaluering> {
         dataSource.connection.use {
-            val resultset = it.prepareStatement("select * from $tabell where $fødselsnummerKolonne IN (?)").apply {
-                setString(1, fødselsnummerliste.joinToString(separator = ", "))
+            val resultset = it.prepareStatement("select * from $tabell where $fødselsnummerKolonne = ANY(?)").apply {
+                setArray(1, dataSource.connection.createArrayOf("varchar", fødselsnummerliste.toTypedArray()))
             }.executeQuery()
 
             return sequence {
