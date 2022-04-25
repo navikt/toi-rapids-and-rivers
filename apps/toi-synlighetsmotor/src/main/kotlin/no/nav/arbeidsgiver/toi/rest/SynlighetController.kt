@@ -3,13 +3,17 @@ package no.nav.arbeidsgiver.toi.rest
 import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.Evaluering
 
-val synlighet: ((List<String>) -> Map<String, Evaluering>) -> (Context) -> Unit = { hentEvalueringer ->
+typealias HentEvalueringForKandidater = (List<String>) -> Map<String, Evaluering>
+typealias Fødselsnummer = String
+
+val hentSynlighetForKandidater: (HentEvalueringForKandidater) -> (Context) -> Unit = { hentEvalueringForKandidater ->
     { context ->
-        val responsebody = hentEvalueringer(context.bodyAsClass())
+        val kandidater: List<Fødselsnummer> = context.bodyAsClass()
+        val synlighetForKandidater: Map<Fødselsnummer, Boolean> = hentEvalueringForKandidater(kandidater)
             .mapValues {
                 it.value.erSynlig()
             }
 
-        context.json(responsebody).status(200)
+        context.json(synlighetForKandidater).status(200)
     }
 }

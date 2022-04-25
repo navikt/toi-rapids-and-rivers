@@ -81,12 +81,12 @@ class Repository(private val dataSource: DataSource) {
     fun hentEvalueringer(fødselsnummerliste: List<String>): Map<String, Evaluering> {
         dataSource.connection.use {
             val resultset = it.prepareStatement("select * from $tabell where $fødselsnummerKolonne IN (?)").apply {
-                setArray(1, connection.createArrayOf("VARCHAR", fødselsnummerliste.toTypedArray()))
+                setString(1, fødselsnummerliste.joinToString(separator = ", "))
             }.executeQuery()
 
             return sequence {
                 while (resultset.next()) {
-                    resultset.getString(1).let { fnr ->
+                    resultset.getString(fødselsnummerKolonne).let { fnr ->
                         if (fnr != null) {
                             yield(fnr to evalueringFraDB(resultset))
                         }

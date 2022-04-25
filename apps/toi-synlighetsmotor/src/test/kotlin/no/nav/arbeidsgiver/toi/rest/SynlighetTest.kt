@@ -35,7 +35,7 @@ class SynlighetTest {
     }
 
     @Test
-    fun `kall med tom liste skal returnere tom liste`() {
+    fun `kall med tom liste skal returnere tomt resultat`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
@@ -45,7 +45,8 @@ class SynlighetTest {
         rapid.sendTestMessage(Testdata.komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
-        val jsonString = objectmapper.writeValueAsString(emptyList<String>())
+        val kandidater = emptyList<String>()
+        val jsonString = objectmapper.writeValueAsString(kandidater)
 
         val response = Fuel.post("http://localhost:8301/synlighet")
             .body(jsonString)
@@ -53,6 +54,31 @@ class SynlighetTest {
 
         Assertions.assertThat(response.statusCode).isEqualTo(200)
         Assertions.assertThat(response.body().asString("application/json")).isEqualTo("{}")
+    }
+
+    @Test
+    fun `Person som er synlig skal returneres som synlig`(){
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val repository = Repository(TestDatabase().dataSource)
+        val rapid = TestRapid()
+
+        startApp(repository, javalin, rapid)
+
+        rapid.sendTestMessage(Testdata.komplettHendelseSomFørerTilSynlighetTrue())
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
+
+        val kandidater = listOf("12345678912")
+        val jsonString = objectmapper.writeValueAsString(kandidater)
+
+        val response = Fuel.post("http://localhost:8301/synlighet")
+            .body(jsonString)
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val expectedJsonResponse = objectmapper.writeValueAsString(mapOf("12345678912" to true))
+        Assertions.assertThat(response.body().asString("application/json")).isEqualTo(expectedJsonResponse)
+
     }
 
 
