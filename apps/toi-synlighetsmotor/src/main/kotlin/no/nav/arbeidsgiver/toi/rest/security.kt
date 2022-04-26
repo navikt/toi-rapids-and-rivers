@@ -16,40 +16,9 @@ enum class Rolle : RouteRole {
     TokenX
 }
 
-
-fun styrTilgang2(issuerProperties: List<IssuerProperties> , issuerPropertiesTokenX:List<IssuerProperties>) : AccessManager {
-    return AccessManager{ handler: Handler, ctx: Context, roller: Set<RouteRole> ->
-
-        if (roller.contains(Rolle.VEILEDER)) {
-            val autentiser: Autentiseringsmetode = autentiserVeileder;
-            val tokenClaims = hentTokenClaims(ctx, issuerProperties);
-            if (autentiser(tokenClaims)) {
-                handler.handle(ctx)
-            } else {
-                throw ForbiddenResponse()
-            }
-        } else if (roller.contains(Rolle.TokenX)) {
-            // TODO: Hvilke claims skal vi evt validere her?
-            val autentiser = Autentiseringsmetode{true};
-            val tokenClaims = hentTokenClaims(ctx, issuerPropertiesTokenX);
-            if (autentiser(tokenClaims)) {
-                handler.handle(ctx)
-            } else {
-                throw ForbiddenResponse()
-            }
-        } else {
-            throw ForbiddenResponse()
-        }
-    }
-}
-
-
-
-
-
-val styrTilgang: (List<IssuerProperties>, List<IssuerProperties>) -> (Handler, Context, Set<RouteRole>) -> Unit =
+val styrTilgang =
     { issuerProperties: List<IssuerProperties>, issuerPropertiesTokenX: List<IssuerProperties> ->
-        { handler, ctx, roller ->
+        { handler:Handler, ctx:Context, roller:Set<RouteRole> ->
 
             if (roller.contains(Rolle.VEILEDER)) {
                 val autentiser: Autentiseringsmetode = autentiserVeileder;
