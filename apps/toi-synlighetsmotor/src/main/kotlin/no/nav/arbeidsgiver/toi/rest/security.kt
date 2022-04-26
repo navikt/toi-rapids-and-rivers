@@ -16,29 +16,22 @@ enum class Rolle : RouteRole {
     ARBEIDSGIVER
 }
 
-fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>)  =
-        AccessManager{ handler: Handler, ctx: Context, roller: Set<RouteRole> ->
+fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
+    AccessManager { handler: Handler, ctx: Context, roller: Set<RouteRole> ->
 
+        val erAutentisert =
             if (roller.contains(Rolle.VEILEDER)) {
-                val autentiser: Autentiseringsmetode = autentiserVeileder;
-                val tokenClaims = hentTokenClaims(ctx, issuerProperties[Rolle.VEILEDER]!!);
-                if (autentiser(tokenClaims)) {
-                    handler.handle(ctx)
-                } else {
-                    throw ForbiddenResponse()
-                }
+                autentiserVeileder(hentTokenClaims(ctx, issuerProperties[Rolle.VEILEDER]!!))
             } else if (roller.contains(Rolle.ARBEIDSGIVER)) {
-                // TODO: Hvilke claims skal vi evt validere her?
-                val tokenClaims = hentTokenClaims(ctx, issuerProperties[Rolle.ARBEIDSGIVER]!!);
-                if (Autentiseringsmetode { true }(tokenClaims)) {
-                    handler.handle(ctx)
-                } else {
-                    throw ForbiddenResponse()
-                }
-            } else {
-                throw ForbiddenResponse()
-            }
+                autentiserArbeidsgiver(hentTokenClaims(ctx, issuerProperties[Rolle.ARBEIDSGIVER]!!))
+            } else false
+
+        if (erAutentisert) {
+            handler.handle(ctx)
+        } else {
+            throw ForbiddenResponse()
         }
+    }
 
 
 fun interface Autentiseringsmetode {
@@ -46,6 +39,7 @@ fun interface Autentiseringsmetode {
 }
 
 val autentiserVeileder = Autentiseringsmetode { it?.get("NAVident")?.toString()?.isNotEmpty() ?: false }
+val autentiserArbeidsgiver = Autentiseringsmetode { it != null }
 
 
 private fun hentTokenClaims(ctx: Context, issuerProperties: IssuerProperties) =
