@@ -47,6 +47,8 @@ spec:
       - type: POSTGRES_12
         databases:
           - name: synlighetsmotor-db
+  tokenx:
+    enabled: true
   accessPolicy:
     inbound:
       rules:

@@ -35,7 +35,7 @@ class EvalueringTest {
             "isso-idtoken"
         )
 
-        javalin = opprettJavalinMedTilgangskontroll(listOf(issuerProperties))
+        javalin = opprettJavalinMedTilgangskontroll(listOf(issuerProperties), listOf(issuerProperties))
     }
 
     @AfterEach

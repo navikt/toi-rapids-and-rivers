@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import io.javalin.core.security.AccessManager
 import io.javalin.core.security.RouteRole
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
@@ -11,26 +12,67 @@ import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.security.token.support.core.validation.JwtTokenValidationHandler
 
 enum class Rolle : RouteRole {
-    VEILEDER
+    VEILEDER,
+    TokenX
 }
 
-val styrTilgang: (List<IssuerProperties>) -> (Handler, Context, Set<RouteRole>) -> Unit = { issuerProperties ->
-    { handler, ctx, roller ->
-        val autentiser: Autentiseringsmetode = when {
-            roller.contains(Rolle.VEILEDER) -> autentiserVeileder
-            else -> Autentiseringsmetode { false }
-        }
 
-        val tokenClaims = hentTokenClaims(ctx, issuerProperties)
+fun styrTilgang2(issuerProperties: List<IssuerProperties> , issuerPropertiesTokenX:List<IssuerProperties>) : AccessManager {
+    return AccessManager{ handler: Handler, ctx: Context, roller: Set<RouteRole> ->
 
-        if (autentiser(tokenClaims)) {
-            handler.handle(ctx)
+        if (roller.contains(Rolle.VEILEDER)) {
+            val autentiser: Autentiseringsmetode = autentiserVeileder;
+            val tokenClaims = hentTokenClaims(ctx, issuerProperties);
+            if (autentiser(tokenClaims)) {
+                handler.handle(ctx)
+            } else {
+                throw ForbiddenResponse()
+            }
+        } else if (roller.contains(Rolle.TokenX)) {
+            // TODO: Hvilke claims skal vi evt validere her?
+            val autentiser = Autentiseringsmetode{true};
+            val tokenClaims = hentTokenClaims(ctx, issuerPropertiesTokenX);
+            if (autentiser(tokenClaims)) {
+                handler.handle(ctx)
+            } else {
+                throw ForbiddenResponse()
+            }
         } else {
             throw ForbiddenResponse()
         }
-
     }
 }
+
+
+
+
+
+val styrTilgang: (List<IssuerProperties>, List<IssuerProperties>) -> (Handler, Context, Set<RouteRole>) -> Unit =
+    { issuerProperties: List<IssuerProperties>, issuerPropertiesTokenX: List<IssuerProperties> ->
+        { handler, ctx, roller ->
+
+            if (roller.contains(Rolle.VEILEDER)) {
+                val autentiser: Autentiseringsmetode = autentiserVeileder;
+                val tokenClaims = hentTokenClaims(ctx, issuerProperties);
+                if (autentiser(tokenClaims)) {
+                    handler.handle(ctx)
+                } else {
+                    throw ForbiddenResponse()
+                }
+            } else if (roller.contains(Rolle.TokenX)) {
+                // TODO: Hvilke claims skal vi evt validere her?
+                val autentiser = Autentiseringsmetode{true};
+                val tokenClaims = hentTokenClaims(ctx, issuerPropertiesTokenX);
+                if (autentiser(tokenClaims)) {
+                    handler.handle(ctx)
+                } else {
+                    throw ForbiddenResponse()
+                }
+            } else {
+                throw ForbiddenResponse()
+            }
+        }
+    }
 
 fun interface Autentiseringsmetode {
     operator fun invoke(claims: JwtTokenClaims?): Boolean
