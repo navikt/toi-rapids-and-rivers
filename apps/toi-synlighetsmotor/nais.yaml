@@ -56,7 +56,7 @@ spec:
           cluster: {{ cluster }}
           namespace: toi
         - application: pam-kandidatsok-api
-          cluster: dev-fss
+          cluster: {{ cluster-fss }}
           namespace: teampam
   env:
     - name: KAFKA_RAPID_TOPIC
