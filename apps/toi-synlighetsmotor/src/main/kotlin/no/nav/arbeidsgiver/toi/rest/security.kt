@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import io.javalin.core.security.AccessManager
 import io.javalin.core.security.RouteRole
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
@@ -15,9 +16,8 @@ enum class Rolle : RouteRole {
     ARBEIDSGIVER
 }
 
-val styrTilgang =
-    { issuerProperties: Map<Rolle, IssuerProperties> ->
-        { handler: Handler, ctx: Context, roller: Set<RouteRole> ->
+fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>)  =
+        AccessManager{ handler: Handler, ctx: Context, roller: Set<RouteRole> ->
 
             if (roller.contains(Rolle.VEILEDER)) {
                 val autentiser: Autentiseringsmetode = autentiserVeileder;
@@ -39,7 +39,7 @@ val styrTilgang =
                 throw ForbiddenResponse()
             }
         }
-    }
+
 
 fun interface Autentiseringsmetode {
     operator fun invoke(claims: JwtTokenClaims?): Boolean
