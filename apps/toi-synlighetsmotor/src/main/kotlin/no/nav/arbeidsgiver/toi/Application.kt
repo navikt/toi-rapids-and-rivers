@@ -18,7 +18,7 @@ fun startApp(
 ) {
     javalin.routes {
         get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
-        post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.TokenX)
+        post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.ARBEIDSGIVER)
     }
 
     rapidsConnection.also {
@@ -27,12 +27,11 @@ fun startApp(
 }
 
 fun opprettJavalinMedTilgangskontroll(
-    issuerProperties: List<IssuerProperties>,
-    issuerPropertiesTokenX: List<IssuerProperties>
+    issuerProperties: Map<Rolle, IssuerProperties>
 ): Javalin =
     Javalin.create {
         it.defaultContentType = "application/json"
-        it.accessManager(styrTilgang(issuerProperties, issuerPropertiesTokenX))
+        it.accessManager(styrTilgang(issuerProperties))
     }.start(8301)
 
 fun main() {
@@ -40,8 +39,7 @@ fun main() {
     val datasource = DatabaseKonfigurasjon(env).lagDatasource()
     val repository = Repository(datasource)
     val issuerProperties = hentIssuerProperties(System.getenv())
-    val issuerPropertiesTokenX = hentIssuerPropertiesTokenX(System.getenv())
-    val javalin = opprettJavalinMedTilgangskontroll(issuerProperties, issuerPropertiesTokenX)
+    val javalin = opprettJavalinMedTilgangskontroll(issuerProperties)
 
     val rapidsConnection = RapidApplication.create(env).apply {
         this.register(object : RapidsConnection.StatusListener {

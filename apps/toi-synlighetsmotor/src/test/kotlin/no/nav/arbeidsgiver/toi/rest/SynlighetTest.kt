@@ -33,7 +33,12 @@ class SynlighetTest {
             "isso-idtoken"
         )
 
-        javalin = opprettJavalinMedTilgangskontroll(listOf(issuerProperties), listOf(issuerProperties))
+        javalin = opprettJavalinMedTilgangskontroll(
+            mapOf(
+                Rolle.VEILEDER to issuerProperties,
+                Rolle.ARBEIDSGIVER to issuerProperties
+            )
+        )
     }
 
     @AfterEach
@@ -170,7 +175,8 @@ class SynlighetTest {
         Assertions.assertThat(response.body().asString("application/json")).isEqualTo(expectedJsonResponse)
     }
 
-    private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.issueToken("isso-idtoken", "someclientid",
+    private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.issueToken(
+        "isso-idtoken", "someclientid",
         DefaultOAuth2TokenCallback(
             issuerId = "isso-idtoken",
             claims = mapOf(
