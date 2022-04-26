@@ -18,7 +18,7 @@ fun startApp(
 ) {
     javalin.routes {
         get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
-        post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.VEILEDER)
+        post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.ARBEIDSGIVER)
     }
 
     rapidsConnection.also {
@@ -26,7 +26,9 @@ fun startApp(
     }.start()
 }
 
-fun opprettJavalinMedTilgangskontroll(issuerProperties: List<IssuerProperties>): Javalin =
+fun opprettJavalinMedTilgangskontroll(
+    issuerProperties: Map<Rolle, IssuerProperties>
+): Javalin =
     Javalin.create {
         it.defaultContentType = "application/json"
         it.accessManager(styrTilgang(issuerProperties))

@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import io.javalin.core.security.AccessManager
 import io.javalin.core.security.RouteRole
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
@@ -11,42 +12,44 @@ import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.security.token.support.core.validation.JwtTokenValidationHandler
 
 enum class Rolle : RouteRole {
-    VEILEDER
+    VEILEDER,
+    ARBEIDSGIVER
 }
 
-val styrTilgang: (List<IssuerProperties>) -> (Handler, Context, Set<RouteRole>) -> Unit = { issuerProperties ->
-    { handler, ctx, roller ->
-        val autentiser: Autentiseringsmetode = when {
-            roller.contains(Rolle.VEILEDER) -> autentiserVeileder
-            else -> Autentiseringsmetode { false }
-        }
+fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
+    AccessManager { handler: Handler, ctx: Context, roller: Set<RouteRole> ->
 
-        val tokenClaims = hentTokenClaims(ctx, issuerProperties)
+        val erAutentisert =
+            if (roller.contains(Rolle.VEILEDER)) {
+                autentiserVeileder(hentTokenClaims(ctx, issuerProperties[Rolle.VEILEDER]!!))
+            } else if (roller.contains(Rolle.ARBEIDSGIVER)) {
+                autentiserArbeidsgiver(hentTokenClaims(ctx, issuerProperties[Rolle.ARBEIDSGIVER]!!))
+            } else false
 
-        if (autentiser(tokenClaims)) {
+        if (erAutentisert) {
             handler.handle(ctx)
         } else {
             throw ForbiddenResponse()
         }
-
     }
-}
+
 
 fun interface Autentiseringsmetode {
     operator fun invoke(claims: JwtTokenClaims?): Boolean
 }
 
 val autentiserVeileder = Autentiseringsmetode { it?.get("NAVident")?.toString()?.isNotEmpty() ?: false }
+val autentiserArbeidsgiver = Autentiseringsmetode { it != null }
 
 
-private fun hentTokenClaims(ctx: Context, issuerProperties: List<IssuerProperties>) =
+private fun hentTokenClaims(ctx: Context, issuerProperties: IssuerProperties) =
     lagTokenValidationHandler(issuerProperties)
         .getValidatedTokens(ctx.httpRequest)
         .anyValidClaims.orElseGet { null }
 
-private fun lagTokenValidationHandler(issuerProperties: List<IssuerProperties>) =
+private fun lagTokenValidationHandler(issuerProperties: IssuerProperties) =
     JwtTokenValidationHandler(
-        MultiIssuerConfiguration(issuerProperties.associateBy { it.cookieName })
+        MultiIssuerConfiguration(mapOf(issuerProperties.cookieName to issuerProperties))
     )
 
 private val Context.httpRequest: HttpRequest

@@ -47,12 +47,17 @@ spec:
       - type: POSTGRES_12
         databases:
           - name: synlighetsmotor-db
+  tokenx:
+    enabled: true
   accessPolicy:
     inbound:
       rules:
         - application: rekrutteringsbistand-container
           cluster: {{ cluster }}
           namespace: toi
+        - application: pam-kandidatsok-api
+          cluster: dev-fss
+          namespace: teampam
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1

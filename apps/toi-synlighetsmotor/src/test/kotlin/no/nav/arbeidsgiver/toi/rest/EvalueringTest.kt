@@ -35,7 +35,12 @@ class EvalueringTest {
             "isso-idtoken"
         )
 
-        javalin = opprettJavalinMedTilgangskontroll(listOf(issuerProperties))
+        javalin = opprettJavalinMedTilgangskontroll(
+            mapOf(
+                Rolle.VEILEDER to issuerProperties,
+                Rolle.ARBEIDSGIVER to issuerProperties
+            )
+        )
     }
 
     @AfterEach
@@ -82,11 +87,15 @@ class EvalueringTest {
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
-        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fritattKandidatsøk = """
+        rapid.sendTestMessage(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                fritattKandidatsøk = """
             "fritattKandidatsøk" : {
                 "fritattKandidatsok" : true
             }
-        """))
+        """
+            )
+        )
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
 
@@ -98,7 +107,8 @@ class EvalueringTest {
 
         val responseJson = response.body().asString("application/json")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
-        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+        Assertions.assertThat(responeEvaluering)
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
     }
 
     @Test
@@ -118,12 +128,14 @@ class EvalueringTest {
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
         val responseJson = response.body().asString("application/json")
-        val responeEvaluering = jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        val responeEvaluering =
+            jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
     }
 }
 
-private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.issueToken("isso-idtoken", "someclientid",
+private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.issueToken(
+    "isso-idtoken", "someclientid",
     DefaultOAuth2TokenCallback(
         issuerId = "isso-idtoken",
         claims = mapOf(
