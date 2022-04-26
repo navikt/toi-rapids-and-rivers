@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi
 
-import io.javalin.core.security.AccessManager
 import io.javalin.core.security.RouteRole
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
@@ -18,7 +17,7 @@ enum class Rolle : RouteRole {
 
 val styrTilgang =
     { issuerProperties: List<IssuerProperties>, issuerPropertiesTokenX: List<IssuerProperties> ->
-        { handler:Handler, ctx:Context, roller:Set<RouteRole> ->
+        { handler: Handler, ctx: Context, roller: Set<RouteRole> ->
 
             if (roller.contains(Rolle.VEILEDER)) {
                 val autentiser: Autentiseringsmetode = autentiserVeileder;
@@ -30,7 +29,7 @@ val styrTilgang =
                 }
             } else if (roller.contains(Rolle.TokenX)) {
                 // TODO: Hvilke claims skal vi evt validere her?
-                val autentiser = Autentiseringsmetode{true};
+                val autentiser = Autentiseringsmetode { true };
                 val tokenClaims = hentTokenClaims(ctx, issuerPropertiesTokenX);
                 if (autentiser(tokenClaims)) {
                     handler.handle(ctx)
