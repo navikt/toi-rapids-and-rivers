@@ -2,3 +2,4 @@ kafka_pool: nav-prod
 kafka_consumer_group_id: toi-synlighetsmotor-rapidconsumer-4
 ingress: https://toi-synlighetsmotor.intern.nav.no
 cluster: prod-gcp
+cluster-fss: prod-fss
