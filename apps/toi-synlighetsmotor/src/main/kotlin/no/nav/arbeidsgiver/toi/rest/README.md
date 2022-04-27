@@ -12,7 +12,7 @@
 ### Autentisering
 #### Arbeidsgivertoken (TokenX obo token)
 ### Url dev
-#### POST https://toi-synlighetsmotor.dev.i ntern.nav.no/synlighet
+#### POST https://toi-synlighetsmotor.dev.intern.nav.no/synlighet
 ### Url prod
 #### POST https://toi-synlighetsmotor.intern.nav.no/synlighet
 ### Inputbody :
