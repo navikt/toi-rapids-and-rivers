@@ -4,9 +4,9 @@
 ### Autentisering
 #### Veiledertoken (Azure obo token)
 ### Url dev
-####GET https://toi-synlighetsmotor.dev.intern.nav.no/evaluering
+#### GET https://toi-synlighetsmotor.dev.intern.nav.no/evaluering
 ### Url prod
-#####GET https://toi-synlighetsmotor.intern.nav.no/evaluering
+#### GET https://toi-synlighetsmotor.intern.nav.no/evaluering
 
 ## /synlighet
 ### Autentisering
