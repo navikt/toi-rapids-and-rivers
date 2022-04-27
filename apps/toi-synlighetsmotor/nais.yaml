@@ -59,7 +59,7 @@ spec:
           cluster: {{ cluster-fss }}
           namespace: teampam
         - application: pam-cv-api
-          cluster: { { cluster-fss } }
+          cluster: {{ cluster-fss }}
           namespace: teampam
   env:
     - name: KAFKA_RAPID_TOPIC
