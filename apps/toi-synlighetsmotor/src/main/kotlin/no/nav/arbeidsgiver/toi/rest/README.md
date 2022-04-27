@@ -3,7 +3,7 @@
 ## /evaluering
 ### Autentisering
 #### Veiledertoken (Azure obo token)
-#### Token audience applikasjon: toi-synlighetsmotor, cluster: dev-gcp/prod-gcp team:toi
+#### Token audience applikasjon: toi-synlighetsmotor, cluster: dev-gcp/prod-gcp team: toi
 ### Url dev
 #### GET https://toi-synlighetsmotor.dev.intern.nav.no/evaluering
 ### Url prod
@@ -12,7 +12,7 @@
 ## /synlighet
 ### Autentisering
 #### Arbeidsgivertoken (TokenX obo token)
-#### Token audience applikasjon: toi-synlighetsmotor, cluster: dev-gcp/prod-gcp team:toi 
+#### Token audience applikasjon: toi-synlighetsmotor, cluster: dev-gcp/prod-gcp team: toi 
 ### Url dev
 #### POST https://toi-synlighetsmotor.dev.intern.nav.no/synlighet
 ### Url prod
