@@ -3,6 +3,7 @@
 ## /evaluering
 ### Autentisering
 #### Veiledertoken (Azure obo token)
+#### Token audience applikasjon: toi-synlighetsmotor
 ### Url dev
 #### GET https://toi-synlighetsmotor.dev.intern.nav.no/evaluering
 ### Url prod
@@ -11,6 +12,7 @@
 ## /synlighet
 ### Autentisering
 #### Arbeidsgivertoken (TokenX obo token)
+#### Token audience applikasjon: toi-synlighetsmotor
 ### Url dev
 #### POST https://toi-synlighetsmotor.dev.intern.nav.no/synlighet
 ### Url prod
