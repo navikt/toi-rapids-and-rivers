@@ -15,7 +15,7 @@
 #### POST https://toi-synlighetsmotor.dev.intern.nav.no/synlighet
 ### Url prod
 #### POST https://toi-synlighetsmotor.intern.nav.no/synlighet
-### Inputbody :
+### Inputbody
 #### Format: ```List<String>``` Der 'String' er fødselsnummer
 #### Eksempel Json: ```["12345678912","10000000000"]```
 ### Response
