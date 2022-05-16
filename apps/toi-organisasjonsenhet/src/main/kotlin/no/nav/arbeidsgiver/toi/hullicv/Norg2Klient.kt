@@ -1,0 +1,51 @@
+package no.nav.arbeidsgiver.toi.hullicv
+
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.jackson.responseObject
+import com.github.kittinunf.result.Result
+
+private typealias OrgenhetNummer = String
+private typealias OrgenhetNavn = String
+private typealias OrgenhetCache = HashMap<OrgenhetNummer, OrgenhetNavn>
+
+class Norg2Klient(private val norg2Url: String) {
+    private val cache = OrgenhetCache()
+
+    fun hentOrgenhetNavn(nummer: OrgenhetNummer) = hentOrgenhetsnavnFraCache(nummer) ?: hentOrgenhetNavnFraNorg2(nummer)
+
+    private fun hentOrgenhetsnavnFraCache(nummer: OrgenhetNummer) =
+        cache[nummer]?.also {
+            log.info("Hentet orgenhetsnavn $it fra cache for orgenhetsnummer: $nummer")
+        }
+
+    private fun hentOrgenhetNavnFraNorg2(nummer: OrgenhetNummer): OrgenhetNavn? {
+
+        val (_, response, result) = Fuel.get("$norg2Url/enhet?enhetsnummerListe=$nummer")
+            .responseObject<List<OrgEnhet>>()
+
+        return when (result) {
+            is Result.Success -> result.get().firstOrNull()?.navn
+                ?: throw RuntimeException("Norg2 har returnert statuskode 200 men med tom liste av enheter, dette skal aldri skje!")
+
+            is Result.Failure -> {
+                val harFåttSvarFraServer = response.data.toString().isNotEmpty()
+
+                if (response.statusCode == 404 && harFåttSvarFraServer) {
+                    log.info("Fant ikke enhetsnavn for enhetsnummer $nummer")
+                    null
+                } else {
+                    throw RuntimeException("Feil ved henting av enhetsnavn for enhetsnummer $nummer")
+                }
+            }
+        }
+    }
+
+    fun erKjentProblematiskEnhet(nummer: OrgenhetNummer) = nummer in listOf(
+        "1279", // NAV Marked Hordaland, opprettet kun i Arena
+        "1476", // NAV Sjukefåvær Sunnfjord, virtuell enhet
+    )
+}
+
+private data class OrgEnhet(
+    val navn: String
+)

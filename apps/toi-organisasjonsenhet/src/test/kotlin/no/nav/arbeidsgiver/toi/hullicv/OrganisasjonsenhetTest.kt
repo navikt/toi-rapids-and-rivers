@@ -96,7 +96,7 @@ class OrganisasjonsenhetTest {
     }
 
     @Test
-    fun `Om mapping ikke finnes skal vi bruke tom streng`() {
+    fun `Om Norg2 returnerer 404 med feilmelding skal vi bruke tom streng`() {
         val testRapid = TestRapid()
         startApp(emptyMap(), testRapid)
 
@@ -106,6 +106,12 @@ class OrganisasjonsenhetTest {
         Assertions.assertThat(inspektør.size).isEqualTo(1)
         Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("")
     }
+
+    @Test
+    fun `Om Norg2 returnerer 404 uten feilmelding skal vi stoppe applikasjonen`() {}
+
+    @Test
+    fun `Dersom vi får noe annet fra Norg2 utenom 200 og 404 skal vi stoppe applikasjonen`() {}
 
     private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList()) = """
         {

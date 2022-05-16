@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi.hullicv
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*
 
-class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>, rapidsConnection: RapidsConnection) :
+class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
     init {
@@ -20,9 +20,9 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
         val aktørid: String = packet["aktørId"].asText()
 
-        val orgnavn = organisasjonsMap[enhetsnummer]
+        val orgnavn = norg2Klient.hentOrgenhetNavn(enhetsnummer)
         if (orgnavn == null) {
-            if (kjenteProblematiskeEnheter.contains(enhetsnummer)) {
+            if (norg2Klient.erKjentProblematiskEnhet(enhetsnummer)) {
                 log.info("Mangler mapping for kjent problematisk enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
             } else {
                 log.error("Mangler mapping for enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
@@ -32,7 +32,7 @@ class OrganisasjonsenhetLytter(private val organisasjonsMap: Map<String, String>
         } else {
             packet["organisasjonsenhetsnavn"] = orgnavn
         }
-        log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${organisasjonsMap[enhetsnummer]?:""}")
+        log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${orgnavn ?: "''"}")
 
         context.publish(aktørid, packet.toJson())
     }
