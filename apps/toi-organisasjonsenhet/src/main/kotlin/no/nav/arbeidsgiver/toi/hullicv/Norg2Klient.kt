@@ -19,8 +19,7 @@ class Norg2Klient(private val norg2Url: String) {
         }
 
     private fun hentOrgenhetNavnFraNorg2(nummer: OrgenhetNummer): OrgenhetNavn? {
-
-        val (_, response, result) = Fuel.get("$norg2Url/enhet?enhetsnummerListe=$nummer")
+        val (req, response, result) = Fuel.get("$norg2Url/enhet?enhetsnummerListe=$nummer")
             .responseObject<List<OrgEnhet>>()
 
         return when (result) {
