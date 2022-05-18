@@ -1,3 +1,4 @@
 kafka_pool: nav-prod
 kafka_consumer_group_id: toi-organisasjonsenhet-rapidconsumer-1
 norg2_url: https://norg2.intern.nav.no/norg2/api/v1
+norg2_host: norg2.intern.nav.no
