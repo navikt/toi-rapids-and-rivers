@@ -39,3 +39,5 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: NORG2_URL
+      value: {{ norg2_url }}
