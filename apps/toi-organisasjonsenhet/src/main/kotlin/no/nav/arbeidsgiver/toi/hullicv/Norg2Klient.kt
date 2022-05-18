@@ -27,7 +27,7 @@ class Norg2Klient(private val norg2Url: String) {
                 ?: throw RuntimeException("Norg2 har returnert statuskode 200 men med tom liste av enheter, dette skal aldri skje!")
 
             is Result.Failure -> {
-                val harFåttSvarFraServer = response.data.toString().isNotEmpty()
+                val harFåttSvarFraServer = String(response.data).isNotEmpty()
 
                 if (response.statusCode == 404 && harFåttSvarFraServer) {
                     log.info("Fant ikke enhetsnavn for enhetsnummer $nummer")
