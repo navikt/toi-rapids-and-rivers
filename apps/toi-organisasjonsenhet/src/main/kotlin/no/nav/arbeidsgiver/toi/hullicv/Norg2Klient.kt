@@ -6,10 +6,19 @@ import com.github.kittinunf.result.Result
 
 private typealias OrgenhetNummer = String
 private typealias OrgenhetNavn = String
-private typealias OrgenhetCache = HashMap<OrgenhetNummer, OrgenhetNavn>
+private typealias OrgenhetCache = MutableMap<OrgenhetNummer, OrgenhetNavn>
 
 class Norg2Klient(private val norg2Url: String) {
-    private val cache = OrgenhetCache()
+    private val cache = populerCache()
+
+    private fun populerCache(): OrgenhetCache {
+        val (req, response, result) = Fuel.get("$norg2Url/enhet")
+            .responseObject<List<OrgEnhet>>()
+        return when (result) {
+            is Result.Success -> result.get().associateBy(OrgEnhet::enhetNr, OrgEnhet::navn).toMutableMap()
+            is Result.Failure -> throw Exception("Feil i kall mot Norg2 for å opprette cache.")
+        }
+    }
 
     fun hentOrgenhetNavn(nummer: OrgenhetNummer) = hentOrgenhetsnavnFraCache(nummer) ?: hentOrgenhetNavnFraNorg2(nummer)
 
@@ -46,5 +55,6 @@ class Norg2Klient(private val norg2Url: String) {
 }
 
 private data class OrgEnhet(
-    val navn: String
+    val navn: OrgenhetNavn,
+    val enhetNr: OrgenhetNummer
 )

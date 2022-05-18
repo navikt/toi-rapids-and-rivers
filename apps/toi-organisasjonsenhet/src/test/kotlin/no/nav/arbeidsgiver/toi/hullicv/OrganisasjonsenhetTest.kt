@@ -13,6 +13,11 @@ class OrganisasjonsenhetTest {
     @BeforeAll
     fun setup() {
         wireMock.stubFor(
+            get(urlEqualTo("/enhet")).willReturn(
+                aResponse().withBody("[]")
+            )
+        )
+        wireMock.stubFor(
             get(urlEqualTo("/enhet?enhetsnummerListe=0001")).willReturn(
                 aResponse().withBody(svar("0001", "første"))
             )
@@ -198,7 +203,7 @@ private fun svar(enhetsnummer: String, navn: String) = """
                 "nedleggelsesdato": null,
                 "oppgavebehandler": true,
                 "versjon": 80,
-                "sosialeTjenester": "--> Kontoret har redusert åpningstid pga Korona-viruset\n\nVed akutt behov for nødhjelp, får bruker hjelp i V/P ved oppmøte, ved ordinære saker må bruker avtale time i forkant med veileder, har ikke bruker veileder sender vi Gosys. \n\nOppfølging og timeavtaler vil kunne bli gjennomført pr telefon.\n\nVed behov for akutt nødhjelp mellom 1530 og 0800 kan bruker ta kontakt med kommunenes sosialtjenestevakt (legevakten) på 23487090\n\nBrukere bes om å benytte nav.no eller ringe til NAV/veileder for å avtale tidspunkt for en samtale.\n-------------------------\n\n3 PCer tilgjengelig i V/P som bruker kan benytte til selvbetjening.\n\nNAV Oslo (0300) registrerer Del A for Nav kontorene i Oslo. Spørsmål skal til NAV kontoret.\n\nSosialfaglige henvendelser\nTil saksbehandler, akutte henvendelser settes over til vakttelefoner m/spørreanrop, mellom kl. 9-15 (tlfnr skal ikke oppgis) som følger:\n902 90 073 Nye henvendelser/mottak\n948 32 781 Sosialhjelpsmottakere; Enslige og familier over 29 år\n940 32 093 Ungdomsteamet (Brukere under 30 år)\n\nSpørsmål om frivillig/tvungen forvaltning: tlf 90227384 m/spørreanrop mellom kl 10-11, telefonnummeret kan gis ut til brukere med forvaltning som selv kan ringe mellom 10-11\n\nSosialfaglige tjenester: Gjeldsrådgivning, frivillig/tvungen forvaltning, kommunalt frikort, Nyankomne flyktninger -  Intro program - bosetting av nyankomne flyktninger (bydels kvote)\n\nSender post digitalt.\n\nPapirsøknadsskjema på papir på kommunens nettside og i V/P. \n- Trenger ikke kontakt i forkant for å søke ordinær sosialhjelp - Ved behov for nødhjelp (mat/bolig) kan bruker møte i V/P etter kl 1200 for samtale før søknad\n\nOslo kommune har en døgnåpen vakttjeneste i Storgata 40, de behandler søknader om akutt nødhjelp når NAV-kontoret er stengt.\n\nSaksbehandlingstider: \nØkonomisk sosialhjelp: 14 dager\n\nUtbetaling: \nFast utbetalingsdato: 1 i mnd\nSiste tidspunkt for kjøring: 13:00 \nVed helg/helligdag utbetales det siste virkedag før \nUtbetalingsmåter nødhjelp: Kronekort/kontantkort, Kronekort/kontantkort utleveres i V/P daglig kl 1400\nKvalifiseringsstønad: 28 i mnd.",
+                "sosialeTjenester": "--> Kontoret har redusert åpningstid pga Korona-viruset\n",
                 "kanalstrategi": null,
                 "orgNrTilKommunaltNavKontor": "974778742"
             }
