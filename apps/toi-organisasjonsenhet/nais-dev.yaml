@@ -1,4 +1,4 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-organisasjonsenhet-rapidconsumer-1
-norg2_url: https://norg2.dev.intern.nav.no/norg2/api/v1
-norg2_host: norg2.dev.intern.nav.no
+norg2_url: https://norg2.dev-fss-pub.nais.io/norg2/api/v1
+norg2_host: norg2.dev-fss-pub.nais.io
