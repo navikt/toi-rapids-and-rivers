@@ -12,11 +12,11 @@ class Norg2Klient(private val norg2Url: String) {
     private val cache = populerCache()
 
     private fun populerCache(): OrgenhetCache {
-        val (req, response, result) = Fuel.get("$norg2Url/enhet")
-            .responseObject<List<OrgEnhet>>()
+        val result = Fuel.get("$norg2Url/enhet")
+            .responseObject<List<OrgEnhet>>().third
         return when (result) {
             is Result.Success -> result.get().associateBy(OrgEnhet::enhetNr, OrgEnhet::navn).toMutableMap()
-            is Result.Failure -> throw Exception("Feil i kall mot Norg2 for å opprette cache.")
+            is Result.Failure -> throw Exception("Feil i kall mot Norg2 for å opprette cache.", result.error)
         }
     }
 
