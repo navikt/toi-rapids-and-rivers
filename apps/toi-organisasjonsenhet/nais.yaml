@@ -32,6 +32,10 @@ spec:
   azure:
     application:
       enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ norg2_host }}
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
@@ -39,3 +43,5 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: NORG2_URL
+      value: {{ norg2_url }}
