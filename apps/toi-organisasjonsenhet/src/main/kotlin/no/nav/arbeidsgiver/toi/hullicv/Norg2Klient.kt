@@ -58,3 +58,4 @@ private data class OrgEnhet(
     val navn: OrgenhetNavn,
     val enhetNr: OrgenhetNummer
 )
+
