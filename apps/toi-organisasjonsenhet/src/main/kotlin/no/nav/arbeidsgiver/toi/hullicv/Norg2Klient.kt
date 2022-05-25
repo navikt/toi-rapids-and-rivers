@@ -51,6 +51,7 @@ class Norg2Klient(private val norg2Url: String) {
     fun erKjentProblematiskEnhet(nummer: OrgenhetNummer) = nummer in listOf(
         "1279", // NAV Marked Hordaland, opprettet kun i Arena
         "1476", // NAV Sjukefåvær Sunnfjord, virtuell enhet
+        "4732", // Enhet har sluttet eksistere (ukjent navn)
     )
 }
 
