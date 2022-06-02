@@ -39,6 +39,21 @@ class MaaBehandleTidligereCvTest {
         assertThat(måBehandleTidligereCvMelding.get("maaBehandleTidligereCv").asBoolean()).isEqualTo(true)
     }
 
+    @Test
+    fun `Lesing av måBehandleTidligereCv-melding fra eksternt topic med verdi false skal produsere ny melding på rapid der verdi også er false`() {
+        val aktørId = "10000100000"
+        val testRapid = TestRapid()
+        MaaBehandleTidligereCvLytter(testRapid)
+
+        val måBehandleTidligereCvMeldingFraEksterntTopic = måBehandleTidligereCvMeldingFraEksterntTopic(aktørId, false)
+        testRapid.sendTestMessage(måBehandleTidligereCvMeldingFraEksterntTopic)
+
+        val inspektør = testRapid.inspektør
+        val måBehandleTidligereCvMelding =  inspektør.message(0).get("måBehandleTidligereCv")
+        assertThat(måBehandleTidligereCvMelding.get("aktorId").asText()).isEqualTo(aktørId)
+        assertThat(måBehandleTidligereCvMelding.get("maaBehandleTidligereCv").asBoolean()).isEqualTo(false)
+    }
+
     private fun måBehandleTidligereCvMeldingFraEksterntTopic(aktørId: String, maaBehandleTidligereCv: Boolean) = """
         {
           "aktorId" : "$aktørId",
