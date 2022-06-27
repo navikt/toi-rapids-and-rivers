@@ -65,3 +65,6 @@ spec:
     - team: toi
       application: toi-hull-i-cv
       access: readwrite
+    - team: toi
+      application: rekrutteringsbistand-kandidat-api
+      access: write
