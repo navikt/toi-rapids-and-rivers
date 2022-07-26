@@ -12,7 +12,7 @@ fun testProgramMedHendelse(
 ) {
     val rapid = TestRapid()
 
-    startApp(repository, Javalin.create(), rapid)
+    startApp(repository, Javalin.create(), rapid) { true }
 
     rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
     rapid.inspektør.assertion()

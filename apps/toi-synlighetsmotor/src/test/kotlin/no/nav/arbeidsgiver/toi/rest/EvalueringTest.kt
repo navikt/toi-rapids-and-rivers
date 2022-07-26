@@ -60,7 +60,7 @@ class EvalueringTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -83,7 +83,7 @@ class EvalueringTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -117,7 +117,7 @@ class EvalueringTest {
         val rapid = TestRapid()
         val token = hentToken(mockOAuth2Server)
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 

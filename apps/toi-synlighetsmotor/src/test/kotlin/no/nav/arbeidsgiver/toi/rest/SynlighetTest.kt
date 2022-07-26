@@ -58,7 +58,7 @@ class SynlighetTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         rapid.sendTestMessage(Testdata.komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -82,7 +82,7 @@ class SynlighetTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         rapid.sendTestMessage(Testdata.komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -108,7 +108,7 @@ class SynlighetTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         rapid.sendTestMessage(Testdata.komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -133,7 +133,7 @@ class SynlighetTest {
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
 
-        startApp(repository, javalin, TestRapid())
+        startApp(repository, javalin, TestRapid()) { true }
 
         val kandidatSomIkkeFinnes = listOf("10000000000")
         val somJson = objectmapper.writeValueAsString(kandidatSomIkkeFinnes)
@@ -156,7 +156,7 @@ class SynlighetTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid)
+        startApp(repository, javalin, rapid) { true }
 
         rapid.sendTestMessage(Testdata.hendelse(cv = Testdata.cv(meldingstype = CvMeldingstype.OPPRETT)))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
