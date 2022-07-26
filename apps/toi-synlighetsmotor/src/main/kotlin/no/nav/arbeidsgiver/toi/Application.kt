@@ -19,7 +19,10 @@ fun startApp(
 ) {
     javalin.routes {
         get("/isalive") { context ->
-            context.status(if (rapidIsAlive()) 200 else 500)
+            val isAlive = rapidIsAlive()
+            RapidApplication.log.info("isalive svarer: $isAlive")
+
+            context.status(if (isAlive) 200 else 500)
         }
         get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
         post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.ARBEIDSGIVER)
