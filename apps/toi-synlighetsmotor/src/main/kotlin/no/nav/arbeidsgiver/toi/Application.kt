@@ -52,11 +52,7 @@ fun main() {
 
     lateinit var rapidIsAlive: () -> Boolean
     val rapidsConnection = RapidApplication.create(env, configure = { _, kafkarapid ->
-        rapidIsAlive = {
-            kafkarapid.isRunning().apply {
-                log.info("rapidIsAlive ble kalt, den returnerte: $this")
-            }
-        }
+        rapidIsAlive = kafkarapid::isRunning
     }).apply {
         this.register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
