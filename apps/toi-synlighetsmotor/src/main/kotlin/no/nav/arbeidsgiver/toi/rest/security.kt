@@ -13,18 +13,20 @@ import no.nav.security.token.support.core.validation.JwtTokenValidationHandler
 
 enum class Rolle : RouteRole {
     VEILEDER,
-    ARBEIDSGIVER
+    ARBEIDSGIVER,
+    UNPROTECTED
 }
 
 fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
     AccessManager { handler: Handler, ctx: Context, roller: Set<RouteRole> ->
 
         val erAutentisert =
-            if (roller.contains(Rolle.VEILEDER)) {
-                autentiserVeileder(hentTokenClaims(ctx, issuerProperties[Rolle.VEILEDER]!!))
-            } else if (roller.contains(Rolle.ARBEIDSGIVER)) {
-                autentiserArbeidsgiver(hentTokenClaims(ctx, issuerProperties[Rolle.ARBEIDSGIVER]!!))
-            } else false
+            when {
+                roller.contains(Rolle.UNPROTECTED) -> true
+                roller.contains(Rolle.VEILEDER) -> autentiserVeileder(hentTokenClaims(ctx, issuerProperties[Rolle.VEILEDER]!!))
+                roller.contains(Rolle.ARBEIDSGIVER) -> autentiserArbeidsgiver(hentTokenClaims(ctx, issuerProperties[Rolle.ARBEIDSGIVER]!!))
+                else -> false
+            }
 
         if (erAutentisert) {
             handler.handle(ctx)
