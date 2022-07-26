@@ -14,9 +14,13 @@ import org.slf4j.LoggerFactory
 fun startApp(
     repository: Repository,
     javalin: Javalin,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
+    rapidIsAlive: () -> Boolean
 ) {
     javalin.routes {
+        get("/javalin/isalive") { context ->
+            context.status(if (rapidIsAlive()) 200 else 500)
+        }
         get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
         post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.ARBEIDSGIVER)
     }
@@ -41,7 +45,10 @@ fun main() {
     val issuerProperties = hentIssuerProperties(System.getenv())
     val javalin = opprettJavalinMedTilgangskontroll(issuerProperties)
 
-    val rapidsConnection = RapidApplication.create(env).apply {
+    lateinit var rapidIsAlive: () -> Boolean
+    val rapidsConnection = RapidApplication.create(env, configure = { _, kafkarapid ->
+        rapidIsAlive = kafkarapid::isRunning
+    }).apply {
         this.register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 repository.kjørFlywayMigreringer()
@@ -49,7 +56,7 @@ fun main() {
         })
     }
 
-    startApp(repository, javalin, rapidsConnection)
+    startApp(repository, javalin, rapidsConnection, rapidIsAlive)
 }
 
 val Any.log: Logger

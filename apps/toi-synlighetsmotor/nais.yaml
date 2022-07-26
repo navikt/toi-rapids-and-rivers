@@ -12,7 +12,7 @@ spec:
     - {{ ingress }}
   liveness:
     port: 8080
-    path: /isalive
+    path: /javalin/isalive
   readiness:
     port: 8080
     path: /isready
