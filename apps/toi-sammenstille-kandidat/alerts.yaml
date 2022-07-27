@@ -13,7 +13,7 @@ spec:
     - alert: toi-sammenstille-kandidat
       severity: danger
       expr: sum(up{app="toi-sammenstille-kandidat", job="kubernetes-pods"}) == 0
-      for: 1s
+      for: 1m
       description: Appen er nede (ingen Kubernetes-pods er oppe)
       action: "https://logs.adeo.no/goto/b0c40010-fc49-11ec-9b1a-4723a5e7a9db"
 

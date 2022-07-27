@@ -13,7 +13,7 @@ spec:
     - alert: toi-maa-behandle-tidligere-cv
       severity: danger
       expr: sum(up{app="toi-maa-behandle-tidligere-cv", job="kubernetes-pods"}) == 0
-      for: 1s
+      for: 1m
       description: Appen er nede (ingen Kubernetes-pods er oppe)
       action: "https://logs.adeo.no/goto/d1f60616b27d3a4a095b0e15989510e7"
 

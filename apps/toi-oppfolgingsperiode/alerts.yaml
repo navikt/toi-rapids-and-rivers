@@ -13,7 +13,7 @@ spec:
     - alert: toi-oppfolgingsperiode
       severity: danger
       expr: sum(up{app="toi-oppfolgingsperiode", job="kubernetes-pods"}) == 0
-      for: 1s
+      for: 1m
       description: Appen er nede (ingen Kubernetes-pods er oppe)
       action: "https://logs.adeo.no/goto/c4ed4d494bb4ee4edd45bfd69c948e80"
 
