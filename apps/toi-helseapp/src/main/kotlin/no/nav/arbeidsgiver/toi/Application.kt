@@ -68,7 +68,11 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
             ResultsPerApplication(application, consumerOffset, sisteOffset - consumerOffset)
         }.sortedByDescending(ResultsPerApplication::behind)
         val result = formatResults(resultsPerApplication, sisteOffset)
-        log.info(result)
+        if(resultsPerApplication.any(ResultsPerApplication::erFeilsituasjon)) {
+            log.error(result)
+        } else {
+            log.info(result)
+        }
         delay(Duration.ofSeconds(10))
     }
 }
@@ -83,7 +87,9 @@ private fun formatResults(
 """.trimIndent()
 
 data class ResultsPerApplication(val name: String, val offset: Long, val behind: Long) {
-    fun printFriendly() = "$name is on offset: $offset ( $behind behind last offset)"
+    private val offsetMargin = 1000
+    fun printFriendly() = "$name is on offset: $offset ( $behind behind last offset)${if (erFeilsituasjon()) " Denne er over $offsetMargin bak offset" else ""}"
+    fun erFeilsituasjon() = behind > offsetMargin
 }
 
 fun consumerOffset(groupId: String, envs: Map<String, String>): Long {
