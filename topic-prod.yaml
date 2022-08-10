@@ -71,3 +71,6 @@ spec:
     - team: arbeidsgiver-inkludering
       application: foresporsel-om-deling-av-cv-api
       access: readwrite
+    - team: toi
+      application: rekrutteringsbistand-statistikk-api
+      access: readwrite
