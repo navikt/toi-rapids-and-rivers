@@ -3,3 +3,5 @@ kafka_consumer_group_id: toi-synlighetsmotor-rapidconsumer-3
 ingress: https://toi-synlighetsmotor.dev.intern.nav.no
 cluster: dev-gcp
 cluster-fss: dev-fss
+gcp_db_tier: db-f1-micro
+gcp_disk_autoresize: false

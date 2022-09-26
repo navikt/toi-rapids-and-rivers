@@ -1,3 +1,5 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-sammenstille-kandidat-rapidconsumer-1
 ingress: https://toi-sammenstille-kandidat.dev.intern.nav.no
+gcp_db_tier: db-f1-micro
+gcp_disk_autoresize: false
