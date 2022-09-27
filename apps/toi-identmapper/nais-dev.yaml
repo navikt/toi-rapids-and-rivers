@@ -5,3 +5,5 @@ kafka_schema_on_prem_url: https://kafka-schema-registry.nais-q.adeo.no
 pdl_scope: api://dev-fss.pdl.pdl-api/.default
 pdl_url: https://pdl-api.dev-fss-pub.nais.io/graphql
 pdl_kafka_group_id: toi-identmapper-1
+gcp_db_tier: db-f1-micro
+gcp_disk_autoresize: false
