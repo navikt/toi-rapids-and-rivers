@@ -2,6 +2,7 @@ rootProject.name = "toi-rapids-and-rivers"
 
 include(
     "apps:toi-cv",
+    "apps:toi-arbeidsmarked-cv",
     "apps:toi-veileder",
     "apps:toi-sammenstille-kandidat",
     "apps:toi-kandidatfeed",
