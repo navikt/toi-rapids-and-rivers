@@ -21,6 +21,9 @@ spec:
       application: toi-cv
       access: readwrite
     - team: toi
+      application: toi-arbeidsmarked-cv
+      access: readwrite
+    - team: toi
       application: toi-veileder
       access: readwrite
     - team: toi
