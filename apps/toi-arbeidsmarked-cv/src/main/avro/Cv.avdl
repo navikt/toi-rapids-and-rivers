@@ -1,0 +1,258 @@
+@namespace("no.nav.arbeid.cv.avro")
+/** Dette definerer det nye ekstern topicet i aiven
+  * Det skille seg litt ut fra det gamle on-prem topicet
+  * ved at tidspunkt som kan være null ikke bruker long, men date.
+  * Vi har også introdusert år-mnd som datatype (bruker string).
+  * dette gjelder for en del fra/til tidspunkt der vi egentlig kun har
+  * oppløsning på måned og år. Da blir det feil å sende med år/mnd/dag
+  * Dette serialiseres som en streng med "yyyy-mm", f.eks "2022-01" for januar 2022
+*/
+
+protocol CvProtocol {
+  enum Ferdighetsnivaa {
+    /** Ikke oppgitt eller ikke relevant, f.eks er skriftlig tegnspråk ikke meningsfullt */
+    IKKE_OPPGITT,
+    NYBEGYNNER,
+    GODT,
+    VELDIG_GODT,
+    FOERSTESPRAAK
+  }
+
+  enum Tidsenhet {
+    TIME,
+    DAG,
+    UKE,
+    MND
+  }
+
+  record Spraakferdighet {
+    string spraaknavn;
+    union {null, string} iso3kode = null; // Det er ikke sikkert det fins ISO-koder for språket. Det er ikke sikkert språket egentlig eksisterer i hele tatt..
+    Ferdighetsnivaa muntlig;
+    Ferdighetsnivaa skriftlig;
+  }
+
+  record Arbeidserfaring {
+    string stillingstittel;
+    string stillingstittel_fritekst = "";
+    union {null, string} styrkkode = null;
+    union {null, string} janzz_konseptid = null;
+    union {null, string} arbeidsgiver = null;
+    union {null, string} fra_tidspunkt = null; // år-mnd
+    union {null, string} til_tidspunkt = null;
+    // Sted er ikke med i de konverterte Arena CV'ene.
+    union {null,string} sted = null;
+    string beskrivelse = "";
+    boolean ikke_aktuelt_for_fremtiden = false;
+  }
+
+  enum UtdannelseYrkestatus {
+    SVENNEBREV_FAGBREV,
+    MESTERBREV,
+    INGEN
+  }
+
+  /** Utdannelse inkluderer også svennebrev */
+  record Utdannelse {
+    string nuskode_grad; // Uvisst hvor mange siffer, sannsynligvis kun det første sifferet i NUS
+    string laerested;
+    string beskrivelse;
+    string utdanningsretning = "";
+    union {null, string} fra_tidspunkt = null; // år-mnd
+    union {null, string} til_tidspunkt = null; // år-mnd
+    union {null, UtdannelseYrkestatus} utdannelse_yrkestatus = null;
+    boolean autorisasjon = false;
+  }
+
+  enum FagdokumentasjonType {
+    SVENNEBREV_FAGBREV,
+    MESTERBREV,
+    AUTORISASJON
+  }
+
+  /** Fagdokumentasjon er fagbrev/svennebrev, mesterbrev og autorisasjon */
+  record Fagdokumentasjon {
+    FagdokumentasjonType type;
+    union {null, string} tittel = null;
+    union {null, string} beskrivelse = null;
+  }
+
+  /** Kurs er f.eks førstehjelpskurs */
+  record Kurs {
+    string tittel;
+    string utsteder;
+    union {null, date} tidspunkt = null; // Dato kurset ble fullført
+    union {null, int} varighet = null;
+    union {null, Tidsenhet} varighet_enhet = null;
+  }
+
+  /** Sertifikater er f.eks sveisesertifikat eller offshoresertifikat
+  * Når man fyller ut CVen som er overskriften "Andre godkjenninger" */
+  record Sertifikat {
+    string tittel;
+    union {null, string} sertifikatnavn = null;
+    union {null, string} sertifikatnavn_fritekst = null;
+    union {null, string} konsept_id = null;
+    string utsteder;
+    union {null, date} gjennomfoert = null; // Egentlig påkrevt felt. Dato fullført
+    union {null, date} utloeper = null; // kan være null
+  }
+
+/** Gokjenninger tidligere Autorisasjoner. Heter "Offentlig godkjenning" når du fyller ut CV */
+  record Godkjenning {
+    union {null, string} tittel = null;
+    union {null, string} konsept_id = null;
+    union {null, string} utsteder = null;
+    union {null, date} gjennomfoert = null; // Dato kurset fullført, påkrevd
+    union {null, date} utloeper = null;
+  }
+
+
+  /** Verv etc inngår i annen erfaring */
+  record AnnenErfaring {
+    string beskrivelse;
+    string rolle = "";
+    union {null, string} fra_tidspunkt = null; // år-mnd
+    union {null, string} til_tidspunkt = null; // år-mnd
+  }
+
+  record FoererkortKlasse {
+    string klasse;
+    union {null, string} klasse_beskrivelse = null;
+    union {null, date} fra_tidspunkt;
+    union {null, date} utloeper = null;
+  }
+  /** Førerkort inneholder kun de førerkortklassene du finner bak på førerkortet ditt,
+      truckførerbevis etc inngår i Sertifikat */
+  record Foererkort {
+    array<FoererkortKlasse> klasse;
+  }
+
+  record Cv {
+    string cv_id;
+    string aktoer_id;
+    timestamp_ms sist_endret;
+    timestamp_ms opprettet;
+
+    string fodselsnummer;
+    date foedselsdato;
+    string fornavn;
+    string etternavn;
+    union {null, string} epost = null;
+    union {null, string} telefon = null;
+    union {null, string} gateadresse = null;
+    union {null, string} postnummer = null;
+    union {null, string} poststed = null;
+    union {null, string} kommunenr = null;
+
+    // Beskriver hva kandidaten har valgt under oppstart i jobbprofil
+    union {null, string} oppstart_kode = null;
+
+    string sammendrag = "";
+
+    // Man kan reservere seg mot at CV skal være synlig for arbeidsgiver hvis man er jobbskifter
+    // informasjonen under det som skal brukes i søk. Eventuelle tilleggsopplysninger i oppfølgingsinformasjon
+    // er kunt ment å være til informasjon for veiledere.
+    // Dette bør kanskje flyttes til oppfølgingsinformasjon?
+    boolean synlig_for_arbeidsgiver = true;
+    boolean synlig_for_veileder = true;
+
+    union {null, Foererkort} foererkort;
+
+    // Kun CV'er som er konvertert fra Arena vil ha dette feltet utfyllt
+    union {null, string} arena_kandidatnr = null;
+
+    array<Arbeidserfaring> arbeidserfaring;
+    array<Utdannelse> utdannelse;
+    union {null, array<Fagdokumentasjon>} fagdokumentasjon = null;
+    union {null, array<Godkjenning>} godkjenninger = null;
+    array<Kurs> kurs;
+    array<Sertifikat> sertifikat;
+    array<AnnenErfaring> annen_erfaring;
+    array<Spraakferdighet> spraakferdigheter;
+  }
+
+  record Geografi {
+    union {null, string} sted = null;
+    union {null, string} kode = null;
+  }
+
+  record Jobbprofil {
+    string jobbprofil_id;
+    string aktoer_id;
+    timestamp_ms sist_endret;
+    timestamp_ms opprettet;
+
+    /** Beskriver hva kandidaten har valgt under oppstart i jobbprofil */
+    union {null, string} oppstart_kode = null;
+
+    array<string> stillinger;
+    array<string> kompetanser;
+    array<string> stillingkladder;
+    array<Geografi> geografi;
+    // Typiske verdier for ansettelsesformer er ENGASJEMENT, FAST, FERIEJOBB, PROSJEKT, SELVSTENDIG_NAERINGSDRIVENDE,
+    // SESONG, VIKARIAT, TRAINEE, LAERLING eller ANNET
+    array<string> ansettelsesformer;
+    // Typiske verdier for arbeidstider er DAGTID, KVELD, NATT
+    array<string> arbeidstider;
+    array<string> arbeidsdager;
+    // Typiske verdier for arbeidstidsordninger er SKIFT, TURNUS, VAKT
+    array<string> arbeidstidsordninger;
+    // Typiske verdier for omfang er HELTID eller DELTID
+    array<string> omfang;
+  }
+
+  record OpprettCv {
+    Cv cv;
+  }
+  record OpprettJobbprofil {
+    Jobbprofil jobbprofil;
+  }
+  record EndreCv {
+    Cv cv;
+  }
+  record EndreJobbprofil {
+    Jobbprofil jobbprofil;
+  }
+  record SlettCv {
+    string cv_id;
+  }
+  record SlettJobbprofil {
+    string jobbprofil_id;
+  }
+
+  enum Meldingstype {
+    OPPRETT,
+    ENDRE,
+    SLETT
+  }
+
+  enum EndretAv {
+    VEILEDER,
+    SYSTEMBRUKER,
+    PERSONBRUKER
+  }
+
+  /** Kun ett av feltene opprett, endre eller slett vil ha verdi.
+      Dette er basert på meldingstype.
+      Hvis meldingstype f.eks er OPPRETT vil både opprett_jobbprofil og opprett_cv kunne ha verdi
+      Det vil alltid være en cv med her, men ikke alltid en jobbprofil.
+      Hvis aktøren er under oppfølging vil det alltid følge med oppfølgingsinformasjon
+   */
+  record Melding {
+    Meldingstype meldingstype;
+
+    union {null, EndretAv} endret_av = null;
+
+    union {null, OpprettCv} opprett_cv = null;
+    union {null, EndreCv} endre_cv = null;
+    union {null, SlettCv} slett_cv = null;
+
+    union {null, OpprettJobbprofil} opprett_jobbprofil = null;
+    union {null, EndreJobbprofil} endre_jobbprofil = null;
+    union {null, SlettJobbprofil} slett_jobbprofil = null;
+
+    string aktoer_id;
+    timestamp_ms sist_endret;
+  }
+}

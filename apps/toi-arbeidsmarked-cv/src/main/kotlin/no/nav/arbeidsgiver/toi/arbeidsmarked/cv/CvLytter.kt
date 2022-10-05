@@ -1,0 +1,33 @@
+package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
+
+import no.nav.arbeid.cv.avro.Cv
+import no.nav.helse.rapids_rivers.RapidsConnection
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerRecords
+import org.apache.kafka.common.TopicPartition
+import java.time.Duration
+
+class CvLytter(private val consumer: Consumer<String, Cv>, private val behandleCv: (Cv) -> Unit
+) : RapidsConnection.StatusListener {
+
+    val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
+
+    override fun onReady(rapidsConnection: RapidsConnection) {
+        try {
+            consumer.subscribe(listOf(cvTopic.topic()))
+            log.info("Starter å konsumere topic")
+
+            while(true) {
+                val records: ConsumerRecords<String, Cv> =
+                    consumer.poll(Duration.ofSeconds(5))
+                records.map { behandleCv(it.value()) }
+
+                consumer.commitSync()
+            }
+        } catch (exception: Exception) {
+            log.error("Feil ved konsumering av CV. Stopper rapidconnection", exception)
+            rapidsConnection.stop()
+        }
+
+    }
+}

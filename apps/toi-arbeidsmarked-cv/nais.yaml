@@ -37,3 +37,5 @@ spec:
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{kafka_consumer_group_id}}
+    - name: ARBEIDSMARKED_CV_KAFKA_GROUP_ID
+      value: {{arbeidsmarked_cv_kafka_group_id}}
