@@ -21,4 +21,5 @@ val Any.log: Logger
 
 val behandleCv: (Cv) -> ArbeidsmarkedCv = {
     ArbeidsmarkedCv(it)
+
 }
