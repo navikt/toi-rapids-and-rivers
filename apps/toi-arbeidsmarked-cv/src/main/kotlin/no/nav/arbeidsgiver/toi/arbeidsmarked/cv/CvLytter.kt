@@ -8,8 +8,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
 import java.time.Duration
 
-class CvLytter(
-    private val consumer: Consumer<String, Cv>, private val behandleCv: (Cv) -> CvMelding
+class CvLytter(private val consumer: Consumer<String, Cv>, private val behandleCv: (Cv) -> ArbeidsmarkedCv
 ) : RapidsConnection.StatusListener {
 
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)

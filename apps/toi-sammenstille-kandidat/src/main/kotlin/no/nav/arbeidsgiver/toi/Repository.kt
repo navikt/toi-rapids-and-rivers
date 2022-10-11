@@ -100,6 +100,7 @@ class Repository(private val dataSource: DataSource) {
 data class Kandidat(
     val aktørId: String,
     val cv: JsonNode? = null,
+    val arbeidsmarkedCv: JsonNode? = null,
     val veileder: JsonNode? = null,
     val oppfølgingsinformasjon: JsonNode? = null,
     val oppfølgingsperiode: JsonNode? = null,
@@ -114,6 +115,7 @@ data class Kandidat(
         fun fraJson(json: JsonNode) = Kandidat(
             aktørId = json["aktørId"].asText(),
             cv = json["cv"],
+            arbeidsmarkedCv = json["arbeidsmarkedCv"],
             veileder = json["veileder"],
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
             oppfølgingsperiode = json["oppfølgingsperiode"],

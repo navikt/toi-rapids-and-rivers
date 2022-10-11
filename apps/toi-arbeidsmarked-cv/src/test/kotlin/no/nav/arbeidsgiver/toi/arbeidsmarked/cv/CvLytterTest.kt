@@ -41,7 +41,7 @@ class CvLytterTest {
 
         Assertions.assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "cvMelding",
+            "arbeidsmarkedCv",
             "aktørId",
             "system_read_count"
         )

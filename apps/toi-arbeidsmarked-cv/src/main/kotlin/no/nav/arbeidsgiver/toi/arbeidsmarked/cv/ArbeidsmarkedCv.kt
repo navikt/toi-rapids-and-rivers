@@ -5,16 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.arbeid.cv.avro.Cv
-import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 
-class CvMelding(cv: Cv) {
+class ArbeidsmarkedCv(cv: Cv) {
     @JsonProperty("@event_name")
     private val event_name = "arbeidsmarked-cv"
 
     val aktørId = cv.aktoerId
-    val cvMelding = cv
+    val arbeidsmarkedCv = cv
 
     fun somJson()= JsonMessage(objectMapper.writeValueAsString(this), MessageProblems("{}")).toJson()
 

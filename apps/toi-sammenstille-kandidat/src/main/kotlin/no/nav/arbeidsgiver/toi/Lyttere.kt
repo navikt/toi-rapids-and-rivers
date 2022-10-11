@@ -40,6 +40,7 @@ class Lytter(
 
         return when (eventNavn) {
             "cv" -> kandidat.copy(cv = verdi)
+            "arbeidsmarked-cv" -> kandidat.copy(arbeidsmarkedCv = verdi)
             "veileder" -> kandidat.copy(veileder = verdi)
             "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = verdi)
             "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = verdi)
