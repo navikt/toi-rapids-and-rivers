@@ -11,8 +11,9 @@ import org.slf4j.LoggerFactory
 
 fun main() =
     RapidApplication.create(System.getenv()).apply {
-        val consumer= KafkaConsumer<String, Cv>(consumerConfig)
-        //val cvLytter= CvLytter(consumer, behandleCv)
+        val consumer = KafkaConsumer<String, Cv>(consumerConfig)
+        val cvLytter = CvLytter(consumer, behandleCv)
+        register(cvLytter)
     }.start()
 
 val Any.log: Logger
