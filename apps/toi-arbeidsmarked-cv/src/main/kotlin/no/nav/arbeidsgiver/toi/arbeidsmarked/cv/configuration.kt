@@ -7,8 +7,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
 
-//val consumerTopic = "cv-endret-ekstern-v2"
-
 val consumerConfig = mapOf(
     CommonClientConfigs.CLIENT_ID_CONFIG to "toi-arbeidsmarked-cv",
     CommonClientConfigs.GROUP_ID_CONFIG to System.getenv("ARBEIDSMARKED_CV_KAFKA_GROUP_ID"),

@@ -8,7 +8,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
 import java.time.Duration
 
-class CvLytter(private val consumer: Consumer<String, Cv>, private val behandleCv: (Cv) -> CvMelding
+class CvLytter(
+    private val consumer: Consumer<String, Cv>, private val behandleCv: (Cv) -> CvMelding
 ) : RapidsConnection.StatusListener {
 
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
@@ -19,17 +20,21 @@ class CvLytter(private val consumer: Consumer<String, Cv>, private val behandleC
             consumer.subscribe(listOf(cvTopic.topic()))
             log.info("Starter å konsumere topic")
 
-            while(konsumer) {
+            while (konsumer) {
                 val records: ConsumerRecords<String, Cv> =
                     consumer.poll(Duration.ofSeconds(5))
                 val cvMeldinger = records.map { behandleCv(it.value()) }
 
-                cvMeldinger.forEach{rapidsConnection.publish(it.aktørId, it.somJson())}
+                cvMeldinger.forEach { rapidsConnection.publish(it.aktørId, it.somJson()) }
                 consumer.commitSync()
             }
         } catch (exception: Exception) {
             log.error("Feil ved konsumering av CV. Stopper rapidconnection", exception)
             rapidsConnection.stop()
         }
+    }
+
+    override fun onShutdown(rapidsConnection: RapidsConnection) {
+        konsumer = false;
     }
 }

@@ -11,14 +11,13 @@ import org.slf4j.LoggerFactory
 
 fun main() =
     RapidApplication.create(System.getenv()).apply {
-        val consumer= KafkaConsumer<String, Cv>(consumerConfig)
-        //val cvLytter= CvLytter(consumer, behandleCv)
+        val consumer = KafkaConsumer<String, Cv>(consumerConfig)
+        // CvLytter(consumer, behandleCv)
     }.start()
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
 
-val behandleCv : (Cv) -> CvMelding = {
-    log.info("Har konsumert en CV, mapper den til Pair av aktørid og CV som Json.")
+val behandleCv: (Cv) -> CvMelding = {
     CvMelding(it)
 }

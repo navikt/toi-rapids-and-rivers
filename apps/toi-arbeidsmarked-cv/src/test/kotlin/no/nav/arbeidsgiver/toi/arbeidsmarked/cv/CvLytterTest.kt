@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Cv
 import no.nav.arbeid.cv.avro.Foererkort
 import no.nav.arbeid.cv.avro.FoererkortKlasse
@@ -18,7 +20,6 @@ class CvLytterTest {
 
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
 
-    @Disabled
     @Test
     fun `lesing av cv-meldinger fra topic skal publiseres på rapid`() {
         val cv = cv()
@@ -27,7 +28,10 @@ class CvLytterTest {
         val cvLytter = CvLytter(consumer, behandleCv)
 
         produserCvMelding(consumer, cv)
-        cvLytter.onReady(rapid)
+
+        GlobalScope.launch {
+            cvLytter.onReady(rapid)
+        }
 
         Thread.sleep(300)
         val inspektør = rapid.inspektør
@@ -37,7 +41,7 @@ class CvLytterTest {
 
         Assertions.assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "cv",
+            "cvMelding",
             "aktørId",
             "system_read_count"
         )
