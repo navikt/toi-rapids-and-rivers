@@ -47,6 +47,7 @@ fun main() {
 suspend fun sjekkOffsets(envs: Map<String, String>) {
     val listOfGroupIds = listOf(
         "toi-cv" to "toi-arbeidsplassen-cv-reader-rapidconsumer-1",
+        "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
         "toi-fritatt-kandidatsøk" to "toi-arena-cv-reader-rapidconsumer-1",
         "toi-hjemmel" to "toi-hjemmel-rapidconsumer-1",
         "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
@@ -81,9 +82,9 @@ private fun formatResults(
     resultsPerApplication: List<ResultsPerApplication>,
     sisteOffset: Long
 ) = """
-                    ${resultsPerApplication.joinToString(separator = "\n",transform = ResultsPerApplication::printFriendly)}
+${resultsPerApplication.joinToString(separator = "\n",transform = ResultsPerApplication::printFriendly)}
 
-                    Siste offset er $sisteOffset
+Siste offset er $sisteOffset
 """.trimIndent()
 
 data class ResultsPerApplication(val name: String, val offset: Long, val behind: Long) {
