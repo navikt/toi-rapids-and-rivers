@@ -5,6 +5,8 @@ import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Cv
 import no.nav.arbeid.cv.avro.Foererkort
 import no.nav.arbeid.cv.avro.FoererkortKlasse
+import no.nav.arbeid.cv.avro.Melding
+import no.nav.arbeid.cv.avro.OpprettCv
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
@@ -21,12 +23,12 @@ class CvLytterTest {
 
     @Test
     fun `lesing av cv-meldinger fra topic skal publiseres på rapid`() {
-        val cv = cv()
+        val melding = melding()
         val consumer = mockConsumer()
         val rapid = TestRapid()
         val cvLytter = CvLytter(consumer, behandleCv)
 
-        produserCvMelding(consumer, cv)
+        produserCvMelding(consumer, melding)
 
         GlobalScope.launch {
             cvLytter.onReady(rapid)
@@ -48,14 +50,14 @@ class CvLytterTest {
         Assertions.assertThat(meldingJson.get("aktørId")).isNotNull
     }
 
-    private fun mockConsumer() = MockConsumer<String, Cv>(OffsetResetStrategy.EARLIEST).apply {
+    private fun mockConsumer() = MockConsumer<String, Melding>(OffsetResetStrategy.EARLIEST).apply {
         schedulePollTask {
             rebalance(listOf(cvTopic))
             updateBeginningOffsets(mapOf(Pair(cvTopic, 0)))
         }
     }
 
-    private fun produserCvMelding(consumer: MockConsumer<String, Cv>, cv: Cv, offset: Long = 0) {
+    private fun produserCvMelding(consumer: MockConsumer<String, Melding>, cv: Melding, offset: Long = 0) {
         val record = ConsumerRecord(
             cvTopic.topic(),
             cvTopic.partition(),
@@ -68,6 +70,11 @@ class CvLytterTest {
         }
     }
 
+
+    private fun melding() = Melding().apply { aktoerId = "123"
+        opprettCv = opprettCv() }
+
+    private fun opprettCv() = OpprettCv().apply { cv = cv() }
     private fun cv() = Cv().apply() {
         aktoerId = "123"
         sistEndret = Instant.now()

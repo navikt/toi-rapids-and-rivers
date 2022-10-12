@@ -2,13 +2,14 @@ package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
 import kotlinx.coroutines.Job
 import no.nav.arbeid.cv.avro.Cv
+import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
 import java.time.Duration
 
-class CvLytter(private val consumer: Consumer<String, Cv>, private val behandleCv: (Cv) -> ArbeidsmarkedCv
+class CvLytter(private val consumer: Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
 ) : RapidsConnection.StatusListener {
 
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
@@ -20,7 +21,7 @@ class CvLytter(private val consumer: Consumer<String, Cv>, private val behandleC
             log.info("Starter å konsumere topic")
 
             while (konsumer) {
-                val records: ConsumerRecords<String, Cv> =
+                val records: ConsumerRecords<String, Melding> =
                     consumer.poll(Duration.ofSeconds(5))
                 val cvMeldinger = records.map { behandleCv(it.value()) }
 
