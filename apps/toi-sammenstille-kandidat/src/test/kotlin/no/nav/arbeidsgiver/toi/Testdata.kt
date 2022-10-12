@@ -31,6 +31,25 @@ fun cvMelding(aktørId: String) = """
         }
     """.trimIndent()
 
+fun arbeidsmarkedCvMelding(aktørId: String) = """
+        {
+          "aktørId": "$aktørId",
+          "arbeidsmarkedCv": {
+            "meldingstype": "SLETT",
+            "oppfolgingsinformasjon": null,
+            "opprettCv": null,
+            "endreCv": null,
+            "slettCv": null,
+            "opprettJobbprofil": null,
+            "endreJobbprofil": null,
+            "slettJobbprofil": null,
+            "aktoerId": "$aktørId",
+            "sistEndret": 1636718935.195
+          },
+          "@event_name": "arbeidsmarked-cv"
+        }
+    """.trimIndent()
+
 fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
         {
           "aktørId": "$aktørid",

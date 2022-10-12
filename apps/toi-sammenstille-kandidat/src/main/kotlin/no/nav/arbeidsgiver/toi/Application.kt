@@ -14,7 +14,7 @@ fun startRapid(
     try {
         rapidsConnection.also { rapid ->
             Lytter(rapid, repository, "cv")
-            Lytter(rapid, repository, "arbeidsmarked-cv")
+            Lytter(rapid, repository, "arbeidsmarked-cv", "arbeidsmarkedCv")
             Lytter(rapid, repository, "veileder")
             Lytter(rapid, repository, "oppfølgingsinformasjon")
             Lytter(rapid, repository, "oppfølgingsperiode")
