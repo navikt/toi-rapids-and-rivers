@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
-import kotlinx.coroutines.Job
-import no.nav.arbeid.cv.avro.Cv
 import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.consumer.Consumer
@@ -25,7 +23,10 @@ class CvLytter(private val consumer: Consumer<String, Melding>, private val beha
                     consumer.poll(Duration.ofSeconds(5))
                 val cvMeldinger = records.map { behandleCv(it.value()) }
 
-                cvMeldinger.forEach { rapidsConnection.publish(it.aktørId, it.somJson()) }
+                cvMeldinger.forEach {
+                    log.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
+                    rapidsConnection.publish(it.aktørId, it.somJson())
+                }
                 consumer.commitSync()
             }
         } catch (exception: Exception) {

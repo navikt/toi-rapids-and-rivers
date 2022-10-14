@@ -19,8 +19,11 @@ fun main(args: Array<String>) {
     val tilkobling = databasetilkobling(databasebruker, databasepassord)
     println("Har koblet til databasen")
 
+    var antallArbeidsmarkedsCver = 0
+
     gjørOperasjonPåAlleKandidaterIndexed(tilkobling) { kandidat, i ->
-        println("Hentet ut kandidat nr. $i")
+        kandidat.arbeidsmarkedCv?.apply { antallArbeidsmarkedsCver++ }
+        println("Antall arbeidsmarkedsCver: $antallArbeidsmarkedsCver, antall kandidater: $i")
     }
 }
 
