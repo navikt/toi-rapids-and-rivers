@@ -1,41 +1,55 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
+import org.apache.kafka.common.errors.RetriableException
 import java.time.Duration
+import kotlin.coroutines.CoroutineContext
 
 class CvLytter(private val consumer: Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
-) : RapidsConnection.StatusListener {
+) : CoroutineScope, RapidsConnection.StatusListener {
 
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
-    var konsumer = true
+
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     override fun onReady(rapidsConnection: RapidsConnection) {
-        try {
-            consumer.subscribe(listOf(cvTopic.topic()))
-            log.info("Starter å konsumere topic")
 
-            while (konsumer) {
-                val records: ConsumerRecords<String, Melding> =
-                    consumer.poll(Duration.ofSeconds(5))
-                val cvMeldinger = records.map { behandleCv(it.value()) }
-
-                cvMeldinger.forEach {
-                    log.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
-                    rapidsConnection.publish(it.aktørId, it.somJson())
-                }
-                consumer.commitSync()
-            }
-        } catch (exception: Exception) {
-            log.error("Feil ved konsumering av CV. Stopper rapidconnection", exception)
+        job.invokeOnCompletion {
+            log.error("Shutting down Rapid", it)
             rapidsConnection.stop()
         }
-    }
 
-    override fun onShutdown(rapidsConnection: RapidsConnection) {
-        konsumer = false;
+        launch {
+            consumer.use {
+                consumer.subscribe(listOf(cvTopic.topic()))
+                log.info("Starter å konsumere topic: ${cvTopic.topic()}")
+
+                while (job.isActive) {
+                    try {
+                        val records: ConsumerRecords<String, Melding> =
+                            consumer.poll(Duration.ofSeconds(5))
+                        val cvMeldinger = records.map { behandleCv(it.value()) }
+
+                        cvMeldinger.forEach {
+                            log.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
+                            rapidsConnection.publish(it.aktørId, it.somJson())
+                        }
+                        consumer.commitSync()
+                    } catch (e: RetriableException) {
+                        log.warn("Fikk en retriable exception, prøver på nytt", e)
+                    }
+                }
+            }
+        }
     }
 }

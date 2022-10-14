@@ -29,10 +29,7 @@ class CvLytterTest {
         val cvLytter = CvLytter(consumer, behandleCv)
 
         produserCvMelding(consumer, melding)
-
-        GlobalScope.launch {
-            cvLytter.onReady(rapid)
-        }
+        cvLytter.onReady(rapid)
 
         Thread.sleep(300)
         val inspektør = rapid.inspektør
