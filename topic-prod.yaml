@@ -80,3 +80,6 @@ spec:
     - team: toi
       application: rekrutteringsbistand-stilling-api
       access: readwrite
+    - team: toi
+      application: presenterte-kandidater-api
+      access: readwrite
