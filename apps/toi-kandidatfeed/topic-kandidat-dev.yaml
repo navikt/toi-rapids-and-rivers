@@ -20,8 +20,8 @@ spec:
     - team: toi
       application: toi-kandidatfeed
       access: readwrite
-    - team: arbeidsgiver-inkludering
-      application: arbeidsgiver-inkludering-kafkamanager
+    - team: toi
+      application: toi-kafkamanager
       access: readwrite
     - team: arbeidsgiver
       application: rekrutteringsbistand-kandidat-indekser
