@@ -15,7 +15,7 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         River(rapidsConnection).apply {
             validate {
                 it.demandAtFørstkommendeUløsteBehovEr(HullICv)
-                it.requireKey("cv")
+                it.requireKey("arbeidsmarkedCv")
                 it.requireKey("aktørId")
             }
         }.register(this)
@@ -27,10 +27,13 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørid: String = packet["aktørId"].asText()
-        val cvPacket = packet["cv"]["opprettCv"]["cv"] ?: packet["cv"]["endreCv"]["cv"]
+        val cvPacket = packet["arbeidsmarkedCv"]["opprettCv"]["cv"] ?: packet["arbeidsmarkedCv"]["endreCv"]["cv"]
         packet[HullICv] =
             if (cvPacket == null) håndterIkkeOpprettEllerEndreCv(packet, aktørid)
-            else objectMapper.treeToValue(cvPacket, Cv::class.java).tilPerioderMedInaktivitet()
+            else {
+                val treeToValue = objectMapper.treeToValue(cvPacket, Cv::class.java)
+                treeToValue.tilPerioderMedInaktivitet()
+            }
 
         context.publish(aktørid, packet.toJson())
     }
@@ -39,7 +42,7 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         packet: JsonMessage,
         aktørid: String
     ): PerioderMedInaktivitet {
-        if (packet["cv"]["slettCv"]["cv"] == null) {
+        if (packet["arbeidsmarkedCv"]["slettCv"]["cv"] == null) {
             log.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har cv")
         }
         return PerioderMedInaktivitet(null, emptyList())

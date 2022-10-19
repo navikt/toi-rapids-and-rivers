@@ -4,10 +4,12 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
 
 class Cv (
-    private val utdannelse: List<CVPeriode>,
-    private val arbeidserfaring: List<CVPeriode>,
+    private val utdannelse: List<CVPeriodeString>,
+    private val arbeidserfaring: List<CVPeriodeString>,
     private val foedselsdato: LocalDate
 ) {
     fun tilPerioderMedInaktivitet(): PerioderMedInaktivitet {
@@ -27,20 +29,40 @@ class Cv (
         return perioderMedInaktivitet(førsteDagIInneværendeInaktivePeriode, inaktivePerioderEtterEnVissAlder)
     }
 
-    private fun perioderMedAktivitet() =
-        this.arbeidserfaring.map(CVPeriode::tilAktivPeriode) + utdannelse.map(CVPeriode::tilAktivPeriode)
+    private fun perioderMedAktivitet(): List<AktivPeriode> {
+        val arbeidserfaringer = this.arbeidserfaring.map(CVPeriodeString::tilCVPeriode).map(CVPeriode::tilAktivPeriode)
+        val utdannelser = utdannelse.map(CVPeriodeString::tilCVPeriode).map(CVPeriode::tilAktivPeriode)
+        return arbeidserfaringer + utdannelser
+    }
 }
 
 class CVPeriode(
     val fraTidspunkt: LocalDate?,
-    val tilTidspunkt: Long?
+    val tilTidspunkt: LocalDate?
 ) {
     fun tilAktivPeriode() = AktivPeriode(
         fraTidspunkt ?: LocalDate.MIN,
-        safeToLocalDate(tilTidspunkt) ?: LocalDate.MAX
+        tilTidspunkt?: LocalDate.MAX
     )
+
+    fun tilArbeidsmarkedJson() = """{
+            "fraTidspunkt": ${fraTidspunkt?.format(DateTimeFormatter.ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"},
+            "tilTidspunkt": ${tilTidspunkt?.format(DateTimeFormatter.ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"}
+          }
+    """.trimIndent()
 }
 
+class CVPeriodeString(
+    val fraTidspunkt: String?,
+    val tilTidspunkt: String?
+) {
+    fun tilCVPeriode(): CVPeriode{
+        return CVPeriode(
+            fraTidspunkt = if (fraTidspunkt != null) LocalDate.parse("$fraTidspunkt-01") else null,
+            tilTidspunkt = if (tilTidspunkt != null) LocalDate.parse("$tilTidspunkt-01") else null,
+        )
+    }
+}
 
 private fun inaktivePerioderEtterEnVissAlder(
     perioder: List<InaktivPeriode>,
