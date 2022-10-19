@@ -85,7 +85,6 @@ jobs:
           snyk monitor
           --org=toi
           --file=apps/${APP_NAME}/build.gradle.kts
-          --file=buildSrc/build.gradle.kts
           --project-name=${APP_NAME}
           --remote-repo-url=https://github.com/${{ github.repository }}.git
         env:
