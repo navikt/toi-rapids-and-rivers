@@ -4,27 +4,6 @@ import java.time.Instant
 
 fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
     Evaluering(
-        harAktivCv = kandidat.cv?.meldingstype.let {
-            listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
-        },
-        harJobbprofil = kandidat.cv?.endreJobbprofil != null || kandidat.cv?.opprettJobbprofil != null,
-        harSettHjemmel = harSettHjemmel(kandidat),
-        maaIkkeBehandleTidligereCv = kandidat.måBehandleTidligereCv?.maaBehandleTidligereCv != true,
-        erIkkeFritattKandidatsøk = kandidat.fritattKandidatsøk == null || !kandidat.fritattKandidatsøk.fritattKandidatsok,
-        erUnderOppfoelging = erUnderOppfølging(kandidat),
-        harRiktigFormidlingsgruppe = kandidat.oppfølgingsinformasjon?.formidlingsgruppe in listOf(
-            Formidlingsgruppe.ARBS,
-            Formidlingsgruppe.IARBS
-        ),
-        erIkkeKode6eller7 = erIkkeKode6EllerKode7(kandidat),
-        erIkkeSperretAnsatt = kandidat.oppfølgingsinformasjon?.sperretAnsatt == false,
-        erIkkeDoed = kandidat.oppfølgingsinformasjon?.erDoed == false,
-        erFerdigBeregnet = beregningsgrunnlag(kandidat)
-    )
-
-
-fun lagNyttEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
-    Evaluering(
         harAktivCv = kandidat.arbeidsmarkedCv?.meldingstype.let {
             listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
         },
@@ -72,4 +51,4 @@ private fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
                     || kandidat.oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
 
 fun beregningsgrunnlag(kandidat: Kandidat) =
-    kandidat.cv != null && kandidat.oppfølgingsperiode != null && kandidat.oppfølgingsinformasjon != null
+    kandidat.arbeidsmarkedCv != null && kandidat.oppfølgingsperiode != null && kandidat.oppfølgingsinformasjon != null

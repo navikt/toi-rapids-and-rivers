@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
-import no.nav.arbeidsgiver.toi.Testdata.Companion.cv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.fritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
@@ -56,18 +56,18 @@ class SynlighetsmotorTest {
 
     @Test
     fun `kandidat med kun cv skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(cv = cv()), enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
+        hendelse(arbeidsmarkedCv = arbeidsmarkedCv()), enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
     )
 
     @Test
     fun `om CV har meldingstype "SLETT" skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(cv = cv(CvMeldingstype.SLETT)),
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = arbeidsmarkedCv(CvMeldingstype.SLETT)),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
     fun `om CV har meldingstype "ENDRE" skal synlighet være true`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(cv = cv(meldingstype = CvMeldingstype.ENDRE)),
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = arbeidsmarkedCv(meldingstype = CvMeldingstype.ENDRE)),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
     )
 
@@ -129,25 +129,25 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(cv = manglendeCV()),
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = manglendeCV()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, false)
     )
 
     @Test
     fun `om Person ikke har jobbprofil skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(cv = harCvManglerJobbprofil()),
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = harCvManglerJobbprofil()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
     )
 
     @Test
     fun `om Person har endrejobbprofil skal synlighet kunne være true`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(cv = harEndreJobbrofil()),
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = harEndreJobbrofil()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
     )
 
     @Test
     fun `om Person har opprettjobbprofil skal synlighet kunne være true`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(cv = harOpprettJobbrofil()),
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = harOpprettJobbrofil()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
     )
 
