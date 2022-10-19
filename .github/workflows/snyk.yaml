@@ -1,4 +1,8 @@
 name: Snyk monitor
+on:
+  push:
+    - .github/workflows/snyk.yaml
+    - buildSrc/**
 
 jobs:
   snyk-monitor-buildSrc:
