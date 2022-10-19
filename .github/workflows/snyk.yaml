@@ -9,9 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Install Snyk CLI
-        uses: snyk/actions/setup@master
       - name: Run Snyk to check for vulnerabilities
-        run: snyk monitor --org=toi --all-projects
+        uses: snyk/actions/gradle@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          command: monitor
+          args: --org=toi --all-projects
