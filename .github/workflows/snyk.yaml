@@ -12,8 +12,6 @@ jobs:
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
       - name: Run Snyk to check for vulnerabilities
+        run: snyk monitor --org=toi --all-projects
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: --org=toi --all-projects
