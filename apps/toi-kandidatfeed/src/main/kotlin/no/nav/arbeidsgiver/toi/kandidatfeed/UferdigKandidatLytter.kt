@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.*
-import org.apache.kafka.clients.producer.Producer
-import org.apache.kafka.clients.producer.ProducerRecord
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.MessageProblems
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
 
 class UferdigKandidatLytter(
     rapidsConnection: RapidsConnection
@@ -19,7 +19,6 @@ class UferdigKandidatLytter(
                 it.demandValue("synlighet.ferdigBeregnet", true)
                 it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
                 it.interestedIn("@behov")
-                it.interestedIn("cv")
             }
         }.register(this)
     }

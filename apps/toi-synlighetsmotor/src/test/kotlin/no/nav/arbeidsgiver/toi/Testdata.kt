@@ -41,7 +41,7 @@ class Testdata {
         fun komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode: String = aktivOppfølgingsperiode(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
-            cv: String = cv(),
+            arbeidsmarkedCv: String = arbeidsmarkedCv(),
             fritattKandidatsøk: String = fritattKandidatsøk(),
             hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
@@ -53,7 +53,7 @@ class Testdata {
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
                 oppfølgingsinformasjon = oppfølgingsinformasjon,
-                cv = cv,
+                arbeidsmarkedCv = arbeidsmarkedCv,
                 fritattKandidatsøk = fritattKandidatsøk,
                 hjemmel = hjemmel,
                 participatingService = participatingService,
@@ -73,7 +73,7 @@ class Testdata {
         fun hendelse(
             oppfølgingsperiode: String? = null,
             oppfølgingsinformasjon: String? = null,
-            cv: String? = null,
+            arbeidsmarkedCv: String? = null,
             fritattKandidatsøk: String? = null,
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
@@ -84,7 +84,7 @@ class Testdata {
                 ${
             listOfNotNull(
                 """"@event_name": "hendelse"""",
-                cv,
+                arbeidsmarkedCv,
                 oppfølgingsinformasjon,
                 oppfølgingsperiode,
                 fritattKandidatsøk,
@@ -145,9 +145,9 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun cv(meldingstype: CvMeldingstype = CvMeldingstype.OPPRETT) =
+        fun arbeidsmarkedCv(meldingstype: CvMeldingstype = CvMeldingstype.OPPRETT) =
             """
-            "cv": {
+            "arbeidsmarkedCv": {
                 "meldingstype": "$meldingstype",
                 "opprettJobbprofil": {},
                 "endreJobbprofil": null,
@@ -166,12 +166,12 @@ class Testdata {
 
         fun manglendeCV() =
             """
-            "cv": null
+            "arbeidsmarkedCv": null
         """.trimIndent()
 
         fun harCvManglerJobbprofil() =
             """
-            "cv": {
+            "arbeidsmarkedCv": {
                 "meldingstype": "${CvMeldingstype.OPPRETT}",
                 "opprettJobbprofil": null,
                 "endreJobbprofil": null
@@ -180,7 +180,7 @@ class Testdata {
 
         fun harEndreJobbrofil() =
             """
-            "cv": {
+            "arbeidsmarkedCv": {
                 "meldingstype": "${CvMeldingstype.OPPRETT}",
                 "opprettJobbprofil": null,
                 "endreJobbprofil": {}
@@ -189,7 +189,7 @@ class Testdata {
 
         fun harOpprettJobbrofil() =
             """
-            "cv": {
+            "arbeidsmarkedCv": {
                 "meldingstype": "${CvMeldingstype.OPPRETT}",
                 "opprettJobbprofil": {},
                 "endreJobbprofil": null

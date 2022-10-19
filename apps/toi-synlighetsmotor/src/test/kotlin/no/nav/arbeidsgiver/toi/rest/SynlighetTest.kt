@@ -158,7 +158,7 @@ class SynlighetTest {
 
         startApp(repository, javalin, rapid) { true }
 
-        rapid.sendTestMessage(Testdata.hendelse(cv = Testdata.cv(meldingstype = CvMeldingstype.OPPRETT)))
+        rapid.sendTestMessage(Testdata.hendelse(arbeidsmarkedCv = Testdata.arbeidsmarkedCv(meldingstype = CvMeldingstype.OPPRETT)))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
         val usynligKandidat = listOf("12345678912")
