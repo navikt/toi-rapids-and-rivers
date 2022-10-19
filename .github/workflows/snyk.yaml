@@ -15,4 +15,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
-          args: --org=toi --all-projects --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
+          args: --org=toi --all-projects
