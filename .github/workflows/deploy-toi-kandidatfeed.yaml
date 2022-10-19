@@ -66,6 +66,7 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
           VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
+
   snyk-monitor:
     name: Monitor dependencies with Snyk
     runs-on: ubuntu-latest
@@ -84,6 +85,7 @@ jobs:
           snyk monitor
           --org=toi
           --file=apps/${APP_NAME}/build.gradle.kts
+          --file=buildSrc/build.gradle.kts
           --project-name=${APP_NAME}
           --remote-repo-url=https://github.com/${{ github.repository }}.git
         env:
