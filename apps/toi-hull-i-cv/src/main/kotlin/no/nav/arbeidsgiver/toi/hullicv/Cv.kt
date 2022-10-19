@@ -1,15 +1,18 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 
 
 class Cv (
-    private val utdannelse: List<CVPeriodeString>,
-    private val arbeidserfaring: List<CVPeriodeString>,
+    private val utdannelse: List<CVPeriode>,
+    private val arbeidserfaring: List<CVPeriode>,
     private val foedselsdato: LocalDate
 ) {
     fun tilPerioderMedInaktivitet(): PerioderMedInaktivitet {
@@ -30,14 +33,16 @@ class Cv (
     }
 
     private fun perioderMedAktivitet(): List<AktivPeriode> {
-        val arbeidserfaringer = this.arbeidserfaring.map(CVPeriodeString::tilCVPeriode).map(CVPeriode::tilAktivPeriode)
-        val utdannelser = utdannelse.map(CVPeriodeString::tilCVPeriode).map(CVPeriode::tilAktivPeriode)
+        val arbeidserfaringer = this.arbeidserfaring.map(CVPeriode::tilAktivPeriode)
+        val utdannelser = utdannelse.map(CVPeriode::tilAktivPeriode)
         return arbeidserfaringer + utdannelser
     }
 }
 
 class CVPeriode(
+    @JsonDeserialize(using = YearMonthDeserializerWithDayOne::class)
     val fraTidspunkt: LocalDate?,
+    @JsonDeserialize(using = YearMonthDeserializerWithDayOne::class)
     val tilTidspunkt: LocalDate?
 ) {
     fun tilAktivPeriode() = AktivPeriode(
@@ -46,21 +51,18 @@ class CVPeriode(
     )
 
     fun tilArbeidsmarkedJson() = """{
-            "fraTidspunkt": ${fraTidspunkt?.format(DateTimeFormatter.ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"},
-            "tilTidspunkt": ${tilTidspunkt?.format(DateTimeFormatter.ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"}
+            "fraTidspunkt": ${fraTidspunkt?.format(ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"},
+            "tilTidspunkt": ${tilTidspunkt?.format(ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"}
           }
     """.trimIndent()
 }
 
-class CVPeriodeString(
-    val fraTidspunkt: String?,
-    val tilTidspunkt: String?
-) {
-    fun tilCVPeriode(): CVPeriode{
-        return CVPeriode(
-            fraTidspunkt = if (fraTidspunkt != null) LocalDate.parse("$fraTidspunkt-01") else null,
-            tilTidspunkt = if (tilTidspunkt != null) LocalDate.parse("$tilTidspunkt-01") else null,
-        )
+class YearMonthDeserializerWithDayOne : FromStringDeserializer<LocalDate?>(LocalDate::class.java) {
+    override fun _deserialize(value: String?, ctxt: DeserializationContext?): LocalDate? {
+        if (value == null) {
+            return null
+        }
+        return LocalDate.parse("$value-01") // Bruk alltid 1. i måneden
     }
 }
 
