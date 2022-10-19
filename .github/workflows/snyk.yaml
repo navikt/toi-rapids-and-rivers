@@ -1,6 +1,8 @@
 name: Snyk monitor
 on:
   push:
+    branches:
+      - main
     paths:
       - .github/workflows/snyk.yaml
       - buildSrc/**
