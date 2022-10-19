@@ -22,6 +22,28 @@ fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
         erFerdigBeregnet = beregningsgrunnlag(kandidat)
     )
 
+
+fun lagNyttEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
+    Evaluering(
+        harAktivCv = kandidat.arbeidsmarkedCv?.meldingstype.let {
+            listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
+        },
+        harJobbprofil = kandidat.arbeidsmarkedCv?.endreJobbprofil != null || kandidat.arbeidsmarkedCv?.opprettJobbprofil != null,
+        harSettHjemmel = harSettHjemmel(kandidat),
+        maaIkkeBehandleTidligereCv = kandidat.måBehandleTidligereCv?.maaBehandleTidligereCv != true,
+        erIkkeFritattKandidatsøk = kandidat.fritattKandidatsøk == null || !kandidat.fritattKandidatsøk.fritattKandidatsok,
+        erUnderOppfoelging = erUnderOppfølging(kandidat),
+        harRiktigFormidlingsgruppe = kandidat.oppfølgingsinformasjon?.formidlingsgruppe in listOf(
+            Formidlingsgruppe.ARBS,
+            Formidlingsgruppe.IARBS
+        ),
+        erIkkeKode6eller7 = erIkkeKode6EllerKode7(kandidat),
+        erIkkeSperretAnsatt = kandidat.oppfølgingsinformasjon?.sperretAnsatt == false,
+        erIkkeDoed = kandidat.oppfølgingsinformasjon?.erDoed == false,
+        erFerdigBeregnet = beregningsgrunnlag(kandidat)
+    )
+
+
 private fun harSettHjemmel(kandidat: Kandidat): Boolean {
     return if (kandidat.hjemmel != null && kandidat.hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL) {
         val now = Instant.now()
