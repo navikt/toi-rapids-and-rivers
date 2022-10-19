@@ -2,8 +2,8 @@ name: Snyk monitor
 on:
   push:
     paths:
-      - .github/workflows/deploy-topic-kandidat-to-dev.yaml
-      - apps/toi-kandidatfeed/topic-kandidat-dev.yaml
+      - .github/workflows/snyk.yaml
+      - buildSrc/**
 
 jobs:
   snyk-monitor-buildSrc:
