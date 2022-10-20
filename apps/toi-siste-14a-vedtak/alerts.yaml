@@ -1,0 +1,32 @@
+apiVersion: 'nais.io/v1'
+kind: 'Alert'
+metadata:
+  name: toi-siste-14a-vedtak
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  receivers:
+    slack:
+      channel: 'inkludering-alerts-prod'
+  alerts:
+    - alert: toi-siste-14a-vedtak
+      severity: danger
+      expr: sum(up{app="toi-siste-14a-vedtak", job="kubernetes-pods"}) == 0
+      for: 1m
+      description: Appen er nede (ingen Kubernetes-pods er oppe)
+      action: "https://logs.adeo.no/goto/2dfa6fc0-398e-11ed-8607-d590fd125f80"
+
+    - alert: toi-siste-14a-vedtak
+      severity: danger
+      expr: sum(increase(logd_messages_total{log_app="toi-siste-14a-vedtak",log_level="Error"}[10m])) > 0
+      for: 1s
+      description: Appen har logget en error
+      action: "https://logs.adeo.no/goto/2dfa6fc0-398e-11ed-8607-d590fd125f80"
+
+    - alert: toi-siste-14a-vedtak
+      severity: warning
+      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-siste-14a-vedtak",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-siste-14a-vedtak"}[5m]))) > 20
+      for: 5m
+      description: Økning i warnings
+      action: "https://logs.adeo.no/goto/2dfa6fc0-398e-11ed-8607-d590fd125f80"

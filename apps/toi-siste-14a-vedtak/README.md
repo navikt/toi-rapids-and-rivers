@@ -1,0 +1,1 @@
+# Henter ut hovedmål og innsatsgruppe og legger den på rapid
