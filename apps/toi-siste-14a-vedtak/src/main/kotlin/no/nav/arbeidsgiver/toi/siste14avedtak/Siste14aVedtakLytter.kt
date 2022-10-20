@@ -34,7 +34,7 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
             "@event_name" to "siste14avedtak",
         )
 
-        log.info("Skal publisere siste14aVedtakmelding med fattetDato ${packet["fattetDato"]}")
+        log.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asText()} og fattetDato ${packet["fattetDato"].asText()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
