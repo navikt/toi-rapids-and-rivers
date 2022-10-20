@@ -42,9 +42,9 @@ class Siste14aVedtakTest {
 
         meldingJson.get("siste14avedtak").apply {
             assertThat(get("aktorId").asText()).isEqualTo(aktørid)
-            assertThat(get("innsatsgruppe").asText()).isEqualTo("BATT")
-            assertThat(get("hovedmal").asText()).isEqualTo("BEHOLDEA")
-            assertThat(get("fattetDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
+            assertThat(get("innsatsgruppe").asText()).isEqualTo("STANDARD_INNSATS")
+            assertThat(get("hovedmal").asText()).isEqualTo("SKAFFE_ARBEID")
+            assertThat(get("fattetDato").asText()).isEqualTo("2021-09-08T09:29:20.398043+02:00")
             assertThat(get("fraArena").asText()).isEqualTo("false")
 
 
@@ -52,11 +52,11 @@ class Siste14aVedtakTest {
     }
     private fun siste14aVedtakMeldingFraEksterntTopic(aktørId: String) = """
         {
-            "aktorId": "$aktørId",
-            "innsatsgruppe": "BATT",
-            "hovedmal": "BEHOLDEA",
-            "fattetDato": "2020-10-30T14:15:38+01:00",
-            "fraArena": "false"
+          "aktorId": "$aktørId",
+          "innsatsgruppe": "STANDARD_INNSATS",
+          "hovedmal": "SKAFFE_ARBEID",
+          "fattetDato": "2021-09-08T09:29:20.398043+02:00",
+          "fraArena": false
         }
     """.trimIndent()
 
