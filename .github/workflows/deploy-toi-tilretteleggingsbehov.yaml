@@ -66,3 +66,28 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
           VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
+
+  snyk-monitor:
+    name: Monitor dependencies with Snyk
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java v17.x
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17.x'
+          cache: gradle
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
+      - name: Monitor dependencies with Snyk
+        run: >
+          snyk monitor
+          --org=toi
+          --file=apps/${APP_NAME}/build.gradle.kts
+          --project-name=${APP_NAME}
+          --remote-repo-url=https://github.com/${{ github.repository }}.git
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
