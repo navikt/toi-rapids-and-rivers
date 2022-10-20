@@ -1,1 +1,1 @@
-# Henter ut hovedmål og innsatsgruppe og legger den på rapid
+# Henter ut siste 14a vedtak og legger det på rapid
