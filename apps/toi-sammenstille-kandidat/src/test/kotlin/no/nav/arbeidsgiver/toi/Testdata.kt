@@ -103,6 +103,19 @@ fun oppfølgingsinformasjonMelding(aktørId: String) = """
         }
     """.trimIndent()
 
+fun siste14avedtakMelding(aktørId: String) = """
+            {
+              "aktørId": "$aktørId",
+              "@event_name": "siste14avedtak",
+              "siste14avedtak": {
+                "aktorId": "$aktørId",
+                "innsatsgruppe": "STANDARD_INNSATS",
+                "hovedmal": "SKAFFE_ARBEID",
+                "fattetDato": "2021-09-08T09:29:20.398043+02:00",
+                "fraArena": false
+              }
+            }
+""".trimIndent()
 fun oppfølgingsperiodeMelding(aktørId: String) = """
         {
             "aktørId": "$aktørId",

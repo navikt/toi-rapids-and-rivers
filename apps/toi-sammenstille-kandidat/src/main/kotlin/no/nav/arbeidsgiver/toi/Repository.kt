@@ -103,6 +103,7 @@ data class Kandidat(
     val arbeidsmarkedCv: JsonNode? = null,
     val veileder: JsonNode? = null,
     val oppfølgingsinformasjon: JsonNode? = null,
+    val siste14avedtak: JsonNode? = null,
     val oppfølgingsperiode: JsonNode? = null,
     val fritattKandidatsøk: JsonNode? = null,
     val hjemmel: JsonNode? = null,
