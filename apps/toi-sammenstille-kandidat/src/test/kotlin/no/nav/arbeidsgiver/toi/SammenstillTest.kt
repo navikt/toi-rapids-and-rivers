@@ -314,6 +314,21 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når siste14avedtak har blitt mottatt skal meldingen lagres i databasen`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+        val testDatabase = TestDatabase()
+
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
+
+        testRapid.sendTestMessage(siste14avedtakMelding(aktørId))
+
+        val lagredeKandidater = testDatabase.hentAlleKandidater()
+        assertThat(lagredeKandidater.size).isEqualTo(1)
+        assertThat(lagredeKandidater.first().siste14avedtak).isNotNull
+    }
+
+    @Test
     fun `Når tilretteleggingsbehov-endret har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
         val testRapid = TestRapid()

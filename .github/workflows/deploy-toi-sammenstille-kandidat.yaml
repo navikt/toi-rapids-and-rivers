@@ -42,7 +42,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/skru-pa-lytter'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ny-app-toi-siste-14a-vedtak'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
