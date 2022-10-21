@@ -119,6 +119,7 @@ data class Kandidat(
             arbeidsmarkedCv = json["arbeidsmarkedCv"],
             veileder = json["veileder"],
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
+            siste14avedtak = json["siste14avedtak"],
             oppfølgingsperiode = json["oppfølgingsperiode"],
             fritattKandidatsøk = json["fritattKandidatsøk"],
             hjemmel = json["hjemmel"],
