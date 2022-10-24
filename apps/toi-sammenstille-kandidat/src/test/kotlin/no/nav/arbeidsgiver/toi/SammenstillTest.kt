@@ -15,10 +15,12 @@ class SammenstillTest {
         "arbeidsmarkedCv",
         "veileder",
         "oppfølgingsinformasjon",
+        "siste14avedtak",
         "oppfølgingsperiode",
         "fritattKandidatsøk",
         "hjemmel",
-        "måBehandleTidligereCv"
+        "måBehandleTidligereCv",
+        "tilretteleggingsbehov"
     )
 
     private lateinit var javalin: Javalin
@@ -179,6 +181,30 @@ class SammenstillTest {
     }
 
     @Test
+    fun `Når siste14avedtak har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+        val aktørId = "12141321"
+        val testRapid = TestRapid()
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
+        testRapid.sendTestMessage(siste14avedtakMelding(aktørId))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        assertThat(melding.get("@event_name").asText()).isEqualTo("siste14avedtak.sammenstilt")
+        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("siste14avedtak")
+
+        val siste14avedtakMelding = melding.get("siste14avedtak")
+
+        assertThat(siste14avedtakMelding.get("aktorId").asText()).isEqualTo("12141321")
+        assertThat(siste14avedtakMelding.get("innsatsgruppe").asText()).isEqualTo("STANDARD_INNSATS")
+        assertThat(siste14avedtakMelding.get("hovedmal").asText()).isEqualTo("SKAFFE_ARBEID")
+        assertThat(siste14avedtakMelding.get("fattetDato").asText()).isEqualTo("2021-09-08T09:29:20.398043+02:00")
+        assertThat(siste14avedtakMelding.get("fraArena").asBoolean()).isFalse
+    }
+
+    @Test
     fun `Når oppfølgingsperiode har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "12141321"
         val testRapid = TestRapid()
@@ -285,6 +311,21 @@ class SammenstillTest {
         val lagredeKandidater = testDatabase.hentAlleKandidater()
         assertThat(lagredeKandidater.size).isEqualTo(1)
         assertThat(lagredeKandidater.first().måBehandleTidligereCv).isNotNull
+    }
+
+    @Test
+    fun `Når siste14avedtak har blitt mottatt skal meldingen lagres i databasen`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+        val testDatabase = TestDatabase()
+
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
+
+        testRapid.sendTestMessage(siste14avedtakMelding(aktørId))
+
+        val lagredeKandidater = testDatabase.hentAlleKandidater()
+        assertThat(lagredeKandidater.size).isEqualTo(1)
+        assertThat(lagredeKandidater.first().siste14avedtak).isNotNull
     }
 
     @Test

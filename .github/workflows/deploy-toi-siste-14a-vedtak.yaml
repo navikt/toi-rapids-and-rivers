@@ -1,4 +1,4 @@
-name: toi-sammenstille-kandidat
+name: toi-siste-14a-vedtak
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
@@ -6,10 +6,13 @@ env:
 
 on:
   push:
+    branches:
+    - main
+    - ny-app-toi-siste-14a-vedtak
     paths:
-      - apps/toi-sammenstille-kandidat/**
-      - .github/workflows/deploy-toi-sammenstille-kandidat.yaml
-      - buildSrc/**
+    - apps/toi-siste-14a-vedtak/**
+    - .github/workflows/deploy-toi-siste-14a-vedtak.yaml
+    - buildSrc/**
 
 jobs:
   build-and-publish:

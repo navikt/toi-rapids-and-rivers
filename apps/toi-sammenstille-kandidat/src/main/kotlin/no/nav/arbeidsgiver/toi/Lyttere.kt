@@ -43,6 +43,7 @@ class Lytter(
             "arbeidsmarked-cv" -> kandidat.copy(arbeidsmarkedCv = verdi)
             "veileder" -> kandidat.copy(veileder = verdi)
             "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = verdi)
+            "siste14avedtak" -> kandidat.copy(siste14avedtak = verdi)
             "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = verdi)
             "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = verdi)
             "hjemmel" -> kandidat.copy(hjemmel = verdi)

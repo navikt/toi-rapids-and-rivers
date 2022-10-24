@@ -17,6 +17,7 @@ fun startRapid(
             Lytter(rapid, repository, "arbeidsmarked-cv", "arbeidsmarkedCv")
             Lytter(rapid, repository, "veileder")
             Lytter(rapid, repository, "oppfølgingsinformasjon")
+            Lytter(rapid, repository, "siste14avedtak")
             Lytter(rapid, repository, "oppfølgingsperiode")
             Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
             Lytter(rapid, repository, "hjemmel")
