@@ -19,14 +19,6 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
         }.register(this)
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        super.onError(problems, context)
-    }
-
-    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        super.onSevere(error, context)
-    }
-
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val melding = mapOf(
             "aktørId" to packet["aktorId"],
