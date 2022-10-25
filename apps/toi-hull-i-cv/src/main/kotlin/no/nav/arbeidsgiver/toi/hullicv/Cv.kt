@@ -1,9 +1,14 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter.ofPattern
+
 
 class Cv (
     private val utdannelse: List<CVPeriode>,
@@ -27,26 +32,45 @@ class Cv (
         return perioderMedInaktivitet(førsteDagIInneværendeInaktivePeriode, inaktivePerioderEtterEnVissAlder)
     }
 
-    private fun perioderMedAktivitet() =
-        this.arbeidserfaring.map(CVPeriode::tilAktivPeriode) + utdannelse.map(CVPeriode::tilAktivPeriode)
+    private fun perioderMedAktivitet(): List<AktivPeriode> {
+        val arbeidserfaringer = this.arbeidserfaring.map(CVPeriode::tilAktivPeriode)
+        val utdannelser = utdannelse.map(CVPeriode::tilAktivPeriode)
+        return arbeidserfaringer + utdannelser
+    }
 }
 
 class CVPeriode(
+    @JsonDeserialize(using = YearMonthDeserializerWithDayOne::class)
     val fraTidspunkt: LocalDate?,
-    val tilTidspunkt: Long?
+    @JsonDeserialize(using = YearMonthDeserializerWithDayOne::class)
+    val tilTidspunkt: LocalDate?
 ) {
     fun tilAktivPeriode() = AktivPeriode(
         fraTidspunkt ?: LocalDate.MIN,
-        safeToLocalDate(tilTidspunkt) ?: LocalDate.MAX
+        tilTidspunkt?: LocalDate.MAX
     )
+
+    fun tilArbeidsmarkedJson() = """{
+            "fraTidspunkt": ${fraTidspunkt?.format(ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"},
+            "tilTidspunkt": ${tilTidspunkt?.format(ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"}
+          }
+    """.trimIndent()
 }
 
+class YearMonthDeserializerWithDayOne : FromStringDeserializer<LocalDate?>(LocalDate::class.java) {
+    override fun _deserialize(value: String?, ctxt: DeserializationContext?): LocalDate? {
+        if (value == null) {
+            return null
+        }
+        return LocalDate.parse("$value-01") // Bruk alltid 1. i måneden
+    }
+}
 
 private fun inaktivePerioderEtterEnVissAlder(
     perioder: List<InaktivPeriode>,
     foedselsdato: LocalDate
 ): List<InaktivPeriode> {
-    val startdatoForVideregåendePlussEttÅr = LocalDate.of(foedselsdato.year + 17, 9, 1)
+    val startdatoForVideregåendePlussEttÅr = LocalDate.of(foedselsdato.year + 17, 8, 31)
 
     return perioder.filter { p ->
         p.sisteDag.isAfterOrEqual(startdatoForVideregåendePlussEttÅr)

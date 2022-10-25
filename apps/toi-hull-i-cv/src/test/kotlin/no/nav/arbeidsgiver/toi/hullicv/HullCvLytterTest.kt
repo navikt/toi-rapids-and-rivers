@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -9,22 +10,22 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 class HullCvLytterTest {
+
+    val nowWithDayOne = LocalDate.now().withDayOfMonth(1)
 
     @Test
     fun `legg på et eller annet svar om første behov er hullICv`() {
         val testRapid = TestRapid()
         startApp(testRapid)
 
+        val melding = behovsMelding(
+            behovListe = """["hullICv"]""",
+            fødselsDato = LocalDate.now().minusYears(30)
+        )
         testRapid.sendTestMessage(
-            behovsMelding(
-                behovListe = """["hullICv"]""",
-                fødselsDato = LocalDate.now().minusYears(30)
-            )
+            melding
         )
 
         val inspektør = testRapid.inspektør
@@ -110,7 +111,7 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedÉnPågåendeYrkeserfaring() {
-        val startdato = LocalDate.now().minusYears(10)
+        val startdato = nowWithDayOne.minusYears(10)
         val melding = lagBehovmeldingMedErfaring(arbeidserfaring = listOf(CVPeriode(startdato, null)))
         assertThat(melding.sluttdatoerForInaktivePerioder)
             .containsExactly(startdato.minusDays(1))
@@ -119,13 +120,13 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedÉnAvsluttetYrkeserfaring() {
-        val startdatoForErfaring = LocalDate.now().minusYears(10)
-        val sluttdatoForErfaring = LocalDate.now().minusYears(1)
+        val startdatoForErfaring = nowWithDayOne.minusYears(10)
+        val sluttdatoForErfaring = nowWithDayOne.minusYears(1)
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
                 CVPeriode(
                     startdatoForErfaring,
-                    localDateTilEpochMS(sluttdatoForErfaring)
+                    sluttdatoForErfaring
                 )
             )
         )
@@ -138,15 +139,15 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedOverlappendeYrkeserfaring() {
-        val tidligsteStartdato = LocalDate.now().minusYears(10)
-        val tidligsteSluttdato = LocalDate.now().minusYears(3)
-        val senesteStartdato = LocalDate.now().minusYears(9)
-        val senesteSluttdato = LocalDate.now().minusYears(1)
+        val tidligsteStartdato = nowWithDayOne.minusYears(10)
+        val tidligsteSluttdato = nowWithDayOne.minusYears(3)
+        val senesteStartdato = nowWithDayOne.minusYears(9)
+        val senesteSluttdato = nowWithDayOne.minusYears(1)
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(tidligsteStartdato, localDateTilEpochMS(tidligsteSluttdato)),
-                CVPeriode(senesteStartdato, localDateTilEpochMS(senesteSluttdato)),
+                CVPeriode(tidligsteStartdato, tidligsteSluttdato),
+                CVPeriode(senesteStartdato, senesteSluttdato),
             )
         )
 
@@ -158,10 +159,10 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedÉnAvsluttetUtdanningOgIkkeIAktivitetNå() {
-        val startdato = LocalDate.now().minusYears(6)
-        val sluttdato = LocalDate.now().minusYears(3)
+        val startdato = nowWithDayOne.minusYears(6)
+        val sluttdato = nowWithDayOne.minusYears(3)
         val melding =
-            lagBehovmeldingMedErfaring(utdannelse = listOf(CVPeriode(startdato, localDateTilEpochMS(sluttdato))))
+            lagBehovmeldingMedErfaring(utdannelse = listOf(CVPeriode(startdato, sluttdato)))
 
         assertThat(melding.sluttdatoerForInaktivePerioder)
             .containsExactly(startdato.minusDays(1))
@@ -171,11 +172,11 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedHullIMidten() {
-        val startdato1 = LocalDate.now().minusYears(10)
-        val sluttdato1 = localDateTilEpochMS(LocalDate.now().minusYears(7))
-        val startdato2 = LocalDate.now().minusYears(4)
-        val sluttDatoAsLocalDate = LocalDate.now().minusYears(1)
-        val sluttdato2 = sluttDatoAsLocalDate.toEpochSecond(LocalTime.of(0, 0, 0), ZoneOffset.UTC) * 1000
+        val startdato1 = nowWithDayOne.minusYears(10)
+        val sluttdato1 = nowWithDayOne.minusYears(7)
+        val startdato2 = nowWithDayOne.minusYears(4)
+        val sluttDatoAsLocalDate = nowWithDayOne.minusYears(1)
+        val sluttdato2 = sluttDatoAsLocalDate
         val erfaring = CVPeriode(startdato1, sluttdato1)
         val utdannelse = CVPeriode(startdato2, sluttdato2)
         val melding = lagBehovmeldingMedErfaring(
@@ -192,13 +193,13 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedHullIMidtenMindreEnnToÅr() {
-        val startdato1 = LocalDate.now().minusYears(10)
-        val sluttdato1 = LocalDate.now().minusYears(7)
-        val startdato2 = LocalDate.now().minusYears(5).minusDays(1)
-        val sluttdato2 = LocalDate.now().minusYears(1)
+        val startdato1 = nowWithDayOne.minusYears(10)
+        val sluttdato1 = nowWithDayOne.minusYears(7)
+        val startdato2 = nowWithDayOne.minusYears(5).minusDays(1)
+        val sluttdato2 = nowWithDayOne.minusYears(1)
         val melding = lagBehovmeldingMedErfaring(
-            arbeidserfaring = listOf(CVPeriode(startdato1, localDateTilEpochMS(sluttdato1))),
-            utdannelse = listOf(CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)))
+            arbeidserfaring = listOf(CVPeriode(startdato1, sluttdato1)),
+            utdannelse = listOf(CVPeriode(startdato2, sluttdato2))
         )
         assertThat(melding.sluttdatoerForInaktivePerioder).containsExactly(startdato1.minusDays(1))
         assertThat(melding.førsteDagIInneværendeInaktivePeriode)
@@ -207,18 +208,18 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedToHullIMidten() {
-        val startdato1 = LocalDate.now().minusYears(16)
-        val sluttdato1 = LocalDate.now().minusYears(13)
-        val startdato2 = LocalDate.now().minusYears(10)
-        val sluttdato2 = LocalDate.now().minusYears(7)
-        val startdato3 = LocalDate.now().minusYears(4)
-        val sluttdato3 = LocalDate.now().minusYears(1)
+        val startdato1 = nowWithDayOne.minusYears(16)
+        val sluttdato1 = nowWithDayOne.minusYears(13)
+        val startdato2 = nowWithDayOne.minusYears(10)
+        val sluttdato2 = nowWithDayOne.minusYears(7)
+        val startdato3 = nowWithDayOne.minusYears(4)
+        val sluttdato3 = nowWithDayOne.minusYears(1)
 
         val melding = lagBehovmeldingMedErfaring(
-            arbeidserfaring = listOf(CVPeriode(startdato1, localDateTilEpochMS(sluttdato1))),
+            arbeidserfaring = listOf(CVPeriode(startdato1, sluttdato1)),
             utdannelse = listOf(
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
-                CVPeriode(startdato3, localDateTilEpochMS(sluttdato3)),
+                CVPeriode(startdato2, sluttdato2),
+                CVPeriode(startdato3, sluttdato3),
             ),
         )
 
@@ -229,15 +230,15 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedEnYrkeserfaringSomOmslutterEnAnnenYrkeserfaring() {
-        val startdato1 = LocalDate.now().minusYears(15)
-        val sluttdato1 = LocalDate.now().minusYears(2)
-        val startdato2 = LocalDate.now().minusYears(14)
-        val sluttdato2 = LocalDate.now().minusYears(4)
+        val startdato1 = nowWithDayOne.minusYears(15)
+        val sluttdato1 = nowWithDayOne.minusYears(2)
+        val startdato2 = nowWithDayOne.minusYears(14)
+        val sluttdato2 = nowWithDayOne.minusYears(4)
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
+                CVPeriode(startdato1, sluttdato1),
+                CVPeriode(startdato2, sluttdato2),
             ),
         )
         assertThat(melding.sluttdatoerForInaktivePerioder).containsExactly(startdato1.minusDays(1))
@@ -246,22 +247,22 @@ class HullCvLytterTest {
 
     @Test
     fun cvMedToYrkeserfaringerSomStarterSamtidigMenAvsluttesPåUlikDato() {
-        val startdato1 = LocalDate.now().minusYears(10)
-        val sluttdato1 = LocalDate.now().minusYears(2)
-        val startdato2 = LocalDate.now().minusYears(10)
-        val sluttdato2 = LocalDate.now().minusYears(8)
+        val startdato1 = nowWithDayOne.minusYears(10)
+        val sluttdato1 = nowWithDayOne.minusYears(2)
+        val startdato2 = nowWithDayOne.minusYears(10)
+        val sluttdato2 = nowWithDayOne.minusYears(8)
 
         val meldingLengsteErfaringFørst = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
+                CVPeriode(startdato1, sluttdato1),
+                CVPeriode(startdato2, sluttdato2),
             ),
         )
 
         val meldingKortesteErfaringFørst = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1))
+                CVPeriode(startdato2, sluttdato2),
+                CVPeriode(startdato1, sluttdato1)
             ),
         )
 
@@ -272,15 +273,15 @@ class HullCvLytterTest {
 
     @Test
     fun harHattJobbTidligereOgHarEnPågåendeJobb() {
-        val startdato1 = LocalDate.now().minusYears(10)
-        val sluttdato1 = LocalDate.now().minusYears(6)
-        val startdato2 = LocalDate.now().minusYears(2)
+        val startdato1 = nowWithDayOne.minusYears(10)
+        val sluttdato1 = nowWithDayOne.minusYears(6)
+        val startdato2 = nowWithDayOne.minusYears(2)
         val sluttdato2: LocalDate? = null
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
+                CVPeriode(startdato1, sluttdato1),
+                CVPeriode(startdato2, sluttdato2),
             ),
         )
 
@@ -291,16 +292,16 @@ class HullCvLytterTest {
 
     @Test
     fun flereYrkeserfaringerSomStarterPåUlikDatoOgSlutterPåSammeDato() {
-        val sammeSluttdato = LocalDate.now().minusYears(4)
-        val startdato1 = LocalDate.now().minusYears(10)
-        val startdato2 = LocalDate.now().minusYears(9)
-        val startdato3 = LocalDate.now().minusYears(8)
+        val sammeSluttdato = nowWithDayOne.minusYears(4)
+        val startdato1 = nowWithDayOne.minusYears(10)
+        val startdato2 = nowWithDayOne.minusYears(9)
+        val startdato3 = nowWithDayOne.minusYears(8)
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sammeSluttdato)),
-                CVPeriode(startdato2, localDateTilEpochMS(sammeSluttdato)),
-                CVPeriode(startdato3, localDateTilEpochMS(sammeSluttdato)),
+                CVPeriode(startdato1, sammeSluttdato),
+                CVPeriode(startdato2, sammeSluttdato),
+                CVPeriode(startdato3, sammeSluttdato),
             ),
         )
 
@@ -310,18 +311,18 @@ class HullCvLytterTest {
 
     @Test
     fun ignorerPerioderSomStarterEtterEnPeriodeUtenSluttdato() {
-        val startdato1 = LocalDate.now().minusYears(10)
-        val sluttdato1 = LocalDate.now().minusYears(8)
-        val startdato2 = LocalDate.now().minusYears(5)
+        val startdato1 = nowWithDayOne.minusYears(10)
+        val sluttdato1 = nowWithDayOne.minusYears(8)
+        val startdato2 = nowWithDayOne.minusYears(5)
         val sluttdato2: LocalDate? = null
-        val startdato3 = LocalDate.now().minusYears(3)
-        val sluttdato3 = LocalDate.now().minusYears(2)
+        val startdato3 = nowWithDayOne.minusYears(3)
+        val sluttdato3 = nowWithDayOne.minusYears(2)
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
-                CVPeriode(startdato3, localDateTilEpochMS(sluttdato3)),
+                CVPeriode(startdato1, sluttdato1),
+                CVPeriode(startdato2, sluttdato2),
+                CVPeriode(startdato3, sluttdato3),
             ),
         )
 
@@ -332,21 +333,21 @@ class HullCvLytterTest {
 
     @Test
     fun rekkefølgeSpillerIngenRolleForToYrkeserfaringerSomStarterSamtidigDenEneUtenSluttdato() {
-        val startdato1 = LocalDate.now().minusYears(5)
-        val sluttdato1 = LocalDate.now().minusYears(2)
+        val startdato1 = nowWithDayOne.minusYears(5)
+        val sluttdato1 = nowWithDayOne.minusYears(2)
         val sluttdatoTom: LocalDate? = null
 
         val meldingTomSluttdatoSist = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdatoTom)),
+                CVPeriode(startdato1, sluttdato1),
+                CVPeriode(startdato1, sluttdatoTom),
             ),
         )
 
         val meldingTomSluttdatoFørst = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdatoTom)),
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
+                CVPeriode(startdato1, sluttdatoTom),
+                CVPeriode(startdato1, sluttdato1),
             ),
         )
 
@@ -362,7 +363,7 @@ class HullCvLytterTest {
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
+                CVPeriode(startdato1, sluttdato1),
             ),
         )
 
@@ -373,11 +374,11 @@ class HullCvLytterTest {
     @Test
     fun enAvsluttetErfaringUtenStartdato() {
         val startdato1: LocalDate? = null
-        val sluttdato1 = LocalDate.now().minusYears(3)
+        val sluttdato1 = nowWithDayOne.minusYears(3)
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
+                CVPeriode(startdato1, sluttdato1),
             ),
         )
         assertThat(melding.sluttdatoerForInaktivePerioder).isEmpty()
@@ -387,18 +388,18 @@ class HullCvLytterTest {
 
     @Test
     fun flereYrkeserfaringerDerEnErUtenStartdato() {
-        val startdato1 = LocalDate.now().minusYears(11)
-        val sluttdato1 = LocalDate.now().minusYears(9)
+        val startdato1 = nowWithDayOne.minusYears(11)
+        val sluttdato1 = nowWithDayOne.minusYears(9)
         val startdato2: LocalDate? = null
-        val sluttdato2 = LocalDate.now().minusYears(5)
-        val startdato3 = LocalDate.now().minusYears(2)
-        val sluttdato3 = LocalDate.now().minusYears(1)
+        val sluttdato2 = nowWithDayOne.minusYears(5)
+        val startdato3 = nowWithDayOne.minusYears(2)
+        val sluttdato3 = nowWithDayOne.minusYears(1)
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = listOf(
-                CVPeriode(startdato1, localDateTilEpochMS(sluttdato1)),
-                CVPeriode(startdato2, localDateTilEpochMS(sluttdato2)),
-                CVPeriode(startdato3, localDateTilEpochMS(sluttdato3)),
+                CVPeriode(startdato1, sluttdato1),
+                CVPeriode(startdato2, sluttdato2),
+                CVPeriode(startdato3, sluttdato3),
             ),
         )
 
@@ -409,33 +410,33 @@ class HullCvLytterTest {
     @Test
     fun spesiellPerson() {
         val yrkeserfaringer = listOf(
-            "2017-10-31" to "2021-04-30",
-            "2016-01-31" to "2017-10-31",
-            "2009-07-31" to "2012-12-31",
-            "2009-01-31" to "2014-03-31",
-            "2006-10-31" to "2016-01-31",
-            "2004-05-31" to "2006-11-30",
-            "2003-06-30" to "2004-05-31",
-            "2001-12-31" to "2003-06-30",
-            "1999-04-30" to "2000-11-30"
+            "2017-10-01" to "2021-04-01",
+            "2016-01-01" to "2017-10-01",
+            "2009-07-01" to "2012-12-01",
+            "2009-01-01" to "2014-03-01",
+            "2006-10-01" to "2016-01-01",
+            "2004-05-01" to "2006-11-01",
+            "2003-06-01" to "2004-05-01",
+            "2001-12-01" to "2003-06-01",
+            "1999-04-01" to "2000-11-01"
         ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
-            .map { CVPeriode(it.first,localDateTilEpochMS(it.second)) }
+            .map { CVPeriode(it.first,it.second) }
         val utdanninger = listOf(
-            "2013-07-31" to "2014-05-31",
-            "1999-07-31" to "2000-05-31",
-            "1995-07-31" to "1998-05-31",
-            "1985-07-31" to "1995-05-31"
+            "2013-07-01" to "2014-05-01",
+            "1999-07-01" to "2000-05-01",
+            "1995-07-01" to "1998-05-01",
+            "1985-07-01" to "1995-05-01"
         ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
-            .map { CVPeriode(it.first,localDateTilEpochMS(it.second)) }
+            .map { CVPeriode(it.first,it.second) }
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = yrkeserfaringer,
             utdannelse = utdanninger,
-            fødselsDato = LocalDate.of(1984,3,16)
+            fødselsDato = LocalDate.of(1984,2,16)
         )
 
         assertThat(melding.sluttdatoerForInaktivePerioder).isEmpty()
-        assertThat(melding.førsteDagIInneværendeInaktivePeriode).isEqualTo(LocalDate.of(2021,5,1))
+        assertThat(melding.førsteDagIInneværendeInaktivePeriode).isEqualTo(LocalDate.of(2021,4,2))
     }
 
     @Test
@@ -446,7 +447,7 @@ class HullCvLytterTest {
 
         val melding = lagBehovmeldingMedErfaring(
             utdannelse = listOf(
-                CVPeriode(aktivFraOgMed, localDateTilEpochMS(aktivTilOgMed)),
+                CVPeriode(aktivFraOgMed, aktivTilOgMed),
             ),
             fødselsDato = fødselsdato
         )
@@ -464,8 +465,8 @@ class HullCvLytterTest {
 
         val melding = lagBehovmeldingMedErfaring(
             utdannelse = listOf(
-                CVPeriode(aktivFraOgMed1, localDateTilEpochMS(aktivTilOgMed1)),
-                CVPeriode(aktivFraOgMed2, localDateTilEpochMS(aktivTilOgMed2)),
+                CVPeriode(aktivFraOgMed1, aktivTilOgMed1),
+                CVPeriode(aktivFraOgMed2, aktivTilOgMed2),
             ),
             fødselsDato = fødselsdato
         )
@@ -477,12 +478,12 @@ class HullCvLytterTest {
     @Test
     fun skalIgnorereAvsluttetInaktivitetOppTilEnVissAlder_gittAktivperiodeSlutterEtterDenVisseAlderen() {
         val fødselsdato = LocalDate.of(1989, 6, 20)
-        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 9, 1)
-        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 15)
+        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 8, 1)
+        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 1)
 
         val melding = lagBehovmeldingMedErfaring(
             utdannelse = listOf(
-                CVPeriode(aktivFraOgMed, localDateTilEpochMS(aktivTilOgMed))
+                CVPeriode(aktivFraOgMed, aktivTilOgMed)
             ),
             fødselsDato = fødselsdato
         )
@@ -494,12 +495,12 @@ class HullCvLytterTest {
     fun skalIkkeIgnorereAvsluttetInaktivitetEtterEnVissAlder() {
         val fødselsdato = LocalDate.of(1989, 6, 20)
 
-        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 9, 2)
-        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 15)
+        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 9, 1)
+        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 1)
 
         val melding = lagBehovmeldingMedErfaring(
             utdannelse = listOf(
-                CVPeriode(aktivFraOgMed, localDateTilEpochMS(aktivTilOgMed))
+                CVPeriode(aktivFraOgMed, aktivTilOgMed)
             ),
             fødselsDato = fødselsdato
         )
@@ -539,11 +540,11 @@ class HullCvLytterTest {
         {
             "aktørId":"123",
             "@behov":$behovListe,
-            "cv": {
+            "arbeidsmarkedCv": {
                 "opprettCv": {
                     "cv": {
-                        "utdannelse": ${utdannelse.tilJsonString()},
-                        "arbeidserfaring": ${arbeidserfaring.tilJsonString()},
+                        "utdannelse": ${utdannelse.map { it.tilArbeidsmarkedJson()}.joinToString(",", "[", "]")},
+                        "arbeidserfaring": ${arbeidserfaring.map { it.tilArbeidsmarkedJson()}.joinToString(",", "[", "]")},
                         "foedselsdato": ${fødselsDato.tilIntList().tilJsonString()}
                     }
                 }
@@ -566,15 +567,5 @@ class HullCvLytterTest {
             if (it.isNull) null else it.asLocalDate()
         }
 
-    fun localDateTilEpochMS(dato: LocalDate?): Long? {
-        return if (dato == null) {
-            null
-        } else LocalDate.of(dato.year, dato.month, dato.dayOfMonth).atTime(0, 0).atZone(ZoneId.systemDefault())
-            .toInstant().toEpochMilli()
-    }
-
     private fun LocalDate.tilIntList() = listOf(year, monthValue, dayOfMonth)
-
 }
-
-
