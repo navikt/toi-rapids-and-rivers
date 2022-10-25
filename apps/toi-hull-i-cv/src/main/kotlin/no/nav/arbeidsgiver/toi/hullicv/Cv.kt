@@ -70,7 +70,7 @@ private fun inaktivePerioderEtterEnVissAlder(
     perioder: List<InaktivPeriode>,
     foedselsdato: LocalDate
 ): List<InaktivPeriode> {
-    val startdatoForVideregåendePlussEttÅr = LocalDate.of(foedselsdato.year + 17, 9, 1)
+    val startdatoForVideregåendePlussEttÅr = LocalDate.of(foedselsdato.year + 17, 8, 31)
 
     return perioder.filter { p ->
         p.sisteDag.isAfterOrEqual(startdatoForVideregåendePlussEttÅr)

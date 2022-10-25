@@ -410,33 +410,33 @@ class HullCvLytterTest {
     @Test
     fun spesiellPerson() {
         val yrkeserfaringer = listOf(
-            "2017-10-31" to "2021-04-30",
-            "2016-01-31" to "2017-10-31",
-            "2009-07-31" to "2012-12-31",
-            "2009-01-31" to "2014-03-31",
-            "2006-10-31" to "2016-01-31",
-            "2004-05-31" to "2006-11-30",
-            "2003-06-30" to "2004-05-31",
-            "2001-12-31" to "2003-06-30",
-            "1999-04-30" to "2000-11-30"
+            "2017-10-01" to "2021-04-01",
+            "2016-01-01" to "2017-10-01",
+            "2009-07-01" to "2012-12-01",
+            "2009-01-01" to "2014-03-01",
+            "2006-10-01" to "2016-01-01",
+            "2004-05-01" to "2006-11-01",
+            "2003-06-01" to "2004-05-01",
+            "2001-12-01" to "2003-06-01",
+            "1999-04-01" to "2000-11-01"
         ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
             .map { CVPeriode(it.first,it.second) }
         val utdanninger = listOf(
-            "2013-07-31" to "2014-05-31",
-            "1999-07-31" to "2000-05-31",
-            "1995-07-31" to "1998-05-31",
-            "1985-07-31" to "1995-05-31"
+            "2013-07-01" to "2014-05-01",
+            "1999-07-01" to "2000-05-01",
+            "1995-07-01" to "1998-05-01",
+            "1985-07-01" to "1995-05-01"
         ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
             .map { CVPeriode(it.first,it.second) }
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = yrkeserfaringer,
             utdannelse = utdanninger,
-            fødselsDato = LocalDate.of(1984,3,16)
+            fødselsDato = LocalDate.of(1984,2,16)
         )
 
         assertThat(melding.sluttdatoerForInaktivePerioder).isEmpty()
-        assertThat(melding.førsteDagIInneværendeInaktivePeriode).isEqualTo(LocalDate.of(2021,5,1))
+        assertThat(melding.førsteDagIInneværendeInaktivePeriode).isEqualTo(LocalDate.of(2021,4,2))
     }
 
     @Test
@@ -478,8 +478,8 @@ class HullCvLytterTest {
     @Test
     fun skalIgnorereAvsluttetInaktivitetOppTilEnVissAlder_gittAktivperiodeSlutterEtterDenVisseAlderen() {
         val fødselsdato = LocalDate.of(1989, 6, 20)
-        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 9, 1)
-        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 15)
+        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 8, 1)
+        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 1)
 
         val melding = lagBehovmeldingMedErfaring(
             utdannelse = listOf(
@@ -495,8 +495,8 @@ class HullCvLytterTest {
     fun skalIkkeIgnorereAvsluttetInaktivitetEtterEnVissAlder() {
         val fødselsdato = LocalDate.of(1989, 6, 20)
 
-        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 9, 2)
-        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 15)
+        val aktivFraOgMed = LocalDate.of(fødselsdato.year + 17, 9, 1)
+        val aktivTilOgMed = LocalDate.of(aktivFraOgMed.year + 3, 6, 1)
 
         val melding = lagBehovmeldingMedErfaring(
             utdannelse = listOf(
