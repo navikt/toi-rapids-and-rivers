@@ -1,24 +1,23 @@
 package no.nav.arbeidsgiver.toi
 
 import com.github.kittinunf.fuel.Fuel
-import io.javalin.Javalin
-import no.nav.arbeidsgiver.toi.api.Tilretteleggingsbehov
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class TilretteleggingsbehovTest {
 
-    private val javalinPort = 9000
-    private val javalin = Javalin.create().start(javalinPort)
-    private val tilretteleggingsbehovUrl = "http://localhost:$javalinPort/tilretteleggingsbehov"
+    private val tilretteleggingsbehovUrl = "http://localhost:9000/tilretteleggingsbehov"
+    private val testRapid = TestRapid()
 
+    @BeforeAll
+    fun beforeAll() {
+        startApp(testRapid, TestUtils.dataSource)
+    }
 
     @Test
     fun `Skal kunne lagre tilretteleggingsbehov`() {
-        var resultat: Tilretteleggingsbehov? = null
-        //tilretteleggingsbehovController(javalinTestInstans, {})
-
-        val inputDto = tilretteleggingsbehovInputJson()
         val (request, response, result) = Fuel.put(tilretteleggingsbehovUrl)
             .body(tilretteleggingsbehovInputJson())
             .response()

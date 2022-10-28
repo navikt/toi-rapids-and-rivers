@@ -8,14 +8,19 @@ import no.nav.arbeidsgiver.toi.api.hentTilretteleggingsbehov
 import no.nav.arbeidsgiver.toi.api.lagre
 import no.nav.arbeidsgiver.toi.api.tilretteleggingsbehovController
 import no.nav.helse.rapids_rivers.RapidApplication
+import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import javax.sql.DataSource
 
 fun main() {
     val envs = System.getenv()
+    val rapid = RapidApplication.create(envs)
+    startApp(rapid, lagDatasource(envs))
+}
 
+fun startApp(rapid: RapidsConnection, dataSource: DataSource) {
     // TODO: Sjekk toi-sammenstiller for å unngå kollisjon med Ktor
-    val dataSource = lagDatasource(System.getenv())
     val javalin = Javalin.create().start(9000)
 
     tilretteleggingsbehovController(
@@ -26,9 +31,8 @@ fun main() {
         sendPåKafka = ::sendPåKafka
     )
 
-    RapidApplication.create(envs).apply {
-        KandidatEndretLytter(this)
-    }.start()
+    KandidatEndretLytter(rapid)
+    rapid.start()
 }
 
 private fun lagDatasource(env: Map<String, String>): HikariDataSource {
@@ -51,8 +55,13 @@ private fun lagDatasource(env: Map<String, String>): HikariDataSource {
     }.let(::HikariDataSource)
 }
 
-private fun republiserAlleKandidater() {}
-private fun sendPåKafka(tilretteleggingsbehov: Tilretteleggingsbehov) {}
+private fun republiserAlleKandidater() {
+    TODO("Legg et annet sted")
+}
+
+private fun sendPåKafka(tilretteleggingsbehov: Tilretteleggingsbehov) {
+    TODO("Legg et annet sted")
+}
 
 private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
 
