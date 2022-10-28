@@ -8,7 +8,7 @@ typealias Fødselsnummer = String
 
 val hentSynlighetForKandidater: (HentEvalueringForKandidater) -> (Context) -> Unit = { hentEvalueringForKandidater ->
     { context ->
-        val kandidater: List<Fødselsnummer> = context.bodyAsClass()
+        val kandidater: List<Fødselsnummer> = context.bodyAsClass<List<Fødselsnummer>>(List::class.java)
         val synlighetForKandidater: Map<Fødselsnummer, Boolean> = hentEvalueringForKandidater(kandidater)
             .mapValues {
                 it.value.erSynlig()
