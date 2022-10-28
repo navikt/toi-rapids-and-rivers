@@ -7,5 +7,5 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:2021.11.29-21.57.443e21ff5a6c")
+    implementation("com.github.navikt:rapids-and-rivers:2022100711511665136276.49acbaae4ed4")
 }

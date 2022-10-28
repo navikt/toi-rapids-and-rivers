@@ -25,7 +25,10 @@ class Siste14aVedtakTest {
             "@event_name",
             "aktørId",
             "siste14avedtak",
-            "system_read_count"
+            "system_read_count",
+            "@id",
+            "@opprettet",
+            "system_participating_services"
         )
 
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("siste14avedtak")

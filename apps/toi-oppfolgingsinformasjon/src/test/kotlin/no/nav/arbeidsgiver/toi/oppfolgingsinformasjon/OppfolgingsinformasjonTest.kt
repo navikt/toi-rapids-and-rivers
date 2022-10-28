@@ -25,7 +25,10 @@ class OppfolgingsinformasjonTest {
             "@event_name",
             "oppfølgingsinformasjon",
             "fodselsnummer",
-            "system_read_count"
+            "system_read_count",
+            "@id",
+            "@opprettet",
+            "system_participating_services"
         )
 
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")

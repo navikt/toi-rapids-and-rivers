@@ -25,7 +25,10 @@ class HjemmelTest {
             "@event_name",
             "hjemmel",
             "aktørId",
-            "system_read_count"
+            "system_read_count",
+            "@id",
+            "@opprettet",
+            "system_participating_services"
         )
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("hjemmel")
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)

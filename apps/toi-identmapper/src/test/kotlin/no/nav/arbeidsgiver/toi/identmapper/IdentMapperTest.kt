@@ -27,7 +27,10 @@ class IdentMapperTest {
             "etAnnetFelt",
             "etObjekt",
             "@event_name",
-            "system_read_count"
+            "system_read_count",
+            "@id",
+            "@opprettet",
+            "system_participating_services"
         )
 
         assertThat(meldingPåRapid.get(fødselsnummerKey).asText()).isEqualTo(fødselsnummer)

@@ -1,12 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import no.nav.arbeid.cv.avro.Cv
-import no.nav.arbeid.cv.avro.Foererkort
-import no.nav.arbeid.cv.avro.FoererkortKlasse
-import no.nav.arbeid.cv.avro.Melding
-import no.nav.arbeid.cv.avro.OpprettCv
+import no.nav.arbeid.cv.avro.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
@@ -41,7 +35,10 @@ class CvLytterTest {
             "@event_name",
             "arbeidsmarkedCv",
             "aktørId",
-            "system_read_count"
+            "system_read_count",
+            "@id",
+            "@opprettet",
+            "system_participating_services"
         )
 
         Assertions.assertThat(meldingJson.get("aktørId")).isNotNull

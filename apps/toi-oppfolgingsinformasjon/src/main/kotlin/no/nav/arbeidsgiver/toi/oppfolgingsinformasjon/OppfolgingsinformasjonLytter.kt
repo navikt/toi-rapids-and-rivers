@@ -36,7 +36,7 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
+        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
         jsonNode.remove(metadataFelter)
         return jsonNode
     }
