@@ -17,9 +17,13 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
 tasks {
     withType<Wrapper> {
-        gradleVersion = "7.2"
+        gradleVersion = "7.5.1"
     }
 
     withType<KotlinCompile> {
