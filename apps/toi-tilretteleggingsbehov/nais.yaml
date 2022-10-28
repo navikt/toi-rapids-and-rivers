@@ -36,6 +36,13 @@ spec:
   azure:
     application:
       enabled: true
+#  gcp:
+#    sqlInstances:
+#      - type: POSTGRES_12
+#        tier: { { gcp_db_tier } }
+#        diskAutoresize: { { gcp_disk_autoresize } }
+#        databases:
+#          - name: tilretteleggingsbehov-db
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
