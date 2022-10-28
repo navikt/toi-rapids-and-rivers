@@ -6,7 +6,6 @@ on:
     paths:
       - .github/workflows/snyk.yaml
       - buildSrc/**
-      - buildSrc/src/main/kotlin/**
 
 jobs:
   snyk-monitor-buildSrc:
@@ -22,28 +21,3 @@ jobs:
           command: monitor
           args: --org=toi --file=buildSrc/build.gradle.kts --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
 
-  snyk-monitor-toi-common:
-    name: Monitor dependencies in toi-common with Snyk
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/gradle@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: --org=toi --file=buildSrc/src/main/kotlin/toi.common.gradle.kts --project-name="toi.common" --remote-repo-url=https://github.com/${{ github.repository }}.git
-
-  snyk-monitor-toi-rapids-and-rivers:
-    name: Monitor dependencies in toi-rapids-and-rivers with Snyk
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/gradle@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: --org=toi --file=buildSrc/src/main/kotlin/toi.rapids-and-rivers.gradle.kts --project-name="toi.rapids-and-rivers" --remote-repo-url=https://github.com/${{ github.repository }}.git
