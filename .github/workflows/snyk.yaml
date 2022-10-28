@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/snyk.yaml
       - buildSrc/**
+      - buildSrc/src/main/kotlin/**
 
 jobs:
   snyk-monitor-buildSrc:
