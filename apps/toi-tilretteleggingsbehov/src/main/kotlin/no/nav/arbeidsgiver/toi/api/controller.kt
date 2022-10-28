@@ -41,5 +41,3 @@ fun tilretteleggingsbehovController(
         }
     }
 }
-
-typealias Fødselsnummer = String

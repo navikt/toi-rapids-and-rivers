@@ -3,22 +3,22 @@ package no.nav.arbeidsgiver.toi.api
 import java.time.LocalDateTime
 
 data class TilretteleggingsbehovInput(
-    private val fødselsnummer: String,
-    private val arbeidstid: Set<Arbeidstid>,
-    private val fysisk: Set<Fysisk>,
-    private val arbeidshverdagen: Set<Fysisk>,
-    private val utfordringerMedNorsk: Set<UtfordringerMedNorsk>
+    val fnr: Fødselsnummer,
+    val arbeidstid: Set<Arbeidstid>,
+    val fysisk: Set<Fysisk>,
+    val arbeidshverdagen: Set<Arbeidshverdagen>,
+    val utfordringerMedNorsk: Set<UtfordringerMedNorsk>
 )
 
 data class Tilretteleggingsbehov(
-    private val fødselsnummer: String,
+    val fnr: Fødselsnummer,
 //    private val aktørId: String,
-    private val sistEndretAvNavIdent: String,
-    private val sistEndretTidspunkt: LocalDateTime,
-    private val arbeidstid: Set<Arbeidstid>,
-    private val fysisk: Set<Fysisk>,
-    private val arbeidshverdagen: Set<Arbeidshverdagen>,
-    private val utfordringerMedNorsk: Set<UtfordringerMedNorsk>
+    val sistEndretAv: String,
+    val sistEndretTidspunkt: LocalDateTime,
+    val arbeidstid: Set<Arbeidstid>,
+    val fysisk: Set<Fysisk>,
+    val arbeidshverdagen: Set<Arbeidshverdagen>,
+    val utfordringerMedNorsk: Set<UtfordringerMedNorsk>
 )
 
 enum class Arbeidstid {
@@ -56,3 +56,5 @@ enum class UtfordringerMedNorsk {
     REGNING_OG_TALLFORSTÅELSE,
     ANDRE_UTFORDRINGER
 }
+
+typealias Fødselsnummer = String
