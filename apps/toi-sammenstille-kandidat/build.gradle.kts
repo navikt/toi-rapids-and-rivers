@@ -1,9 +1,9 @@
-val postgresVersion = "42.2.18"
-val hikariVersion = "4.0.2"
-val flywayVersion = "7.5.3"
-val h2Version = "1.4.200"
-val logbackVersion = "1.2.3"
-val logstashEncoderVersion = "6.5" // Oppgradering til 6.6 tar inn jackson:2.12.0 som ikke er kompatibel med jackson-versjonen til kafka
+val postgresVersion = "42.5.0"
+val hikariVersion = "5.0.1"
+val flywayVersion = "9.6.0"
+val h2Version = "2.1.214"
+val logbackVersion = "1.4.4"
+val logstashEncoderVersion = "7.2"
 
 
 plugins {
@@ -15,8 +15,8 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("io.javalin:javalin:4.1.1")
+    implementation("io.javalin:javalin:5.1.2")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-    testImplementation("com.github.kittinunf.fuel:fuel:2.2.3")
+    testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
     testImplementation("com.h2database:h2:$h2Version")
 }
