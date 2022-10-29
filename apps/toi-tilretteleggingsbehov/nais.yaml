@@ -7,14 +7,18 @@ metadata:
     team: toi
 spec:
   image: {{ image }}
-  port: 8080
+  port: 8301
+  ingresses:
+    - {{ ingress }}
   liveness:
     path: /isalive
   readiness:
+    port: 8080
     path: /isready
   prometheus:
     enabled: true
     path: /metrics
+    port: "8080"
   replicas:
     min: 1
     max: 1

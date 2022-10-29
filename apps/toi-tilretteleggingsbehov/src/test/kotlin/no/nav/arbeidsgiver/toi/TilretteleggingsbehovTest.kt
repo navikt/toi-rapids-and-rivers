@@ -1,10 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.jackson.responseObject
 import no.nav.arbeidsgiver.toi.api.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +24,7 @@ class TilretteleggingsbehovTest {
 
     @BeforeAll
     fun beforeAll() {
-        startApp(testRapid, TestUtils.dataSource)
+        startApp(testRapid, TestUtils.dataSource, System.getenv())
     }
 
     @Test

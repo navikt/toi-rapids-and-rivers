@@ -5,12 +5,10 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.javalin.Javalin
 import io.javalin.plugin.json.JavalinJackson
-import no.nav.arbeidsgiver.toi.api.Tilretteleggingsbehov
-import no.nav.arbeidsgiver.toi.api.hentTilretteleggingsbehov
-import no.nav.arbeidsgiver.toi.api.lagre
-import no.nav.arbeidsgiver.toi.api.tilretteleggingsbehovController
+import no.nav.arbeidsgiver.toi.api.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.security.token.support.core.configuration.IssuerProperties
 import org.flywaydb.core.Flyway
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -19,17 +17,16 @@ import javax.sql.DataSource
 fun main() {
     val envs = System.getenv()
     val rapid = RapidApplication.create(envs)
-    startApp(rapid, lagDatasource(envs))
+    startApp(rapid, lagDatasource(envs), envs)
 }
 
-fun startApp(rapid: RapidsConnection, dataSource: DataSource) {
+fun startApp(rapid: RapidsConnection, dataSource: DataSource, envs: Map<String, String>) {
     kjørFlyway(dataSource)
 
-    // TODO: Sjekk toi-sammenstiller for å unngå kollisjon med Ktor
     val javalin = Javalin.create { config ->
         config.defaultContentType = "application/json"
-        // config.accessManager(styrTilgang(issuerProperties))
-    }.start(9000)
+        config.accessManager(styrTilgang(envs))
+    }.start(8301)
 
     tilretteleggingsbehovController(
         javalin = javalin,
@@ -76,7 +73,7 @@ private fun republiserAlleKandidater() {
 private fun sendPåKafka(tilretteleggingsbehov: Tilretteleggingsbehov) {
 }
 
-private fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
+fun Map<String, String>.variable(felt: String) = this[felt] ?: throw Exception("$felt er ikke angitt")
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)

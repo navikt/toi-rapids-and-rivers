@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation("com.zaxxer:HikariCP:4.0.2")
     implementation("io.javalin:javalin:4.6.7") // TODO: Øk til seneste
+    implementation("no.nav.security:token-validation-core:1.3.9")
     implementation("org.postgresql:postgresql:42.2.26")
     implementation("org.flywaydb:flyway-core:9.6.0")
     testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
