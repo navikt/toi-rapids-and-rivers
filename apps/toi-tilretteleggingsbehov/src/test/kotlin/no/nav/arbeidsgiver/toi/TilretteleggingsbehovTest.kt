@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.jackson.responseObject
@@ -16,6 +18,11 @@ class TilretteleggingsbehovTest {
 
     private val tilretteleggingsbehovUrl = "http://localhost:9000/tilretteleggingsbehov"
     private val testRapid = TestRapid()
+    private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+    /*
+    Test cases:
+    - hvis ikke kan publisere på Kafka, reverser lagring i database og returner 500
+     */
 
     @BeforeAll
     fun beforeAll() {
@@ -27,8 +34,8 @@ class TilretteleggingsbehovTest {
         val tilretteleggingsbehovInput = tilretteleggingsbehovInput()
 
         val (_, response, result) = Fuel.put(tilretteleggingsbehovUrl)
-            .body(jacksonObjectMapper().writeValueAsString(tilretteleggingsbehovInput))
-            .responseObject<Tilretteleggingsbehov>()
+            .body(objectMapper.writeValueAsString(tilretteleggingsbehovInput))
+            .responseString()
 
         assertThat(response.statusCode).isEqualTo(200)
         val lagreteTilretteleggingsbehov = hentTilretteleggingsbehov(tilretteleggingsbehovInput.fnr, TestUtils.dataSource)!!
@@ -39,7 +46,8 @@ class TilretteleggingsbehovTest {
         assertThat(lagreteTilretteleggingsbehov.arbeidstid).isEqualTo(tilretteleggingsbehovInput.arbeidstid)
         assertThat(lagreteTilretteleggingsbehov.sistEndretTidspunkt).isEqualToIgnoringSeconds(LocalDateTime.now())
         assertThat(lagreteTilretteleggingsbehov.sistEndretAv).isEqualTo("G-DUMMY")
-        val tilretteleggingsbehovIResponsen = result.get()
+
+        val tilretteleggingsbehovIResponsen = objectMapper.readValue(result.get(), Tilretteleggingsbehov::class.java)
         assertThat(lagreteTilretteleggingsbehov).isEqualTo(tilretteleggingsbehovIResponsen)
         TODO("Assert sending på rapid")
     }
