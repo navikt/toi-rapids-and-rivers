@@ -86,3 +86,6 @@ spec:
     - team: toi
       application: presenterte-kandidater-api
       access: readwrite
+    - team: toi
+      aplication: toi-ontologitjeneste
+      access: readwrite

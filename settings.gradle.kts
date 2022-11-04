@@ -17,5 +17,6 @@ include(
     "apps:toi-organisasjonsenhet",
     "apps:toi-tilretteleggingsbehov",
     "apps:toi-helseapp",
-    "apps:toi-hull-i-cv"
+    "apps:toi-hull-i-cv",
+    "apps:toi-ontologitjeneste"
 )
