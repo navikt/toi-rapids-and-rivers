@@ -9,6 +9,9 @@ jobs:
     name: Monitor dependencies in monorepo with Snyk
     runs-on: ubuntu-latest
     steps:
+      - name: Get repository-name
+        run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        shell: bash
       - uses: actions/checkout@master
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/gradle@master
@@ -17,4 +20,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           command: monitor
-          args: --org=toi --all-sub-projects
+          args: --org=toi --all-sub-projects --project-name=${{ env.REPOSITORY_NAME }} --remote-repo-url=${{ env.REPOSITORY_NAME }}
