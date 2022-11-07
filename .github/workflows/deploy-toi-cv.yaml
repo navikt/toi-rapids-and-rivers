@@ -8,6 +8,7 @@ on:
   push:
     branches:
     - main
+    - oppdatere-dependencies
     paths:
     - apps/toi-cv/**
     - .github/workflows/deploy-toi-cv.yaml

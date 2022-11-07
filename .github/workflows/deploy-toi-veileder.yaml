@@ -8,6 +8,7 @@ on:
   push:
     branches:
     - main
+    - oppdatere-dependencies
     paths:
     - apps/toi-veileder/**
     - .github/workflows/deploy-toi-veileder.yaml

@@ -8,7 +8,7 @@ on:
   push:
     branches:
     - main
-    - skru-pa-lytter
+    - oppdatere-dependencies
     paths:
     - apps/toi-arbeidsmarked-cv/**
     - .github/workflows/deploy-toi-arbeidsmarked-cv.yaml

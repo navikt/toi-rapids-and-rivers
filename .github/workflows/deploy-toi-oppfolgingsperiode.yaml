@@ -8,6 +8,7 @@ on:
   push:
     branches:
     - main
+    - oppdatere-dependencies
     paths:
     - apps/toi-oppfolgingsperiode/**
     - .github/workflows/deploy-toi-oppfolgingsperiode.yaml

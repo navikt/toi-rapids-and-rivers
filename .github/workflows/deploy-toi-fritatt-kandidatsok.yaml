@@ -8,6 +8,7 @@ on:
   push:
     branches:
     - main
+    - oppdatere-dependencies
     paths:
     - apps/toi-fritatt-kandidatsok/**
     - .github/workflows/deploy-toi-fritatt-kandidatsok.yaml
