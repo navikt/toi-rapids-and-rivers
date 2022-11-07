@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.helse.rapids_rivers.isMissingOrNull
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
@@ -54,16 +55,18 @@ class KandidatfeedTest {
 
     @Test
     fun `Meldinger der synlighet er ferdig beregnet og har dekte behov skal produsere melding på kandidat-topic`() {
-        val hullJson = """{}"""
+        val tomJson = """{}"""
         val meldingSynlig = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
-            hullICv = hullJson
+            hullICv = tomJson,
+            ontologi = tomJson
         )
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
-            hullICv = hullJson
+            hullICv = tomJson,
+            ontologi = tomJson
         )
 
         val testrapid = TestRapid()
@@ -105,7 +108,7 @@ class KandidatfeedTest {
     @Test
     fun `Informasjon om kandidaten skal sendes videre til kandidat-topic`() {
         val rapidMelding =
-            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}")
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = "{}")
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
@@ -132,6 +135,7 @@ class KandidatfeedTest {
 
         assertThat(resultatJson.get("oppfølgingsinformasjon").get("oppfolgingsenhet").asText()).isEqualTo("1234")
         assertThat(resultatJson.get("organisasjonsenhetsnavn").asText()).isEqualTo("NAV et kontor")
-
+        assertThat(resultatJson.get("hullICv").isMissingOrNull()).isFalse
+        assertThat(resultatJson.get("ontologi").isMissingOrNull()).isFalse
     }
 }

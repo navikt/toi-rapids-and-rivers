@@ -13,7 +13,8 @@ fun rapidMelding(
     synlighetJson: String?,
     behovsListe: List<String>? = null,
     organisasjonsenhetsnavn: String? = null,
-    hullICv: String? = null
+    hullICv: String? = null,
+    ontologi: String? = null
 ): String = """
         {
           "@event_name": "cv.sammenstilt",
@@ -56,6 +57,7 @@ fun rapidMelding(
 }
           ${organisasjonsenhetsnavn?.let { """"organisasjonsenhetsnavn": "$it",""" } ?: ""}
           ${hullICv?.let { """"hullICv": "$it",""" } ?: ""}
+          ${ontologi?.let { """"ontologi": "$it",""" } ?: ""}
           "system_read_count": 1,
           "system_participating_services": [
             {

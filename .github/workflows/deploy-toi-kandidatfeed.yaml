@@ -42,7 +42,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/hull-i-cv-behov'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/legg-til-ontologitjeneste'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
