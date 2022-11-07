@@ -8,6 +8,7 @@ on:
   push:
     branches:
     - main
+    - oppdatere-dependencies
     paths:
     - apps/toi-oppfolgingsperiode/**
     - .github/workflows/deploy-toi-oppfolgingsperiode.yaml
@@ -44,7 +45,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/kul-feature'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/oppdatere-dependencies'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -70,7 +71,7 @@ jobs:
           VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
 
   snyk-monitor:
-    name: Monitor dependencies in ${APP_NAME} with Snyk
+    name: Monitor dependencies with Snyk
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -88,7 +89,7 @@ jobs:
           snyk monitor
           --org=toi
           --file=apps/${APP_NAME}/build.gradle.kts
-          --project-name=${APP_NAME}
+          --project-name=${{ github.repository }}
           --remote-repo-url=https://github.com/${{ github.repository }}.git
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

@@ -28,7 +28,11 @@ class KandidatEndretLytterTest {
             "@event_name",
             "aktørId",
             "tilretteleggingsbehov",
-            "system_read_count"
+            "system_read_count",
+            "@id",
+            "@opprettet",
+            "system_participating_services",
+            "@forårsaket_av"
         )
 
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("tilretteleggingsbehov")

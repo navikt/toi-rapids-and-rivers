@@ -30,7 +30,6 @@ class SammenstillTest {
 
     @BeforeEach
     fun before() {
-        modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
         javalin = Javalin.create().start(9000)
     }
 
@@ -416,22 +415,5 @@ class SammenstillTest {
 
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("system_read_count").asInt()).isEqualTo(2)
-    }
-
-    @Test
-    fun `Sammenstiller legger til seg selv i system_participating_services`() {
-        val testRapid = TestRapid()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(cvMeldingMedSystemParticipatingServices())
-
-        val rapidInspektør = testRapid.inspektør
-        assertThat(rapidInspektør.size).isEqualTo(1)
-
-        val melding = rapidInspektør.message(0)
-
-        val systemParticipationServices = melding.get("system_participating_services").elements().asSequence().toList()
-            .map { it.get("service").asText() }
-        assertThat(systemParticipationServices).hasSize(2).containsExactly("toi-cv", "toi-sammenstiller")
     }
 }
