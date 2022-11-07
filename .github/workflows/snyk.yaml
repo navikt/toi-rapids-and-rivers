@@ -10,20 +10,13 @@ jobs:
     name: Monitor dependencies in monorepo with Snyk
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Java v17.x
-        uses: actions/setup-java@v1
-        with:
-          java-version: '17.x'
-          cache: gradle
-      - name: Install Snyk CLI
-        uses: snyk/actions/setup@master
-      - name: Monitor dependencies with Snyk
-        run: >
-          snyk monitor
-          --org=toi
-          --all-sub-projects
+      - uses: actions/checkout@v2
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/gradle@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          command: monitor
+          args: --org=toi --all-sub-projects
+
