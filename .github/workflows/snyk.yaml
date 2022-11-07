@@ -1,15 +1,14 @@
 name: Snyk monitor
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
     paths:
       - .github/workflows/snyk.yaml
-      - buildSrc/**
 
 jobs:
-  snyk-monitor-buildSrc:
-    name: Monitor dependencies in buildSrc with Snyk
+  snyk-monitor-monorepo:
+    name: Monitor dependencies in monorepo with Snyk
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -17,7 +16,8 @@ jobs:
         uses: snyk/actions/gradle@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           command: monitor
-          args: --org=toi --file=buildSrc/build.gradle.kts --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
+          args: --org=toi --all-sub-projects
 
