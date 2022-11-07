@@ -9,7 +9,7 @@ on:
 
 jobs:
   snyk-monitor-buildSrc:
-    name: Monitor dependencies in buildSrc with Snyk
+    name: Monitor dependencies in buildSrc-folder with Snyk
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
