@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class UferdigKandidatLytterTest {
-    private val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv")
+    private val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi")
 
     @Test
     fun `Melding uten behov-felt skal republiseres med behov`() {
