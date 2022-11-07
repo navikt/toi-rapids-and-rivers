@@ -1,5 +1,12 @@
 name: Snyk monitor
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - test-sub-projects-snyk
+    paths:
+      - .github/workflows/snyk.yaml
+      - buildSrc/**
 
 jobs:
   snyk-monitor-monorepo:
