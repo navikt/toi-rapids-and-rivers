@@ -14,7 +14,7 @@ class OntologiTest {
     @BeforeAll
     fun setup() {
         wireMock.stubFor(
-            get(urlEqualTo("/pam-lokal-ontologi/rest/synonymer/stilling")).willReturn(
+            get(urlEqualTo("/stilling/?stillingstittel=IT-sjef")).willReturn(
                 aResponse().withBody(
                     """
                     {
@@ -42,7 +42,7 @@ class OntologiTest {
             )
         )
         wireMock.stubFor(
-            get(urlEqualTo("/pam-lokal-ontologi/rest/synonymer/kompetanse")).willReturn(
+            get(urlEqualTo("/kompetanse/?kompetansenavn=Sentralbord")).willReturn(
                 aResponse().withBody(
                     """
                     {
@@ -65,6 +65,9 @@ class OntologiTest {
                 )
             )
         )
+        wireMock.stubFor(
+            get(urlEqualTo("/kompetanse/?kompetansenavn=FeilendeKall")).willReturn(aResponse().withStatus(500))
+        )
         wireMock.start()
     }
 
@@ -74,7 +77,7 @@ class OntologiTest {
     }
 
     @Test
-    fun `legg på et eller annet svar om første behov er organisasjonsenhetsnavn`() {
+    fun `legg på et eller annet svar om første behov er ontologi`() {
         val testRapid = TestRapid()
         startApp("http://localhost:8082", testRapid)
 
@@ -86,11 +89,16 @@ class OntologiTest {
     }
 
     @Test
-    fun `ikke legg på svar om andre behov enn organisasjonsenhetsnavn som ikke er løst`() {
+    fun `ikke les melding om melding mangler stillingstittel`() {
         val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        startApp("http://localhost:8082", testRapid)
 
-        testRapid.sendTestMessage(behovsMelding(behovListe = """["noeannet", "organisasjonsenhetsnavn"]"""))
+        testRapid.sendTestMessage("""
+            {
+                "@behov": ["ontologi"],
+                "kompetanse": [],
+            }
+        """.trimIndent())
 
         val inspektør = testRapid.inspektør
 
@@ -98,13 +106,42 @@ class OntologiTest {
     }
 
     @Test
-    fun `legg på svar om behov nummer 2 er organisasjonsenhet, dersom første behov har en løsning`() {
+    fun `ikke les melding om melding mangler kompetanse`() {
         val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        startApp("http://localhost:8082", testRapid)
+
+        testRapid.sendTestMessage("""
+            {
+                "@behov": ["ontologi"],
+                "stillingstittel": []
+            }
+        """.trimIndent())
+
+        val inspektør = testRapid.inspektør
+
+        Assertions.assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `ikke legg på svar om andre behov enn ontologi som ikke er løst`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
+
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["noeannet", "ontologi"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        Assertions.assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `legg på svar om behov nummer 2 er ontologi, dersom første behov har en løsning`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["noeannet", "organisasjonsenhetsnavn"]""",
+                behovListe = """["noeannet", "ontologi"]""",
                 løsninger = listOf("noeannet" to """{"noeannetsvar": 123}""")
             )
         )
@@ -112,15 +149,12 @@ class OntologiTest {
         val inspektør = testRapid.inspektør
 
         Assertions.assertThat(inspektør.size).isEqualTo(1)
-        val melding = inspektør.message(0)
-        Assertions.assertThat(melding["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
-        Assertions.assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
     @Test
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        startApp("http://localhost:8082", testRapid)
 
         testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
 
@@ -132,12 +166,17 @@ class OntologiTest {
     @Test
     fun `ikke legg på svar om svar allerede er lagt på`() {
         val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        startApp("http://localhost:8082", testRapid)
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["organisasjonsenhetsnavn"]""",
-                løsninger = listOf("organisasjonsenhetsnavn" to """"svar"""")
+                behovListe = """["ontologi"]""",
+                løsninger = listOf("ontologi" to """
+                    {
+                        "stillingstitler": {},
+                        "kompetanse": {}
+                    }
+                """.trimIndent())
             )
         )
 
@@ -147,56 +186,57 @@ class OntologiTest {
     }
 
     @Test
-    fun `Legg til korrekt NAV-kontor-navn på populert melding`() {
+    fun `Legg til korrekt stillingstittel-synonymer på populert melding`() {
         val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        startApp("http://localhost:8082", testRapid)
 
-        testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]"""))
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["ontologi"]"""))
 
         val inspektør = testRapid.inspektør
 
         Assertions.assertThat(inspektør.size).isEqualTo(1)
 
-        Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
-    }
-
-    @Test
-    fun `Om Norg2 returnerer 404 med feilmelding skal vi bruke tom streng`() {
-        val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
-
-        testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]""", enhetsNummer = "0404"))
-
-        val inspektør = testRapid.inspektør
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
-        Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("")
-    }
-
-    @Test
-    fun `Om Norg2 returnerer 404 uten feilmelding skal vi stoppe applikasjonen`() {
-        val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
-
-        assertThrows<Exception> {
-            testRapid.sendTestMessage(
-                behovsMelding(
-                    behovListe = """["organisasjonsenhetsnavn"]""",
-                    enhetsNummer = "0405"
-                )
-            )
+        Assertions.assertThat(inspektør.message(0)["ontologi"]["stillingstittel"].toPrettyString()).isEqualToIgnoringWhitespace("""
+        {
+          "IT-sjef" : {
+            "synonymer" : [ "Avdelingsleder IT", "Driftsleder (IT)", "Driftsdirektør (EDB)", "Datasjef", "ICT-Manager", "Information Technology Manager", "Systemsjef", "Driftssjef (EDB/IKT)", "IT-sjef" ],
+            "merGenerell" : [ "Information technology specialist" ]
+           }
         }
+        """.trimIndent())
     }
 
     @Test
-    fun `Dersom vi får noe annet fra Norg2 utenom 200 og 404 skal vi stoppe applikasjonen`() {
+    fun `Legg til korrekt kompetanse-synonymer på populert melding`() {
         val testRapid = TestRapid()
-        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        startApp("http://localhost:8082", testRapid)
+
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["ontologi"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+
+        Assertions.assertThat(inspektør.message(0)["ontologi"]["kompetansenavn"].toPrettyString()).isEqualToIgnoringWhitespace("""
+        { 
+          "Sentralbord" : {
+            "synonymer": [ "Sentralbord" ],
+            "merGenerell": [ "Telefonferdigheter", "Profesjonell fremtreden på telefonen", "Kommunikasjon ferdigheter på telefon", "Kommunisere via telefon", "Betjene telefon" ]
+          }
+        }
+        """.trimIndent())
+    }
+
+    @Test
+    fun `Om ontologien returnerer 500 skal vi stoppe applikasjonen`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
 
         assertThrows<Exception> {
             testRapid.sendTestMessage(
                 behovsMelding(
-                    behovListe = """["organisasjonsenhetsnavn"]""",
-                    enhetsNummer = "0500"
+                    behovListe = """["ontologi"]""",
+                    kompetanser = listOf("FeilendeKall")
                 )
             )
         }
@@ -205,12 +245,14 @@ class OntologiTest {
     private fun behovsMelding(
         behovListe: String,
         kompetanser: List<String> = listOf("Sentralbord"),
-        stillingstitler: List<String> = listOf("Sentralbord")
+        stillingstitler: List<String> = listOf("IT-sjef"),
+        løsninger: List<Pair<String, String>> = emptyList()
     ) = """
         {
             "@behov":$behovListe,
             "kompetanse": [${kompetanser.joinToString { """"$it"""" }}],
             "stillingstittel": [${stillingstitler.joinToString { """"$it"""" }}]
+            ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
         }
     """.trimIndent()
 }
