@@ -1,4 +1,5 @@
-import no.nav.arbeidsgiver.toi.ontologitjeneste.OntologiLytter
+package no.nav.arbeidsgiver.toi.ontologitjeneste
+
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.Logger

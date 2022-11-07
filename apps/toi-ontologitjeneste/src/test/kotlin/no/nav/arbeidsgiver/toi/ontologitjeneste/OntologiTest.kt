@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
-import startApp
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OntologiTest {
