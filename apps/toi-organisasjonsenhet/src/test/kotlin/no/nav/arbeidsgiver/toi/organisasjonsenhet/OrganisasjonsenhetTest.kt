@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.hullicv
+package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
