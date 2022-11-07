@@ -1,3 +1,3 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-ontologitjeneste-rapidconsumer-1
-ontologi_url: https://pam-lokal-ontologi.dev.intern.nav.no/pam-lokal-ontologi/rest/synonymer
+ontologi_url: https://pam-ontologi.dev.intern.nav.no/rest/synonymer
