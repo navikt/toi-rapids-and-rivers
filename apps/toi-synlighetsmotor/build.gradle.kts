@@ -4,10 +4,10 @@ plugins {
 
 dependencies {
     implementation("org.postgresql:postgresql:42.5.0")
-    implementation("org.flywaydb:flyway-core:9.6.0")
+    implementation("org.flywaydb:flyway-core:9.7.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("io.javalin:javalin:5.1.2")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4")
+    implementation("io.javalin:javalin:5.1.3")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
     implementation("no.nav.security:token-validation-core:2.1.7")
 
     testImplementation("no.nav.security:mock-oauth2-server:0.5.6")
