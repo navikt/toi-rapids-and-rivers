@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi.ontologitjeneste
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.jackson.responseObject
-import log
 import no.nav.helse.rapids_rivers.*
 
 class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsConnection) :

@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.hullicv
+package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
