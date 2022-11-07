@@ -17,4 +17,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           command: monitor
-          args: --org=toi --all-sub-projects --remote-repo-url=https://github.com/${{ github.repository }}.git
+          args: --org=toi --all-projects --remote-repo-url=https://github.com/${{ github.repository }}.git
