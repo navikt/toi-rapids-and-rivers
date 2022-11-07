@@ -71,7 +71,7 @@ class EvalueringTest {
 
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json")
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
@@ -105,7 +105,7 @@ class EvalueringTest {
 
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json")
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
             .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
@@ -127,7 +127,7 @@ class EvalueringTest {
 
         Assertions.assertThat(response.statusCode).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json")
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering =
             jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())

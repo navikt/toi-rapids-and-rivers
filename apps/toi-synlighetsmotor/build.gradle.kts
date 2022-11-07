@@ -11,6 +11,6 @@ dependencies {
     implementation("no.nav.security:token-validation-core:2.1.7")
 
     testImplementation("no.nav.security:mock-oauth2-server:0.5.6")
-    testImplementation("com.github.kittinunf.fuel:fuel:2.2.3")
+    testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
     testImplementation("com.h2database:h2:2.1.214")
 }
