@@ -71,7 +71,7 @@ jobs:
           VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
 
   snyk-monitor:
-    name: Monitor dependencies with Snyk
+    name: Monitor dependencies in ${APP_NAME} with Snyk
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
