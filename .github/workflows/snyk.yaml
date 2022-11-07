@@ -20,3 +20,4 @@ jobs:
         with:
           command: monitor
           args: --org=toi --file=buildSrc/build.gradle.kts --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
+
