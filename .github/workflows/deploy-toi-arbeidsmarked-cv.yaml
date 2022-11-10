@@ -90,6 +90,9 @@ jobs:
           --file=apps/${APP_NAME}/build.gradle.kts
           --project-name=${{ github.repository }}
           --remote-repo-url=https://github.com/${{ github.repository }}.git
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Monitor dependencies in buildSrc with Snyk
         run: >
           snyk monitor
