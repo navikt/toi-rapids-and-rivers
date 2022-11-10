@@ -88,6 +88,12 @@ jobs:
           snyk monitor
           --org=toi
           --file=apps/${APP_NAME}/build.gradle.kts
+          --project-name=${{ github.repository }}
+          --remote-repo-url=https://github.com/${{ github.repository }}.git
+      - name: Monitor dependencies in buildSrc with Snyk
+        run: >
+          snyk monitor
+          --org=toi
           --file=buildSrc/build.gradle.kts
           --project-name=${{ github.repository }}
           --remote-repo-url=https://github.com/${{ github.repository }}.git
