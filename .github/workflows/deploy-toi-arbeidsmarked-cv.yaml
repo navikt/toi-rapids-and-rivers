@@ -8,7 +8,7 @@ on:
   push:
     branches:
     - main
-    - skru-pa-lytter
+    - oppdatere-dependencies
     paths:
     - apps/toi-arbeidsmarked-cv/**
     - .github/workflows/deploy-toi-arbeidsmarked-cv.yaml
@@ -44,7 +44,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/skru-pa-lytter'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/oppdatere-dependencies'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -70,7 +70,7 @@ jobs:
           VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
 
   snyk-monitor:
-    name: Monitor dependencies in ${APP_NAME} with Snyk
+    name: Monitor dependencies with Snyk
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +80,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17.x'
-          cache: gradle
+          cache: 'gradle'
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
       - name: Monitor dependencies with Snyk
@@ -88,7 +88,17 @@ jobs:
           snyk monitor
           --org=toi
           --file=apps/${APP_NAME}/build.gradle.kts
-          --project-name=${APP_NAME}
+          --project-name=${{ github.repository }}
+          --remote-repo-url=https://github.com/${{ github.repository }}.git
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Monitor dependencies in buildSrc with Snyk
+        run: >
+          snyk monitor
+          --org=toi
+          --file=buildSrc/build.gradle.kts
+          --project-name=${{ github.repository }}
           --remote-repo-url=https://github.com/${{ github.repository }}.git
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

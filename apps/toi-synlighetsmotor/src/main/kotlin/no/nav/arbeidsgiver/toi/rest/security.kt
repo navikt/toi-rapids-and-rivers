@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
-import io.javalin.core.security.AccessManager
-import io.javalin.core.security.RouteRole
+import io.javalin.security.AccessManager
+import io.javalin.security.RouteRole
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
 import io.javalin.http.Handler

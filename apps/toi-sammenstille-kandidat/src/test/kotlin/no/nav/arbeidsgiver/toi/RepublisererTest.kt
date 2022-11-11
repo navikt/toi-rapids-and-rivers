@@ -16,7 +16,6 @@ class RepublisererTest {
 
     @BeforeEach
     fun before() {
-        modifiserbareSystemVariabler["NAIS_APP_NAME"] = "toi-sammenstiller"
         javalin = Javalin.create().start(9000)
     }
 

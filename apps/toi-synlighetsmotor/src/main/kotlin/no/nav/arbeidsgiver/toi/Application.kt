@@ -39,7 +39,7 @@ fun opprettJavalinMedTilgangskontroll(
     issuerProperties: Map<Rolle, IssuerProperties>
 ): Javalin =
     Javalin.create {
-        it.defaultContentType = "application/json"
+        it.http.defaultContentType = "application/json"
         it.accessManager(styrTilgang(issuerProperties))
     }.start(8301)
 
