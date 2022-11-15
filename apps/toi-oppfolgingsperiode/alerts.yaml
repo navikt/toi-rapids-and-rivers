@@ -15,17 +15,18 @@ spec:
       expr: sum(up{app="toi-oppfolgingsperiode", job="kubernetes-pods"}) == 0
       for: 1m
       description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/c4ed4d494bb4ee4edd45bfd69c948e80"
+      action: "https://logs.adeo.no/goto/808e54a0-64d0-11ed-9d6c-8305350409f6"
 
     - alert: toi-oppfolgingsperiode
+      severity: danger
       expr: sum(increase(logd_messages_total{log_app="toi-oppfolgingsperiode",log_level="Error"}[10m])) > 0
       for: 1s
       description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/c4ed4d494bb4ee4edd45bfd69c948e80"
+      action: "https://logs.adeo.no/goto/808e54a0-64d0-11ed-9d6c-8305350409f6"
 
     - alert: toi-oppfolgingsperiode
       severity: warning
       expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsperiode",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsperiode"}[5m]))) > 20
       for: 5m
       description: Økning i warnings
-      action: "https://logs.adeo.no/goto/c4ed4d494bb4ee4edd45bfd69c948e80"
+      action: "https://logs.adeo.no/goto/808e54a0-64d0-11ed-9d6c-8305350409f6"
