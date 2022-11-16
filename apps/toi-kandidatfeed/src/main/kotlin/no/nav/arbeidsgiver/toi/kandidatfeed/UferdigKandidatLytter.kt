@@ -21,55 +21,34 @@ class UferdigKandidatLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        if(packet.rejectOnAll("@behov", behovsListe)) return
+        if (packet.rejectOnAll("@behov", behovsListe)) return
 
         val aktørId = packet["aktørId"].asText()
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
 
-        val opprettCv = packet["arbeidsmarkedCv.opprettCv"]
-        val endreCv = packet["arbeidsmarkedCv.endreCv"]
-
-        val cvMelding =
-            if(!opprettCv.isMissingOrNull()) opprettCv
-            else if(!endreCv.isMissingOrNull()) endreCv
-            else throw RuntimeException("Cv må finnes i UferdigKandidatLytter")
-
-        val arbeidserfaringNode = cvMelding["cv"]["arbeidserfaring"]
-
-
-        val opprettJobbrofil = packet["arbeidsmarkedCv.opprettJobbprofil"]
-        val endreJobbprofil = packet["arbeidsmarkedCv.endreJobbprofil"]
-
-        val jobbMelding =
-            if(!opprettJobbrofil.isMissingOrNull()) opprettJobbrofil
-            else if(!endreJobbprofil.isMissingOrNull()) endreJobbprofil
-            else throw RuntimeException("Jobbprofil må finnes i UferdigKandidatLytter")
-
-        val kompteanseNode = jobbMelding["jobbprofil"]["kompetanser"]
-        val jobbønsker = jobbMelding["jobbprofil"]["stillinger"]
-
-
-        val arbeidserfaringListe = arbeidserfaringNode.toList().map {
-            it["stillingstittel"].asText()
-        }
-
-        val kompetanseListe = kompteanseNode.map {
-            it.asText()
-        }
-
-        val jobbønskeListe = jobbønsker.map {
-            it.asText()
-        }
-
-        val stillingsTitler = arbeidserfaringListe.union(jobbønskeListe)
-
-        packet["kompetanse"] = kompetanseListe
-        packet["stillingstittel"] = stillingsTitler
+        leggTilOntologiBehovFelt(packet)
 
         log.info("Sender behov for $aktørId")
         context.publish(aktørId, packet.toJson())
     }
 
+    private fun leggTilOntologiBehovFelt(packet: JsonMessage) {
+        val cvMelding =
+            if (packet["arbeidsmarkedCv.opprettCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettCv"]
+            else if (packet["arbeidsmarkedCv.endreCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.endreCv"]
+            else throw RuntimeException("Cv må finnes i UferdigKandidatLytter")
+
+        val jobbMelding =
+            if (packet["arbeidsmarkedCv.opprettJobbprofil"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettJobbprofil"]
+            else if (packet["arbeidsmarkedCv.endreJobbprofil"].jsonNodeHasValue()) packet["arbeidsmarkedCv.endreJobbprofil"]
+            else throw RuntimeException("Jobbprofil må finnes i UferdigKandidatLytter")
+
+        packet["kompetanse"] = jobbMelding["jobbprofil"]["kompetanser"].map(JsonNode::asText)
+
+        val jobbønskeListe = jobbMelding["jobbprofil"]["stillinger"].map(JsonNode::asText)
+        val arbeidserfaringsListe = cvMelding["cv"]["arbeidserfaring"].toList().map { it["stillingstittel"].asText() }
+        packet["stillingstittel"] = arbeidserfaringsListe.union(jobbønskeListe)
+    }
 
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
@@ -77,6 +56,8 @@ class UferdigKandidatLytter(
     }
 
 }
+
+private fun JsonNode.jsonNodeHasValue() = !this.isMissingOrNull()
 
 private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = get(key).let { node ->
     !node.isMissingNode && node.isArray && node.map(JsonNode::asText).containsAll(values)
