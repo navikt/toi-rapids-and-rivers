@@ -15,6 +15,7 @@ class UferdigKandidatLytter(
                 it.demandValue("synlighet.ferdigBeregnet", true)
                 it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
                 it.interestedIn("@behov")
+                it.interestedIn("arbeidsmarkedCv.opprettCv", "arbeidsmarkedCv.endreCv", "arbeidsmarkedCv.opprettJobbprofil", "arbeidsmarkedCv.endreJobbprofil")
             }
         }.register(this)
     }
@@ -25,8 +26,8 @@ class UferdigKandidatLytter(
         val aktørId = packet["aktørId"].asText()
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
 
-        val opprettCv = packet["arbeidsmarkedsCv.opprettCv"]
-        val endreCv = packet["arbeidsmarkedsCv.endreCv"]
+        val opprettCv = packet["arbeidsmarkedCv.opprettCv"]
+        val endreCv = packet["arbeidsmarkedCv.endreCv"]
 
         val cvMelding =
             if(!opprettCv.isMissingOrNull()) opprettCv
@@ -36,8 +37,8 @@ class UferdigKandidatLytter(
         val arbeidserfaringNode = cvMelding["cv"]["arbeidserfaring"]
 
 
-        val opprettJobbrofil = packet["arbeidsmarkedsCv.opprettJobbprofil"]
-        val endreJobbprofil = packet["arbeidsmarkedsCv.endreJobbprofil"]
+        val opprettJobbrofil = packet["arbeidsmarkedCv.opprettJobbprofil"]
+        val endreJobbprofil = packet["arbeidsmarkedCv.endreJobbprofil"]
 
         val jobbMelding =
             if(!opprettJobbrofil.isMissingOrNull()) opprettJobbrofil

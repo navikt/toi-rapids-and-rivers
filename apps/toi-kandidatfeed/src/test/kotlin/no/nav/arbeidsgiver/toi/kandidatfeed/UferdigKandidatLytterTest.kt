@@ -24,6 +24,24 @@ class UferdigKandidatLytterTest {
     }
 
     @Test
+    fun `Melding skal legge ved ontologi kompetanse og stillingstitler den ønsker ontologi på`() {
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true))
+
+        val testrapid = TestRapid()
+
+        UferdigKandidatLytter(testrapid)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        val inspektør = testrapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["stillingstittel"].asIterable()).map<String>(JsonNode::asText)
+            .containsExactlyInAnyOrder("Lege", "Pianolærer", "Baker", "Sjåfør", "Sirkustekniker", "Produktsjef kjøretøy")
+        assertThat(melding["kompetanse"].asIterable()).map<String>(JsonNode::asText)
+            .containsExactlyInAnyOrder("Sirkusestetikk", "Sirkusvokabular", "Definere riggebehov for sirkuskunster", "Kontrollere sirkusrigging før fremføring", "Servicearbeid")
+    }
+
+    @Test
     fun `Melding uten gitte behov-verdier skal republiseres med behov`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true),
             behovsListe = listOf("uinteressant_behov"))
