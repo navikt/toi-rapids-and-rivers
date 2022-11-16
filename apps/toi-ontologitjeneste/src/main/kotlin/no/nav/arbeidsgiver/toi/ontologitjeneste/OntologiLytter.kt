@@ -25,6 +25,10 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         context.publish(packet.toJson())
     }
 
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        log.error("Fant ikke obligatoriske parametere")
+    }
+
     private fun synonymerTilKompetanse(kompetanse: String)=
         ontologiRelasjoner("/kompetanse/?kompetansenavn=$kompetanse")
     private fun synonymerTilStillingstittel(stillingstittel: String) =
