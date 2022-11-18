@@ -53,20 +53,20 @@ jobs:
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml
           VARS: apps/${{ env.APP_NAME }}/nais-dev.yaml
 
-#  deploy-to-prod-gcp:
-#    name: Deploy to prod-gcp
-#    needs: build-and-publish
-#    if: github.ref == 'refs/heads/main'
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: nais/deploy/actions/deploy@v1
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: prod-gcp
-#          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
-#          VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
-#
+  deploy-to-prod-gcp:
+    name: Deploy to prod-gcp
+    needs: build-and-publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
+          VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
+
 #  snyk-monitor:
 #    name: Monitor dependencies with Snyk
 #    if: github.ref == 'refs/heads/main'
