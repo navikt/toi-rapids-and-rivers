@@ -49,6 +49,7 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
             log.error("Ontologirelasjoner er null. Burde ikke gå an")
             throw NullPointerException("Ontologirelasjoner er null. Burde ikke gå an")
         }
+        log.info("Ontologi-resultat av $path er ${result.get()}")
         return ontologiRelasjoner
     }
 }
