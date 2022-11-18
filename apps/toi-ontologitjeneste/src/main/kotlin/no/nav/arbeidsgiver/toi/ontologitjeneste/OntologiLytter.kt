@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.jackson.responseObject
 import no.nav.helse.rapids_rivers.*
+import java.util.*
 
 class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsConnection) :
     River.PacketListener {
@@ -25,13 +26,19 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         context.publish(packet.toJson())
     }
 
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        log.error("Fant ikke obligatoriske parametere")
+    }
+
     private fun synonymerTilKompetanse(kompetanse: String)=
         ontologiRelasjoner("/kompetanse/?kompetansenavn=$kompetanse")
     private fun synonymerTilStillingstittel(stillingstittel: String) =
         ontologiRelasjoner("/stilling/?stillingstittel=$stillingstittel")
 
     private fun ontologiRelasjoner(path:String): OntologiRelasjoner {
+        val uuid = UUID.randomUUID()
         val (_, _, result) = Fuel.get("$ontologiUrl$path")
+            .header("Nav-CallId", uuid)
             .responseObject<OntologiRelasjoner>()
         val (ontologiRelasjoner, error) = result
         if (error != null) {

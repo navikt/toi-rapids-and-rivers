@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class UferdigKandidatLytterTest {
-    private val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv")
+    private val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi")
 
     @Test
     fun `Melding uten behov-felt skal republiseres med behov`() {
@@ -21,6 +21,24 @@ class UferdigKandidatLytterTest {
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
         assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).containsAll(behovsListe)
+    }
+
+    @Test
+    fun `Melding skal legge ved ontologi kompetanse og stillingstitler den ønsker ontologi på`() {
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true))
+
+        val testrapid = TestRapid()
+
+        UferdigKandidatLytter(testrapid)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        val inspektør = testrapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["stillingstittel"].asIterable()).map<String>(JsonNode::asText)
+            .containsExactlyInAnyOrder("Lege", "Pianolærer", "Baker", "Sjåfør", "Sirkustekniker", "Produktsjef kjøretøy")
+        assertThat(melding["kompetanse"].asIterable()).map<String>(JsonNode::asText)
+            .containsExactlyInAnyOrder("Sirkusestetikk", "Sirkusvokabular", "Definere riggebehov for sirkuskunster", "Kontrollere sirkusrigging før fremføring", "Servicearbeid")
     }
 
     @Test
