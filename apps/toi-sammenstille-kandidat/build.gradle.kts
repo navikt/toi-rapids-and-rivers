@@ -1,6 +1,6 @@
 val postgresVersion = "42.5.0"
 val hikariVersion = "5.0.1"
-val flywayVersion = "9.7.0"
+val flywayVersion = "9.8.0"
 val h2Version = "2.1.214"
 val logbackVersion = "1.4.4"
 val logstashEncoderVersion = "7.2"
