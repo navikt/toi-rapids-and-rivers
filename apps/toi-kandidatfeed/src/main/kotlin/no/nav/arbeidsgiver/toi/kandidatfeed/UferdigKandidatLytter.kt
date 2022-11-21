@@ -46,8 +46,9 @@ class UferdigKandidatLytter(
         packet["kompetanse"] = jobbMelding["jobbprofil"]["kompetanser"].map(JsonNode::asText)
 
         val jobbønskeListe = jobbMelding["jobbprofil"]["stillinger"].map(JsonNode::asText)
+        val jobbønskeKladdeListe = jobbMelding["jobbprofil"]["stillingkladder"].map(JsonNode::asText)
         val arbeidserfaringsListe = cvMelding["cv"]["arbeidserfaring"].toList().map { it["stillingstittel"].asText() }
-        packet["stillingstittel"] = arbeidserfaringsListe.union(jobbønskeListe)
+        packet["stillingstittel"] = arbeidserfaringsListe.union(jobbønskeListe).union(jobbønskeKladdeListe)
     }
 
 
