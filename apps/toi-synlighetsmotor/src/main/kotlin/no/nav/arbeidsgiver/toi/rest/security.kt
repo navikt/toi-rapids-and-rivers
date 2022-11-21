@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.rest
 
 import io.javalin.security.AccessManager
 import io.javalin.security.RouteRole
@@ -23,8 +23,8 @@ fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
         val erAutentisert =
             when {
                 roller.contains(Rolle.UNPROTECTED) -> true
-                roller.contains(Rolle.VEILEDER) -> autentiserVeileder(hentTokenClaims(ctx, issuerProperties[Rolle.VEILEDER]!!))
-                roller.contains(Rolle.ARBEIDSGIVER) -> autentiserArbeidsgiver(hentTokenClaims(ctx, issuerProperties[Rolle.ARBEIDSGIVER]!!))
+                roller.contains(Rolle.VEILEDER) -> autentiserVeileder(hentTokenClaims(ctx, issuerProperties, Rolle.VEILEDER))
+                roller.contains(Rolle.ARBEIDSGIVER) -> autentiserArbeidsgiver(hentTokenClaims(ctx, issuerProperties, Rolle.ARBEIDSGIVER))
                 else -> false
             }
 
@@ -44,15 +44,10 @@ val autentiserVeileder = Autentiseringsmetode { it?.get("NAVident")?.toString()?
 val autentiserArbeidsgiver = Autentiseringsmetode { it != null }
 
 
-private fun hentTokenClaims(ctx: Context, issuerProperties: IssuerProperties) =
-    lagTokenValidationHandler(issuerProperties)
+private fun hentTokenClaims(ctx: Context, issuerProperties: Map<Rolle, IssuerProperties>, rolle: Rolle) =
+    hentTokenValidationHandler(issuerProperties, rolle)
         .getValidatedTokens(ctx.httpRequest)
         .anyValidClaims.orElseGet { null }
-
-private fun lagTokenValidationHandler(issuerProperties: IssuerProperties) =
-    JwtTokenValidationHandler(
-        MultiIssuerConfiguration(mapOf(issuerProperties.cookieName to issuerProperties))
-    )
 
 private val Context.httpRequest: HttpRequest
     get() = object : HttpRequest {
