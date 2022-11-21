@@ -63,6 +63,5 @@ fun main() {
     startApp(repository, javalin, rapidsConnection, rapidIsAlive)
 }
 
-fun log(navn: String): Logger {
-    return LoggerFactory.getLogger(navn)
-}
+fun log(navn: String): Logger = LoggerFactory.getLogger(navn)
+
