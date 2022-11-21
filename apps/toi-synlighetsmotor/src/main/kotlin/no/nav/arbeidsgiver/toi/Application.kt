@@ -4,8 +4,7 @@ import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.http.Context
-import no.nav.arbeidsgiver.toi.rest.evaluerKandidatFraContext
-import no.nav.arbeidsgiver.toi.rest.hentSynlighetForKandidater
+import no.nav.arbeidsgiver.toi.rest.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.security.token.support.core.configuration.IssuerProperties
@@ -64,5 +63,6 @@ fun main() {
     startApp(repository, javalin, rapidsConnection, rapidIsAlive)
 }
 
-val Any.log: Logger
-    get() = LoggerFactory.getLogger(this::class.java)
+fun log(navn: String): Logger {
+    return LoggerFactory.getLogger(navn)
+}
