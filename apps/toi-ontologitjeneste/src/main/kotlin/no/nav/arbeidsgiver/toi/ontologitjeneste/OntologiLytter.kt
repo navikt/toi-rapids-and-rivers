@@ -9,7 +9,13 @@ import java.util.*
 class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
+    private val kompetanseCache: (String) -> OntologiRelasjoner
+    private val stillingstittelCache: (String) -> OntologiRelasjoner
+
     init {
+        val cacheHjelper = CacheHjelper()
+        kompetanseCache = cacheHjelper.lagCache { ontologiRelasjoner("/kompetanse/?kompetansenavn=$it") }
+        stillingstittelCache = cacheHjelper.lagCache { ontologiRelasjoner("/stilling/?stillingstittel=$it") }
         River(rapidsConnection).apply {
             validate {
                 it.demandAtFørstkommendeUløsteBehovEr("ontologi")
@@ -30,10 +36,8 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         log.error("Fant ikke obligatoriske parametere")
     }
 
-    private fun synonymerTilKompetanse(kompetanse: String)=
-        ontologiRelasjoner("/kompetanse/?kompetansenavn=$kompetanse")
-    private fun synonymerTilStillingstittel(stillingstittel: String) =
-        ontologiRelasjoner("/stilling/?stillingstittel=$stillingstittel")
+    private fun synonymerTilKompetanse(kompetanse: String)= kompetanseCache(kompetanse)
+    private fun synonymerTilStillingstittel(stillingstittel: String) =stillingstittelCache(stillingstittel)
 
     private fun ontologiRelasjoner(path:String): OntologiRelasjoner {
         val uuid = UUID.randomUUID()
