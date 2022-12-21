@@ -46,7 +46,6 @@ fun main() {
 
 suspend fun sjekkOffsets(envs: Map<String, String>) {
     val listOfGroupIds = listOf(
-        "toi-cv" to "toi-arbeidsplassen-cv-reader-rapidconsumer-1",
         "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
         "toi-fritatt-kandidatsøk" to "toi-arena-cv-reader-rapidconsumer-1",
         "toi-hjemmel" to "toi-hjemmel-rapidconsumer-1",

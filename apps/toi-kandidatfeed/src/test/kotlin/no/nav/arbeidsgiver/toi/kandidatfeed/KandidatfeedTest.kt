@@ -125,7 +125,7 @@ class KandidatfeedTest {
         val resultatJson = jacksonObjectMapper().readTree(melding.value())
         val forventetJson = jacksonObjectMapper().readTree(rapidMelding)
 
-        assertThat(resultatJson.get("cv")).isEqualTo(forventetJson.get("cv"))
+        assertThat(resultatJson.get("arbeidsmarkedCv")).isEqualTo(forventetJson.get("arbeidsmarkedCv"))
         assertThat(resultatJson.get("veileder")).isEqualTo(forventetJson.get("veileder"))
         assertThat(resultatJson.get("aktørId")).isEqualTo(forventetJson.get("aktørId"))
 

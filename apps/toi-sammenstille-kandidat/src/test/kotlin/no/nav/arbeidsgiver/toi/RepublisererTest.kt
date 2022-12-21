@@ -124,7 +124,7 @@ class RepublisererTest {
 
     private fun lagre3KandidaterTilDatabasen(repository: Repository) =
         listOf("111", "222", "333").map {
-            val kandidat = Kandidat.fraJson(cvMelding(it))
+            val kandidat = Kandidat.fraJson(arbeidsmarkedCvMelding(it))
             repository.lagreKandidat(kandidat)
             kandidat
         }
@@ -134,7 +134,7 @@ class RepublisererTest {
         return generateSequence { (count++).takeIf { it < n } }
             .toList()
             .map {
-                val kandidat = Kandidat.fraJson(cvMelding(it.toString()))
+                val kandidat = Kandidat.fraJson(arbeidsmarkedCvMelding(it.toString()))
                 repository.lagreKandidat(kandidat)
                 kandidat.aktørId
             }

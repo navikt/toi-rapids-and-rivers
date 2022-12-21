@@ -222,7 +222,7 @@ class SynlighetsmotorTest {
     @Test
     fun `Ingen ny melding dersom sammenstiller ikke er kjørt`() = testProgramMedHendelse(
         oppfølgingsinformasjonHendelseMedParticipatingService(
-            participatingService = participatingService("toi-cv")
+            participatingService = participatingService("toi-arbeidsmarked-cv")
         ),
         enHendelseErIkkePublisert()
     )

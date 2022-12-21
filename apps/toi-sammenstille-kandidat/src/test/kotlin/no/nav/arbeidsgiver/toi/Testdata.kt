@@ -12,25 +12,6 @@ fun veilederMelding(aktørId: String) = """
         }
     """.trimIndent()
 
-fun cvMelding(aktørId: String) = """
-        {
-          "aktørId": "$aktørId",
-          "cv": {
-            "meldingstype": "SLETT",
-            "oppfolgingsinformasjon": null,
-            "opprettCv": null,
-            "endreCv": null,
-            "slettCv": null,
-            "opprettJobbprofil": null,
-            "endreJobbprofil": null,
-            "slettJobbprofil": null,
-            "aktoerId": "$aktørId",
-            "sistEndret": 1636718935.195
-          },
-          "@event_name": "cv"
-        }
-    """.trimIndent()
-
 fun arbeidsmarkedCvMelding(aktørId: String) = """
         {
           "aktørId": "$aktørId",
@@ -53,7 +34,7 @@ fun arbeidsmarkedCvMelding(aktørId: String) = """
 fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
         {
           "aktørId": "$aktørid",
-          "cv": {
+          "arbeidsmarkedCv": {
             "meldingstype": "SLETT",
             "oppfolgingsinformasjon": null,
             "opprettCv": null,
@@ -65,12 +46,12 @@ fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
             "aktoerId": "$aktørid",
             "sistEndret": 1636718935.195
           },
-          "@event_name": "cv",
+          "@event_name": "arbeidsmarked-cv",
           "system_read_count": 1,
           "system_participating_services": [
             {
-              "service": "toi-cv",
-              "instance": "toi-cv-58849d5f86-7qffs",
+              "service": "toi-arbeidsmarked-cv",
+              "instance": "toi-arbeidsmarked-cv-58849d5f86-7qffs",
               "time": "2021-11-19T10:53:59.163725026"
             }
           ]
