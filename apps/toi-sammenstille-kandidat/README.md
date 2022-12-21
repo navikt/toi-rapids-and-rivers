@@ -1,6 +1,6 @@
 # Sammenstiller kandidatinformasjon
 
-Henter ut cv og veilederinformasjon, lagrer i database, og legger sammenstillt kandidatinformasjon tilbake på rapid
+Henter ut CV og veilederinformasjon, lagrer i database, og legger sammenstillt kandidatinformasjon tilbake på rapid
 
 # Republisering
 
