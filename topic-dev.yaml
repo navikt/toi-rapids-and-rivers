@@ -86,3 +86,6 @@ spec:
     - team: toi
       application: toi-ontologitjeneste
       access: readwrite
+    - team: toi
+      application: toi-rapids-and-rivers-grapher
+      access: read
