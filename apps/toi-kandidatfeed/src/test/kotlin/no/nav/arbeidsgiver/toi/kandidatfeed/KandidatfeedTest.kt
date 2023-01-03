@@ -138,4 +138,69 @@ class KandidatfeedTest {
         assertThat(resultatJson.get("hullICv").isMissingOrNull()).isFalse
         assertThat(resultatJson.get("ontologi").isMissingOrNull()).isFalse
     }
+
+    @Test
+    fun `UsynligKandidatfeedLytter leser ikke melding om slutt_av_hendelseskjede er true`() {
+        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true), sluttAvHendelseskjede = true)
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(meldingUsynlig)
+
+        assertThat(producer.history().size).isEqualTo(0)
+        assertThat(testrapid.inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `SynligKandidatfeedLytter leser ikke melding om slutt_av_hendelseskjede er true`() {
+        val rapidMelding =
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = "{}", sluttAvHendelseskjede = true)
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(rapidMelding)
+
+        assertThat(producer.history().size).isEqualTo(0)
+        assertThat(testrapid.inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `UsynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
+        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true))
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(meldingUsynlig)
+
+        assertThat(testrapid.inspektør.size).isEqualTo(1)
+        assertThat(testrapid.inspektør.message(0).get("@slutt_av_hendelseskjede").booleanValue()).isEqualTo(true)
+    }
+
+    @Test
+    fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
+        val rapidMelding =
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = "{}")
+
+        val testrapid = TestRapid()
+        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+
+        SynligKandidatfeedLytter(testrapid, producer)
+        UsynligKandidatfeedLytter(testrapid, producer)
+
+        testrapid.sendTestMessage(rapidMelding)
+
+        assertThat(testrapid.inspektør.size).isEqualTo(1)
+        assertThat(testrapid.inspektør.message(0).get("@slutt_av_hendelseskjede").booleanValue()).isEqualTo(true)
+    }
 }

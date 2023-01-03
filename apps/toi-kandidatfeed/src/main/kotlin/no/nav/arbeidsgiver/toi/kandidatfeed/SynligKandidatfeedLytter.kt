@@ -21,6 +21,7 @@ class SynligKandidatfeedLytter(
                 it.demandKey("aktørId")
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
+                it.rejectValue("@slutt_av_hendelseskjede", true)
                 it.requireKey("oppfølgingsinformasjon")
                 behovsListe.forEach(it::demandKey)
             }
@@ -43,6 +44,8 @@ class SynligKandidatfeedLytter(
             } else {
                 log.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
+            packet["@slutt_av_hendelseskjede"] = true
+            context.publish(packet.toJson())
         }
     }
 

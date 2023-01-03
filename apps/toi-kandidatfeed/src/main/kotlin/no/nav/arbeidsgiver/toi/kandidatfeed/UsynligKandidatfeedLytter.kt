@@ -19,6 +19,7 @@ class UsynligKandidatfeedLytter(
                 it.demandKey("aktørId")
                 it.demandValue("synlighet.erSynlig", false)
                 it.demandValue("synlighet.ferdigBeregnet", true)
+                it.rejectValue("@slutt_av_hendelseskjede", true)
             }
         }.register(this)
     }
@@ -34,6 +35,8 @@ class UsynligKandidatfeedLytter(
             } else {
                 log.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
+            packet["@slutt_av_hendelseskjede"] = true
+            context.publish(packet.toJson())
         }
     }
 

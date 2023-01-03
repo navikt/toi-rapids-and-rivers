@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-
 fun synlighet(erSynlig: Boolean = true, ferdigBeregnet: Boolean = true) = """
         "synlighet": {
             "erSynlig": $erSynlig,
@@ -14,7 +12,8 @@ fun rapidMelding(
     behovsListe: List<String>? = null,
     organisasjonsenhetsnavn: String? = null,
     hullICv: String? = null,
-    ontologi: String? = null
+    ontologi: String? = null,
+    sluttAvHendelseskjede: Boolean? = null
 ): String = """
         {
           "@event_name": "cv.sammenstilt",
@@ -435,5 +434,6 @@ fun rapidMelding(
               "time": "2021-11-19T13:18:03.307756227"
             }
           ]
+          ${if(sluttAvHendelseskjede==null) "" else """, "@slutt_av_hendelseskjede": $sluttAvHendelseskjede"""}
         }
     """.trimIndent()
