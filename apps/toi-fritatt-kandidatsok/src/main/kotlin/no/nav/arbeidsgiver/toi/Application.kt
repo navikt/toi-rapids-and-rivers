@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
+import DatabaseKonfigurasjon
+import Repository
 import no.nav.arbeid.cv.events.CvEvent
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -15,9 +17,13 @@ fun main() {
         val consumerConfig = arenaCvLytterConfig(envs)
         val consumer = KafkaConsumer<String, CvEvent>(consumerConfig)
 
-        register(ArenaCvLytter(topicName, consumer))
+        val repository = Repository(datasource())
+
+        register(ArenaCvLytter(topicName, consumer, repository))
     }.start()
 }
+
+fun datasource() = DatabaseKonfigurasjon(System.getenv()).lagDatasource()
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)

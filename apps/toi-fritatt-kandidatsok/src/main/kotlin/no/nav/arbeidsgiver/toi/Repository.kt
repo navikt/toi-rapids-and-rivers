@@ -39,25 +39,15 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun lagreKandidat(fritattKandidatsokTilDatabase: FritattKandidatsokTilDatabase, skalSlettes: Boolean) {
-
-        /*val fritattInnslagFinnesForPersonen = hentKandidat(kandidat.aktørId) != null
-
-
-        dataSource.connection.use {
-            if (kandidatFinnes) {
-                it.prepareStatement("UPDATE $sammenstiltkandidatTabell SET $kandidatKolonne = ? WHERE $aktørIdKolonne = ?")
-                    .apply {
-                        setString(1, kandidat.toJson())
-                        setString(2, kandidat.aktørId)
-                    }
+        if(kandidatFinnes(fritattKandidatsokTilDatabase.fodselsnummer)) {
+            if(skalSlettes) {
+                slettKandidat(fritattKandidatsokTilDatabase.fodselsnummer)
             } else {
-                it.prepareStatement("insert into $sammenstiltkandidatTabell($aktørIdKolonne, $kandidatKolonne) VALUES (?,?)")
-                    .apply {
-                        setString(1, kandidat.aktørId)
-                        setString(2, kandidat.toJson())
-                    }
-            }.executeUpdate()
-        }*/
+                oppdaterKandidat(fritattKandidatsokTilDatabase)
+            }
+        } else {
+            insertKandiat(fritattKandidatsokTilDatabase)
+        }
     }
 
     fun kandidatFinnes(fødselsnummer: String): Boolean = dataSource.connection.use {
@@ -89,7 +79,10 @@ class Repository(private val dataSource: DataSource) {
     }
 
     fun oppdaterKandidat(fritattKandidatsokTilDatabase: FritattKandidatsokTilDatabase) = dataSource.connection.use {
-        it.prepareStatement("UPDATE $fritattKandidatsøkTabell SET $fritattKandidatsøkKolonne = ?, $sistEndretAvVeileder = ?, $sistEndretAvSystem = ?, $sistEndretTidspunkt = ? WHERE $fødselsnummerKolonne = ?")
+        it.prepareStatement(
+            "UPDATE $fritattKandidatsøkTabell " +
+                    "SET $fritattKandidatsøkKolonne = ?, $sistEndretAvVeileder = ?, $sistEndretAvSystem = ?, $sistEndretTidspunkt = ? " +
+                    "WHERE $fødselsnummerKolonne = ?")
             .apply {
                 setBoolean(1, fritattKandidatsokTilDatabase.fritattKandidatsøk)
                 setString(2, fritattKandidatsokTilDatabase.sistEndretAvVeileder)

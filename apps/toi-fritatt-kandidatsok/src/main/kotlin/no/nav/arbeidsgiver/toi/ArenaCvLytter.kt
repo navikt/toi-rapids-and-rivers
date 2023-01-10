@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,6 +20,7 @@ import kotlin.coroutines.CoroutineContext
 class ArenaCvLytter(
     private val topicName: String,
     private val consumer: Consumer<String, CvEvent>,
+    private val repository: Repository,
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val job = Job()
@@ -46,15 +48,22 @@ class ArenaCvLytter(
                             .filterNot(CvEvent::erKode6Eller7)
                             .map(::FritattKandidatsokMelding)
                             .map(FritattKandidatsokMelding::somString)
-                            .onEach{
+                            .onEach {
                                 log.info("Skal publisere fritatt kandidatsøk-melding")
                             }
                             .map { JsonMessage(it, MessageProblems("{}")).toJson() }
                             .forEach(rapidsConnection::publish)
 
                         val fritattKandidatsokArenaTilDatabase = meldinger
-                            .map{fritattKandidatsokTilDatabase(it)}
-                            //.forEach()
+                            .map {
+                                Pair(
+                                    fritattKandidatsokTilDatabase(it),
+                                    it.erKode6Eller7()
+                                )
+                            }
+                            .forEach {
+                                repository.lagreKandidat(it.first, it.second)
+                            }
 
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)

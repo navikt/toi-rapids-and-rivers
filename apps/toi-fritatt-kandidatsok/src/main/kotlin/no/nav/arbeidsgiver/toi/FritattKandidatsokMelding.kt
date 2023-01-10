@@ -24,7 +24,7 @@ data class FritattKandidatsokTilDatabase(
     val sistEndretAvVeileder: String?,
 )
 
-fun fritattKandidatsokTilDatabase(melding: CvEvent) {
+fun fritattKandidatsokTilDatabase(melding: CvEvent) =
     FritattKandidatsokTilDatabase(
         fodselsnummer = melding.fodselsnummer,
         fritattKandidatsøk = melding.fritattKandidatsok,
@@ -32,7 +32,7 @@ fun fritattKandidatsokTilDatabase(melding: CvEvent) {
         sistEndretAvSystem = "Arena",
         sistEndretAvVeileder = null,
     )
-}
+
 
 
 data class FritattKandidatsok(
