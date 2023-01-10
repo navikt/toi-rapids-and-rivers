@@ -39,11 +39,10 @@ class ArenaCvLytter(
 
                 while (job.isActive) {
                     try {
-                        val melding = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                        val meldinger = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, CvEvent>::value)
 
-
-                        melding
+                        meldinger
                             .filterNot(CvEvent::erKode6Eller7)
                             .map(::FritattKandidatsokMelding)
                             .map(FritattKandidatsokMelding::somString)
@@ -53,15 +52,9 @@ class ArenaCvLytter(
                             .map { JsonMessage(it, MessageProblems("{}")).toJson() }
                             .forEach(rapidsConnection::publish)
 
-
-
-                        melding
-                            .filter(CvEvent::erKode6Eller7)
-                             // slett fra db metode
-
-                        val fritattKandidatsokArenaTilDatabase = melding
-                            .filterNot(CvEvent::erKode6Eller7)
+                        val fritattKandidatsokArenaTilDatabase = meldinger
                             .map{fritattKandidatsokTilDatabase(it)}
+                            //.forEach()
 
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
