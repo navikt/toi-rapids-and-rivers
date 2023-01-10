@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeid.cv.events.CvEvent
+import java.time.ZonedDateTime
 
 class FritattKandidatsokMelding(melding: CvEvent) {
     @JsonProperty("@event_name")
@@ -15,16 +16,27 @@ class FritattKandidatsokMelding(melding: CvEvent) {
     fun somString() = objectMapper.writeValueAsString(this)
 }
 
-class FritattKandidatsokArenaTilDatabase(melding: CvEvent) {
-    val fodselsnummer = melding.fodselsnummer
-    val fritattKandidatsøk = melding.fritattKandidatsok
-    val sistEndretTidspunkt = melding.tidsstempel
-    val sistEndretAvSystem = "Arena"
-    val sistEndretAvVeileder = null
+data class FritattKandidatsokTilDatabase(
+    val fodselsnummer: String,
+    val fritattKandidatsøk: Boolean,
+    val sistEndretTidspunkt: ZonedDateTime,
+    val sistEndretAvSystem: String,
+    val sistEndretAvVeileder: String?,
+)
+
+fun fritattKandidatsokTilDatabase(melding: CvEvent) {
+    FritattKandidatsokTilDatabase(
+        fodselsnummer = melding.fodselsnummer,
+        fritattKandidatsøk = melding.fritattKandidatsok,
+        sistEndretTidspunkt = ZonedDateTime.parse(melding.tidsstempel),
+        sistEndretAvSystem = "Arena",
+        sistEndretAvVeileder = null,
+    )
 }
 
+
 data class FritattKandidatsok(
-    val fritattKandidatsok: Boolean
+    val fritattKandidatsok: Boolean,
 )
 
 private val objectMapper = ObjectMapper()
@@ -33,6 +45,7 @@ private val objectMapper = ObjectMapper()
 abstract class AvroMixIn {
     @JsonIgnore
     abstract fun getSchema(): org.apache.avro.Schema
+
     @JsonIgnore
-    abstract fun getSpecificData() : org.apache.avro.specific.SpecificData
+    abstract fun getSpecificData(): org.apache.avro.specific.SpecificData
 }
