@@ -43,7 +43,7 @@ class ArenaCvLytter(
                             .map(ConsumerRecord<String, CvEvent>::value)
                             .filterNot(CvEvent::erKode6Eller7)
                             .onEach{
-                                log.info("Skal publisere fritatt kandidatsøk-melding med timestamp " + it.tidsstempel)
+                                log.info("Skal publisere fritatt kandidatsøk-melding med timestamp " + it.tidsstempel + " er fritatt kandidatsøk " + it.fritattKandidatsok)
                             }
                             .map(::FritattKandidatsokMelding)
                             .map(FritattKandidatsokMelding::somString)
