@@ -15,6 +15,14 @@ class FritattKandidatsokMelding(melding: CvEvent) {
     fun somString() = objectMapper.writeValueAsString(this)
 }
 
+class FritattKandidatsokArenaTilDatabase(melding: CvEvent) {
+    val fodselsnummer = melding.fodselsnummer
+    val fritattKandidatsøk = melding.fritattKandidatsok
+    val sistEndretTidspunkt = melding.tidsstempel
+    val sistEndretAvSystem = "Arena"
+    val sistEndretAvVeileder = null
+}
+
 data class FritattKandidatsok(
     val fritattKandidatsok: Boolean
 )
