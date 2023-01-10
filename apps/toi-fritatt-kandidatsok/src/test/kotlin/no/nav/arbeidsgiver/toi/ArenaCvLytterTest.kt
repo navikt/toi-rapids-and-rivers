@@ -80,12 +80,19 @@ class ArenaCvLytterTest {
     @Test
     fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med fritatt kandidatsøk true `() {
         val consumer = mockConsumer()
-        ArenaCvLytter(topicName, consumer, repository)
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
+        val rapid = TestRapid()
         val fødselsnummer = "10108000398"
         val fritattKandidatsøk = true
+
         val melding = melding(fødselsnummer, fritattKandidatsøk)
 
         mottaArenaCvMelding(consumer, melding)
+        arenaCvLytter.onReady(rapid)
+
+        Thread.sleep(300)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
 
         val kandidat = repository.hentKandidat(fødselsnummer)
 
@@ -95,49 +102,76 @@ class ArenaCvLytterTest {
     @Test
     fun `Skal ikke lagre personer med kode 6 eller 7 i databasen`() {
         val consumer = mockConsumer()
-        ArenaCvLytter(topicName, consumer, repository)
-        val fødselsnummer = "123"
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
+        val rapid = TestRapid()
+        val fødselsnummer = "10108000398"
         val fritattKandidatsøk = true
+
         val meldingMedKode6 = melding(fødselsnummer, fritattKandidatsøk, "6")
         val meldingMedKode7 = melding(fødselsnummer, fritattKandidatsøk, "7")
 
         mottaArenaCvMelding(consumer, meldingMedKode6)
         mottaArenaCvMelding(consumer, meldingMedKode7)
+        arenaCvLytter.onReady(rapid)
+
+        Thread.sleep(300)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
     fun `Skal slette person med kode 6 eller 7 fra database`() {
         val consumer = mockConsumer()
-        ArenaCvLytter(topicName, consumer, repository)
-        val fødselsnummer = "123"
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
+        val rapid = TestRapid()
+        val fødselsnummer = "10108000398"
         val fritattKandidatsøk = true
+
         val meldingMedKode6 = melding(fødselsnummer, fritattKandidatsøk, "6")
         val meldingMedKode7 = melding(fødselsnummer, fritattKandidatsøk, "7")
 
         mottaArenaCvMelding(consumer, meldingMedKode6)
         mottaArenaCvMelding(consumer, meldingMedKode7)
+        arenaCvLytter.onReady(rapid)
+
+        Thread.sleep(300)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
     fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med fritatt kandidatsøk er false`() {
         val consumer = mockConsumer()
-        ArenaCvLytter(topicName, consumer, repository)
-        val fødselsnummer = "123"
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
+        val rapid = TestRapid()
+        val fødselsnummer = "10108000398"
         val fritattKandidatsøk = false
+
         val melding = melding(fødselsnummer, fritattKandidatsøk)
 
         mottaArenaCvMelding(consumer, melding)
+        arenaCvLytter.onReady(rapid)
+
+        Thread.sleep(300)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
     }
 
     @Test
     fun `Skal oppdatere person i databasen når fritatt kandidatsøk endres fra true til false`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
-        val fødselsnummer = "123"
+        val rapid = TestRapid()
+        val fødselsnummer = "10108000398"
         val fritattKandidatsøk = false
         val melding = melding(fødselsnummer, fritattKandidatsøk)
 
         mottaArenaCvMelding(consumer, melding)
+        arenaCvLytter.onReady(rapid)
+
+        Thread.sleep(300)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 }
 
