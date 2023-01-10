@@ -16,8 +16,8 @@ class FritattKandidatsokMelding(melding: CvEvent) {
     fun somString() = objectMapper.writeValueAsString(this)
 }
 
-data class FritattKandidatsokTilDatabase(
-    val fodselsnummer: String,
+data class FritattKandidatsokIDatabase(
+    val fødselsnummer: String,
     val fritattKandidatsøk: Boolean,
     val sistEndretTidspunkt: ZonedDateTime,
     val sistEndretAvSystem: String,
@@ -25,8 +25,8 @@ data class FritattKandidatsokTilDatabase(
 )
 
 fun fritattKandidatsokTilDatabase(melding: CvEvent) =
-    FritattKandidatsokTilDatabase(
-        fodselsnummer = melding.fodselsnummer,
+    FritattKandidatsokIDatabase(
+        fødselsnummer = melding.fodselsnummer,
         fritattKandidatsøk = melding.fritattKandidatsok,
         sistEndretTidspunkt = ZonedDateTime.parse(melding.tidsstempel),
         sistEndretAvSystem = "Arena",

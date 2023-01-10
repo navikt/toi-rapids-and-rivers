@@ -54,7 +54,7 @@ class ArenaCvLytter(
                             .map { JsonMessage(it, MessageProblems("{}")).toJson() }
                             .forEach(rapidsConnection::publish)
 
-                        val fritattKandidatsokArenaTilDatabase = meldinger
+                        meldinger
                             .map {
                                 Pair(
                                     fritattKandidatsokTilDatabase(it),

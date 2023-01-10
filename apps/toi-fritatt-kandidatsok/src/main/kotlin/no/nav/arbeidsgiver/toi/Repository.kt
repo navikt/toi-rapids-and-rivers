@@ -1,8 +1,9 @@
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.arbeidsgiver.toi.FritattKandidatsokTilDatabase
+import no.nav.arbeidsgiver.toi.FritattKandidatsokIDatabase
 import org.flywaydb.core.Flyway
 import java.sql.Timestamp
+import java.time.ZoneId
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
@@ -38,15 +39,15 @@ class Repository(private val dataSource: DataSource) {
         kjørFlywayMigreringer()
     }
 
-    fun lagreKandidat(fritattKandidatsokTilDatabase: FritattKandidatsokTilDatabase, skalSlettes: Boolean) {
-        if(kandidatFinnes(fritattKandidatsokTilDatabase.fodselsnummer)) {
+    fun lagreKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase, skalSlettes: Boolean) {
+        if(kandidatFinnes(fritattKandidatsokIDatabase.fødselsnummer)) {
             if(skalSlettes) {
-                slettKandidat(fritattKandidatsokTilDatabase.fodselsnummer)
+                slettKandidat(fritattKandidatsokIDatabase.fødselsnummer)
             } else {
-                oppdaterKandidat(fritattKandidatsokTilDatabase)
+                oppdaterKandidat(fritattKandidatsokIDatabase)
             }
         } else {
-            insertKandiat(fritattKandidatsokTilDatabase)
+            insertKandiat(fritattKandidatsokIDatabase)
         }
     }
 
@@ -65,35 +66,48 @@ class Repository(private val dataSource: DataSource) {
         statement.executeQuery()
     }
 
-    fun insertKandiat(fritattKandidatsokTilDatabase: FritattKandidatsokTilDatabase) = dataSource.connection.use {
+    fun insertKandiat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {
         it.prepareStatement("insert into $fritattKandidatsøkTabell(" +
                 "$fødselsnummerKolonne, $fritattKandidatsøkKolonne, $sistEndretAvVeileder, $sistEndretAvSystem, $sistEndretTidspunkt) " +
                 "VALUES (?,?,?,?,?)")
             .apply {
-                setString(1, fritattKandidatsokTilDatabase.fodselsnummer)
-                setBoolean(2, fritattKandidatsokTilDatabase.fritattKandidatsøk)
-                setString(3, fritattKandidatsokTilDatabase.sistEndretAvVeileder)
-                setString(4, fritattKandidatsokTilDatabase.sistEndretAvSystem)
-                setTimestamp(5, Timestamp(fritattKandidatsokTilDatabase.sistEndretTidspunkt.toInstant().toEpochMilli()))
+                setString(1, fritattKandidatsokIDatabase.fødselsnummer)
+                setBoolean(2, fritattKandidatsokIDatabase.fritattKandidatsøk)
+                setString(3, fritattKandidatsokIDatabase.sistEndretAvVeileder)
+                setString(4, fritattKandidatsokIDatabase.sistEndretAvSystem)
+                setTimestamp(5, Timestamp(fritattKandidatsokIDatabase.sistEndretTidspunkt.toInstant().toEpochMilli()))
             }.executeUpdate()
     }
 
-    fun oppdaterKandidat(fritattKandidatsokTilDatabase: FritattKandidatsokTilDatabase) = dataSource.connection.use {
+    fun oppdaterKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {
         it.prepareStatement(
             "UPDATE $fritattKandidatsøkTabell " +
                     "SET $fritattKandidatsøkKolonne = ?, $sistEndretAvVeileder = ?, $sistEndretAvSystem = ?, $sistEndretTidspunkt = ? " +
                     "WHERE $fødselsnummerKolonne = ?")
             .apply {
-                setBoolean(1, fritattKandidatsokTilDatabase.fritattKandidatsøk)
-                setString(2, fritattKandidatsokTilDatabase.sistEndretAvVeileder)
-                setString(3, fritattKandidatsokTilDatabase.sistEndretAvSystem)
-                setTimestamp(4, Timestamp(fritattKandidatsokTilDatabase.sistEndretTidspunkt.toInstant().toEpochMilli()))
-                setString(5, fritattKandidatsokTilDatabase.fodselsnummer)
+                setBoolean(1, fritattKandidatsokIDatabase.fritattKandidatsøk)
+                setString(2, fritattKandidatsokIDatabase.sistEndretAvVeileder)
+                setString(3, fritattKandidatsokIDatabase.sistEndretAvSystem)
+                setTimestamp(4, Timestamp(fritattKandidatsokIDatabase.sistEndretTidspunkt.toInstant().toEpochMilli()))
+                setString(5, fritattKandidatsokIDatabase.fødselsnummer)
             }.executeUpdate()
     }
 
-
-
+    fun hentKandidat(fødselsnummer: String) = dataSource.connection.use {
+        val statement =
+            it.prepareStatement("select * from $fritattKandidatsøkTabell where $fødselsnummerKolonne = ?")
+        statement.setString(1, fødselsnummer)
+        val resultSet = statement.executeQuery()
+        if (resultSet.next())
+            FritattKandidatsokIDatabase(
+                fødselsnummer = resultSet.getString(fødselsnummerKolonne),
+                fritattKandidatsøk = resultSet.getBoolean(fritattKandidatsøkKolonne),
+                sistEndretTidspunkt = resultSet.getTimestamp(sistEndretTidspunkt).toInstant().atZone(ZoneId.of("Europe/Oslo")),
+                sistEndretAvSystem = resultSet.getString(sistEndretAvSystem),
+                sistEndretAvVeileder = resultSet.getString(sistEndretAvVeileder)
+            )
+        else null
+    }
 
     private fun kjørFlywayMigreringer() {
         Flyway.configure()
