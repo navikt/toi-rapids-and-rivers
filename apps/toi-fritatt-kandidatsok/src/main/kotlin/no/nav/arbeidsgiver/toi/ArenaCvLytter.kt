@@ -83,7 +83,7 @@ class ArenaCvLytter(
             }
 
         } else if(!erkode6eller7 && fritattKandidatsokIDatabase.fritattKandidatsøk){
-            repository.insertKandiat(fritattKandidatsokIDatabase)
+            repository.insertKandidat(fritattKandidatsokIDatabase)
         }
     }
 }

@@ -1,6 +1,6 @@
 CREATE TABLE fritattkandidatsok (
     id bigserial PRIMARY KEY,
-    fodselsnummer VARCHAR(11) UNIQUE,
+    fodselsnummer CHAR(11) UNIQUE,
     fritatt_kandidatsok BOOLEAN NOT NULL DEFAULT FALSE,
     sist_endret_av_veileder TEXT,
     sist_endret_av_system TEXT,

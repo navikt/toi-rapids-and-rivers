@@ -11,7 +11,10 @@ import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import java.time.ZonedDateTime
 
 private val topicName = "arena-cv-topic"
 
@@ -63,10 +66,9 @@ class ArenaCvLytterTest {
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
         val fødselsnummer = "123"
-        val fritattKandidatsøk = true
 
-        val meldingMedKode6 = melding(fødselsnummer, fritattKandidatsøk, "6")
-        val meldingMedKode7 = melding(fødselsnummer, fritattKandidatsøk, "7")
+        val meldingMedKode6 = melding(fødselsnummer, true, "6")
+        val meldingMedKode7 = melding(fødselsnummer, true, "7")
 
         mottaArenaCvMelding(consumer, meldingMedKode6)
         mottaArenaCvMelding(consumer, meldingMedKode7)
@@ -78,14 +80,13 @@ class ArenaCvLytterTest {
     }
 
     @Test
-    fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med fritatt kandidatsøk true `() {
+    fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med fritatt kandidatsøk true`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
         val fødselsnummer = "10108000398"
-        val fritattKandidatsøk = true
 
-        val melding = melding(fødselsnummer, fritattKandidatsøk)
+        val melding = melding(fødselsnummer, true)
 
         mottaArenaCvMelding(consumer, melding)
         arenaCvLytter.onReady(rapid)
@@ -105,18 +106,16 @@ class ArenaCvLytterTest {
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
         val fødselsnummer = "10108000398"
-        val fritattKandidatsøk = true
 
-        val meldingMedKode6 = melding(fødselsnummer, fritattKandidatsøk, "6")
-        val meldingMedKode7 = melding(fødselsnummer, fritattKandidatsøk, "7")
+        val meldingMedKode6 = melding(fødselsnummer, true, "6")
+        val meldingMedKode7 = melding(fødselsnummer, true, "7")
 
         mottaArenaCvMelding(consumer, meldingMedKode6)
         mottaArenaCvMelding(consumer, meldingMedKode7)
         arenaCvLytter.onReady(rapid)
 
         Thread.sleep(300)
-        val inspektør = rapid.inspektør
-        assertThat(inspektør.size).isEqualTo(0)
+        assertNull(repository.hentKandidat(fødselsnummer))
     }
 
     @Test
@@ -125,29 +124,34 @@ class ArenaCvLytterTest {
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
         val fødselsnummer = "10108000398"
-        val fritattKandidatsøk = true
 
-        val meldingMedKode6 = melding(fødselsnummer, fritattKandidatsøk, "6")
-        val meldingMedKode7 = melding(fødselsnummer, fritattKandidatsøk, "7")
+        val meldingSynlig = melding(fødselsnummer, true)
+        val meldingMedKode6 = melding(fødselsnummer, true, "6")
+        val meldingMedKode7 = melding(fødselsnummer, true, "7")
+
+        mottaArenaCvMelding(consumer, meldingSynlig)
+
+        arenaCvLytter.onReady(rapid)
+        Thread.sleep(300)
+
+        assertNotNull(repository.hentKandidat(fødselsnummer))
 
         mottaArenaCvMelding(consumer, meldingMedKode6)
         mottaArenaCvMelding(consumer, meldingMedKode7)
         arenaCvLytter.onReady(rapid)
 
         Thread.sleep(300)
-        val inspektør = rapid.inspektør
-        assertThat(inspektør.size).isEqualTo(0)
+        assertNull(repository.hentKandidat(fødselsnummer))
     }
 
     @Test
-    fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med fritatt kandidatsøk er false`() {
+    fun `Lesing av melding på Arena CV-topic skal ikke føre til at personen lagres i databasen hvis fritatt kandidatsøk false`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
         val fødselsnummer = "10108000398"
-        val fritattKandidatsøk = false
 
-        val melding = melding(fødselsnummer, fritattKandidatsøk)
+        val melding = melding(fødselsnummer, false)
 
         mottaArenaCvMelding(consumer, melding)
         arenaCvLytter.onReady(rapid)
@@ -155,23 +159,32 @@ class ArenaCvLytterTest {
         Thread.sleep(300)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
+
+        assertNull(repository.hentKandidat(fødselsnummer))
     }
 
     @Test
-    fun `Skal oppdatere person i databasen når fritatt kandidatsøk endres fra true til false`() {
+    fun `Skal slette person i databasen når fritatt kandidatsøk endres fra true til false`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
         val fødselsnummer = "10108000398"
-        val fritattKandidatsøk = false
-        val melding = melding(fødselsnummer, fritattKandidatsøk)
 
-        mottaArenaCvMelding(consumer, melding)
+        val meldingFritatt = melding(fødselsnummer, true)
+        val meldingIkkeFritatt = melding(fødselsnummer, false)
+
+        mottaArenaCvMelding(consumer, meldingFritatt)
         arenaCvLytter.onReady(rapid)
 
         Thread.sleep(300)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(0)
+
+        assertNotNull(repository.hentKandidat(fødselsnummer))
+
+        mottaArenaCvMelding(consumer, meldingIkkeFritatt)
+        Thread.sleep(300)
+        assertNull(repository.hentKandidat(fødselsnummer))
     }
 }
 
@@ -199,6 +212,7 @@ private fun mottaArenaCvMelding(consumer: MockConsumer<String, CvEvent>, melding
 private val topic = TopicPartition(topicName, 0)
 
 private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean, frkode: String = "1") = CvEvent().apply {
+    tidsstempel = ZonedDateTime.now().toString()
     fodselsnummer = fødselsnummer
     fornavn = ""
     etternavn = ""
@@ -222,7 +236,6 @@ private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean, frkode
     landkode = ""
     kommunenr = 1
     disponererBil = true
-    tidsstempel = ""
     orgenhet = ""
     kvalifiseringsgruppekode = ""
     hovedmaalkode = ""

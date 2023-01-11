@@ -39,19 +39,6 @@ class Repository(private val dataSource: DataSource) {
         kjørFlywayMigreringer()
     }
 
-    fun lagreKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase, erKode6Eller7: Boolean) {
-        if(kandidatFinnes(fritattKandidatsokIDatabase.fødselsnummer)) {
-            if(erKode6Eller7) {
-                slettKandidat(fritattKandidatsokIDatabase.fødselsnummer)
-            } else {
-                oppdaterKandidat(fritattKandidatsokIDatabase)
-            }
-
-        } else if(!erKode6Eller7){
-            insertKandiat(fritattKandidatsokIDatabase)
-        }
-    }
-
     fun kandidatFinnes(fødselsnummer: String): Boolean = dataSource.connection.use {
         val statement =
             it.prepareStatement("select 1 from $fritattKandidatsøkTabell where $fødselsnummerKolonne = ?")
@@ -67,7 +54,7 @@ class Repository(private val dataSource: DataSource) {
         statement.executeQuery()
     }
 
-    fun insertKandiat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {
+    fun insertKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {
         it.prepareStatement("insert into $fritattKandidatsøkTabell(" +
                 "$fødselsnummerKolonne, $fritattKandidatsøkKolonne, $sistEndretAvVeileder, $sistEndretAvSystem, $sistEndretTidspunkt) " +
                 "VALUES (?,?,?,?,?)")
