@@ -1,6 +1,6 @@
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.arbeidsgiver.toi.FritattKandidatsokIDatabase
+import no.nav.arbeidsgiver.toi.FritattKandidatsok
 import org.flywaydb.core.Flyway
 import java.sql.Timestamp
 import java.time.ZoneId
@@ -54,7 +54,7 @@ class Repository(private val dataSource: DataSource) {
         statement.execute()
     }
 
-    fun insertKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {
+    fun insertKandidat(fritattKandidatsokIDatabase: FritattKandidatsok) = dataSource.connection.use {
         it.prepareStatement("insert into $fritattKandidatsøkTabell(" +
                 "$fødselsnummerKolonne, $fritattKandidatsøkKolonne, $sistEndretAvVeileder, $sistEndretAvSystem, $sistEndretTidspunkt) " +
                 "VALUES (?,?,?,?,?)")
@@ -67,17 +67,17 @@ class Repository(private val dataSource: DataSource) {
             }.executeUpdate()
     }
 
-    fun oppdaterKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {
+    fun oppdaterKandidat(fritattKandidatsok: FritattKandidatsok) = dataSource.connection.use {
         it.prepareStatement(
             "UPDATE $fritattKandidatsøkTabell " +
                     "SET $fritattKandidatsøkKolonne = ?, $sistEndretAvVeileder = ?, $sistEndretAvSystem = ?, $sistEndretTidspunkt = ? " +
                     "WHERE $fødselsnummerKolonne = ?")
             .apply {
-                setBoolean(1, fritattKandidatsokIDatabase.fritattKandidatsøk)
-                setString(2, fritattKandidatsokIDatabase.sistEndretAvVeileder)
-                setString(3, fritattKandidatsokIDatabase.sistEndretAvSystem)
-                setTimestamp(4, Timestamp(fritattKandidatsokIDatabase.sistEndretTidspunkt.toInstant().toEpochMilli()))
-                setString(5, fritattKandidatsokIDatabase.fødselsnummer)
+                setBoolean(1, fritattKandidatsok.fritattKandidatsøk)
+                setString(2, fritattKandidatsok.sistEndretAvVeileder)
+                setString(3, fritattKandidatsok.sistEndretAvSystem)
+                setTimestamp(4, Timestamp(fritattKandidatsok.sistEndretTidspunkt.toInstant().toEpochMilli()))
+                setString(5, fritattKandidatsok.fødselsnummer)
             }.executeUpdate()
     }
 
@@ -87,7 +87,7 @@ class Repository(private val dataSource: DataSource) {
         statement.setString(1, fødselsnummer)
         val resultSet = statement.executeQuery()
         if (resultSet.next())
-            FritattKandidatsokIDatabase(
+            FritattKandidatsok(
                 fødselsnummer = resultSet.getString(fødselsnummerKolonne),
                 fritattKandidatsøk = resultSet.getBoolean(fritattKandidatsøkKolonne),
                 sistEndretTidspunkt = resultSet.getTimestamp(sistEndretTidspunkt).toInstant().atZone(ZoneId.of("Europe/Oslo")),

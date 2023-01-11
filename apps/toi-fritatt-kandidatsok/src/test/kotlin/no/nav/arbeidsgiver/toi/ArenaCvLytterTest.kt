@@ -14,7 +14,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 private val topicName = "arena-cv-topic"
@@ -128,7 +127,7 @@ class ArenaCvLytterTest {
     fun `Skal slette person med kode 6 fra database`() {
         val fødselsnummer = "10108000398"
         repository.insertKandidat(
-            FritattKandidatsokIDatabase(
+            FritattKandidatsok(
                 fødselsnummer = fødselsnummer,
                 fritattKandidatsøk = true,
                 sistEndretTidspunkt = ZonedDateTime.now(),
@@ -155,7 +154,7 @@ class ArenaCvLytterTest {
     fun `Skal slette person med kode 7 fra database`() {
         val fødselsnummer = "10108000398"
         repository.insertKandidat(
-            FritattKandidatsokIDatabase(
+            FritattKandidatsok(
                 fødselsnummer = fødselsnummer,
                 fritattKandidatsøk = true,
                 sistEndretTidspunkt = ZonedDateTime.now(),
@@ -201,7 +200,7 @@ class ArenaCvLytterTest {
     fun `Skal slette person i databasen når fritatt kandidatsøk endres fra true til false`() {
         val fødselsnummer = "10108000398"
         repository.insertKandidat(
-            FritattKandidatsokIDatabase(
+            FritattKandidatsok(
                 fødselsnummer = fødselsnummer,
                 fritattKandidatsøk = true,
                 sistEndretTidspunkt = ZonedDateTime.now(),

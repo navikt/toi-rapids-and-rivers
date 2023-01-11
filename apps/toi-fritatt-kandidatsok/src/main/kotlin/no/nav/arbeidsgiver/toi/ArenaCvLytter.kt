@@ -41,31 +41,17 @@ class ArenaCvLytter(
 
                 while (job.isActive) {
                     try {
-                        val meldinger = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
+                        consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, CvEvent>::value)
-
-
-                        meldinger
+                            .asSequence()
+                            .onEach { lagreKandidatFraArena(it.tilFritattKandidatsok(), it.erKode6Eller7()) }
                             .filterNot(CvEvent::erKode6Eller7)
-                            .map(::FritattKandidatsokMelding)
-                            .map(FritattKandidatsokMelding::somString)
+                            .map(CvEvent::tilFritattKandidatsokMelding)
                             .onEach {
                                 log.info("Skal publisere fritatt kandidatsøk-melding")
                             }
                             .map { JsonMessage(it, MessageProblems("{}")).toJson() }
                             .forEach(rapidsConnection::publish)
-
-                        meldinger
-
-                            .map {
-                                Pair(
-                                    fritattKandidatsokTilDatabase(it),
-                                    it.erKode6Eller7()
-                                )
-                            }
-                            .forEach {
-                                lagreKandidatFraArena(it.first, it.second)
-                            }
                         consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
@@ -75,7 +61,7 @@ class ArenaCvLytter(
         }
     }
 
-    fun lagreKandidatFraArena(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase, erkode6eller7: Boolean) {
+    fun lagreKandidatFraArena(fritattKandidatsokIDatabase: FritattKandidatsok, erkode6eller7: Boolean) {
         if(repository.kandidatFinnes(fritattKandidatsokIDatabase.fødselsnummer)) {
             if(erkode6eller7 || !fritattKandidatsokIDatabase.fritattKandidatsøk) {
                 repository.slettKandidat(fritattKandidatsokIDatabase.fødselsnummer)
