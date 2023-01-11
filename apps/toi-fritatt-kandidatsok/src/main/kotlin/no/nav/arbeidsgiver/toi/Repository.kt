@@ -51,7 +51,7 @@ class Repository(private val dataSource: DataSource) {
         val statement =
             it.prepareStatement("DELETE from $fritattKandidatsøkTabell where $fødselsnummerKolonne = ?")
         statement.setString(1, fødselsnummer)
-        statement.executeQuery()
+        statement.execute()
     }
 
     fun insertKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase) = dataSource.connection.use {

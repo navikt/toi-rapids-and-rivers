@@ -13,6 +13,7 @@ import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -23,8 +24,13 @@ class ArenaCvLytterTest {
 
     private val repository = Repository(testDatabase.dataSource)
 
+    @BeforeEach
+    fun beforeEach() {
+        testDatabase.slettAlt()
+    }
+
     @Test
-    fun  `Lesing av melding på Arena CV-topic skal føre til at en fritatt kandidatsøk-melding blir publisert på rapid`() {
+    fun `Lesing av melding på Arena CV-topic skal føre til at en fritatt kandidatsøk-melding blir publisert på rapid`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
@@ -55,9 +61,9 @@ class ArenaCvLytterTest {
         assertThat(meldingJson.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk")
         assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
 
-       val fritattMelding = meldingJson.get("fritattKandidatsøk")
-       assertThat(fritattMelding.fieldNames().asSequence().toList()).containsExactlyInAnyOrder("fritattKandidatsok")
-       assertThat(fritattMelding.get("fritattKandidatsok").asBoolean()).isEqualTo(fritattKandidatsøk)
+        val fritattMelding = meldingJson.get("fritattKandidatsøk")
+        assertThat(fritattMelding.fieldNames().asSequence().toList()).containsExactlyInAnyOrder("fritattKandidatsok")
+        assertThat(fritattMelding.get("fritattKandidatsok").asBoolean()).isEqualTo(fritattKandidatsøk)
     }
 
     @Test
@@ -119,28 +125,56 @@ class ArenaCvLytterTest {
     }
 
     @Test
-    fun `Skal slette person med kode 6 eller 7 fra database`() {
+    fun `Skal slette person med kode 6 fra database`() {
+        val fødselsnummer = "10108000398"
+        repository.insertKandidat(
+            FritattKandidatsokIDatabase(
+                fødselsnummer = fødselsnummer,
+                fritattKandidatsøk = true,
+                sistEndretTidspunkt = ZonedDateTime.now(),
+                sistEndretAvSystem = "Test",
+                sistEndretAvVeileder = "A100000"
+            )
+        )
+
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
+
+        val melding = melding(fødselsnummer, true, "6")
+
+        mottaArenaCvMelding(consumer, melding)
+
+        arenaCvLytter.onReady(rapid)
+        Thread.sleep(300)
+
+        assertNull(repository.hentKandidat(fødselsnummer))
+    }
+
+    @Test
+    fun `Skal slette person med kode 7 fra database`() {
         val fødselsnummer = "10108000398"
+        repository.insertKandidat(
+            FritattKandidatsokIDatabase(
+                fødselsnummer = fødselsnummer,
+                fritattKandidatsøk = true,
+                sistEndretTidspunkt = ZonedDateTime.now(),
+                sistEndretAvSystem = "Test",
+                sistEndretAvVeileder = "A100000"
+            )
+        )
 
-        val meldingSynlig = melding(fødselsnummer, true)
-        val meldingMedKode6 = melding(fødselsnummer, true, "6")
-        val meldingMedKode7 = melding(fødselsnummer, true, "7")
+        val consumer = mockConsumer()
+        val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
+        val rapid = TestRapid()
 
-        mottaArenaCvMelding(consumer, meldingSynlig)
+        val melding = melding(fødselsnummer, true, "7")
+
+        mottaArenaCvMelding(consumer, melding)
 
         arenaCvLytter.onReady(rapid)
         Thread.sleep(300)
 
-        assertNotNull(repository.hentKandidat(fødselsnummer))
-
-        mottaArenaCvMelding(consumer, meldingMedKode6)
-        mottaArenaCvMelding(consumer, meldingMedKode7)
-        arenaCvLytter.onReady(rapid)
-
-        Thread.sleep(300)
         assertNull(repository.hentKandidat(fødselsnummer))
     }
 

@@ -44,6 +44,7 @@ class ArenaCvLytter(
                         val meldinger = consumer.poll(Duration.of(100, ChronoUnit.MILLIS))
                             .map(ConsumerRecord<String, CvEvent>::value)
 
+
                         meldinger
                             .filterNot(CvEvent::erKode6Eller7)
                             .map(::FritattKandidatsokMelding)
