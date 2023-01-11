@@ -55,6 +55,7 @@ class ArenaCvLytter(
                             .forEach(rapidsConnection::publish)
 
                         meldinger
+                            //TODO: .filter bare ja på fritatt
                             .map {
                                 Pair(
                                     fritattKandidatsokTilDatabase(it),
