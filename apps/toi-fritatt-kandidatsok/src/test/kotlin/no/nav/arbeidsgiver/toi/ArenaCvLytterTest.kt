@@ -11,10 +11,10 @@ import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 private val topicName = "arena-cv-topic"
@@ -249,7 +249,7 @@ private fun mottaArenaCvMelding(consumer: MockConsumer<String, CvEvent>, melding
 private val topic = TopicPartition(topicName, 0)
 
 private fun melding(fødselsnummer: String, fritattKandidatsøk: Boolean, frkode: String = "1") = CvEvent().apply {
-    tidsstempel = ZonedDateTime.now().toString()
+    tidsstempel = "2023-01-11T14:07:13"
     fodselsnummer = fødselsnummer
     fornavn = ""
     etternavn = ""

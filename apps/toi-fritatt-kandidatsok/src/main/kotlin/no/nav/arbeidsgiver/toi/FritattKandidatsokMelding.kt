@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeid.cv.events.CvEvent
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class FritattKandidatsokMelding(melding: CvEvent) {
@@ -28,12 +30,12 @@ fun fritattKandidatsokTilDatabase(melding: CvEvent) =
     FritattKandidatsokIDatabase(
         fødselsnummer = melding.fodselsnummer,
         fritattKandidatsøk = melding.fritattKandidatsok,
-        sistEndretTidspunkt = ZonedDateTime.parse(melding.tidsstempel),
+        sistEndretTidspunkt = ZonedDateTime.of(LocalDateTime.parse(melding.tidsstempel), ZoneId.of("Europe/Oslo")),
         sistEndretAvSystem = "Arena",
         sistEndretAvVeileder = null,
     )
 
-
+//private fun ZonedDateTime.tilNorskTidssone(): ZonedDateTime = this.withZoneSameInstant(ZoneId.of("Europe/Oslo"))!!
 
 data class FritattKandidatsok(
     val fritattKandidatsok: Boolean,
