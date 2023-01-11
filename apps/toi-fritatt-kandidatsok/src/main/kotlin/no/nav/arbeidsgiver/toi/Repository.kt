@@ -39,15 +39,15 @@ class Repository(private val dataSource: DataSource) {
         kjørFlywayMigreringer()
     }
 
-    fun lagreKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase, skalSlettes: Boolean) {
+    fun lagreKandidat(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase, erKode6Eller7: Boolean) {
         if(kandidatFinnes(fritattKandidatsokIDatabase.fødselsnummer)) {
-            if(skalSlettes) {
+            if(erKode6Eller7) {
                 slettKandidat(fritattKandidatsokIDatabase.fødselsnummer)
             } else {
                 oppdaterKandidat(fritattKandidatsokIDatabase)
             }
 
-        } else {
+        } else if(!erKode6Eller7){
             insertKandiat(fritattKandidatsokIDatabase)
         }
     }
