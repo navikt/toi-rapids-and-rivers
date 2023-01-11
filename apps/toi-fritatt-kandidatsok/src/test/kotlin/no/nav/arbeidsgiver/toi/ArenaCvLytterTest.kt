@@ -199,25 +199,28 @@ class ArenaCvLytterTest {
 
     @Test
     fun `Skal slette person i databasen når fritatt kandidatsøk endres fra true til false`() {
+        val fødselsnummer = "10108000398"
+        repository.insertKandidat(
+            FritattKandidatsokIDatabase(
+                fødselsnummer = fødselsnummer,
+                fritattKandidatsøk = true,
+                sistEndretTidspunkt = ZonedDateTime.now(),
+                sistEndretAvSystem = "Test",
+                sistEndretAvVeileder = "A100000"
+            )
+        )
+
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
-        val fødselsnummer = "10108000398"
 
-        val meldingFritatt = melding(fødselsnummer, true)
-        val meldingIkkeFritatt = melding(fødselsnummer, false)
+        val melding = melding(fødselsnummer, false)
 
-        mottaArenaCvMelding(consumer, meldingFritatt)
+        mottaArenaCvMelding(consumer, melding)
         arenaCvLytter.onReady(rapid)
 
         Thread.sleep(300)
-        val inspektør = rapid.inspektør
-        assertThat(inspektør.size).isEqualTo(0)
 
-        assertNotNull(repository.hentKandidat(fødselsnummer))
-
-        mottaArenaCvMelding(consumer, meldingIkkeFritatt)
-        Thread.sleep(300)
         assertNull(repository.hentKandidat(fødselsnummer))
     }
 }
