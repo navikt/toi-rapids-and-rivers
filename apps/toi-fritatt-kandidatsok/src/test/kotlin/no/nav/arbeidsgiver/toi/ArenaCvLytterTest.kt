@@ -14,6 +14,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 private val topicName = "arena-cv-topic"
@@ -85,7 +87,7 @@ class ArenaCvLytterTest {
     }
 
     @Test
-    fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med fritatt kandidatsøk true`() {
+    fun `Lesing av melding på Arena CV-topic skal føre til at personen lagres i databasen med rette felter hvis fritatt_kandidatsøk er true`() {
         val consumer = mockConsumer()
         val arenaCvLytter = ArenaCvLytter(topicName, consumer, repository)
         val rapid = TestRapid()
@@ -103,6 +105,10 @@ class ArenaCvLytterTest {
         val kandidat = repository.hentKandidat(fødselsnummer)
 
         assertThat(kandidat?.fritattKandidatsøk).isTrue
+        assertThat(kandidat?.fødselsnummer).isEqualTo(fødselsnummer)
+        assertThat(kandidat?.sistEndretAvSystem).isEqualTo("Arena")
+        assertThat(kandidat?.sistEndretTidspunkt).isEqualTo(ZonedDateTime.of(LocalDateTime.parse(melding.tidsstempel), ZoneId.of("Europe/Oslo")))
+        assertNull(kandidat?.sistEndretAvVeileder)
     }
 
     @Test
