@@ -35,8 +35,6 @@ fun fritattKandidatsokTilDatabase(melding: CvEvent) =
         sistEndretAvVeileder = null,
     )
 
-//private fun ZonedDateTime.tilNorskTidssone(): ZonedDateTime = this.withZoneSameInstant(ZoneId.of("Europe/Oslo"))!!
-
 data class FritattKandidatsok(
     val fritattKandidatsok: Boolean,
 )
