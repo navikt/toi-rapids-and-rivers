@@ -65,7 +65,7 @@ class ArenaCvLytter(
                             .forEach {
                                 lagreKandidatFraArena(it.first, it.second)
                             }
-
+                        consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Had a retriable exception, retrying", e)
                     }

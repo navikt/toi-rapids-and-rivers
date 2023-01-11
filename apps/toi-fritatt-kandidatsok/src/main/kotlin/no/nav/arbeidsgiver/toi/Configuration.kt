@@ -15,6 +15,7 @@ fun arenaCvLytterConfig(envs: Map<String, String>) = mapOf<String, String>(
     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java.canonicalName,
     ConsumerConfig.GROUP_ID_CONFIG to (envs["ARENA_CV_KAFKA_GROUP_ID"] ?: throw Exception("ARENA_CV_KAFKA_GROUP_ID er ikke definert")),
     ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+    ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
 
     CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SASL_SSL",
     SaslConfigs.SASL_MECHANISM to "PLAIN",
