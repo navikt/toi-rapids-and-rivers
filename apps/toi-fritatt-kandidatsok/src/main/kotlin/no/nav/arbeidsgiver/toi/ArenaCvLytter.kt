@@ -55,7 +55,7 @@ class ArenaCvLytter(
                             .forEach(rapidsConnection::publish)
 
                         meldinger
-                            //TODO: .filter bare ja på fritatt
+
                             .map {
                                 Pair(
                                     fritattKandidatsokTilDatabase(it),
@@ -63,7 +63,7 @@ class ArenaCvLytter(
                                 )
                             }
                             .forEach {
-                                repository.lagreKandidat(it.first, it.second)
+                                lagreKandidatFraArena(it.first, it.second)
                             }
 
                     } catch (e: RetriableException) {
@@ -71,6 +71,19 @@ class ArenaCvLytter(
                     }
                 }
             }
+        }
+    }
+
+    fun lagreKandidatFraArena(fritattKandidatsokIDatabase: FritattKandidatsokIDatabase, erkode6eller7: Boolean) {
+        if(repository.kandidatFinnes(fritattKandidatsokIDatabase.fødselsnummer)) {
+            if(erkode6eller7 || !fritattKandidatsokIDatabase.fritattKandidatsøk) {
+                repository.slettKandidat(fritattKandidatsokIDatabase.fødselsnummer)
+            } else {
+                repository.oppdaterKandidat(fritattKandidatsokIDatabase)
+            }
+
+        } else if(!erkode6eller7 && fritattKandidatsokIDatabase.fritattKandidatsøk){
+            repository.insertKandiat(fritattKandidatsokIDatabase)
         }
     }
 }

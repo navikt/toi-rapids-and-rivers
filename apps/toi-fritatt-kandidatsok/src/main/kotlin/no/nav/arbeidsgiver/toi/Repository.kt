@@ -46,6 +46,7 @@ class Repository(private val dataSource: DataSource) {
             } else {
                 oppdaterKandidat(fritattKandidatsokIDatabase)
             }
+
         } else {
             insertKandiat(fritattKandidatsokIDatabase)
         }
