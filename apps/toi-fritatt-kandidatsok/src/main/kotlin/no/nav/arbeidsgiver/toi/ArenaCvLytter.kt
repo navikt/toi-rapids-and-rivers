@@ -46,10 +46,10 @@ class ArenaCvLytter(
                             .asSequence()
                             .onEach { lagreKandidatFraArena(it.tilFritattKandidatsok(), it.erKode6Eller7()) }
                             .filterNot(CvEvent::erKode6Eller7)
-                            .map(CvEvent::tilFritattKandidatsokMelding)
-                            .onEach {
-                                log.info("Skal publisere fritatt kandidatsøk-melding")
+                            .onEach{
+                                log.info("Skal publisere fritatt kandidatsøk-melding med timestamp " + it.tidsstempel + " er fritatt kandidatsøk " + it.fritattKandidatsok)
                             }
+                            .map(CvEvent::tilFritattKandidatsokMelding)
                             .map { JsonMessage(it, MessageProblems("{}")).toJson() }
                             .forEach(rapidsConnection::publish)
                         consumer.commitSync()
