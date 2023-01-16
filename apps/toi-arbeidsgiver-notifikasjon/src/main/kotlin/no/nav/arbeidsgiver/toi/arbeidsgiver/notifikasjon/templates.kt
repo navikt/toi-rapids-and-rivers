@@ -4,7 +4,12 @@ private val pesostegn = "$"
 
 fun lagEpostBody() = """ epost """
 
-fun lagGraphQlMutation() = """
+fun lagGraphQlMutation(
+    epostArbeidsgiver: String,
+    stillingsId: String,
+    stillingstittel: String,
+    virksomhetsnummer: String,
+) = """
     mutation OpprettNyBeskjed(
       ${pesostegn}grupperingsid: String!
       ${pesostegn}merkelapp: String!
@@ -55,4 +60,5 @@ fun lagGraphQlMutation() = """
         }
       }
     }
+    
 """.trimIndent()

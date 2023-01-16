@@ -2,15 +2,25 @@ package no.nav.arbeidsgiver.toi.arbeidsgiver
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.post
+import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.NotifikasjonLytter
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotifikasjonLytterTest {
 
     val testRapid = TestRapid()
     val wiremock = WireMockServer().also { it.start() }
+
+    @BeforeAll
+    fun beforeAll() {
+        NotifikasjonLytter(testRapid)
+    }
 
     @BeforeEach
     fun beforeEach() {
@@ -19,6 +29,23 @@ class NotifikasjonLytterTest {
 
     @Test
     fun `Når vi mottar notifikasjonsmelding på rapid skal vi gjøre kall til notifikasjonssystemet`() {
+        val melding = """
+            {
+              "@event_name": "notifikasjon.cv-delt",
+              "epostArbeidsgiver": "test.testepost.no",
+              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+              "stillingstittel: "Kjøpman søkes",
+              "virksomhetsnummer": "123456789"
+            }
+        """.trimIndent()
+        testRapid.sendTestMessage(melding)
+
+        wiremock.verify(1, WireMock.postRequestedFor(
+            WireMock.urlEqualTo("/api/graphql")).withRequestBody(
+            containing("""
+                TODO: Legg til medling i klartekst med variables i tillegg til mutation
+            """.trimIndent())
+            ))
 
     }
 
