@@ -21,6 +21,7 @@ import java.util.*
 fun main() {
     try {
         var offsetJob: Job? = null
+        var eventSjekkJob: Job? = null
         val envs = System.getenv()
         RapidApplication.create(envs)
             .apply {
@@ -29,10 +30,13 @@ fun main() {
                         override fun onStartup(rapidsConnection: RapidsConnection) {
                             offsetJob = GlobalScope.launch { sjekkOffsets(envs) }
                             offsetJob?.invokeOnCompletion { rapidsConnection.stop() }
+                            eventSjekkJob = GlobalScope.launch { sjekkTidSidenEvent(envs) }
+                            eventSjekkJob?.invokeOnCompletion { rapidsConnection.stop() }
                         }
 
                         override fun onShutdown(rapidsConnection: RapidsConnection) {
                             offsetJob?.cancel()
+                            eventSjekkJob?.cancel()
                         }
                     }
                 )
@@ -57,6 +61,7 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
         "toi-oppfolgingsperiode" to "toi-oppfølgingsperiode-rapidconsumer-1",
         "toi-organisasjonsenhet" to "toi-organisasjonsenhet-rapidconsumer-1",
         "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
+        "toi-siste-14a-vedtak" to "toi-siste-14a-vedtak-rapidconsumer-1",
         "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
         "toi-tilretteleggingsbehov" to "toi-tilretteleggingsbehov-reader-rapidconsumer-1",
         "toi-veileder" to "toi-veileder-rapidconsumer-9",
@@ -118,7 +123,7 @@ fun sisteOffset(envs: Map<String, String>): Long {
     return position
 }
 
-private fun consumerProperties(envs: Map<String, String>, groupId: String, clientId: String = "consumer-toi-helseapp-$groupId") = Properties().apply {
+internal fun consumerProperties(envs: Map<String, String>, groupId: String, clientId: String = "consumer-toi-helseapp-$groupId") = Properties().apply {
     put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, envs["KAFKA_BROKERS"])
     put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
     put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
