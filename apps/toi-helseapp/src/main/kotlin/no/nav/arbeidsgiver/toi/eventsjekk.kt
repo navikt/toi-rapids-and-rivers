@@ -15,6 +15,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val sisteEvent = mutableMapOf<String, Instant>()
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     consument.assign(listOf(topicPartition))
+    consument.seekToBeginning(listOf(topicPartition))
     while(true) {
         val records = consument.poll(Duration.ofSeconds(1))
         records.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
