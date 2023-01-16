@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
-import no.nav.arbeidsgiver.toi.presentertekandidater.sikkerhet.TokendingsKlient
+import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.TokendingsKlient
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.*
