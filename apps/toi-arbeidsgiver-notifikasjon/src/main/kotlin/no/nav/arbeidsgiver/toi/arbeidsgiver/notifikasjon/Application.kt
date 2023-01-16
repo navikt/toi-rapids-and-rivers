@@ -10,3 +10,5 @@ fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
+
+fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
