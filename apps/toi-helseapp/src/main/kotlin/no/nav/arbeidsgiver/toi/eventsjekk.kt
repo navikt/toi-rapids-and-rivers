@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.time.delay
+import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -16,7 +17,9 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     consument.assign(listOf(topicPartition))
     while(true) {
         val records = consument.poll(Duration.ofSeconds(1))
-        records.map { objectMapper.readTree(it.value())["@event_name"].asText() to Instant.ofEpochMilli(it.timestamp()) }
+        records.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
+            .filterNot { (node, _) ->  node.isMissingOrNull() }
+            .map { (node, instant) -> node.asText() to instant }
             .forEach { (eventName, instant) ->
                 if(sisteEvent[eventName]?.isBefore(instant) != false){
                     sisteEvent[eventName] = instant
