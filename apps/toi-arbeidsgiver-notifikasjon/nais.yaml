@@ -32,3 +32,5 @@ spec:
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{kafka_consumer_group_id}}
+    - name: NOTIFIKASJON_API_URL
+      value: {{notifikasjon-api-url}}
