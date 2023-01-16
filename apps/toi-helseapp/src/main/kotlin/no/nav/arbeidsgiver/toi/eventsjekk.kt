@@ -19,6 +19,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     while(true) {
         val records = consument.poll(Duration.ofSeconds(1))
         records.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
+            .filterNot { (node, _) ->  node != null }
             .filterNot { (node, _) ->  node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
             .forEach { (eventName, instant) ->
