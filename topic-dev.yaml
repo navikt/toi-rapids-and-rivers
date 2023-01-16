@@ -89,3 +89,6 @@ spec:
     - team: toi
       application: toi-rapids-and-rivers-grapher
       access: read
+    - team: toi
+      application: toi-arbeidsgiver-notifikasjon
+      access: readwrite
