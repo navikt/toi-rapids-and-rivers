@@ -39,9 +39,26 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     epostBody: String,
     mottakerEpost: String,
     tidspunkt: LocalDateTime,
-    utløperOm: Period = Period.of(0, 3, 0)
-) = spørringForCvDeltMedArbeidsgiver(notifikasjonsId, stillingsId, virksomhetsnummer,epostBody, mottakerEpost, tidspunkt, utløperOm)
-    .replace("\n", "")
+    utløperOm: Period = Period.of(0, 3, 0),
+) = utenLangeMellomrom(
+    spørringForCvDeltMedArbeidsgiver(
+        notifikasjonsId,
+        stillingsId,
+        virksomhetsnummer,
+        epostBody,
+        mottakerEpost,
+        tidspunkt,
+        utløperOm
+    ).replace("\n", "")
+)
+
+fun utenLangeMellomrom(tekst: String) : String{
+    var retur = tekst
+    while(retur.contains("  ")) {
+        retur = retur.replace("  ", " ")
+    }
+    return retur
+}
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: UUID,
@@ -50,7 +67,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
     epostBody: String,
     mottakerEpost: String,
     tidspunkt: LocalDateTime,
-    utløperOm: Period
+    utløperOm: Period,
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
