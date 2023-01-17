@@ -1,5 +1,10 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.*
+
 private val pesostegn = "$"
 
 fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
@@ -27,9 +32,21 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      </html>
 """.trimIndent()
 
+fun lagGraphQlSpørringForCvDeltMedArbeidsgiver(
+    stillingsId: String,
+    virksomhetsnummer: String,
+    epostBody: String,
+    epostMottaker: String,
+): String {
+    val eksternId = UUID.randomUUID().toString()
+    val merkelapp = "Kandidater";
+    val epostTittel = "Kandidater fra NAV";
+    val lenke = "https://presenterte-kandidater.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
+    val tidspunkt = LocalDateTime.now().toString()
+    val hardDeleteDuration = Duration.of(3, ChronoUnit.MONTHS)
+    val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
 
-// TODO: Må fjerne newlines
-fun lagGraphQlSpørring() = """
+    return """
     {
         "query": "mutation OpprettNyBeskjed(
             ${pesostegn}eksternId: String! 
@@ -93,18 +110,19 @@ fun lagGraphQlSpørring() = """
           }
         }",
         "variables": { 
-            "eksternId": "ID", 
-            "grupperingsId": "id", 
-            "merkelapp": "merkelapp",
-            "virksomhetsnummer": "virksomhetsnummer",
-            "epostTittel": "tittel",
-            "epostBody": "body",
-            "epostMottaker": "hei@hei.no",
-            "lenke": "lenke",
-            "tidspunkt": "2001-12-24T10:44:01",
-            "hardDeleteDuration": "P2DT3H4M",
-            "notifikasjonTekst": "tekst",
-            "epostSendetidspunkt": "2001-12-24T10:44:01"
+            "eksternId": "$eksternId", 
+            "grupperingsId": "$stillingsId", 
+            "merkelapp": "$merkelapp",
+            "virksomhetsnummer": "$virksomhetsnummer",
+            "epostTittel": "$epostTittel",
+            "epostBody": "$epostBody",
+            "epostMottaker": "$epostMottaker",
+            "lenke": "$lenke",
+            "tidspunkt": "$tidspunkt",
+            "hardDeleteDuration": "$hardDeleteDuration",
+            "notifikasjonTekst": "$notifikasjonTekst",
+            "epostSendetidspunkt": "$tidspunkt"
         }
     }
 """.trimIndent()
+}
