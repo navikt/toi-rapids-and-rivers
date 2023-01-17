@@ -75,8 +75,8 @@ class NotifikasjonKlientLytterTest {
                         {
                           "data": {
                             "nyBeskjed": {
-                              "__typename": "DuplikatEksternIdOgMerkelapp",
-                              "feilmelding": "ingen feilmelding?"
+                              "__typename": "NyBeskjedVellykket",
+                              "id": "79c444d8-c658-43f8-8bfe-fabe668c6dcb"
                             }
                           }
                         }

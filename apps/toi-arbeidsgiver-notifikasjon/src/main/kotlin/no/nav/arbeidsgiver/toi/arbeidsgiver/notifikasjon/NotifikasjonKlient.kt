@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
@@ -42,6 +43,11 @@ class NotifikasjonKlient(val url: String) {
         if(errors != null && errors.size() > 0) {
             log.error("Feil fra notifiksjonssystemet ${errors.asText()}")
             throw RuntimeException("Feil fra notifiksjonssystemet ${errors.asText()}")
+        }
+
+        val varVellykket = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText() == "NyBeskjedVellykket"
+        if (!varVellykket) {
+            throw RuntimeException("Kall mot notifikasjon-api feilet, men fikk 200 OK uten errors i responsen")
         }
     }
 }
