@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.post
+import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
@@ -14,13 +15,12 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotifikasjonKlientLytterTest {
 
-    val testRapid = TestRapid()
-    val wiremock = WireMockServer().also { it.start() }
+    private val testRapid = TestRapid()
+    private val urlNotifikasjonApi = "http:/localhost/api/graphql/"
+    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi)
+    private val notifikasjonsLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
 
-    @BeforeAll
-    fun beforeAll() {
-        NotifikasjonLytter(testRapid)
-    }
+    val wiremock = WireMockServer(8082).also { it.start() }
 
     @BeforeEach
     fun beforeEach() {
@@ -29,7 +29,6 @@ class NotifikasjonKlientLytterTest {
 
     @Test
     fun `Når vi mottar notifikasjonsmelding på rapid skal vi gjøre kall til notifikasjonssystemet`() {
-        NotifikasjonLytter(testRapid)
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",

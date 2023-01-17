@@ -7,8 +7,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import java.util.*
 
-class NotifikasjonLytter(rapidsConnection: RapidsConnection) : River.PacketListener {
-    private val notifikasjonKlient = NotifikasjonKlient()
+class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifikasjonKlient: NotifikasjonKlient) : River.PacketListener {
 
     init {
         River(rapidsConnection).apply {

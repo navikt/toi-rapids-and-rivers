@@ -28,6 +28,7 @@ class NotifikasjonKlient(val url: String) {
                 tidspunkt = LocalDateTime.now(),
                 mottakerEpost = mottakerEpost
             )
+
         val (_, response, result) = Fuel.post(path = url).body(spørring).responseString()
 
         if(response.statusCode != 200) {
