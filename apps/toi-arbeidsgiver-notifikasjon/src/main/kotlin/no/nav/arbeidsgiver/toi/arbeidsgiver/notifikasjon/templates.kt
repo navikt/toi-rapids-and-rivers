@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -32,7 +33,15 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      </html>
 """.trimIndent()
 
-fun lagGraphQlSpørringForCvDeltMedArbeidsgiver(
+fun graphQlSpørringForCvDeltMedArbeidsgiver(
+    stillingsId: String,
+    virksomhetsnummer: String,
+    epostBody: String,
+    epostMottaker: String,
+) = spørringForCvDeltMedArbeidsgiver(stillingsId, virksomhetsnummer,epostBody, epostMottaker)
+
+
+private fun spørringForCvDeltMedArbeidsgiver(
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
@@ -43,7 +52,7 @@ fun lagGraphQlSpørringForCvDeltMedArbeidsgiver(
     val epostTittel = "Kandidater fra NAV";
     val lenke = "https://presenterte-kandidater.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
     val tidspunkt = LocalDateTime.now().toString()
-    val hardDeleteDuration = Duration.of(3, ChronoUnit.MONTHS)
+    val hardDeleteDuration = Period.of(0, 3, 0).toString()
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
 
     return """
