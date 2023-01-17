@@ -102,7 +102,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                                     epostadresse: ${pesostegn}epostMottaker 
                                 } 
                             } 
-                            epostSendetidspunkt: { 
+                            sendetidspunkt: { 
                                 tidspunkt: ${pesostegn}epostSendetidspunkt
                             } 
                         } 
