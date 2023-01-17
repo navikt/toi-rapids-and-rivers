@@ -2,7 +2,31 @@ package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
 private val pesostegn = "$"
 
-fun lagEpostBody() = """ epost """
+fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
+     <html>
+     <head>
+         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+         <title>$tittel</title>
+     </head>
+     <body>
+     <p>
+         Hei.<br/>
+         Din bedrift har mottatt en kandidatliste fra NAV: $tittel.<br/>
+         Melding fra markedskontakt i NAV:
+     </p>
+     <p>
+         <pre style="font-family: unset;">$tekst</pre>
+     </p>
+     <p>
+         Logg deg inn på Min side - Arbeidsgiver for å se lista.
+     </p>
+     <p>
+         Mvh, $avsender
+     </p>
+     </body>
+     </html>
+""".trimIndent()
+
 
 // TODO: Må fjerne newlines
 fun lagGraphQlSpørring() = """
