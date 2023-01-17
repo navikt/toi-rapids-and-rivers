@@ -40,12 +40,17 @@ class NotifikasjonLytterTest {
         """.trimIndent()
         testRapid.sendTestMessage(melding)
 
-        wiremock.verify(1, WireMock.postRequestedFor(
-            WireMock.urlEqualTo("/api/graphql")).withRequestBody(
-            containing("""
+        wiremock.verify(
+            1, WireMock.postRequestedFor(
+                WireMock.urlEqualTo("/api/graphql")
+            ).withRequestBody(
+                containing(
+                    """
                 TODO: Legg til medling i klartekst med variables i tillegg til mutation
-            """.trimIndent())
-            ))
+            """.trimIndent()
+                )
+            )
+        )
 
     }
 
@@ -59,10 +64,9 @@ class NotifikasjonLytterTest {
 
     fun stubKallTilNotifikasjonssystemet() {
         wiremock.stubFor(
-            post("/api/graphql/")
-                .withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN"))
-                .willReturn(
-                    WireMock.ok("""
+            post("/api/graphql/").withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN")).willReturn(
+                    WireMock.ok(
+                        """
                         {
                           "data": {
                             "nyBeskjed": {
@@ -71,18 +75,17 @@ class NotifikasjonLytterTest {
                             }
                           }
                         }
-                    """.trimIndent())
-                        .withHeader("Content-Type", "application/json")
+                    """.trimIndent()
+                    ).withHeader("Content-Type", "application/json")
                 )
         )
     }
 
     fun stubFeilendeKallTilNotifikasjonssystemet() {
         wiremock.stubFor(
-            post("/api/graphql/")
-                .withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN"))
-                .willReturn(
-                    WireMock.ok("""
+            post("/api/graphql/").withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN")).willReturn(
+                    WireMock.ok(
+                        """
                         {
                           "error": {
                             "errors": [
@@ -109,8 +112,8 @@ class NotifikasjonLytterTest {
                             ]
                           }
                         }
-                    """.trimIndent())
-                        .withHeader("Content-Type", "application/json")
+                    """.trimIndent()
+                    ).withHeader("Content-Type", "application/json")
                 )
         )
     }
