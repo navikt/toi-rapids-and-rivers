@@ -13,6 +13,14 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection) : River.PacketListe
     init {
         River(rapidsConnection).apply {
             validate {
+                it.demandValue("@event_name", "notifikasjon.cv-delt")
+                it.requireKey(
+                    "virksomhetsnummer",
+                    "stillingsId",
+                    "utførendeVeilederFornavn",
+                    "utførendeVeilederEtternavn",
+                    "mottakerEpost"
+                )
             }
         }.register(this)
     }

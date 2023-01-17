@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,15 +29,19 @@ class NotifikasjonKlientLytterTest {
 
     @Test
     fun `Når vi mottar notifikasjonsmelding på rapid skal vi gjøre kall til notifikasjonssystemet`() {
+        NotifikasjonLytter(testRapid)
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",
-              "epostArbeidsgiver": "test.testepost.no",
+              "mottakerEpost": "test.testepost.no",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "stillingstittel: "Kjøpman søkes",
-              "virksomhetsnummer": "123456789"
+              "virksomhetsnummer": "123456789",
+              "utførendeVeilederFornavn": "Veileder",
+              "utførendeVeilederEtternavn": "Veildersen"
             }
         """.trimIndent()
+        stubKallTilNotifikasjonssystemet()
+
         testRapid.sendTestMessage(melding)
 
         wiremock.verify(
@@ -50,7 +55,7 @@ class NotifikasjonKlientLytterTest {
                 )
             )
         )
-
+        assertThat(testRapid.inspektør.size).isZero
     }
 
     @Test
