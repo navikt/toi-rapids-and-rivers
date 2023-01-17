@@ -53,7 +53,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
 )
 
 fun utenLangeMellomrom(tekst: String) : String{
-    var retur = tekst
+    var retur = "$tekst"
     while(retur.contains("  ")) {
         retur = retur.replace("  ", " ")
     }
