@@ -1,9 +1,7 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
-import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Period
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 private val pesostegn = "$"
@@ -33,26 +31,30 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      </html>
 """.trimIndent()
 
+// TODO: Eget tidspunkt for deling, eget tidspunkt for notifikasjon
 fun graphQlSpørringForCvDeltMedArbeidsgiver(
+    notifikasjonsId: UUID = UUID.randomUUID(),
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
     epostMottaker: String,
-) = spørringForCvDeltMedArbeidsgiver(stillingsId, virksomhetsnummer,epostBody, epostMottaker)
-
+    tidspunkt: LocalDateTime,
+    utløperOm: Period = Period.of(0, 3, 0)
+) = spørringForCvDeltMedArbeidsgiver(notifikasjonsId, stillingsId, virksomhetsnummer,epostBody, epostMottaker, tidspunkt, utløperOm)
+    .replace("\n", "")
 
 private fun spørringForCvDeltMedArbeidsgiver(
+    notifikasjonsId: UUID,
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
     epostMottaker: String,
+    tidspunkt: LocalDateTime,
+    utløperOm: Period
 ): String {
-    val eksternId = UUID.randomUUID().toString()
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
     val lenke = "https://presenterte-kandidater.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
-    val tidspunkt = LocalDateTime.now().toString()
-    val hardDeleteDuration = Period.of(0, 3, 0).toString()
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
 
     return """
@@ -119,7 +121,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
           }
         }",
         "variables": { 
-            "eksternId": "$eksternId", 
+            "eksternId": "$notifikasjonsId", 
             "grupperingsId": "$stillingsId", 
             "merkelapp": "$merkelapp",
             "virksomhetsnummer": "$virksomhetsnummer",
@@ -128,7 +130,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "epostMottaker": "$epostMottaker",
             "lenke": "$lenke",
             "tidspunkt": "$tidspunkt",
-            "hardDeleteDuration": "$hardDeleteDuration",
+            "hardDeleteDuration": "$utløperOm",
             "notifikasjonTekst": "$notifikasjonTekst",
             "epostSendetidspunkt": "$tidspunkt"
         }
