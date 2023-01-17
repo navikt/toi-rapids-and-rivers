@@ -52,13 +52,10 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     ).replace("\n", "")
 )
 
-fun utenLangeMellomrom(tekst: String) : String{
-    var retur = "$tekst"
-    while(retur.contains("  ")) {
-        retur = retur.replace("  ", " ")
-    }
-    return retur
-}
+fun utenLangeMellomrom(tekst: String): String =
+    if (tekst.contains("  "))
+        utenLangeMellomrom(tekst.replace("  ", " "))
+    else tekst
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: UUID,
