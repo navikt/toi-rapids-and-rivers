@@ -1,10 +1,9 @@
-package no.nav.arbeidsgiver.toi.arbeidsgiver
+package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.post
-import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.NotifikasjonLytter
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
