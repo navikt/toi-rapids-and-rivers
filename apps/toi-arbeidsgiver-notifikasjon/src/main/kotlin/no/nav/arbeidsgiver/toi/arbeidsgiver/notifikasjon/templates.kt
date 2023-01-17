@@ -37,10 +37,10 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
-    epostMottaker: String,
+    mottakerEpost: String,
     tidspunkt: LocalDateTime,
     utløperOm: Period = Period.of(0, 3, 0)
-) = spørringForCvDeltMedArbeidsgiver(notifikasjonsId, stillingsId, virksomhetsnummer,epostBody, epostMottaker, tidspunkt, utløperOm)
+) = spørringForCvDeltMedArbeidsgiver(notifikasjonsId, stillingsId, virksomhetsnummer,epostBody, mottakerEpost, tidspunkt, utløperOm)
     .replace("\n", "")
 
 private fun spørringForCvDeltMedArbeidsgiver(
@@ -48,7 +48,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
-    epostMottaker: String,
+    mottakerEpost: String,
     tidspunkt: LocalDateTime,
     utløperOm: Period
 ): String {
@@ -127,7 +127,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "virksomhetsnummer": "$virksomhetsnummer",
             "epostTittel": "$epostTittel",
             "epostBody": "$epostBody",
-            "epostMottaker": "$epostMottaker",
+            "epostMottaker": "$mottakerEpost",
             "lenke": "$lenke",
             "tidspunkt": "$tidspunkt",
             "hardDeleteDuration": "$utløperOm",

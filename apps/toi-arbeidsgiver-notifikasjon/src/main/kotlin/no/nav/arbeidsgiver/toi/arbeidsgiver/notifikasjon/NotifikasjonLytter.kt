@@ -1,12 +1,11 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.graphQlSpørringForCvDeltMedArbeidsgiver
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.lagEpostBody
+import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import java.time.LocalDateTime
+import java.util.*
 
 class NotifikasjonLytter(rapidsConnection: RapidsConnection) : River.PacketListener {
 
@@ -18,24 +17,19 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection) : River.PacketListe
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val stillingId = "";
-        val virksomhetsnummer = "";
-        val epostBody = lagEpostBody(
-            tittel = "",
-            tekst = "",
-            avsender = ""
+
+        val stillingsId = UUID.fromString(packet["stillingsId"].asText())
+        val virksomhetsnummer = packet["virksomhetsnummer"].asText()
+        val utførendeVeilederFornavn = packet["utførendeVeilederFornavn"].asText()
+        val utførendeVeilederEtternavn = packet["utførendeVeilederEtternavn"].asText()
+        val mottakerEpost = packet["mottakerEpost"].asText()
+        val notifikasjonKlient = NotifikasjonKlient()
+
+        notifikasjonKlient.sendNotifikasjon(
+            mottakerEpost = mottakerEpost,
+            stillingsId = stillingsId,
+            virksomhetsnummer = virksomhetsnummer,
+            avsender = "$utførendeVeilederFornavn $utførendeVeilederEtternavn"
         )
-        val epostMottaker = "";
-
-        val spørring =
-            graphQlSpørringForCvDeltMedArbeidsgiver(
-                stillingsId = stillingId,
-                virksomhetsnummer = virksomhetsnummer,
-                epostBody = epostBody,
-                tidspunkt = LocalDateTime.now(),
-                epostMottaker = epostMottaker
-            )
-
-
     }
 }

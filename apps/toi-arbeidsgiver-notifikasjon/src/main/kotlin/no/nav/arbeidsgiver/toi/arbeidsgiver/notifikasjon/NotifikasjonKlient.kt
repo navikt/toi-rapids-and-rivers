@@ -1,16 +1,14 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
-import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.TokendingsKlient
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-class Notifikasjon(private val tokendingsKlient: TokendingsKlient) {
-    private val skalSletteNotifikasjonOm = Duration.of(3, ChronoUnit.MONTHS)
+class NotifikasjonKlient {
 
     fun sendNotifikasjon(
-        epostArbeidsgiver: String,
+        mottakerEpost: String,
         stillingsId: UUID,
         virksomhetsnummer: String,
         avsender: String,
@@ -27,10 +25,10 @@ class Notifikasjon(private val tokendingsKlient: TokendingsKlient) {
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
                 tidspunkt = LocalDateTime.now(),
-                epostMottaker = epostArbeidsgiver
+                mottakerEpost = mottakerEpost
             )
 
-    }
+        // TODO: Send notifikasjon
 
-    private fun lenkeTilKandidatliste() = ""
+    }
 }
