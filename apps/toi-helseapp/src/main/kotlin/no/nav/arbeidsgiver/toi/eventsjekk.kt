@@ -6,8 +6,9 @@ import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
-import java.time.Duration
-import java.time.Instant
+import java.time.*
+
+private val uinteressanteHendelser = listOf("application_up", "application_ready", "application_not_ready", "application_stop", "application_down")
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(consumerProperties(envs, "toi-helseapp-eventsjekker", "toi-helseapp-eventsjekker"), StringDeserializer(), StringDeserializer())
@@ -17,22 +18,56 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     consument.assign(listOf(topicPartition))
     consument.seekToBeginning(listOf(topicPartition))
     while(true) {
-        val records = consument.poll(Duration.ofSeconds(1))
+        val records = consument.poll(Duration.ofMinutes(1))
         records.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
             .filterNot { (node, _) ->  node == null }
             .filterNot { (node, _) ->  node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
+            .filterNot { (node, _) -> node in uinteressanteHendelser }
             .forEach { (eventName, instant) ->
                 if(sisteEvent[eventName]?.isBefore(instant) != false){
                     sisteEvent[eventName] = instant
                 }
             }
-        val timestamp = Instant.ofEpochMilli(records.last().timestamp())
-        if(Duration.between(timestamp, Instant.now()) < Duration.ofMinutes(5)) {
-            log.info(sisteEvent.map { (eventName,instant) ->
-                "$eventName: ${Duration.between(instant, Instant.now())}"
-            }.joinToString("\n"))
-            delay(Duration.ofMinutes(1))
+        val grenseVerdiForÅVæreIKapp = Duration.ofMinutes(5)
+        val tidSidenSisteLesteMelding = Duration.between(
+            Instant.ofEpochMilli(records.last().timestamp()),
+            Instant.now()
+        )
+        if(tidSidenSisteLesteMelding < grenseVerdiForÅVæreIKapp) {
+            val nå = Instant.now()
+            val sorterteEventer = sisteEvent.toList()
+                .map { (eventName, instant) -> eventName to Duration.between(instant, nå) }
+                .sortedByDescending(Pair<String, Duration>::second)
+            val mestUtdaterteHendelse = sorterteEventer.map(Pair<String, Duration>::second).maxOrNull()
+            if(mestUtdaterteHendelse != null && mestUtdaterteHendelse>Duration.ofHours(1) && forventerIkkeUtdaterteHendelserNå()){
+                log.error("Tid siden hendelser (grenseverdi er nådd):\n"+
+                        sorterteEventer
+                            .joinToString("\n") { (eventName, duration) ->
+                                "$eventName: $duration"
+                            })
+            }
+            else {
+                log.info("Tid siden hendelser:\n"+
+                        sorterteEventer
+                            .joinToString("\n") { (eventName, duration) ->
+                                "$eventName: $duration"
+                            })
+            }
+            if(tidSidenSisteLesteMelding < Duration.ofSeconds(30)) {
+                delay(Duration.ofMinutes(1))
+            }
         }
+    }
+}
+
+private fun forventerIkkeUtdaterteHendelserNå() = !forventerUtdaterteHendelserNå()
+private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now().let {
+    when {
+        it.dayOfWeek == DayOfWeek.SATURDAY -> true
+        it.dayOfWeek == DayOfWeek.SUNDAY -> true
+        it.hour < 8 -> true
+        it.hour > 16 -> true
+        else -> false
     }
 }
