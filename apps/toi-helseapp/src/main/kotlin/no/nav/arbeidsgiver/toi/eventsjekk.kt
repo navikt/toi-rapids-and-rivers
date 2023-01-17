@@ -8,7 +8,7 @@ import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
 
-private val uinteressanteHendelser = listOf("application_up", "application_ready", "application_not_ready", "application_stop", "application_down")
+private val uinteressanteHendelser = listOf("application_up", "application_ready", "application_not_ready", "application_stop", "application_down", "republisert.sammenstilt")
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(consumerProperties(envs, "toi-helseapp-eventsjekker", "toi-helseapp-eventsjekker"), StringDeserializer(), StringDeserializer())
@@ -62,12 +62,12 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
 }
 
 private fun forventerIkkeUtdaterteHendelserNå() = !forventerUtdaterteHendelserNå()
-private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now().let {
+private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now(ZoneId.of("Europe/Oslo")).let {
     when {
         it.dayOfWeek == DayOfWeek.SATURDAY -> true
         it.dayOfWeek == DayOfWeek.SUNDAY -> true
-        it.hour < 8 -> true
-        it.hour > 16 -> true
+        it.hour < 9 -> true
+        it.hour > 15 -> true
         else -> false
     }
 }
