@@ -8,6 +8,7 @@ import no.nav.helse.rapids_rivers.River
 import java.util.*
 
 class NotifikasjonLytter(rapidsConnection: RapidsConnection) : River.PacketListener {
+    private val notifikasjonKlient = NotifikasjonKlient()
 
     init {
         River(rapidsConnection).apply {
@@ -17,13 +18,11 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection) : River.PacketListe
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
         val stillingsId = UUID.fromString(packet["stillingsId"].asText())
         val virksomhetsnummer = packet["virksomhetsnummer"].asText()
         val utførendeVeilederFornavn = packet["utførendeVeilederFornavn"].asText()
         val utførendeVeilederEtternavn = packet["utførendeVeilederEtternavn"].asText()
         val mottakerEpost = packet["mottakerEpost"].asText()
-        val notifikasjonKlient = NotifikasjonKlient()
 
         notifikasjonKlient.sendNotifikasjon(
             mottakerEpost = mottakerEpost,
