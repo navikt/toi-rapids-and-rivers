@@ -31,7 +31,6 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      </html>
 """.trimIndent()
 
-// TODO: Eget tidspunkt for deling, eget tidspunkt for notifikasjon
 fun graphQlSpørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: UUID = UUID.randomUUID(),
     stillingsId: String,
@@ -39,7 +38,6 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     epostBody: String,
     mottakerEpost: String,
     tidspunkt: LocalDateTime,
-    utløperOm: Period = Period.of(0, 3, 0),
 ) = utenLangeMellomrom(
     spørringForCvDeltMedArbeidsgiver(
         notifikasjonsId,
@@ -47,12 +45,11 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
         virksomhetsnummer,
         epostBody,
         mottakerEpost,
-        tidspunkt,
-        utløperOm
+        tidspunkt
     ).replace("\n", "")
 )
 
-fun utenLangeMellomrom(tekst: String): String =
+private fun utenLangeMellomrom(tekst: String): String =
     if (tekst.contains("  "))
         utenLangeMellomrom(tekst.replace("  ", " "))
     else tekst
@@ -63,13 +60,13 @@ private fun spørringForCvDeltMedArbeidsgiver(
     virksomhetsnummer: String,
     epostBody: String,
     mottakerEpost: String,
-    tidspunkt: LocalDateTime,
-    utløperOm: Period,
+    tidspunkt: LocalDateTime
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
     val lenke = "https://presenterte-kandidater.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
+    val utløperOm = Period.of(0, 3, 0)
 
     return """
     {

@@ -36,16 +36,12 @@ class NotifikasjonKlient(val url: String) {
             throw RuntimeException("Feilkode fra notifikasjonssystemet: ${response.statusCode} ${result.get()}")
         }
 
-
         val json = jacksonObjectMapper().readTree(result.get())
-
         val errors = json["errors"]
 
-        if(!errors.isNull && errors.size() > 0) {
+        if(errors != null && errors.size() > 0) {
             log.error("Feil fra notifiksjonssystemet ${errors.asText()}")
             throw RuntimeException("Feil fra notifiksjonssystemet ${errors.asText()}")
-
         }
-
     }
 }

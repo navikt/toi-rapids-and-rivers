@@ -28,7 +28,7 @@ class TemplatesTest {
 
         assertThat(
             graphQlSpørringForCvDeltMedArbeidsgiver(
-                notifikasjonsId, stillingId, virksomhetsnummer, epostBody, epostMottaker, tidspunkt, utløperOm
+                notifikasjonsId, stillingId, virksomhetsnummer, epostBody, epostMottaker, tidspunkt
             )
         ).isEqualTo(expected)
     }

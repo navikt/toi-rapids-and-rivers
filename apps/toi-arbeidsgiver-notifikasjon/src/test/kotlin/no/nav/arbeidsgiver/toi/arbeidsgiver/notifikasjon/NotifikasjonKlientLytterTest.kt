@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
+import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.graphQlSpørringForCvDeltMedArbeidsgiver
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.TestInstance
 class NotifikasjonKlientLytterTest {
 
     private val testRapid = TestRapid()
-    private val urlNotifikasjonApi = "http:/localhost/api/graphql/"
+    private val urlNotifikasjonApi = "http://localhost:8082/api/graphql"
     private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi)
     private val notifikasjonsLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
 
@@ -65,9 +66,10 @@ class NotifikasjonKlientLytterTest {
     fun `Når kall mot notifikasjonssystemet feiler skal vi throwe error og offset skal ikke commites`() {
     }
 
+    // TODO: Legg på Authorization header i stub'en
     fun stubKallTilNotifikasjonssystemet() {
         wiremock.stubFor(
-            post("/api/graphql/").withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN")).willReturn(
+            post("/api/graphql").willReturn(
                     WireMock.ok(
                         """
                         {
@@ -86,7 +88,7 @@ class NotifikasjonKlientLytterTest {
 
     fun stubFeilendeKallTilNotifikasjonssystemet() {
         wiremock.stubFor(
-            post("/api/graphql/").withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN")).willReturn(
+            post("/api/graphql").withHeader("Authorization", WireMock.containing("Bearer TULLETOKEN")).willReturn(
                     WireMock.ok(
                         """
                         {
