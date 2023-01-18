@@ -50,10 +50,14 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
         .replace("\n", "")
         .utenLangeMellomrom()
 
-tailrec fun String.utenLangeMellomrom(): String =
-    if (contains("  "))
-        replace("  ", " ").utenLangeMellomrom()
-    else this
+
+fun String.utenLangeMellomrom(): String =
+    fold(this) { acc, next ->
+        if (acc.last() == ' ' && next == ' ')
+            acc
+        else
+            acc + next
+    }
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: UUID,
@@ -61,7 +65,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
     virksomhetsnummer: String,
     epostBody: String,
     mottakerEpost: String,
-    tidspunktForVarsel: LocalDateTime
+    tidspunktForVarsel: LocalDateTime,
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
