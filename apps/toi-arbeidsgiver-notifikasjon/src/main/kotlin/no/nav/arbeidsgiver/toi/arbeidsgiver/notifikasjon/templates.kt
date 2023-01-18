@@ -38,7 +38,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     epostBody: String,
     mottakerEpost: String,
     tidspunktForVarsel: LocalDateTime,
-) = utenLangeMellomrom(
+) =
     spørringForCvDeltMedArbeidsgiver(
         notifikasjonsId,
         stillingsId,
@@ -46,13 +46,14 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
         epostBody,
         mottakerEpost,
         tidspunktForVarsel
-    ).replace("\n", "")
-)
+    )
+        .replace("\n", "")
+        .utenLangeMellomrom()
 
-private fun utenLangeMellomrom(tekst: String): String =
-    if (tekst.contains("  "))
-        utenLangeMellomrom(tekst.replace("  ", " "))
-    else tekst
+tailrec fun String.utenLangeMellomrom(): String =
+    if (contains("  "))
+        replace("  ", " ").utenLangeMellomrom()
+    else this
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: UUID,
