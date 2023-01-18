@@ -2,8 +2,7 @@ package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.containing
-import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.graphQlSpørringForCvDeltMedArbeidsgiver
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.lagEpostBody
@@ -70,6 +69,24 @@ class NotifikasjonKlientLytterTest {
 
     @Test
     fun `Når vi mottar notifikasjonsmelding på rapid uten epostadresse skal vi logge feil men gå videre`() {
+        val melding = """
+            {
+              "@event_name": "notifikasjon.cv-delt",
+              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+              "virksomhetsnummer": "123456789",
+              "utførendeVeilederFornavn": "Veileder",
+              "utførendeVeilederEtternavn": "Veiledersen"
+            }
+        """.trimIndent()
+        stubKallTilNotifikasjonssystemet()
+
+        testRapid.sendTestMessage(melding)
+
+        wiremock.verify(
+            0, WireMock.postRequestedFor(urlEqualTo( "/api/graphql"))
+            )
+        assertThat(testRapid.inspektør.size).isZero
+
     }
 
     @Test
