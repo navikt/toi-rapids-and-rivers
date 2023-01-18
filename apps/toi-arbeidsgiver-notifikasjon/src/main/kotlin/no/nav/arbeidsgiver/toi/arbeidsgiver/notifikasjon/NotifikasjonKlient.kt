@@ -1,13 +1,16 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
 import java.time.LocalDateTime
 import java.util.*
 
-class NotifikasjonKlient(val url: String) {
+class NotifikasjonKlient(
+    val url: String,
+    val lagNotifikasjonsId: () -> UUID = { UUID.randomUUID() },
+    val lagTidspunktForVarsel: () -> LocalDateTime = { LocalDateTime.now() }
+) {
 
     fun sendNotifikasjon(
         mottakerEpost: String,
@@ -23,16 +26,17 @@ class NotifikasjonKlient(val url: String) {
 
         val spørring =
             graphQlSpørringForCvDeltMedArbeidsgiver(
+                notifikasjonsId = lagNotifikasjonsId(),
                 stillingsId = stillingsId.toString(),
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
-                tidspunkt = LocalDateTime.now(),
+                tidspunktForVarsel = lagTidspunktForVarsel(),
                 mottakerEpost = mottakerEpost
             )
 
         val (_, response, result) = Fuel.post(path = url).body(spørring).responseString()
 
-        if(response.statusCode != 200) {
+        if (response.statusCode != 200) {
             log.error("Feilkode fra notifikasjonssystemet: ${response.statusCode}")
             throw RuntimeException("Feilkode fra notifikasjonssystemet: ${response.statusCode} ${result.get()}")
         }
@@ -40,7 +44,7 @@ class NotifikasjonKlient(val url: String) {
         val json = jacksonObjectMapper().readTree(result.get())
         val errors = json["errors"]
 
-        if(errors != null && errors.size() > 0) {
+        if (errors != null && errors.size() > 0) {
             log.error("Feil fra notifiksjonssystemet ${errors.asText()}")
             throw RuntimeException("Feil fra notifiksjonssystemet ${errors.asText()}")
         }

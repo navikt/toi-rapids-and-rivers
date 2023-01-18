@@ -37,7 +37,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     virksomhetsnummer: String,
     epostBody: String,
     mottakerEpost: String,
-    tidspunkt: LocalDateTime,
+    tidspunktForVarsel: LocalDateTime,
 ) = utenLangeMellomrom(
     spørringForCvDeltMedArbeidsgiver(
         notifikasjonsId,
@@ -45,7 +45,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
         virksomhetsnummer,
         epostBody,
         mottakerEpost,
-        tidspunkt
+        tidspunktForVarsel
     ).replace("\n", "")
 )
 
@@ -60,7 +60,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
     virksomhetsnummer: String,
     epostBody: String,
     mottakerEpost: String,
-    tidspunkt: LocalDateTime
+    tidspunktForVarsel: LocalDateTime
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
@@ -140,10 +140,10 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "epostBody": "$epostBody",
             "epostMottaker": "$mottakerEpost",
             "lenke": "$lenke",
-            "tidspunkt": "$tidspunkt",
+            "tidspunkt": "$tidspunktForVarsel",
             "hardDeleteDuration": "$utløperOm",
             "notifikasjonTekst": "$notifikasjonTekst",
-            "epostSendetidspunkt": "$tidspunkt"
+            "epostSendetidspunkt": "${LocalDateTime.MIN}"
         }
     }
 """.trimIndent()

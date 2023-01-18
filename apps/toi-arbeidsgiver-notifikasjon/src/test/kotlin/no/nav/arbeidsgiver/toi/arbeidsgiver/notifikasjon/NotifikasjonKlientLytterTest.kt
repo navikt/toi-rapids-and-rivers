@@ -6,19 +6,27 @@ import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.graphQlSpørringForCvDeltMedArbeidsgiver
+import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.lagEpostBody
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.time.LocalDateTime
+import java.time.Month
+import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotifikasjonKlientLytterTest {
 
     private val testRapid = TestRapid()
     private val urlNotifikasjonApi = "http://localhost:8082/api/graphql"
-    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi)
+    private val notifikasjonsId = UUID.fromString("83f28af1-fe3b-4630-809d-5f9ab7808932")
+    private val tidpsunktForVarsel = LocalDateTime.of(2023, Month.JANUARY, 18, 0, 0)
+    private val pesostegn = "$"
+
+    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi, {notifikasjonsId}, {tidpsunktForVarsel})
     private val notifikasjonsLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
 
     val wiremock = WireMockServer(8082).also { it.start() }
@@ -37,7 +45,7 @@ class NotifikasjonKlientLytterTest {
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
               "utførendeVeilederFornavn": "Veileder",
-              "utførendeVeilederEtternavn": "Veildersen"
+              "utførendeVeilederEtternavn": "Veiledersen"
             }
         """.trimIndent()
         stubKallTilNotifikasjonssystemet()
@@ -48,14 +56,15 @@ class NotifikasjonKlientLytterTest {
             1, WireMock.postRequestedFor(
                 WireMock.urlEqualTo("/api/graphql")
             ).withRequestBody(
-                containing(
+                containing(" " +
                     """
-                TODO: Legg til medling i klartekst med variables i tillegg til mutation
-            """.trimIndent()
+                         { "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}epostMottaker: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostSendetidspunkt: ISO8601LocalDateTime ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostMottaker } } sendetidspunkt: { tidspunkt: ${pesostegn}epostSendetidspunkt } } } } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "eksternId": "83f28af1-fe3b-4630-809d-5f9ab7808932", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "<html><head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>Todo tittel</title></head><body><p> Hei.<br/> Din bedrift har mottatt en kandidatliste fra NAV: Todo tittel.<br/> Melding fra markedskontakt i NAV:</p><p> <pre style="font-family: unset;">Todo tekst</pre></p><p> Logg deg inn på Min side - Arbeidsgiver for å se lista.</p><p> Mvh, Veileder Veiledersen</p></body></html>", "epostMottaker": "test.testepost.no", "lenke": "https://presenterte-kandidater.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-01-18T00:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater", "epostSendetidspunkt": "-999999999-01-01T00:00" } }
+                    """.trimIndent()
                 )
             )
         )
         assertThat(testRapid.inspektør.size).isZero
+        // TODO: Assert på CallId
     }
 
     @Test
