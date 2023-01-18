@@ -30,7 +30,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
             "grant_type" to "client_credentials",
             "client_secret" to env["AZURE_APP_CLIENT_SECRET"],
             "client_id" to env["AZURE_APP_CLIENT_ID"],
-            "scope" to env["NOTIFIKASJON_API_SCOPE"] // TODO: Endre scope
+            "scope" to env["NOTIFIKASJON_API_SCOPE"]
         )
 
         val (_, _, result) = FuelManager()

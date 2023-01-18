@@ -103,10 +103,8 @@ class NotifikasjonKlientLytterTest {
         assertThrows<RuntimeException> {
             testRapid.sendTestMessage(melding)
         }
-
     }
 
-    // TODO: Legg på Authorization header i stub'en
     fun stubKallTilNotifikasjonssystemet() {
         wiremock.stubFor(
             post("/api/graphql")
