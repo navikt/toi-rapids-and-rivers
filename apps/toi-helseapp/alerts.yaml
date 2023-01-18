@@ -24,6 +24,12 @@ spec:
       action: "https://logs.adeo.no/goto/2d965f50-0db3-11ed-9b1a-4723a5e7a9db"
 
     - alert: toi-helseapp
+      expr: sum(increase(logd_messages_total{log_app="toi-helseapp",component="toi-helseapp",log_level="Warning"}[10m])) > 0
+      for: 1s
+      description: Appen har logget en warning
+      action: "https://logs.adeo.no/goto/2d965f50-0db3-11ed-9b1a-4723a5e7a9db"
+
+    - alert: toi-helseapp
       severity: warning
       expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-helseapp",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-helseapp"}[5m]))) > 20
       for: 5m

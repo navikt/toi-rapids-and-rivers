@@ -9,7 +9,8 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
 
 private val uinteressanteHendelser = listOf("application_up", "application_ready", "application_not_ready", "application_stop", "application_down", "republisert.sammenstilt", "kandidat.")
-private val uinteressanteHendelsePrefikser = listOf("kandidat.", "cv")
+private val uinteressanteHendelsePrefikser = listOf("kandidat.")
+private val hendelserSomIkkeSendesLenger = listOf("cv", "cv.sammenstilt")
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(consumerProperties(envs, "toi-helseapp-eventsjekker", "toi-helseapp-eventsjekker"), StringDeserializer(), StringDeserializer())
@@ -39,11 +40,12 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
         if(tidSidenSisteLesteMelding < grenseVerdiForÅVæreIKapp) {
             val nå = Instant.now()
             val sorterteEventer = sisteEvent.toList()
+                .filterNot { (eventName, _) -> eventName in hendelserSomIkkeSendesLenger}
                 .map { (eventName, instant) -> eventName to Duration.between(instant, nå) }
                 .sortedByDescending(Pair<String, Duration>::second)
             val mestUtdaterteHendelse = sorterteEventer.map(Pair<String, Duration>::second).maxOrNull()
             if(mestUtdaterteHendelse != null && mestUtdaterteHendelse>Duration.ofHours(1) && forventerIkkeUtdaterteHendelserNå()){
-                log.error("Tid siden hendelser (grenseverdi er nådd):\n"+
+                log.warn("Tid siden hendelser (grenseverdi er nådd):\n"+
                         sorterteEventer
                             .joinToString("\n") { (eventName, duration) ->
                                 "$eventName: $duration"
@@ -55,6 +57,9 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                             .joinToString("\n") { (eventName, duration) ->
                                 "$eventName: $duration"
                             })
+            }
+            hendelserSomIkkeSendesLenger.filterNot(sisteEvent::containsKey).forEach {
+                log.warn("Finner ingen hendelser ved navn $it i rapiden lenger. Burde fjernes fra hendelserSomIkkeSendesLenger-listen")
             }
             if(tidSidenSisteLesteMelding < Duration.ofSeconds(30)) {
                 delay(Duration.ofMinutes(1))
