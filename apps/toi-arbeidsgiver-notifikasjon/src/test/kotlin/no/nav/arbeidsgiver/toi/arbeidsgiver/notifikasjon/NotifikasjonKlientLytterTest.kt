@@ -25,8 +25,9 @@ class NotifikasjonKlientLytterTest {
     private val notifikasjonsId = UUID.fromString("83f28af1-fe3b-4630-809d-5f9ab7808932")
     private val tidpsunktForVarsel = LocalDateTime.of(2023, Month.JANUARY, 18, 0, 0)
     private val pesostegn = "$"
+    private val accessToken = "TestAccessToken"
 
-    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi, {notifikasjonsId}, {tidpsunktForVarsel})
+    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi, {notifikasjonsId}, {tidpsunktForVarsel}, {accessToken})
     private val notifikasjonsLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
 
     val wiremock = WireMockServer(8082).also { it.start() }
@@ -78,7 +79,9 @@ class NotifikasjonKlientLytterTest {
     // TODO: Legg på Authorization header i stub'en
     fun stubKallTilNotifikasjonssystemet() {
         wiremock.stubFor(
-            post("/api/graphql").willReturn(
+            post("/api/graphql")
+                .withHeader("Authorization", containing("Bearer $accessToken"))
+                .willReturn(
                     WireMock.ok(
                         """
                         {

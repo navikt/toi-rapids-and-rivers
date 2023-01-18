@@ -9,7 +9,8 @@ import java.util.*
 class NotifikasjonKlient(
     val url: String,
     val lagNotifikasjonsId: () -> UUID = { UUID.randomUUID() },
-    val lagTidspunktForVarsel: () -> LocalDateTime = { LocalDateTime.now() }
+    val lagTidspunktForVarsel: () -> LocalDateTime = { LocalDateTime.now() },
+    val hentAccessToken: () -> String
 ) {
 
     fun sendNotifikasjon(
@@ -34,7 +35,11 @@ class NotifikasjonKlient(
                 mottakerEpost = mottakerEpost
             )
 
-        val (_, response, result) = Fuel.post(path = url).body(spørring).responseString()
+        val (_, response, result) = Fuel
+            .post(path = url)
+            .header("Authorization", "Bearer ${hentAccessToken()}")
+            .body(spørring)
+            .responseString()
 
         if (response.statusCode != 200) {
             log.error("Feilkode fra notifikasjonssystemet: ${response.statusCode}")

@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
     val urlNotifikasjonsApi = System.getenv("NOTIFIKASJON_API_URL")
-    val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonsApi)
+    val accessTokenClient = AccessTokenClient(System.getenv())
+    val notifikasjonKlient = NotifikasjonKlient(url = urlNotifikasjonsApi, hentAccessToken = accessTokenClient::hentAccessToken)
 
     NotifikasjonLytter(rapidsConnection, notifikasjonKlient)
 }.start()
