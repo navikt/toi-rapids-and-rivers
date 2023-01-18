@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
+import java.util.*
 
 private val uinteressanteHendelser = listOf(
     "application_up",
@@ -91,6 +92,13 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
 private fun forventerIkkeUtdaterteHendelserNå() = !forventerUtdaterteHendelserNå()
 private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now(ZoneId.of("Europe/Oslo")).let {
     when {
+        it.month == Month.JANUARY && it.dayOfMonth == 1 -> true
+        it.month == Month.MAY && it.dayOfMonth == 1 -> true
+        it.month == Month.MAY && it.dayOfMonth == 17 -> true
+        it.month == Month.DECEMBER && it.dayOfMonth >= 24 -> true
+        it.toLocalDate().erPåske() -> true
+        it.toLocalDate().erPinse() -> true
+        it.toLocalDate().erKristiHimmelfartsdag() -> true
         it.dayOfWeek == DayOfWeek.SATURDAY -> true
         it.dayOfWeek == DayOfWeek.SUNDAY -> true
         it.hour < 9 -> true
