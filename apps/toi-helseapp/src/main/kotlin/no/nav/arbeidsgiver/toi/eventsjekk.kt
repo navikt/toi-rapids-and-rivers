@@ -8,7 +8,8 @@ import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
 
-private val uinteressanteHendelser = listOf("application_up", "application_ready", "application_not_ready", "application_stop", "application_down", "republisert.sammenstilt")
+private val uinteressanteHendelser = listOf("application_up", "application_ready", "application_not_ready", "application_stop", "application_down", "republisert.sammenstilt", "kandidat.")
+private val uinteressanteHendelsePrefikser = listOf("kandidat.", "cv")
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(consumerProperties(envs, "toi-helseapp-eventsjekker", "toi-helseapp-eventsjekker"), StringDeserializer(), StringDeserializer())
@@ -23,7 +24,8 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             .filterNot { (node, _) ->  node == null }
             .filterNot { (node, _) ->  node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
-            .filterNot { (node, _) -> node in uinteressanteHendelser }
+            .filterNot { (eventName, _) -> eventName in uinteressanteHendelser }
+            .filterNot { (eventName, _) -> uinteressanteHendelsePrefikser.any(eventName::startsWith) }
             .forEach { (eventName, instant) ->
                 if(sisteEvent[eventName]?.isBefore(instant) != false){
                     sisteEvent[eventName] = instant
