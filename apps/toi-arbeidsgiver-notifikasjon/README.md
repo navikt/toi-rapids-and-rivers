@@ -13,7 +13,7 @@ For at en melding skal plukkes opp av appen må meldinga ha følgende format:
   "stillingsId": "656028f2-d031-4d53-8a44-156efc1a2385",
   "virksomhetsnummer": "123456789",
   "utførendeVeilederFornavn": "Veileder",
-  "utførendeVeilederEtternavn": "Veiledersen"
+  "utførendeVeilederEtternavn": "Veiledersen",
   "mottakerEpost": "test@testepost.no",
 }
 ```
