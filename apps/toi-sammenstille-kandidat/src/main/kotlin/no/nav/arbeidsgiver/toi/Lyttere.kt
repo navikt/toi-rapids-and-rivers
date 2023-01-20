@@ -39,7 +39,6 @@ class Lytter(
         val verdi = packet[feltSomSkalBehandles]
 
         return when (eventNavn) {
-            "cv" -> kandidat.copy(cv = verdi)
             "arbeidsmarked-cv" -> kandidat.copy(arbeidsmarkedCv = verdi)
             "veileder" -> kandidat.copy(veileder = verdi)
             "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = verdi)

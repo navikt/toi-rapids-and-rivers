@@ -15,7 +15,7 @@ fun veilederMelding(aktørId: String) = """
 fun cvMelding(aktørId: String) = """
         {
           "aktørId": "$aktørId",
-          "cv": {
+          "arbeidsmarkedCv": {
             "meldingstype": "SLETT",
             "oppfolgingsinformasjon": null,
             "opprettCv": null,
@@ -27,7 +27,7 @@ fun cvMelding(aktørId: String) = """
             "aktoerId": "$aktørId",
             "sistEndret": 1636718935.195
           },
-          "@event_name": "cv"
+          "@event_name": "arbeidsmarked-cv"
         }
     """.trimIndent()
 
@@ -53,7 +53,7 @@ fun arbeidsmarkedCvMelding(aktørId: String) = """
 fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
         {
           "aktørId": "$aktørid",
-          "cv": {
+          "arbeidsmarkedCv": {
             "meldingstype": "SLETT",
             "oppfolgingsinformasjon": null,
             "opprettCv": null,
@@ -65,7 +65,7 @@ fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
             "aktoerId": "$aktørid",
             "sistEndret": 1636718935.195
           },
-          "@event_name": "cv",
+          "@event_name": "arbeidsmarked-cv",
           "system_read_count": 1,
           "system_participating_services": [
             {
