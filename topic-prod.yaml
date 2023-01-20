@@ -18,9 +18,6 @@ spec:
     retentionHours: 336
   acl:
     - team: toi
-      application: toi-cv
-      access: readwrite
-    - team: toi
       application: toi-arbeidsmarked-cv
       access: readwrite
     - team: toi

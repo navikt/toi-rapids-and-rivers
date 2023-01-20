@@ -69,8 +69,8 @@ fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
           "system_read_count": 1,
           "system_participating_services": [
             {
-              "service": "toi-cv",
-              "instance": "toi-cv-58849d5f86-7qffs",
+              "service": "toi-arbeidsmarked-cv",
+              "instance": "toi-arbeidsmarked-cv-58849d5f86-7qffs",
               "time": "2021-11-19T10:53:59.163725026"
             }
           ]
