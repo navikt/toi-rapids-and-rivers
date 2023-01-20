@@ -19,7 +19,7 @@ private val uinteressanteHendelser = listOf(
     "kandidat."
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat.")
-private val hendelserSomIkkeSendesLenger = emptyList<String>()
+private val hendelserSomIkkeSendesLenger = listOf("cv", "cv.sammenstilt")
 
 val grenseverdiForAlarm = Duration.ofHours(1)
 
