@@ -8,12 +8,12 @@ import java.util.*
 
 class NotifikasjonKlient(
     val url: String,
-    val lagNotifikasjonsId: () -> UUID = { UUID.randomUUID() },
     val lagTidspunktForVarsel: () -> LocalDateTime = { LocalDateTime.now() },
     val hentAccessToken: () -> String
 ) {
 
     fun sendNotifikasjon(
+        notifikasjonsId: String,
         mottakerEpost: String,
         stillingsId: UUID,
         virksomhetsnummer: String,
@@ -27,7 +27,7 @@ class NotifikasjonKlient(
 
         val spørring =
             graphQlSpørringForCvDeltMedArbeidsgiver(
-                notifikasjonsId = lagNotifikasjonsId(),
+                notifikasjonsId = notifikasjonsId,
                 stillingsId = stillingsId.toString(),
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,

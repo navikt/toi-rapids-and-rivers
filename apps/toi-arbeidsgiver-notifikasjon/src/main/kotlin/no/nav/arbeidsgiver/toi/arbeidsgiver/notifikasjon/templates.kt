@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
 import java.time.LocalDateTime
 import java.time.Period
-import java.util.*
 
 private val pesostegn = "$"
 
@@ -32,7 +31,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
 """.trimIndent()
 
 fun graphQlSpørringForCvDeltMedArbeidsgiver(
-    notifikasjonsId: UUID = UUID.randomUUID(),
+    notifikasjonsId: String,
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
@@ -60,7 +59,7 @@ fun String.utenLangeMellomrom(): String =
     }
 
 private fun spørringForCvDeltMedArbeidsgiver(
-    notifikasjonsId: UUID,
+    notifikasjonsId: String,
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,

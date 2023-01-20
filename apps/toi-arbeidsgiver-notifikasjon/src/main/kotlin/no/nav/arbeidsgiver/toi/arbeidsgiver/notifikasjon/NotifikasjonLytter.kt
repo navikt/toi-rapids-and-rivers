@@ -14,6 +14,7 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
             validate {
                 it.demandValue("@event_name", "notifikasjon.cv-delt")
                 it.requireKey(
+                    "notifikasjonsId",
                     "virksomhetsnummer",
                     "stillingsId",
                     "utførendeVeilederFornavn",
@@ -25,6 +26,7 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val notifikasjonsId = packet["notifikasjonsId"].asText()
         val stillingsId = UUID.fromString(packet["stillingsId"].asText())
         val virksomhetsnummer = packet["virksomhetsnummer"].asText()
         val utførendeVeilederFornavn = packet["utførendeVeilederFornavn"].asText()
@@ -32,6 +34,7 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         val mottakerEpost = packet["mottakerEpost"].asText()
 
         notifikasjonKlient.sendNotifikasjon(
+            notifikasjonsId = notifikasjonsId,
             mottakerEpost = mottakerEpost,
             stillingsId = stillingsId,
             virksomhetsnummer = virksomhetsnummer,
