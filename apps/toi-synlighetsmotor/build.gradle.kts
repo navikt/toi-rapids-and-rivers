@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.postgresql:postgresql:42.5.0")
+    implementation("org.postgresql:postgresql:42.5.1")
     implementation("org.flywaydb:flyway-core:9.8.2")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("io.javalin:javalin:5.1.3")

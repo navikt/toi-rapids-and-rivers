@@ -1,4 +1,4 @@
-val postgresVersion = "42.5.0"
+val postgresVersion = "42.5.1"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.8.2"
 val h2Version = "2.1.214"
