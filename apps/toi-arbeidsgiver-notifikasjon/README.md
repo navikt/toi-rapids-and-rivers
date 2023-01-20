@@ -18,6 +18,7 @@ For at en melding skal plukkes opp av appen må meldinga ha følgende format:
 }
 ```
 
-arbeidsgiver-notifikasjon-produsent-api er idempotent så lenge notifikasjonsId er lik. 
+arbeidsgiver-notifikasjon-produsent-api er idempotent så lenge innholdet i meldingen er lik.
+Dersom notifikasjonsId er lik i to meldinger mens resten av innholdet er ulikt, så vil arbeidsgiver-notifikasjon-produsent-api kaste feil.
 Det vil si at man kan sende flere meldinger på rapid'en med samme notifikasjonsId uten at det vil medføre at arbeidsgiver spammes ned av notifikasjoner.
 
