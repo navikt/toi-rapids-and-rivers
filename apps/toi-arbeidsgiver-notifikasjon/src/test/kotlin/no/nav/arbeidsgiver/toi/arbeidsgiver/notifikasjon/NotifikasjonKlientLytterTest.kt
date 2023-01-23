@@ -38,11 +38,11 @@ class NotifikasjonKlientLytterTest {
             {
               "@event_name": "notifikasjon.cv-delt",
               "notifikasjonsId": "enEllerAnnenId",
-              "mottakerEpost": "test@testepost.no",
+              "epostAdresseArbeidsgiver": "test@testepost.no",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
-              "utførendeVeilederFornavn": "Veileder",
-              "utførendeVeilederEtternavn": "Veiledersen"
+              "utførtAvVeilederFornavn": "Veileder",
+              "utførtAvVeilederEtternavn": "Veiledersen"
             }
         """.trimIndent()
         stubKallTilNotifikasjonssystemet()
@@ -73,8 +73,8 @@ class NotifikasjonKlientLytterTest {
               "notifikasjonsId": "enEllerAnnenId",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
-              "utførendeVeilederFornavn": "Veileder",
-              "utførendeVeilederEtternavn": "Veiledersen"
+              "utførtAvVeilederFornavn": "Veileder",
+              "utførtAvVeilederEtternavn": "Veiledersen"
             }
         """.trimIndent()
         stubKallTilNotifikasjonssystemet()
@@ -93,12 +93,12 @@ class NotifikasjonKlientLytterTest {
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",
-              "mottakerEpost": "test.testepost.no",
+              "epostAdresseArbeidsgiver": "test@testepost.no",
               "notifikasjonsId": "enEllerAnnenId",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
-              "utførendeVeilederFornavn": "Veileder",
-              "utførendeVeilederEtternavn": "Veiledersen"
+              "utførtAvVeilederFornavn": "Veileder",
+              "utførtAvVeilederEtternavn": "Veiledersen"
             }
         """.trimIndent()
         stubFeilendeKallTilNotifikasjonssystemet()

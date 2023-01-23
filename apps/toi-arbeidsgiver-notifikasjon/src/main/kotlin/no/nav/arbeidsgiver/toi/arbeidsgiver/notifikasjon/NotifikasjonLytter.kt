@@ -17,9 +17,9 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
                     "notifikasjonsId",
                     "virksomhetsnummer",
                     "stillingsId",
-                    "utførendeVeilederFornavn",
-                    "utførendeVeilederEtternavn",
-                    "mottakerEpost"
+                    "utførtAvVeilederFornavn",
+                    "utførtAvVeilederEtternavn",
+                    "epostAdresseArbeidsgiver"
                 )
             }
         }.register(this)
@@ -29,16 +29,16 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         val notifikasjonsId = packet["notifikasjonsId"].asText()
         val stillingsId = UUID.fromString(packet["stillingsId"].asText())
         val virksomhetsnummer = packet["virksomhetsnummer"].asText()
-        val utførendeVeilederFornavn = packet["utførendeVeilederFornavn"].asText()
-        val utførendeVeilederEtternavn = packet["utførendeVeilederEtternavn"].asText()
-        val mottakerEpost = packet["mottakerEpost"].asText()
+        val utførtAvVeilederFornavn = packet["utførtAvVeilederFornavn"].asText()
+        val utførtAvVeilederEtternavn = packet["utførtAvVeilederEtternavn"].asText()
+        val epostAdresseArbeidsgiver = packet["epostAdresseArbeidsgiver"].asText()
 
         notifikasjonKlient.sendNotifikasjon(
             notifikasjonsId = notifikasjonsId,
-            mottakerEpost = mottakerEpost,
+            mottakerEpost = epostAdresseArbeidsgiver,
             stillingsId = stillingsId,
             virksomhetsnummer = virksomhetsnummer,
-            avsender = "$utførendeVeilederFornavn $utførendeVeilederEtternavn"
+            avsender = "$utførtAvVeilederFornavn $utførtAvVeilederEtternavn"
         )
     }
 }
