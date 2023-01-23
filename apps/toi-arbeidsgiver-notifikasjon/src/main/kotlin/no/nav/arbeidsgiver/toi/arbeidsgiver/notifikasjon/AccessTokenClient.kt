@@ -43,7 +43,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
                  return result.get()
              }
 
-             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.getException())
+             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.error)
         }
     }
 }
