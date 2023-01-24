@@ -39,8 +39,6 @@ class NotifikasjonKlient(
                 mottakerEpost = mottakerEpost
             )
 
-        log.info("TMP: Melding til notifikasjonssystemet: $spørring")
-
         // TODO: Legg på call-ID
         val (_, response, result) = Fuel
             .post(path = url)
@@ -49,15 +47,7 @@ class NotifikasjonKlient(
             .body(spørring)
             .responseString()
 
-        if (response.statusCode == 200) {
-            log.info("Sendte notifikasjon til arbeidsgiver via notifikasjon-produsent-api og fikk 200 OK men er det riktig?")
-        }
-        if (response.statusCode != 200) {
-            log.error("Feilkode fra notifikasjonssystemet: ${response.statusCode}")
-        }
-
         val json = jacksonObjectMapper().readTree(result.get())
-
         val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
 
         when (notifikasjonsSvar) {
