@@ -2,6 +2,9 @@ package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
 import java.time.LocalDateTime
 import java.time.Period
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 private val pesostegn = "$"
 
@@ -36,7 +39,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     virksomhetsnummer: String,
     epostBody: String,
     mottakerEpost: String,
-    tidspunktForVarsel: LocalDateTime,
+    tidspunktForVarsel: ZonedDateTime,
 ) =
     spørringForCvDeltMedArbeidsgiver(
         notifikasjonsId,
@@ -61,13 +64,14 @@ private fun spørringForCvDeltMedArbeidsgiver(
     virksomhetsnummer: String,
     epostBody: String,
     mottakerEpost: String,
-    tidspunktForVarsel: LocalDateTime,
+    tidspunktForVarsel: ZonedDateTime,
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
     val lenke = "https://presenterte-kandidater.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
     val utløperOm = Period.of(0, 3, 0)
+    val tidspunktForVarselISO8601DateTime = tidspunktForVarsel.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
     return """
     {
@@ -141,7 +145,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "epostBody": "$epostBody",
             "epostMottaker": "$mottakerEpost",
             "lenke": "$lenke",
-            "tidspunkt": "$tidspunktForVarsel",
+            "tidspunkt": "$tidspunktForVarselISO8601DateTime",
             "hardDeleteDuration": "$utløperOm",
             "notifikasjonTekst": "$notifikasjonTekst",
             "epostSendetidspunkt": "${LocalDateTime.MIN}"

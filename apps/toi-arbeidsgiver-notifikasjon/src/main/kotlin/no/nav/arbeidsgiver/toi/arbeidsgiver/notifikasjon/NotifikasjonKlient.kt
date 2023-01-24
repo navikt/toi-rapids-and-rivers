@@ -32,7 +32,7 @@ class NotifikasjonKlient(
                 stillingsId = stillingsId.toString(),
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
-                tidspunktForVarsel = tidspunktForHendelse.toLocalDateTime(),
+                tidspunktForVarsel = tidspunktForHendelse,
                 mottakerEpost = mottakerEpost
             )
 
