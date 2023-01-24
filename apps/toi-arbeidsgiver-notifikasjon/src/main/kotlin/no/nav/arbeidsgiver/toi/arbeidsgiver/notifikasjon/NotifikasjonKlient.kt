@@ -4,11 +4,11 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 class NotifikasjonKlient(
     val url: String,
-    val lagTidspunktForVarsel: () -> LocalDateTime = { LocalDateTime.now() },
     val hentAccessToken: () -> String
 ) {
 
@@ -18,6 +18,7 @@ class NotifikasjonKlient(
         stillingsId: UUID,
         virksomhetsnummer: String,
         avsender: String,
+        tidspunktForHendelse: ZonedDateTime
     ) {
         val epostBody = lagEpostBody(
             tittel = "Todo tittel",
@@ -31,7 +32,7 @@ class NotifikasjonKlient(
                 stillingsId = stillingsId.toString(),
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
-                tidspunktForVarsel = lagTidspunktForVarsel(),
+                tidspunktForVarsel = tidspunktForHendelse.toLocalDateTime(),
                 mottakerEpost = mottakerEpost
             )
 

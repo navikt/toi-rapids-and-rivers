@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import java.time.ZonedDateTime
 import java.util.*
 
 class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifikasjonKlient: NotifikasjonKlient) : River.PacketListener {
@@ -19,7 +20,8 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
                     "stillingsId",
                     "utførtAvVeilederFornavn",
                     "utførtAvVeilederEtternavn",
-                    "epostAdresseArbeidsgiver"
+                    "epostAdresseArbeidsgiver",
+                    "tidspunktForHendelse"
                 )
             }
         }.register(this)
@@ -32,13 +34,15 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         val utførtAvVeilederFornavn = packet["utførtAvVeilederFornavn"].asText()
         val utførtAvVeilederEtternavn = packet["utførtAvVeilederEtternavn"].asText()
         val epostAdresseArbeidsgiver = packet["epostAdresseArbeidsgiver"].asText()
+        val tidspunktForHendelse = ZonedDateTime.parse(packet["tidspunktForHendelse"].asText())
 
         notifikasjonKlient.sendNotifikasjon(
             notifikasjonsId = notifikasjonsId,
             mottakerEpost = epostAdresseArbeidsgiver,
             stillingsId = stillingsId,
             virksomhetsnummer = virksomhetsnummer,
-            avsender = "$utførtAvVeilederFornavn $utførtAvVeilederEtternavn"
+            avsender = "$utførtAvVeilederFornavn $utførtAvVeilederEtternavn",
+            tidspunktForHendelse = tidspunktForHendelse
         )
     }
 }
