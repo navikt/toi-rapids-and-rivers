@@ -8,7 +8,7 @@ private val pesostegn = "$"
 fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      <html>
      <head>
-         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
          <title>$tittel</title>
      </head>
      <body>
@@ -18,7 +18,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
          Melding fra markedskontakt i NAV:
      </p>
      <p>
-         <pre style="font-family: unset;">$tekst</pre>
+         <pre style='font-family: unset;'>$tekst</pre>
      </p>
      <p>
          Logg deg inn på Min side - Arbeidsgiver for å se lista.
@@ -141,7 +141,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "merkelapp": "$merkelapp",
             "virksomhetsnummer": "$virksomhetsnummer",
             "epostTittel": "$epostTittel",
-            "epostBody": '$epostBody',
+            "epostBody": "$epostBody",
             "epostMottaker": "$mottakerEpost",
             "lenke": "$lenke",
             "tidspunkt": "$tidspunktForVarsel",
