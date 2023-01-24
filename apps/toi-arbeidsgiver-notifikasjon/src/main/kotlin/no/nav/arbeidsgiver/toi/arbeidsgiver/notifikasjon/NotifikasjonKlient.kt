@@ -48,7 +48,6 @@ class NotifikasjonKlient(
         }
         if (response.statusCode != 200) {
             log.error("Feilkode fra notifikasjonssystemet: ${response.statusCode}")
-            throw RuntimeException("Feilkode fra notifikasjonssystemet: ${response.statusCode} ${result.get()}")
         }
 
         val json = jacksonObjectMapper().readTree(result.get())
