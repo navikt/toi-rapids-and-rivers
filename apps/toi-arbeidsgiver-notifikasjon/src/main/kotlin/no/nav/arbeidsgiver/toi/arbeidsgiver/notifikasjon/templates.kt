@@ -141,7 +141,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "merkelapp": "$merkelapp",
             "virksomhetsnummer": "$virksomhetsnummer",
             "epostTittel": "$epostTittel",
-            "epostBody": "$epostBody",
+            "epostBody": '$epostBody',
             "epostMottaker": "$mottakerEpost",
             "lenke": "$lenke",
             "tidspunkt": "$tidspunktForVarsel",
