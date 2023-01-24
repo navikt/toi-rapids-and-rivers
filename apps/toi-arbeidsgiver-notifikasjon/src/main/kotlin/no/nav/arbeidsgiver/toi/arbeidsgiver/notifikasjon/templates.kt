@@ -50,13 +50,10 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
         .utenLangeMellomrom()
 
 
-fun String.utenLangeMellomrom(): String =
-    fold(this) { acc, next ->
-        if (acc.last() == ' ' && next == ' ')
-            acc
-        else
-            acc + next
-    }
+tailrec fun String.utenLangeMellomrom(): String =
+    if (contains("  "))
+        replace("  ", " ").utenLangeMellomrom()
+    else this
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: String,
