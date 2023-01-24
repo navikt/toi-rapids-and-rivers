@@ -68,7 +68,10 @@ private fun spørringForCvDeltMedArbeidsgiver(
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
-    val lenke = "https://presenterte-kandidater.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
+
+    val erProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
+    val hostprefix = if(erProd) "arbeidsgiver" else "presenterte-kandidater.dev"
+    val lenke ="https://$hostprefix.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
     val utløperOm = Period.of(0, 3, 0)
     val tidspunktForVarselISO8601DateTime = tidspunktForVarsel.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
