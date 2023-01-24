@@ -55,8 +55,10 @@ class NotifikasjonKlient(
             val errors = json["errors"]
 
             if (errors != null && errors.size() > 0) {
-                log.error("Feil fra notifiksjonssystemet ${errors.asText()}")
-                throw RuntimeException("Feil fra notifiksjonssystemet ${errors.asText()}")
+                log.error("Feil fra notifikasjonssystemet, statuskode: ${response.statusCode}")
+                log.error("Feil fra notifikasjonssystemet, hele responsen: $json")
+                log.error("Feil fra notifiksjonssystemet, errors: $errors}")
+                throw RuntimeException("Feil fra notifiksjonssystemet: $errors")
             }
 
             val varVellykket = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText() == "NyBeskjedVellykket"
