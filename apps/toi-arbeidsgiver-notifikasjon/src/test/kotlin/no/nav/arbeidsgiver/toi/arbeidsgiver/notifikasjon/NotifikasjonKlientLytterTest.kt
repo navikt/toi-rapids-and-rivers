@@ -1,14 +1,11 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
-import java.time.LocalDateTime
-import java.time.Month
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -66,11 +63,12 @@ class NotifikasjonKlientLytterTest {
     }
 
     @Test
-    fun `Når vi mottar notifikasjonsmelding på rapid uten epostadresse skal vi logge feil men gå videre`() {
+    fun `Skal ikke feile når notifikasjon-api svarer med at notifikasjonen er duplikat `() {
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",
               "notifikasjonsId": "enEllerAnnenId",
+              "epostAdresseArbeidsgiver": "test@testepost.no",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
@@ -78,19 +76,13 @@ class NotifikasjonKlientLytterTest {
               "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00[Europe/Oslo]"
             }
         """.trimIndent()
-        stubKallTilNotifikasjonssystemet()
+        stubDuplisertKallTilNotifikasjonssystemet()
 
         testRapid.sendTestMessage(melding)
-
-        wiremock.verify(
-            0, postRequestedFor(urlEqualTo("/api/graphql"))
-        )
-        assertThat(testRapid.inspektør.size).isZero
-
     }
 
     @Test
-    fun `Når kall mot notifikasjonssystemet feiler skal vi throwe error`() {
+    fun `Når vi får errors i svaret fra notifikasjonssystemet skal vi throwe error`() {
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",
@@ -103,7 +95,28 @@ class NotifikasjonKlientLytterTest {
               "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00[Europe/Oslo]"
             }
         """.trimIndent()
-        stubFeilendeKallTilNotifikasjonssystemet()
+        stubErrorsIResponsFraNotifikasjonApi()
+
+        assertThrows<RuntimeException> {
+            testRapid.sendTestMessage(melding)
+        }
+    }
+
+    @Test
+    fun `Når vi får ukjent verdi for notifikasjonssvar skal vi throwe error`() {
+        val melding = """
+            {
+              "@event_name": "notifikasjon.cv-delt",
+              "epostAdresseArbeidsgiver": "test@testepost.no",
+              "notifikasjonsId": "enEllerAnnenId",
+              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+              "virksomhetsnummer": "123456789",
+              "utførtAvVeilederFornavn": "Veileder",
+              "utførtAvVeilederEtternavn": "Veiledersen",
+              "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00[Europe/Oslo]"
+            }
+        """.trimIndent()
+        stubUforventetStatusIResponsFraNotifikasjonApi()
 
         assertThrows<RuntimeException> {
             testRapid.sendTestMessage(melding)
@@ -131,7 +144,49 @@ class NotifikasjonKlientLytterTest {
         )
     }
 
-    fun stubFeilendeKallTilNotifikasjonssystemet() {
+    fun stubDuplisertKallTilNotifikasjonssystemet() {
+        wiremock.stubFor(
+            post("/api/graphql")
+                .withHeader("Authorization", containing("Bearer $accessToken"))
+                .willReturn(
+                    ok(
+                        """
+                        {
+                          "data": {
+                            "nyBeskjed": {
+                              "__typename": "DuplikatEksternIdOgMerkelapp",
+                              "feilmelding": "notifikasjon med angitt eksternId og merkelapp finnes fra før"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                    ).withHeader("Content-Type", "application/json")
+                )
+        )
+    }
+
+    fun stubUforventetStatusIResponsFraNotifikasjonApi() {
+        wiremock.stubFor(
+            post("/api/graphql")
+                .withHeader("Authorization", containing("Bearer $accessToken"))
+                .willReturn(
+                    ok(
+                        """
+                        {
+                          "data": {
+                            "nyBeskjed": {
+                              "__typename": "UforventetStatus",
+                              "feilmelding": "Dette er en artig feil"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                    ).withHeader("Content-Type", "application/json")
+                )
+        )
+    }
+
+    fun stubErrorsIResponsFraNotifikasjonApi() {
         wiremock.stubFor(
             post("/api/graphql")
                 .withHeader("Authorization", containing("Bearer $accessToken"))
