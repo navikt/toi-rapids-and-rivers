@@ -36,6 +36,8 @@ class NotifikasjonKlient(
                 mottakerEpost = mottakerEpost
             )
 
+        log.info("TMP: Melding til notifikasjonssystemet: $spørring")
+
         // TODO: Legg på call-ID
         val (_, response, result) = Fuel
             .post(path = url)
