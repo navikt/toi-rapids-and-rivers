@@ -71,10 +71,6 @@ class NotifikasjonKlient(
                 håndterFeil(json, response)
             }
         }
-
-        if (response.statusCode == 200) {
-            log.info("Sendte notifikasjon til arbeidsgiver via notifikasjon-produsent-api og fikk 200 OK men er det riktig?")
-        }
     }
 
     private fun håndterFeil(
