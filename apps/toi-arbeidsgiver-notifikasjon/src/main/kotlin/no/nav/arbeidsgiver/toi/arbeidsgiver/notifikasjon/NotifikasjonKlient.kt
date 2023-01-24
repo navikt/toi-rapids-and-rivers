@@ -35,8 +35,10 @@ class NotifikasjonKlient(
                 mottakerEpost = mottakerEpost
             )
 
+        // TODO: Legg på call-ID
         val (_, response, result) = Fuel
             .post(path = url)
+            .header("Content-type", "application/json")
             .header("Authorization", "Bearer ${hentAccessToken()}")
             .body(spørring)
             .responseString()
