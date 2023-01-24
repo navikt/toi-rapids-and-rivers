@@ -43,22 +43,26 @@ class NotifikasjonKlient(
             .body(spørring)
             .responseString()
 
-        if (response.statusCode != 200) {
-            log.error("Feilkode fra notifikasjonssystemet: ${response.statusCode}")
-            throw RuntimeException("Feilkode fra notifikasjonssystemet: ${response.statusCode} ${result.get()}")
-        }
+        if (response.statusCode == 200) {
+            log.info("Sendte notifikasjon til arbeidsgiver via notifikasjon-produsent-api")
+        } else {
+            if (response.statusCode != 200) {
+                log.error("Feilkode fra notifikasjonssystemet: ${response.statusCode}")
+                throw RuntimeException("Feilkode fra notifikasjonssystemet: ${response.statusCode} ${result.get()}")
+            }
 
-        val json = jacksonObjectMapper().readTree(result.get())
-        val errors = json["errors"]
+            val json = jacksonObjectMapper().readTree(result.get())
+            val errors = json["errors"]
 
-        if (errors != null && errors.size() > 0) {
-            log.error("Feil fra notifiksjonssystemet ${errors.asText()}")
-            throw RuntimeException("Feil fra notifiksjonssystemet ${errors.asText()}")
-        }
+            if (errors != null && errors.size() > 0) {
+                log.error("Feil fra notifiksjonssystemet ${errors.asText()}")
+                throw RuntimeException("Feil fra notifiksjonssystemet ${errors.asText()}")
+            }
 
-        val varVellykket = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText() == "NyBeskjedVellykket"
-        if (!varVellykket) {
-            throw RuntimeException("Kall mot notifikasjon-api feilet, men fikk 200 OK uten errors i responsen")
+            val varVellykket = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText() == "NyBeskjedVellykket"
+            if (!varVellykket) {
+                throw RuntimeException("Kall mot notifikasjon-api feilet, men fikk 200 OK uten errors i responsen")
+            }
         }
     }
 }
