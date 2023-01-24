@@ -56,9 +56,10 @@ class NotifikasjonKlient(
         val json = jacksonObjectMapper().readTree(result.get())
         val errors = json["errors"]
 
+        log.info("Respons: $json")
+
         if (errors != null && errors.size() > 0) {
             log.error("Feil fra notifikasjonssystemet, statuskode: ${response.statusCode}")
-            log.error("Feil fra notifikasjonssystemet, hele responsen: $json")
             log.error("Feil fra notifiksjonssystemet, errors: $errors}")
             throw RuntimeException("Feil fra notifiksjonssystemet: $errors")
         }
