@@ -105,8 +105,8 @@ private fun spørringForCvDeltMedArbeidsgiver(
                     } 
                     mottaker: { 
                         altinn: { 
-                            serviceEdition: \"1\" 
-                            serviceCode: \"5078\" 
+                            serviceEdition: "1" 
+                            serviceCode: "5078" 
                         } 
                     } 
                     notifikasjon: { 
@@ -124,7 +124,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                                         epostHtmlBody: ${pesostegn}epostBody
                                         mottaker: { 
                                             kontaktinfo: { 
-                                                epostadresse: \"$it\"
+                                                epostadresse: "$it"
                                             } 
                                         } 
                                         sendetidspunkt: { 
