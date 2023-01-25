@@ -114,7 +114,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                         tekst:  ${pesostegn}notifikasjonTekst 
                         lenke: ${pesostegn}lenke 
                     } 
-                    eksterneVarsler: { 
+                    eksterneVarsler: [
                         ${
                             mottakerEpostAdresser.map {
                                 """
@@ -135,7 +135,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                             """.trimIndent()
                             }.joinToString(", ")
                         }
-                    } 
+                    ] 
                 } 
             ) { 
             __typename 
