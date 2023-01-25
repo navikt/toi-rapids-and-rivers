@@ -124,7 +124,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                                         epostHtmlBody: ${pesostegn}epostBody
                                         mottaker: { 
                                             kontaktinfo: { 
-                                                epostadresse: $it
+                                                epostadresse: \"$it\"
                                             } 
                                         } 
                                         sendetidspunkt: { 
