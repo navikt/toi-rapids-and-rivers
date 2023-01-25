@@ -34,7 +34,7 @@ class NotifikasjonKlientLytterTest {
             {
               "@event_name": "notifikasjon.cv-delt",
               "notifikasjonsId": "enEllerAnnenId",
-              "epostAdresseArbeidsgiver": "test@testepost.no",
+              "arbeidsgiversEpostadresser": ["test@testepost.no"], 
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
@@ -68,7 +68,7 @@ class NotifikasjonKlientLytterTest {
             {
               "@event_name": "notifikasjon.cv-delt",
               "notifikasjonsId": "enEllerAnnenId",
-              "epostAdresseArbeidsgiver": "test@testepost.no",
+              "arbeidsgiversEpostadresser": |"test@testepost.no"],
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
@@ -86,7 +86,7 @@ class NotifikasjonKlientLytterTest {
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",
-              "epostAdresseArbeidsgiver": "test@testepost.no",
+              "arbeidsgiversEpostadresser": ["test@testepost.no"],
               "notifikasjonsId": "enEllerAnnenId",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",
@@ -107,7 +107,7 @@ class NotifikasjonKlientLytterTest {
         val melding = """
             {
               "@event_name": "notifikasjon.cv-delt",
-              "epostAdresseArbeidsgiver": "test@testepost.no",
+              "arbeidsgiversEpostadresser": ["test@testepost.no"],
               "notifikasjonsId": "enEllerAnnenId",
               "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
               "virksomhetsnummer": "123456789",

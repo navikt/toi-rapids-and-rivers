@@ -38,7 +38,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
-    mottakerEpost: String,
+    mottakerEpostAdresser: List<String>,
     tidspunktForVarsel: ZonedDateTime,
 ) =
     spørringForCvDeltMedArbeidsgiver(
@@ -46,7 +46,7 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
         stillingsId,
         virksomhetsnummer,
         epostBody,
-        mottakerEpost,
+        mottakerEpostAdresser,
         tidspunktForVarsel
     )
         .replace("\n", "")
@@ -63,18 +63,19 @@ private fun spørringForCvDeltMedArbeidsgiver(
     stillingsId: String,
     virksomhetsnummer: String,
     epostBody: String,
-    mottakerEpost: String,
+    mottakerEpostAdresser: List<String>,
     tidspunktForVarsel: ZonedDateTime,
 ): String {
     val merkelapp = "Kandidater";
     val epostTittel = "Kandidater fra NAV";
 
     val erProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
-    val hostprefix = if(erProd) "arbeidsgiver" else "presenterte-kandidater.dev"
-    val lenke ="https://$hostprefix.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
+    val hostprefix = if (erProd) "arbeidsgiver" else "presenterte-kandidater.dev"
+    val lenke = "https://$hostprefix.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
     val utløperOm = Period.of(0, 3, 0)
-    val tidspunktForVarselISO8601DateTime = tidspunktForVarsel.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    val tidspunktForVarselISO8601DateTime =
+        tidspunktForVarsel.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
     return """
     {
@@ -85,7 +86,6 @@ private fun spørringForCvDeltMedArbeidsgiver(
             ${pesostegn}virksomhetsnummer: String! 
             ${pesostegn}epostTittel: String! 
             ${pesostegn}epostBody: String! 
-            ${pesostegn}epostMottaker: String! 
             ${pesostegn}lenke: String! 
             ${pesostegn}tidspunkt: ISO8601DateTime! 
             ${pesostegn}hardDeleteDuration: ISO8601Duration!
@@ -115,18 +115,26 @@ private fun spørringForCvDeltMedArbeidsgiver(
                         lenke: ${pesostegn}lenke 
                     } 
                     eksterneVarsler: { 
-                        epost: { 
-                            epostTittel: ${pesostegn}epostTittel 
-                            epostHtmlBody: ${pesostegn}epostBody 
-                            mottaker: { 
-                                kontaktinfo: { 
-                                    epostadresse: ${pesostegn}epostMottaker 
-                                } 
-                            } 
-                            sendetidspunkt: { 
-                                tidspunkt: ${pesostegn}epostSendetidspunkt
-                            } 
-                        } 
+                        ${
+                            mottakerEpostAdresser.map {
+                                """
+                                {
+                                    epost: { 
+                                        epostTittel: ${pesostegn}epostTittel
+                                        epostHtmlBody: ${pesostegn}epostBody
+                                        mottaker: { 
+                                            kontaktinfo: { 
+                                                epostadresse: $it
+                                            } 
+                                        } 
+                                        sendetidspunkt: { 
+                                            tidspunkt: ${pesostegn}epostSendetidspunkt
+                                        } 
+                                    } 
+                                }
+                            """.trimIndent()
+                            }.joinToString(", ")
+                        }
                     } 
                 } 
             ) { 
@@ -146,7 +154,6 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "virksomhetsnummer": "$virksomhetsnummer",
             "epostTittel": "$epostTittel",
             "epostBody": "$epostBody",
-            "epostMottaker": "$mottakerEpost",
             "lenke": "$lenke",
             "tidspunkt": "$tidspunktForVarselISO8601DateTime",
             "hardDeleteDuration": "$utløperOm",

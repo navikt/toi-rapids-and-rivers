@@ -17,7 +17,7 @@ class NotifikasjonKlient(
 
     fun sendNotifikasjon(
         notifikasjonsId: String,
-        mottakerEpost: String,
+        mottakerEpostadresser: List<String>,
         stillingsId: UUID,
         virksomhetsnummer: String,
         avsender: String,
@@ -36,10 +36,13 @@ class NotifikasjonKlient(
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
                 tidspunktForVarsel = tidspunktForHendelse,
-                mottakerEpost = mottakerEpost
+                mottakerEpostAdresser = mottakerEpostadresser
             )
 
-        // TODO: Legg på call-ID
+        println("")
+        println(spørring)
+        println("")
+
         val (_, response, result) = Fuel
             .post(path = url)
             .header("Content-type", "application/json")
