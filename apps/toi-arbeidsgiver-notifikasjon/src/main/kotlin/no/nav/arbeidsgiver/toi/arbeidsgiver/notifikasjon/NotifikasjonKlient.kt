@@ -22,10 +22,12 @@ class NotifikasjonKlient(
         virksomhetsnummer: String,
         avsender: String,
         tidspunktForHendelse: ZonedDateTime,
+        meldingTilArbeidsgiver: String,
+        stillingstittel: String,
     ) {
         val epostBody = lagEpostBody(
-            tittel = "Todo tittel",
-            tekst = "Todo tekst",
+            tittel = stillingstittel,
+            tekst = meldingTilArbeidsgiver,
             avsender = avsender
         )
 
@@ -36,7 +38,7 @@ class NotifikasjonKlient(
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
                 tidspunktForVarsel = tidspunktForHendelse,
-                mottakerEpostAdresser = mottakerEpostadresser
+                mottakerEpostAdresser = mottakerEpostadresser,
             )
 
         val (_, response, result) = Fuel

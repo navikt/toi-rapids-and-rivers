@@ -21,7 +21,9 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
                     "utførtAvVeilederFornavn",
                     "utførtAvVeilederEtternavn",
                     "arbeidsgiversEpostadresser",
-                    "tidspunktForHendelse"
+                    "tidspunktForHendelse",
+                    "meldingTilArbeidsgiver",
+                    "stillingstittel",
                 )
             }
         }.register(this)
@@ -35,6 +37,8 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         val utførtAvVeilederEtternavn = packet["utførtAvVeilederEtternavn"].asText()
         val arbeidsgiversEpostadresser = packet["arbeidsgiversEpostadresser"].toList().map { it.asText() }
         val tidspunktForHendelse = ZonedDateTime.parse(packet["tidspunktForHendelse"].asText())
+        val meldingTilArbeidsgiver = packet["meldingTilArbeidsgiver"].asText()
+        val stillingstittel = packet["stillingstittel"].asText()
 
         notifikasjonKlient.sendNotifikasjon(
             notifikasjonsId = notifikasjonsId,
@@ -42,7 +46,9 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
             stillingsId = stillingsId,
             virksomhetsnummer = virksomhetsnummer,
             avsender = "$utførtAvVeilederFornavn $utførtAvVeilederEtternavn",
-            tidspunktForHendelse = tidspunktForHendelse
+            tidspunktForHendelse = tidspunktForHendelse,
+            meldingTilArbeidsgiver = meldingTilArbeidsgiver,
+            stillingstittel = stillingstittel
         )
     }
 }
