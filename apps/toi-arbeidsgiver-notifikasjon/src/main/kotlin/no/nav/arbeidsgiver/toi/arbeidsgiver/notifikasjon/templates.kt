@@ -6,8 +6,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-private val pesostegn = "$"
-
 fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      <html>
      <head>
@@ -77,30 +75,39 @@ private fun spørringForCvDeltMedArbeidsgiver(
     val tidspunktForVarselISO8601DateTime =
         tidspunktForVarsel.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
+    val s = "$"
+
     return """
     {
         "query": "mutation OpprettNyBeskjed(
-            ${pesostegn}eksternId: String! 
-            ${pesostegn}grupperingsId: String! 
-            ${pesostegn}merkelapp: String! 
-            ${pesostegn}virksomhetsnummer: String! 
-            ${pesostegn}epostTittel: String! 
-            ${pesostegn}epostBody: String! 
-            ${pesostegn}lenke: String! 
-            ${pesostegn}tidspunkt: ISO8601DateTime! 
-            ${pesostegn}hardDeleteDuration: ISO8601Duration!
-            ${pesostegn}notifikasjonTekst: String!
-            ${pesostegn}epostSendetidspunkt: ISO8601LocalDateTime
+            ${s}eksternId: String! 
+            ${s}grupperingsId: String! 
+            ${s}merkelapp: String! 
+            ${s}virksomhetsnummer: String! 
+            ${s}epostTittel: String! 
+            ${s}epostBody: String! 
+            ${s}lenke: String! 
+            ${s}tidspunkt: ISO8601DateTime! 
+            ${s}hardDeleteDuration: ISO8601Duration!
+            ${s}notifikasjonTekst: String!
+            ${s}epostSendetidspunkt: ISO8601LocalDateTime
+            ${
+                mottakerEpostAdresser.mapIndexed{idx, it ->
+                    """
+                        ${s}epostadresse${idx+1}: String!
+                    """.trimIndent()
+                }.joinToString("\n ")
+            }
             ) { 
             nyBeskjed (
                 nyBeskjed: { 
                     metadata: { 
-                        virksomhetsnummer: ${pesostegn}virksomhetsnummer
-                        eksternId: ${pesostegn}eksternId
-                        opprettetTidspunkt: ${pesostegn}tidspunkt
-                        grupperingsid: ${pesostegn}grupperingsId
+                        virksomhetsnummer: ${s}virksomhetsnummer
+                        eksternId: ${s}eksternId
+                        opprettetTidspunkt: ${s}tidspunkt
+                        grupperingsid: ${s}grupperingsId
                         hardDelete: { 
-                            om: ${pesostegn}hardDeleteDuration 
+                            om: ${s}hardDeleteDuration 
                         } 
                     } 
                     mottaker: { 
@@ -110,25 +117,25 @@ private fun spørringForCvDeltMedArbeidsgiver(
                         } 
                     } 
                     notifikasjon: { 
-                        merkelapp: ${pesostegn}merkelapp 
-                        tekst:  ${pesostegn}notifikasjonTekst 
-                        lenke: ${pesostegn}lenke 
+                        merkelapp: ${s}merkelapp 
+                        tekst:  ${s}notifikasjonTekst 
+                        lenke: ${s}lenke 
                     } 
                     eksterneVarsler: [
                         ${
-                            mottakerEpostAdresser.map {
+                            mottakerEpostAdresser.mapIndexed { idx, it -> 
                                 """
                                 {
                                     epost: { 
-                                        epostTittel: ${pesostegn}epostTittel
-                                        epostHtmlBody: ${pesostegn}epostBody
+                                        epostTittel: ${s}epostTittel
+                                        epostHtmlBody: ${s}epostBody
                                         mottaker: { 
                                             kontaktinfo: { 
-                                                epostadresse: \"$it\"
+                                                epostadresse: ${s}epostadresse${idx+1}
                                             } 
                                         } 
                                         sendetidspunkt: { 
-                                            tidspunkt: ${pesostegn}epostSendetidspunkt
+                                            tidspunkt: ${s}epostSendetidspunkt
                                         } 
                                     } 
                                 }
@@ -148,6 +155,13 @@ private fun spørringForCvDeltMedArbeidsgiver(
           }
         }",
         "variables": { 
+                    ${
+        mottakerEpostAdresser.mapIndexed { idx, verdi ->
+            """
+                        "epostadresse${idx+1}": "$verdi",
+                    """.trimIndent()
+                }.joinToString("\n ")
+            }
             "eksternId": "$notifikasjonsId", 
             "grupperingsId": "$stillingsId", 
             "merkelapp": "$merkelapp",

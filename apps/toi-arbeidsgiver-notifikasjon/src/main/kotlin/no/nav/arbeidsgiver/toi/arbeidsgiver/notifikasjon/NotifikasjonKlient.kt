@@ -41,6 +41,10 @@ class NotifikasjonKlient(
                 mottakerEpostAdresser = mottakerEpostadresser,
             )
 
+        println("")
+        println(spørring)
+        println("")
+
         val (_, response, result) = Fuel
             .post(path = url)
             .header("Content-type", "application/json")
