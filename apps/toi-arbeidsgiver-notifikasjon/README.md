@@ -7,15 +7,18 @@ Appen støtter kun notifikasjon for CV delt med arbeidsgiver.
 For at en melding skal plukkes opp av appen må meldinga ha følgende format:
 
 ```
-{
-  "@event_name": "notifikasjon.cv-delt",
-  "notifikasjonsId": "enUnikId",
-  "stillingsId": "656028f2-d031-4d53-8a44-156efc1a2385",
-  "virksomhetsnummer": "123456789",
-  "utførendeVeilederFornavn": "Veileder",
-  "utførendeVeilederEtternavn": "Veiledersen",
-  "mottakerEpost": "test@testepost.no",
-}
+    {
+      "@event_name": "notifikasjon.cv-delt",
+      "notifikasjonsId": "enEllerAnnenId",
+      "arbeidsgiversEpostadresser": ["test@testepost.no", "test2@testpost.no"], 
+      "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+      "virksomhetsnummer": "123456789",
+      "utførtAvVeilederFornavn": "Veileder",
+      "utførtAvVeilederEtternavn": "Veiledersen",
+      "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00[Europe/Oslo]",
+      "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
+      "stillingstittel": "En fantastisk stilling!"
+    }
 ```
 
 arbeidsgiver-notifikasjon-produsent-api er idempotent så lenge innholdet i meldingen er lik.
