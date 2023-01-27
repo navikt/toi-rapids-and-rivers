@@ -90,7 +90,6 @@ private fun spørringForCvDeltMedArbeidsgiver(
             ${s}tidspunkt: ISO8601DateTime! 
             ${s}hardDeleteDuration: ISO8601Duration!
             ${s}notifikasjonTekst: String!
-            ${s}epostSendetidspunkt: ISO8601LocalDateTime
             ${
                 mottakerEpostAdresser.mapIndexed{idx, it ->
                     """
@@ -135,7 +134,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                                             } 
                                         } 
                                         sendetidspunkt: { 
-                                            tidspunkt: ${s}epostSendetidspunkt
+                                            sendevindu: LOEPENDE
                                         } 
                                     } 
                                 }
@@ -171,8 +170,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
             "lenke": "$lenke",
             "tidspunkt": "$tidspunktForVarselISO8601DateTime",
             "hardDeleteDuration": "$utløperOm",
-            "notifikasjonTekst": "$notifikasjonTekst",
-            "epostSendetidspunkt": "${LocalDateTime.MIN}"
+            "notifikasjonTekst": "$notifikasjonTekst"
         }
     }
 """.trimIndent()

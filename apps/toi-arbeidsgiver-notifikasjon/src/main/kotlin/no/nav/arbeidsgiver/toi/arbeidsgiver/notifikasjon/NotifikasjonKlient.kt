@@ -41,11 +41,16 @@ class NotifikasjonKlient(
                 mottakerEpostAdresser = mottakerEpostadresser,
             )
 
-        val erProd: Boolean = System.getenv()["NAIS_CLUSTER_NAME"]?.contains("prod") ?: false
+        val erLokal: Boolean = System.getenv()["NAIS_CLUSTER_NAME"] == null
+        val erDev: Boolean = System.getenv()["NAIS_CLUSTER_NAME"]?.equals("dev-gcp") ?: false
 
-        if(!erProd)  {
+
+        if(erDev)  {
             log.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
+        } else if(erLokal) {
+            println("query: $spørring")
         }
+
 
         val (_, response, result) = Fuel
             .post(path = url)
