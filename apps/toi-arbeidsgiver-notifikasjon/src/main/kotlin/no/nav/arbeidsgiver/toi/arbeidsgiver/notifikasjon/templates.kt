@@ -25,7 +25,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
          Logg deg inn på Min side - Arbeidsgiver for å se lista.
      </p>
      <p>
-         Mvh, $avsender
+         Mvh. $avsender
      </p>
      </body>
      </html>
