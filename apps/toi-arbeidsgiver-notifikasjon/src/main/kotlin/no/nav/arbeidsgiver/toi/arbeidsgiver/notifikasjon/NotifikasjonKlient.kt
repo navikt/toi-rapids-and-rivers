@@ -7,6 +7,9 @@ import com.github.kittinunf.fuel.core.Response
 import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.NyBeskjedVellykket
+import java.time.LocalDateTime
+import java.time.Month
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -14,6 +17,9 @@ class NotifikasjonKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
+
+    private val startDatoForNotifikasjoner =
+        ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
 
     fun sendNotifikasjon(
         notifikasjonsId: String,
@@ -25,6 +31,12 @@ class NotifikasjonKlient(
         meldingTilArbeidsgiver: String,
         stillingstittel: String,
     ) {
+
+        if (tidspunktForHendelse.isBefore(startDatoForNotifikasjoner)) {
+            log.info("Sender ikke notifikasjoner til arbeidsgivere for hendelser opprettet før $startDatoForNotifikasjoner")
+            return
+        }
+
         val epostBody = lagEpostBody(
             tittel = stillingstittel,
             tekst = meldingTilArbeidsgiver,
@@ -66,9 +78,11 @@ class NotifikasjonKlient(
             DuplikatEksternIdOgMerkelapp.name -> {
                 log.info("Duplikatmelding sendt mot notifikasjon api")
             }
+
             NyBeskjedVellykket.name -> {
                 log.info("Melding sendt til notifikasjon api")
             }
+
             else -> {
                 håndterFeil(json, response)
             }
