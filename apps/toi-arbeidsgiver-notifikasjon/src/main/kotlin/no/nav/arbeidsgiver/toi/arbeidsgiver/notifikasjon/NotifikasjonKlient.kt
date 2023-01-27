@@ -41,6 +41,12 @@ class NotifikasjonKlient(
                 mottakerEpostAdresser = mottakerEpostadresser,
             )
 
+        val erProd: Boolean = System.getenv()["NAIS_CLUSTER_NAME"]?.contains("prod") ?: false
+
+        if(!erProd)  {
+            log.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
+        }
+
         val (_, response, result) = Fuel
             .post(path = url)
             .header("Content-type", "application/json")
