@@ -25,3 +25,5 @@ arbeidsgiver-notifikasjon-produsent-api er idempotent så lenge innholdet i meld
 Dersom notifikasjonsId er lik i to meldinger mens resten av innholdet er ulikt, så vil arbeidsgiver-notifikasjon-produsent-api kaste feil.
 Det vil si at man kan sende flere meldinger på rapid'en med samme notifikasjonsId uten at det vil medføre at arbeidsgiver spammes ned av notifikasjoner.
 
+# Notifikasjonsapi grafana, applikasjonens nottifikasjoner har navnet "kandidater"
+https://grafana.nais.io/d/_CEEMTr7z/bruk-av-ekstern-varsling?orgId=1&var-cluster=prod-gcp&var-produsent_id=All&var-status=All&var-feilkode=All&var-merkelapp=All
