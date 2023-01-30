@@ -33,9 +33,6 @@ spec:
         - host: kafka-schema-registry.nais.adeo.no
   kafka:
     pool: {{ kafka_pool }}
-  azure:
-    application:
-      enabled: true
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
