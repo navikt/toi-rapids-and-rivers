@@ -43,6 +43,7 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: false
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
