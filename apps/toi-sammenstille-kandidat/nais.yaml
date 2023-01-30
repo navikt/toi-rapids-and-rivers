@@ -41,9 +41,6 @@ spec:
         diskAutoresize: {{ gcp_disk_autoresize }}
         databases:
           - name: db
-  azure:
-    application:
-      enabled: true
   envFrom:
     - secret: passord-for-republisering
   env:
