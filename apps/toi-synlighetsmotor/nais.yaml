@@ -38,9 +38,13 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: false
       claims:
         extra:
           - NAVident
+        groups:
+          - id: {{ ad_gruppe_modia_generell_tilgang }}
+          - id: {{ ad_gruppe_modia_oppfølging }}
   gcp:
     sqlInstances:
       - type: POSTGRES_12
@@ -48,20 +52,12 @@ spec:
         diskAutoresize: {{ gcp_disk_autoresize }}
         databases:
           - name: synlighetsmotor-db
-  tokenx:
-    enabled: true
   accessPolicy:
     inbound:
       rules:
         - application: rekrutteringsbistand-container
           cluster: {{ cluster }}
           namespace: toi
-        - application: pam-kandidatsok-api
-          cluster: {{ cluster-fss }}
-          namespace: teampam
-        - application: pam-cv-api
-          cluster: {{ cluster-fss }}
-          namespace: teampam
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1

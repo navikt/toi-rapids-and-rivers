@@ -20,7 +20,6 @@ fun startApp(
     javalin.routes {
         get("/isalive", isAlive(rapidIsAlive), Rolle.UNPROTECTED)
         get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
-        post("/synlighet", hentSynlighetForKandidater(repository::hentEvalueringer), Rolle.ARBEIDSGIVER)
     }
 
     rapidsConnection.also {

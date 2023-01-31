@@ -37,8 +37,7 @@ class EvalueringTest {
 
         javalin = opprettJavalinMedTilgangskontroll(
             mapOf(
-                Rolle.VEILEDER to issuerProperties,
-                Rolle.ARBEIDSGIVER to issuerProperties
+                Rolle.VEILEDER to issuerProperties
             )
         )
     }
