@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
 
-import java.time.LocalDateTime
 import java.time.Period
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -19,7 +18,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
          Melding fra markedskontakt i NAV:
      </p>
      <p>
-         <pre style='font-family: unset;'>$tekst</pre>
+         <pre style='font-family: unset;'>${tekst.byttUtLinjeskiftMedHtmlLinjeskift()}</pre>
      </p>
      <p>
          Logg deg inn på Min side - Arbeidsgiver for å se lista.
@@ -49,12 +48,6 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     )
         .replace("\n", "")
         .utenLangeMellomrom()
-
-
-tailrec fun String.utenLangeMellomrom(): String =
-    if (contains("  "))
-        replace("  ", " ").utenLangeMellomrom()
-    else this
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: String,
@@ -175,3 +168,11 @@ private fun spørringForCvDeltMedArbeidsgiver(
     }
 """.trimIndent()
 }
+
+tailrec fun String.utenLangeMellomrom(): String =
+    if (contains("  "))
+        replace("  ", " ").utenLangeMellomrom()
+    else this
+
+fun String.byttUtLinjeskiftMedHtmlLinjeskift(): String =
+    replace("\n", "<br/>")
