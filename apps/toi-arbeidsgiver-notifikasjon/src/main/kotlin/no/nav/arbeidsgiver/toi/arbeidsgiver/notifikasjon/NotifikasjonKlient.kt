@@ -87,7 +87,7 @@ class NotifikasjonKlient(
             }
 
             NyBeskjedVellykket.name -> {
-                log.info("Melding sendt til notifikasjon api")
+                log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
                 notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
             }
 
