@@ -15,7 +15,7 @@ For at en melding skal plukkes opp av appen må meldinga ha følgende format:
       "virksomhetsnummer": "123456789",
       "utførtAvVeilederFornavn": "Veileder",
       "utførtAvVeilederEtternavn": "Veiledersen",
-      "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00[Europe/Oslo]",
+      "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00",
       "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
       "stillingstittel": "En fantastisk stilling!"
     }

@@ -39,7 +39,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -74,7 +74,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -109,7 +109,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -138,7 +138,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -159,7 +159,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -182,7 +182,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
