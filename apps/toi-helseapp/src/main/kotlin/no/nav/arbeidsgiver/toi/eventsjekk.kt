@@ -17,7 +17,7 @@ private val uinteressanteHendelser = listOf(
     "application_down",
     "republisert.sammenstilt",
     "kandidat.",
-    "notifikasjon.cv-delt"
+    "notifikasjon.cv-delt" // TODO: Fjern fra lista 18.02.2023
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
