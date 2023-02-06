@@ -31,7 +31,7 @@ fun main() {
                         override fun onStartup(rapidsConnection: RapidsConnection) {
                             offsetJob = GlobalScope.launch { logException("Offset-jobb", envs, ::sjekkOffsets) }
                             offsetJob?.invokeOnCompletion { rapidsConnection.stop() }
-                            eventSjekkJob = GlobalScope.launch { logException("Event-sjekk-jobb", envs, ::sjekkOffsets) }
+                            eventSjekkJob = GlobalScope.launch { logException("Event-sjekk-jobb", envs, ::sjekkTidSidenEvent) }
                             eventSjekkJob?.invokeOnCompletion { rapidsConnection.stop() }
                         }
 
