@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
+import java.lang.Exception
 import java.time.*
 import java.util.*
 
@@ -17,12 +18,13 @@ private val uinteressanteHendelser = listOf(
     "application_down",
     "republisert.sammenstilt",
     "kandidat.",
-    "notifikasjon.cv-delt" // TODO: Fjern fra lista 18.02.2023
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
 val grenseverdiForAlarm = Duration.ofHours(1)
+
+private val objectMapper = jacksonObjectMapper()
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(
@@ -30,14 +32,15 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
         StringDeserializer(),
         StringDeserializer()
     )
-    val objectMapper = jacksonObjectMapper()
     val sisteEvent = mutableMapOf<String, Instant>()
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     consument.assign(listOf(topicPartition))
     consument.seekToBeginning(listOf(topicPartition))
     while (true) {
         val records = consument.poll(Duration.ofMinutes(1))
-        records.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
+        val recordsMedGyldigJson = records.filter { it.value().erGyldigJson() }
+
+        recordsMedGyldigJson.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
             .filterNot { (node, _) -> node == null }
             .filterNot { (node, _) -> node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
@@ -50,7 +53,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             }
         val grenseVerdiForÅVæreIKapp = Duration.ofMinutes(5)
         val tidSidenSisteLesteMelding = Duration.between(
-            Instant.ofEpochMilli(records.last().timestamp()),
+            Instant.ofEpochMilli(recordsMedGyldigJson.last().timestamp()),
             Instant.now()
         )
         if (tidSidenSisteLesteMelding < grenseVerdiForÅVæreIKapp) {
@@ -87,6 +90,14 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                 delay(Duration.ofMinutes(1))
             }
         }
+    }
+}
+
+private fun String.erGyldigJson(): Boolean {
+    return try {
+       objectMapper.readTree(this) != null
+    } catch (e: Exception) {
+        false
     }
 }
 
