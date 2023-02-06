@@ -38,9 +38,9 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     consument.seekToBeginning(listOf(topicPartition))
     while (true) {
         val records = consument.poll(Duration.ofMinutes(1))
-        val recordsMedGyldigJson = records.filter { it.value().erGyldigJson() }
 
-        recordsMedGyldigJson.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
+        records.filter { it.value().erGyldigJson() }
+            .map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
             .filterNot { (node, _) -> node == null }
             .filterNot { (node, _) -> node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
@@ -53,7 +53,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             }
         val grenseVerdiForÅVæreIKapp = Duration.ofMinutes(5)
         val tidSidenSisteLesteMelding = Duration.between(
-            Instant.ofEpochMilli(recordsMedGyldigJson.last().timestamp()),
+            Instant.ofEpochMilli(records.last().timestamp()),
             Instant.now()
         )
         if (tidSidenSisteLesteMelding < grenseVerdiForÅVæreIKapp) {
