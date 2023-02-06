@@ -66,7 +66,7 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
         "toi-veileder" to "toi-veileder-rapidconsumer-9",
         "toi-hull-i-cv" to "toi-hull-i-cv-rapidconsumer-1",
         "toi-ontologitjeneste" to "toi-ontologitjeneste-rapidconsumer-1",
-        "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1"
+//        "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1"
     )
     while (true) {
         val sisteOffset = sisteOffset(envs)
