@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection

@@ -1,12 +1,9 @@
-package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
+package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
-import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.NyBeskjedVellykket
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.Month
@@ -88,12 +85,12 @@ class NotifikasjonKlient(
         val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
 
         when (notifikasjonsSvar) {
-            DuplikatEksternIdOgMerkelapp.name -> {
+            NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
                 log.info("Duplikatmelding sendt mot notifikasjon api")
                 notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
             }
 
-            NyBeskjedVellykket.name -> {
+            NotifikasjonsSvar.NyBeskjedVellykket.name -> {
                 log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
                 notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
             }

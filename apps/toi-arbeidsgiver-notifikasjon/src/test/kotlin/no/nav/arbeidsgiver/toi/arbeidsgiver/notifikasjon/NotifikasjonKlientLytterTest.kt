@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*

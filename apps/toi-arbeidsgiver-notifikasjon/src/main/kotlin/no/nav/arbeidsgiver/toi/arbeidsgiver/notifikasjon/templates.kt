@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
+package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import java.time.Period
 import java.time.ZonedDateTime
