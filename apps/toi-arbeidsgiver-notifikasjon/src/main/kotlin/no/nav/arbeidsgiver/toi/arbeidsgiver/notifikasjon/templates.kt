@@ -14,11 +14,11 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      <body>
      <p>
          Hei.<br/>
-         Din bedrift har mottatt en kandidatliste fra NAV: $tittel.<br/>
+         Din bedrift har mottatt en kandidatliste fra NAV: ${tittel.escape()}.<br/>
          Melding fra markedskontakt i NAV:
      </p>
      <p>
-         <pre style='font-family: unset;'>${tekst.byttUtLinjeskiftMedHtmlLinjeskift()}</pre>
+         <pre style='font-family: unset;'>${tekst.escape()}</pre>
      </p>
      <p>
          Logg deg inn på Min side - Arbeidsgiver for å se lista.
@@ -174,5 +174,6 @@ tailrec fun String.utenLangeMellomrom(): String =
         replace("  ", " ").utenLangeMellomrom()
     else this
 
-fun String.byttUtLinjeskiftMedHtmlLinjeskift(): String =
+private fun String.escape(): String =
     replace("\n", "<br/>")
+        .replace("\"", "\\\"")
