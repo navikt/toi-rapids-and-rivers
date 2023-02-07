@@ -8,7 +8,6 @@ import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.NyBeskjedVellykket
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -79,7 +78,7 @@ class NotifikasjonKlient(
                 .header("Authorization", "Bearer ${hentAccessToken()}")
                 .body(spørring)
                 .responseString()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api, se secureLog")
             secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
             throw e
