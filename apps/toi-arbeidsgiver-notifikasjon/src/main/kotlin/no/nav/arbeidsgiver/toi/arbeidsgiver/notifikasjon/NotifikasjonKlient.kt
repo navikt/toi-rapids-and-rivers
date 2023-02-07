@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.Response
 import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp
 import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.NyBeskjedVellykket
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -18,6 +19,7 @@ class NotifikasjonKlient(
     val hentAccessToken: () -> String,
 ) {
 
+    private val secureLog = LoggerFactory.getLogger("secureLog")
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
     private val notifikasjonsIderTilSendteMeldinger = mutableListOf<String>()
@@ -92,7 +94,7 @@ class NotifikasjonKlient(
             }
 
             else -> {
-                håndterFeil(json, response)
+                håndterFeil(json, response, spørring)
             }
         }
     }
@@ -100,7 +102,9 @@ class NotifikasjonKlient(
     private fun håndterFeil(
         json: JsonNode,
         response: Response,
+        body: String,
     ) {
+        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
         val errors = json["errors"]
         if (errors != null && errors.size() > 0) {
             log.error("Feil fra notifikasjon api, errors: $errors}")
