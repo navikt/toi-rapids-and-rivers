@@ -80,7 +80,7 @@ class NotifikasjonKlient(
                 .body(spørring)
                 .responseString()
         } catch (e: Exception) {
-            log.info("Uventet feil i kall til notifikasjon-api, se secureLog")
+            log.error("Uventet feil i kall til notifikasjon-api, se secureLog")
             secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
             throw e
         }
