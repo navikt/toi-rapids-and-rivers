@@ -68,6 +68,8 @@ class NotifikasjonKlient(
             println("query: $spørring")
         }
 
+        log.info("Sender kall til notifikasjonsapi")
+        secureLog.info("Uventet feil i kall til notifikasjon-api med body: $spørring")
         val (_, response, result) = try {
             Fuel
                 .post(path = url)
@@ -79,6 +81,9 @@ class NotifikasjonKlient(
             log.error("Uventet feil i kall til notifikasjon-api, se secureLog")
             secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
             throw e
+        }
+        if(response.statusCode == 400) {
+            log.error("Kall mot notifikasjonsapi feilet med bad request: ${response.responseMessage}")
         }
 
         val json = jacksonObjectMapper().readTree(result.get())
