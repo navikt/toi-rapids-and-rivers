@@ -14,11 +14,11 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      <body>
      <p>
          Hei.<br/>
-         Din bedrift har mottatt en kandidatliste fra NAV: ${tittel.escape()}.<br/>
+         Din bedrift har mottatt en kandidatliste fra NAV: ${tittel.htmlEscape()}.<br/>
          Melding fra markedskontakt i NAV:
      </p>
      <p>
-         <pre style='font-family: unset;'>${tekst.escape()}</pre>
+         <pre style='font-family: unset;'>${tekst.htmlEscape()}</pre>
      </p>
      <p>
          Logg deg inn på Min side - Arbeidsgiver for å se lista.
@@ -174,6 +174,6 @@ tailrec fun String.utenLangeMellomrom(): String =
         replace("  ", " ").utenLangeMellomrom()
     else this
 
-private fun String.escape(): String =
+private fun String.htmlEscape(): String =
     replace("\n", "<br/>")
-        .replace("\"", "\\\"")
+        .replace("\"", "&quot;")
