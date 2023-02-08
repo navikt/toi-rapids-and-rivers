@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
+import io.micrometer.core.instrument.util.StringEscapeUtils
 import java.time.Period
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -84,12 +85,12 @@ private fun spørringForCvDeltMedArbeidsgiver(
             ${s}hardDeleteDuration: ISO8601Duration!
             ${s}notifikasjonTekst: String!
             ${
-                mottakerEpostAdresser.mapIndexed{idx, it ->
-                    """
-                        ${s}epostadresse${idx+1}: String!
+        mottakerEpostAdresser.mapIndexed { idx, it ->
+            """
+                        ${s}epostadresse${idx + 1}: String!
                     """.trimIndent()
-                }.joinToString("\n ")
-            }
+        }.joinToString("\n ")
+    }
             ) { 
             nyBeskjed (
                 nyBeskjed: { 
@@ -115,15 +116,15 @@ private fun spørringForCvDeltMedArbeidsgiver(
                     } 
                     eksterneVarsler: [
                         ${
-                            mottakerEpostAdresser.mapIndexed { idx, it -> 
-                                """
+        mottakerEpostAdresser.mapIndexed { idx, it ->
+            """
                                 {
                                     epost: { 
                                         epostTittel: ${s}epostTittel
                                         epostHtmlBody: ${s}epostBody
                                         mottaker: { 
                                             kontaktinfo: { 
-                                                epostadresse: ${s}epostadresse${idx+1}
+                                                epostadresse: ${s}epostadresse${idx + 1}
                                             } 
                                         } 
                                         sendetidspunkt: { 
@@ -132,8 +133,8 @@ private fun spørringForCvDeltMedArbeidsgiver(
                                     } 
                                 }
                             """.trimIndent()
-                            }.joinToString(", ")
-                        }
+        }.joinToString(", ")
+    }
                     ] 
                 } 
             ) { 
@@ -150,10 +151,10 @@ private fun spørringForCvDeltMedArbeidsgiver(
                     ${
         mottakerEpostAdresser.mapIndexed { idx, verdi ->
             """
-                        "epostadresse${idx+1}": "$verdi",
+                        "epostadresse${idx + 1}": "$verdi",
                     """.trimIndent()
-                }.joinToString("\n ")
-            }
+        }.joinToString("\n ")
+    }
             "eksternId": "$notifikasjonsId", 
             "grupperingsId": "$stillingsId", 
             "merkelapp": "$merkelapp",
@@ -176,4 +177,5 @@ tailrec fun String.utenLangeMellomrom(): String =
 
 private fun String.htmlEscape(): String =
     replace("\n", "<br/>")
-        .replace("\"", "&quot;")
+        .let { StringEscapeUtils.escapeJson(it) }
+
