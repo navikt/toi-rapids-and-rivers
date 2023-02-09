@@ -14,8 +14,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      </head>
      <body>
      <p>
-         Hei.<br/>
-         <br/>
+         Hei.<br/><br/>
          Din bedrift har mottatt en kandidatliste fra NAV: ${tittel.htmlEscape()}.<br/>
          Melding fra markedskontakt i NAV:
      </p>
