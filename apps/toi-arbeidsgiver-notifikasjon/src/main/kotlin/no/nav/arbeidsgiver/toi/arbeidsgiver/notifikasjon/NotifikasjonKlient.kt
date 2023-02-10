@@ -67,36 +67,36 @@ class NotifikasjonKlient(
             println("query: $spørring")
         }
 
-        val (_, response, result) = try {
-            Fuel
+        try {
+            val (_, response, result) = Fuel
                 .post(path = url)
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer ${hentAccessToken()}")
                 .body(spørring)
                 .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
+
+            when (notifikasjonsSvar) {
+                NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
+                    log.info("Duplikatmelding sendt mot notifikasjon api")
+                    notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
+                }
+
+                NotifikasjonsSvar.NyBeskjedVellykket.name -> {
+                    log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
+                    notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
+                }
+
+                else -> {
+                    håndterFeil(json, response, spørring)
+                }
+            }
         } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api, se secureLog")
             secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
             throw e
-        }
-
-        val json = jacksonObjectMapper().readTree(result.get())
-        val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
-
-        when (notifikasjonsSvar) {
-            NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
-                log.info("Duplikatmelding sendt mot notifikasjon api")
-                notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
-            }
-
-            NotifikasjonsSvar.NyBeskjedVellykket.name -> {
-                log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
-                notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
-            }
-
-            else -> {
-                håndterFeil(json, response, spørring)
-            }
         }
     }
 
