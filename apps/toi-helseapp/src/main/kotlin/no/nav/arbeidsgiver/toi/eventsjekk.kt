@@ -51,10 +51,12 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                 }
             }
         val grenseVerdiForÅVæreIKapp = Duration.ofMinutes(5)
-        val tidSidenSisteLesteMelding = Duration.between(
-            Instant.ofEpochMilli(records.last().timestamp()),
-            Instant.now()
-        )
+        val tidSidenSisteLesteMelding = records.lastOrNull()?.timestamp()?.let {
+            Duration.between(
+                Instant.ofEpochMilli(it),
+                Instant.now()
+            )
+        } ?: Duration.ZERO
         if (tidSidenSisteLesteMelding < grenseVerdiForÅVæreIKapp) {
             val nå = Instant.now()
             val sorterteEventer = sisteEvent.toList()
