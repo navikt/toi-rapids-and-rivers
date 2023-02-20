@@ -4,8 +4,9 @@ plugins {
 
 repositories {
     maven("https://jitpack.io")
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:2022110411121667556720.8a951a765583")
+    implementation("no.nav.arbeidsgiver.toi:toi-rapids-and-rivers-fork:1.1")
 }
