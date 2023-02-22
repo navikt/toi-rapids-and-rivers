@@ -92,3 +92,6 @@ spec:
     - team: toi
       application: toi-arbeidsgiver-notifikasjon
       access: readwrite
+    - team: toi
+      application: toi-kafkamanager
+      access: readwrite
