@@ -98,35 +98,6 @@ class NotifikasjonKlientLytterTest {
     }
 
     @Test
-    fun `Når vi mottar to notifikasjonsmeldinger på rapid med samme notifikasjonsId skal vi bare gjøre ett kall til notifikasjon-api`() {
-        val melding = """
-            {
-              "@event_name": "notifikasjon.cv-delt",
-              "notifikasjonsId": "enNotifikasjonsId",
-              "arbeidsgiversEpostadresser": ["test@testepost.no"], 
-              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "virksomhetsnummer": "123456789",
-              "utførtAvVeilederFornavn": "Veileder",
-              "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
-              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
-            }
-        """.trimIndent()
-        stubKallTilNotifikasjonssystemet()
-
-        testRapid.sendTestMessage(melding)
-        testRapid.sendTestMessage(melding)
-
-        wiremock.verify(
-            1, postRequestedFor(
-                urlEqualTo("/api/graphql")
-            )
-        )
-        assertThat(testRapid.inspektør.size).isZero
-    }
-
-    @Test
     fun `Skal ikke feile når notifikasjon-api svarer med at notifikasjonen er duplikat `() {
         val melding = """
             {

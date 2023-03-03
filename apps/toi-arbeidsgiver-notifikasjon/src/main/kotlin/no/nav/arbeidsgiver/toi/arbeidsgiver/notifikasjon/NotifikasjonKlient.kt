@@ -19,7 +19,6 @@ class NotifikasjonKlient(
     private val secureLog = LoggerFactory.getLogger("secureLog")
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
-    private val notifikasjonsIderTilSendteMeldinger = mutableListOf<String>()
 
     fun sendNotifikasjon(
         notifikasjonsId: String,
@@ -33,11 +32,6 @@ class NotifikasjonKlient(
     ) {
         if (tidspunktForHendelse.isBefore(startDatoForNotifikasjoner)) {
             log.info("Sender ikke notifikasjoner til arbeidsgivere for hendelser opprettet før $startDatoForNotifikasjoner")
-            return
-        }
-
-        if (notifikasjonsId in notifikasjonsIderTilSendteMeldinger) {
-            log.info("Sender ikke notifikasjon for $notifikasjonsId fordi lik notifikasjon allerede har blitt sendt")
             return
         }
 
@@ -81,12 +75,10 @@ class NotifikasjonKlient(
             when (notifikasjonsSvar) {
                 NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
                     log.info("Duplikatmelding sendt mot notifikasjon api")
-                    notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
                 }
 
                 NotifikasjonsSvar.NyBeskjedVellykket.name -> {
                     log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
-                    notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
                 }
 
                 else -> {
