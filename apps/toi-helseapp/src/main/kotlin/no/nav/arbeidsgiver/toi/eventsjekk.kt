@@ -17,14 +17,12 @@ private val uinteressanteHendelser = listOf(
     "application_down",
     "republisert.sammenstilt",
 )
-private val uinteressanteHendelsePrefikser = listOf("kandidat.", "kandidat_v2.")
+private val uinteressanteHendelsePrefikser = emptyList<String>()//listOf("kandidat.", "kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
 val grenseverdiForAlarm = Duration.ofHours(1)
 
 private val objectMapper = jacksonObjectMapper()
-
-private val eventNameset = HashSet<String>()
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(
@@ -45,11 +43,6 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             .filterNot { (node, _) -> node == null }
             .filterNot { (node, _) -> node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
-            .onEach { (eventName, _) ->
-                if (eventNameset.add(eventName)) {
-                    log.info("Nytt eventnavn i denne instansen: $eventName")
-                }
-            }
             .filterNot { (eventName, _) -> eventName in uinteressanteHendelser }
             .filterNot { (eventName, _) -> uinteressanteHendelsePrefikser.any(eventName::startsWith) }
             .forEach { (eventName, instant) ->
