@@ -1,6 +1,6 @@
-package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
+package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
-import java.time.LocalDateTime
+import io.micrometer.core.instrument.util.StringEscapeUtils
 import java.time.Period
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -10,16 +10,16 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
      <html>
      <head>
          <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
-         <title>$tittel</title>
+         <title>${tittel.htmlEscape()}</title>
      </head>
      <body>
      <p>
-         Hei.<br/>
-         Din bedrift har mottatt en kandidatliste fra NAV: $tittel.<br/>
+         Hei.<br/><br/>
+         Din bedrift har mottatt en kandidatliste fra NAV: ${tittel.htmlEscape()}.<br/>
          Melding fra markedskontakt i NAV:
      </p>
      <p>
-         <pre style='font-family: unset;'>$tekst</pre>
+         <pre style='font-family: unset;'>${tekst.htmlEscape()}</pre>
      </p>
      <p>
          Logg deg inn på Min side - Arbeidsgiver for å se lista.
@@ -49,12 +49,6 @@ fun graphQlSpørringForCvDeltMedArbeidsgiver(
     )
         .replace("\n", "")
         .utenLangeMellomrom()
-
-
-tailrec fun String.utenLangeMellomrom(): String =
-    if (contains("  "))
-        replace("  ", " ").utenLangeMellomrom()
-    else this
 
 private fun spørringForCvDeltMedArbeidsgiver(
     notifikasjonsId: String,
@@ -91,12 +85,12 @@ private fun spørringForCvDeltMedArbeidsgiver(
             ${s}hardDeleteDuration: ISO8601Duration!
             ${s}notifikasjonTekst: String!
             ${
-                mottakerEpostAdresser.mapIndexed{idx, it ->
-                    """
-                        ${s}epostadresse${idx+1}: String!
+        mottakerEpostAdresser.mapIndexed { idx, it ->
+            """
+                        ${s}epostadresse${idx + 1}: String!
                     """.trimIndent()
-                }.joinToString("\n ")
-            }
+        }.joinToString("\n ")
+    }
             ) { 
             nyBeskjed (
                 nyBeskjed: { 
@@ -122,15 +116,15 @@ private fun spørringForCvDeltMedArbeidsgiver(
                     } 
                     eksterneVarsler: [
                         ${
-                            mottakerEpostAdresser.mapIndexed { idx, it -> 
-                                """
+        mottakerEpostAdresser.mapIndexed { idx, it ->
+            """
                                 {
                                     epost: { 
                                         epostTittel: ${s}epostTittel
                                         epostHtmlBody: ${s}epostBody
                                         mottaker: { 
                                             kontaktinfo: { 
-                                                epostadresse: ${s}epostadresse${idx+1}
+                                                epostadresse: ${s}epostadresse${idx + 1}
                                             } 
                                         } 
                                         sendetidspunkt: { 
@@ -139,8 +133,8 @@ private fun spørringForCvDeltMedArbeidsgiver(
                                     } 
                                 }
                             """.trimIndent()
-                            }.joinToString(", ")
-                        }
+        }.joinToString(", ")
+    }
                     ] 
                 } 
             ) { 
@@ -157,10 +151,10 @@ private fun spørringForCvDeltMedArbeidsgiver(
                     ${
         mottakerEpostAdresser.mapIndexed { idx, verdi ->
             """
-                        "epostadresse${idx+1}": "$verdi",
+                        "epostadresse${idx + 1}": "$verdi",
                     """.trimIndent()
-                }.joinToString("\n ")
-            }
+        }.joinToString("\n ")
+    }
             "eksternId": "$notifikasjonsId", 
             "grupperingsId": "$stillingsId", 
             "merkelapp": "$merkelapp",
@@ -175,3 +169,13 @@ private fun spørringForCvDeltMedArbeidsgiver(
     }
 """.trimIndent()
 }
+
+tailrec fun String.utenLangeMellomrom(): String =
+    if (contains("  "))
+        replace("  ", " ").utenLangeMellomrom()
+    else this
+
+private fun String.htmlEscape(): String =
+    replace("\n", "<br/>")
+        .let { StringEscapeUtils.escapeJson(it) }
+

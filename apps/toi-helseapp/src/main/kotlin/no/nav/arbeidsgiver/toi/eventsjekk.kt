@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
+import java.lang.Exception
 import java.time.*
 import java.util.*
 
@@ -16,12 +17,13 @@ private val uinteressanteHendelser = listOf(
     "application_stop",
     "application_down",
     "republisert.sammenstilt",
-    "kandidat."
 )
-private val uinteressanteHendelsePrefikser = listOf("kandidat.")
-private val hendelserSomIkkeSendesLenger = listOf("cv", "cv.sammenstilt")
+private val uinteressanteHendelsePrefikser = listOf("kandidat.","kandidat_v2.")
+private val hendelserSomIkkeSendesLenger = listOf<String>()
 
 val grenseverdiForAlarm = Duration.ofHours(1)
+
+private val objectMapper = jacksonObjectMapper()
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(
@@ -29,14 +31,15 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
         StringDeserializer(),
         StringDeserializer()
     )
-    val objectMapper = jacksonObjectMapper()
     val sisteEvent = mutableMapOf<String, Instant>()
     val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
     consument.assign(listOf(topicPartition))
     consument.seekToBeginning(listOf(topicPartition))
     while (true) {
         val records = consument.poll(Duration.ofMinutes(1))
-        records.map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
+
+        records.filter { it.value().erGyldigJson() }
+            .map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
             .filterNot { (node, _) -> node == null }
             .filterNot { (node, _) -> node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
@@ -48,10 +51,12 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                 }
             }
         val grenseVerdiForÅVæreIKapp = Duration.ofMinutes(5)
-        val tidSidenSisteLesteMelding = Duration.between(
-            Instant.ofEpochMilli(records.last().timestamp()),
-            Instant.now()
-        )
+        val tidSidenSisteLesteMelding = records.lastOrNull()?.timestamp()?.let {
+            Duration.between(
+                Instant.ofEpochMilli(it),
+                Instant.now()
+            )
+        } ?: Duration.ZERO
         if (tidSidenSisteLesteMelding < grenseVerdiForÅVæreIKapp) {
             val nå = Instant.now()
             val sorterteEventer = sisteEvent.toList()
@@ -86,6 +91,14 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                 delay(Duration.ofMinutes(1))
             }
         }
+    }
+}
+
+private fun String.erGyldigJson(): Boolean {
+    return try {
+       objectMapper.readTree(this) != null
+    } catch (e: Exception) {
+        false
     }
 }
 

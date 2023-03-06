@@ -17,6 +17,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.util.*
+import kotlin.reflect.KSuspendFunction1
 
 fun main() {
     try {
@@ -28,9 +29,9 @@ fun main() {
                 register(
                     object : RapidsConnection.StatusListener {
                         override fun onStartup(rapidsConnection: RapidsConnection) {
-                            offsetJob = GlobalScope.launch { sjekkOffsets(envs) }
+                            offsetJob = GlobalScope.launch { logException("Offset-jobb", envs, ::sjekkOffsets) }
                             offsetJob?.invokeOnCompletion { rapidsConnection.stop() }
-                            eventSjekkJob = GlobalScope.launch { sjekkTidSidenEvent(envs) }
+                            eventSjekkJob = GlobalScope.launch { logException("Event-sjekk-jobb", envs, ::sjekkTidSidenEvent) }
                             eventSjekkJob?.invokeOnCompletion { rapidsConnection.stop() }
                         }
 
@@ -45,6 +46,15 @@ fun main() {
 
     } catch (e: Exception) {
         log.error(e.message, e)
+    }
+}
+
+suspend fun logException(jobbNavn: String, envs: Map<String, String>, funksjon: KSuspendFunction1<Map<String, String>, Unit>) {
+    try {
+        funksjon(envs)
+    } catch (e: Exception) {
+        log.error("Feil i $jobbNavn: ${e.message}", e)
+        throw e
     }
 }
 
@@ -66,7 +76,11 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
         "toi-veileder" to "toi-veileder-rapidconsumer-9",
         "toi-hull-i-cv" to "toi-hull-i-cv-rapidconsumer-1",
         "toi-ontologitjeneste" to "toi-ontologitjeneste-rapidconsumer-1",
-        "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1"
+        "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1",
+        "rekrutteringsbistand-stilling-api" to "rekrutteringsbistand-stilling-rapidconsumer-2",
+        "presenterte-kandidagter-api" to "presenterte-kandidagter-api-rapidconsumer-1",
+        "foresporsel-om-deling-av-cv-api" to "foresporsel-om-deling-av-cv-api-rapidconsumer-1",
+        "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-1"
     )
     while (true) {
         val sisteOffset = sisteOffset(envs)

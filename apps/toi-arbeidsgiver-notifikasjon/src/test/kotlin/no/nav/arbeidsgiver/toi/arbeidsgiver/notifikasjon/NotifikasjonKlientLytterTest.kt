@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -39,8 +38,8 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
-              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
+              "meldingTilArbeidsgiver": "Her\nhar du noen \n fine kandidater med \"hermetegn\".",
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
@@ -55,7 +54,7 @@ class NotifikasjonKlientLytterTest {
                 equalTo(
                     " " +
                             """
-                         { "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "eksternId": "enEllerAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "<html><head> <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/> <title>En fantastisk stilling!</title></head><body><p> Hei.<br/> Din bedrift har mottatt en kandidatliste fra NAV: En fantastisk stilling!.<br/> Melding fra markedskontakt i NAV:</p><p> <pre style='font-family: unset;'>Her har du noen fine kandidater!</pre></p><p> Logg deg inn på Min side - Arbeidsgiver for å se lista.</p><p> Mvh. Veileder Veiledersen</p></body></html>", "lenke": "https://presenterte-kandidater.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }
+                         { "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "eksternId": "enEllerAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "<html><head> <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/> <title>En fantastisk stilling!</title></head><body><p> Hei.<br/><br/> Din bedrift har mottatt en kandidatliste fra NAV: En fantastisk stilling!.<br/> Melding fra markedskontakt i NAV:</p><p> <pre style='font-family: unset;'>Her<br/>har du noen <br/> fine kandidater med \"hermetegn\".</pre></p><p> Logg deg inn på Min side - Arbeidsgiver for å se lista.</p><p> Mvh. Veileder Veiledersen</p></body></html>", "lenke": "https://presenterte-kandidater.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }
                     """.trimIndent()
                 )
             )
@@ -74,7 +73,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -90,38 +89,9 @@ class NotifikasjonKlientLytterTest {
                 equalTo(
                     " " +
                             """
-                         { "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ${pesostegn}epostadresse2: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } }, { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse2 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "epostadresse2": "test2@testepost.no", "eksternId": "enHeltAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "<html><head> <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/> <title>En fantastisk stilling!</title></head><body><p> Hei.<br/> Din bedrift har mottatt en kandidatliste fra NAV: En fantastisk stilling!.<br/> Melding fra markedskontakt i NAV:</p><p> <pre style='font-family: unset;'>Her har du noen fine kandidater!</pre></p><p> Logg deg inn på Min side - Arbeidsgiver for å se lista.</p><p> Mvh. Veileder Veiledersen</p></body></html>", "lenke": "https://presenterte-kandidater.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }
+                         { "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ${pesostegn}epostadresse2: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } }, { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse2 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "epostadresse2": "test2@testepost.no", "eksternId": "enHeltAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "<html><head> <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/> <title>En fantastisk stilling!</title></head><body><p> Hei.<br/><br/> Din bedrift har mottatt en kandidatliste fra NAV: En fantastisk stilling!.<br/> Melding fra markedskontakt i NAV:</p><p> <pre style='font-family: unset;'>Her har du noen fine kandidater!</pre></p><p> Logg deg inn på Min side - Arbeidsgiver for å se lista.</p><p> Mvh. Veileder Veiledersen</p></body></html>", "lenke": "https://presenterte-kandidater.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }
                     """.trimIndent()
                 )
-            )
-        )
-        assertThat(testRapid.inspektør.size).isZero
-    }
-
-    @Test
-    fun `Når vi mottar to notifikasjonsmeldinger på rapid med samme notifikasjonsId skal vi bare gjøre ett kall til notifikasjon-api`() {
-        val melding = """
-            {
-              "@event_name": "notifikasjon.cv-delt",
-              "notifikasjonsId": "enNotifikasjonsId",
-              "arbeidsgiversEpostadresser": ["test@testepost.no"], 
-              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "virksomhetsnummer": "123456789",
-              "utførtAvVeilederFornavn": "Veileder",
-              "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
-              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
-            }
-        """.trimIndent()
-        stubKallTilNotifikasjonssystemet()
-
-        testRapid.sendTestMessage(melding)
-        testRapid.sendTestMessage(melding)
-
-        wiremock.verify(
-            1, postRequestedFor(
-                urlEqualTo("/api/graphql")
             )
         )
         assertThat(testRapid.inspektør.size).isZero
@@ -138,7 +108,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -159,7 +129,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }
@@ -182,7 +152,7 @@ class NotifikasjonKlientLytterTest {
               "virksomhetsnummer": "123456789",
               "utførtAvVeilederFornavn": "Veileder",
               "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00[Europe/Oslo]",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
               "stillingstittel": "En fantastisk stilling!"
             }

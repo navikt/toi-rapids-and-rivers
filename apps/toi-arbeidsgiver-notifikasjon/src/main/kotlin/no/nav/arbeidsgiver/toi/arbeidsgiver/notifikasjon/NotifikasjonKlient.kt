@@ -1,12 +1,10 @@
-package no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner
+package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
-import no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.log
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp
-import no.nav.arbeidsgiver.toi.presentertekandidater.notifikasjoner.NotifikasjonKlient.NotifikasjonsSvar.NyBeskjedVellykket
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -18,9 +16,9 @@ class NotifikasjonKlient(
     val hentAccessToken: () -> String,
 ) {
 
+    private val secureLog = LoggerFactory.getLogger("secureLog")
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
-    private val notifikasjonsIderTilSendteMeldinger = mutableListOf<String>()
 
     fun sendNotifikasjon(
         notifikasjonsId: String,
@@ -32,14 +30,8 @@ class NotifikasjonKlient(
         meldingTilArbeidsgiver: String,
         stillingstittel: String,
     ) {
-
         if (tidspunktForHendelse.isBefore(startDatoForNotifikasjoner)) {
             log.info("Sender ikke notifikasjoner til arbeidsgivere for hendelser opprettet før $startDatoForNotifikasjoner")
-            return
-        }
-
-        if (notifikasjonsId in notifikasjonsIderTilSendteMeldinger) {
-            log.info("Sender ikke notifikasjon for $notifikasjonsId fordi lik notifikasjon allerede har blitt sendt")
             return
         }
 
@@ -63,44 +55,49 @@ class NotifikasjonKlient(
         val erDev: Boolean = System.getenv()["NAIS_CLUSTER_NAME"]?.equals("dev-gcp") ?: false
 
 
-        if(erDev)  {
+        if (erDev) {
             log.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
-        } else if(erLokal) {
+        } else if (erLokal) {
             println("query: $spørring")
         }
 
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(spørring)
+                .responseString()
 
-        val (_, response, result) = Fuel
-            .post(path = url)
-            .header("Content-type", "application/json")
-            .header("Authorization", "Bearer ${hentAccessToken()}")
-            .body(spørring)
-            .responseString()
+            val json = jacksonObjectMapper().readTree(result.get())
+            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
 
-        val json = jacksonObjectMapper().readTree(result.get())
-        val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
+            when (notifikasjonsSvar) {
+                NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
+                    log.info("Duplikatmelding sendt mot notifikasjon api")
+                }
 
-        when (notifikasjonsSvar) {
-            DuplikatEksternIdOgMerkelapp.name -> {
-                log.info("Duplikatmelding sendt mot notifikasjon api")
-                notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
+                NotifikasjonsSvar.NyBeskjedVellykket.name -> {
+                    log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
+                }
+
+                else -> {
+                    håndterFeil(json, response, spørring)
+                }
             }
-
-            NyBeskjedVellykket.name -> {
-                log.info("Melding sendt til notifikasjon api")
-                notifikasjonsIderTilSendteMeldinger.add(notifikasjonsId)
-            }
-
-            else -> {
-                håndterFeil(json, response)
-            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api, se secureLog")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            throw e
         }
     }
 
     private fun håndterFeil(
         json: JsonNode,
         response: Response,
+        body: String,
     ) {
+        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
         val errors = json["errors"]
         if (errors != null && errors.size() > 0) {
             log.error("Feil fra notifikasjon api, errors: $errors}")

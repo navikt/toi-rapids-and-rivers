@@ -15,7 +15,7 @@ For at en melding skal plukkes opp av appen må meldinga ha følgende format:
       "virksomhetsnummer": "123456789",
       "utførtAvVeilederFornavn": "Veileder",
       "utførtAvVeilederEtternavn": "Veiledersen",
-      "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00[Europe/Oslo]",
+      "tidspunktForHendelse": "2022-11-09T10:37:45.108+01:00",
       "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
       "stillingstittel": "En fantastisk stilling!"
     }
@@ -27,3 +27,4 @@ Det vil si at man kan sende flere meldinger på rapid'en med samme notifikasjons
 
 # Notifikasjonsapi grafana, applikasjonens nottifikasjoner har navnet "kandidater"
 https://grafana.nais.io/d/_CEEMTr7z/bruk-av-ekstern-varsling?orgId=1&var-cluster=prod-gcp&var-produsent_id=All&var-status=All&var-feilkode=All&var-merkelapp=All
+
