@@ -47,7 +47,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             .map { (node, instant) -> node.asText() to instant }
             .onEach { (eventName, _) ->
                 if (eventNameset.add(eventName)) {
-                    log.info("Nytt eventnavn: $eventName")
+                    log.info("Nytt eventnavn i denne instansen: $eventName")
                 }
             }
             .filterNot { (eventName, _) -> eventName in uinteressanteHendelser }
