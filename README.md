@@ -1,12 +1,17 @@
 # Tiltak og inkludering's rapids & rivers-microservicer
 
 ## Republisering
-For republisering av all kandidatinformasjon, se README i toi-sammenstille-kandidat. 
+For republisering på Kafka av all kandidatinformasjon, se README i toi-sammenstille-kandidat. 
 
-## Github packages-dependencies
-For å kunn bygge kreves noen pakker fra github packages. Disse kan lastes ned ved å lage til en personal access token med read-packages-scope. 
-Bygg-scriptet leter etter gradle-propertien `mavenUserGithub` som kan settes i gradle.properties i hjemme-området ditt.
-Alternativt letes det etter system-variabelen GITHUB_TOKEN.
+## For å kunne bygge 
+Bygget trenger å laste ned noen pakker fra Github Pacakge Registry. Slik setter du opp credentials for å autentisere deg:
+
+1. Du trenger å generere en Personal Access Token i Github som har read-packages-scope. 
+2. Bygg-scriptet leter etter gradle-propertien `passwordGithub`. Den setter du i filen `gradle.properties` på hjemmeområdet ditt. Default katalog er `~/.gradle/`. Den skal ikke settes i "gradle.properties" som ligger i prosjektet, fordi dette er din personlige secret. 
+3. Frivillig: Jeg har lagret min Personal Access Token i en miljøvariabel `GITHUB_TOKEN` i operativsystemet mitt. Jeg trenger den i flere andre sammenhenger og jeg vil helst å lagre den bare ett sted på min maskin for å redusere sannsynligheten litt for at den kommer på avveie. Jeg kan refere til miljøvariabelen i min fil `~/.gradle/gradle.properties`, som inneholder kun denne ene linjen:
+```
+passwordGithub=GITHUB_TOKEN
+```
 
 
 # Henvendelser
