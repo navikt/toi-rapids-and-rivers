@@ -6,7 +6,6 @@ import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
-import java.lang.Exception
 import java.time.*
 import java.util.*
 
@@ -18,12 +17,14 @@ private val uinteressanteHendelser = listOf(
     "application_down",
     "republisert.sammenstilt",
 )
-private val uinteressanteHendelsePrefikser = listOf("kandidat.","kandidat_v2.")
+private val uinteressanteHendelsePrefikser = listOf("kandidat.", "kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
 val grenseverdiForAlarm = Duration.ofHours(1)
 
 private val objectMapper = jacksonObjectMapper()
+
+private val eventNameset = HashSet<String>()
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(
@@ -38,11 +39,17 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     while (true) {
         val records = consument.poll(Duration.ofMinutes(1))
 
+
         records.filter { it.value().erGyldigJson() }
             .map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
             .filterNot { (node, _) -> node == null }
             .filterNot { (node, _) -> node.isMissingOrNull() }
             .map { (node, instant) -> node.asText() to instant }
+            .onEach { (eventName, _) ->
+                if (eventNameset.add(eventName)) {
+                    log.info("Nytt eventnavn: $eventName")
+                }
+            }
             .filterNot { (eventName, _) -> eventName in uinteressanteHendelser }
             .filterNot { (eventName, _) -> uinteressanteHendelsePrefikser.any(eventName::startsWith) }
             .forEach { (eventName, instant) ->
@@ -96,7 +103,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
 
 private fun String.erGyldigJson(): Boolean {
     return try {
-       objectMapper.readTree(this) != null
+        objectMapper.readTree(this) != null
     } catch (e: Exception) {
         false
     }
