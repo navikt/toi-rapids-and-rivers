@@ -27,4 +27,3 @@ Det vil si at man kan sende flere meldinger på rapid'en med samme notifikasjons
 
 # Notifikasjonsapi grafana, applikasjonens nottifikasjoner har navnet "kandidater"
 https://grafana.nais.io/d/_CEEMTr7z/bruk-av-ekstern-varsling?orgId=1&var-cluster=prod-gcp&var-produsent_id=All&var-status=All&var-feilkode=All&var-merkelapp=All
-
