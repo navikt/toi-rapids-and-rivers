@@ -8,14 +8,6 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://packages.confluent.io/maven/")
-    maven("https://maven.pkg.github.com/navikt/maven-release") {
-        val passwordPropertyKey = "passwordGithub"
-        val githubToken = properties[passwordPropertyKey]?.toString()
-            ?: throw NullPointerException("Mangler Gradle property $passwordPropertyKey. Se instruksjoner i README")
-        credentials {
-            password = githubToken
-        }
-    }
 }
 
 dependencies {
