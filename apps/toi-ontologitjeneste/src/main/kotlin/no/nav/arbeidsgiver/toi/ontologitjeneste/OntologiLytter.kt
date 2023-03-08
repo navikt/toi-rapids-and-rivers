@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.ontologitjeneste
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.jackson.responseObject
 import no.nav.helse.rapids_rivers.*
 import java.util.*
@@ -36,28 +37,34 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         log.error("Fant ikke obligatoriske parametere")
     }
 
-    private fun synonymerTilKompetanse(kompetanse: String)= kompetanseCache(kompetanse)
-    private fun synonymerTilStillingstittel(stillingstittel: String) =stillingstittelCache(stillingstittel)
+    private fun synonymerTilKompetanse(kompetanse: String) = kompetanseCache(kompetanse)
+    private fun synonymerTilStillingstittel(stillingstittel: String) = stillingstittelCache(stillingstittel)
 
-    private fun ontologiRelasjoner(path:String): OntologiRelasjoner {
+    private fun ontologiRelasjoner(path: String): OntologiRelasjoner {
         val uuid = UUID.randomUUID()
         val (_, _, result) = Fuel.get("$ontologiUrl$path")
             .header("Nav-CallId", uuid)
             .responseObject<OntologiRelasjoner>()
-        val (ontologiRelasjoner, error) = result
+        val (ontologiRelasjoner: OntologiRelasjoner?, error: FuelError?) = result
         if (error != null) {
-            log.error("Feil ved kall til ontologi: Error: $error")
+            log.error("Feil ved kall til ontologi. response=${error.response}", error)
             throw error
         }
         if (ontologiRelasjoner == null) {
-            log.error("Ontologirelasjoner er null. Burde ikke gå an")
-            throw NullPointerException("Ontologirelasjoner er null. Burde ikke gå an")
+            val msg = "Ontologirelasjoner er null. Burde ikke gå an"
+            val e = NullPointerException(msg)
+            log.error(msg, e)
+            throw e
         }
         return ontologiRelasjoner
     }
 }
 
-data class Ontologi(val kompetansenavn: Map<String, OntologiRelasjoner>, val stillingstittel: Map<String, OntologiRelasjoner>)
+data class Ontologi(
+    val kompetansenavn: Map<String, OntologiRelasjoner>,
+    val stillingstittel: Map<String, OntologiRelasjoner>
+)
+
 data class OntologiRelasjoner(val synonymer: List<String>, val merGenerell: List<String>)
 
 private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
