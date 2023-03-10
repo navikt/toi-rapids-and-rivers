@@ -1,32 +1,40 @@
-apiVersion: 'nais.io/v1'
-kind: 'Alert'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: toi-arbeidsgiver-notifikasjon
   namespace: toi
   labels:
     team: toi
 spec:
-  receivers:
-    slack:
-      channel: 'inkludering-alerts-prod'
-  alerts:
-    - alert: toi-arbeidsgiver-notifikasjon
-      severity: danger
-      expr: sum(up{app="toi-arbeidsgiver-notifikasjon", job="kubernetes-pods"}) == 0
-      for: 1m
-      description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/app/r/s/Cr1VK"
+  groups:
+    - name: toi-arbeidsgiver-notifikasjon
+      rules:
+        - alert: toi-arbeidsgiver-notifikasjon
+          expr: sum(up{app="toi-arbeidsgiver-notifikasjon", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1s
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/app/r/s/Cr1VK"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-arbeidsgiver-notifikasjon
-      severity: danger
-      expr: sum(increase(logd_messages_total{log_app="toi-arbeidsgiver-notifikasjon",log_level="Error"}[10m])) > 0
-      for: 1s
-      description: Appen har logget en error
-      action: "https://logs.adeo.no/app/r/s/Cr1VK"
+        - alert: toi-arbeidsgiver-notifikasjon
+          expr: sum(increase(logd_messages_total{log_app="toi-arbeidsgiver-notifikasjon",log_level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/app/r/s/Cr1VK"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-arbeidsgiver-notifikasjon
-      severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-arbeidsgiver-notifikasjon",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-arbeidsgiver-notifikasjon"}[5m]))) > 20
-      for: 5m
-      description: Økning i warnings
-      action: "https://logs.adeo.no/app/r/s/Cr1VK"
+        - alert: toi-arbeidsgiver-notifikasjon
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-arbeidsgiver-notifikasjon  ",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-arbeidsgiver-notifikasjon  "}[5m]))) > 5
+          for: 3m
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/app/r/s/Cr1VK"
+          labels:
+            namespace: toi
+            severity: warning
