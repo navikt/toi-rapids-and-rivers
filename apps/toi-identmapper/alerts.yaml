@@ -1,31 +1,40 @@
-apiVersion: 'nais.io/v1'
-kind: 'Alert'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: toi-identmapper
   namespace: toi
   labels:
     team: toi
 spec:
-  receivers:
-    slack:
-      channel: 'inkludering-alerts-prod'
-  alerts:
-    - alert: toi-identmapper
-      severity: danger
-      expr: sum(up{app="toi-identmapper", job="kubernetes-pods"}) == 0
-      for: 1m
-      description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+  groups:
+    - name: toi-identmapper
+      rules:
+        - alert: toi-identmapper
+          expr: sum(up{app="toi-identmapper", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1s
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-identmapper
-      expr: sum(increase(logd_messages_total{log_app="toi-identmapper",log_level="Error"}[10m])) > 0
-      for: 1s
-      description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+        - alert: toi-identmapper
+          expr: sum(increase(logd_messages_total{log_app="toi-identmapper",log_level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-identmapper
-      severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-identmapper",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-identmapper"}[5m]))) > 20
-      for: 5m
-      description: Økning i warnings
-      action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+        - alert: toi-identmapper
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-identmapper  ",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-identmapper  "}[5m]))) > 5
+          for: 3m
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+          labels:
+            namespace: toi
+            severity: warning
