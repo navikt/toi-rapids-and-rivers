@@ -1,31 +1,40 @@
-apiVersion: 'nais.io/v1'
-kind: 'Alert'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: toi-maa-behandle-tidligere-cv
   namespace: toi
   labels:
     team: toi
 spec:
-  receivers:
-    slack:
-      channel: 'inkludering-alerts-prod'
-  alerts:
-    - alert: toi-maa-behandle-tidligere-cv
-      severity: danger
-      expr: sum(up{app="toi-maa-behandle-tidligere-cv", job="kubernetes-pods"}) == 0
-      for: 1m
-      description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/d1f60616b27d3a4a095b0e15989510e7"
+  groups:
+    - name: toi-maa-behandle-tidligere-cv
+      rules:
+        - alert: toi-maa-behandle-tidligere-cv
+          expr: sum(up{app="toi-maa-behandle-tidligere-cv", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1s
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/app/r/s/fs550"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-maa-behandle-tidligere-cv
-      expr: sum(increase(logd_messages_total{log_app="toi-maa-behandle-tidligere-cv",log_level="Error"}[10m])) > 0
-      for: 1s
-      description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/d1f60616b27d3a4a095b0e15989510e7"
+        - alert: toi-maa-behandle-tidligere-cv
+          expr: sum(increase(logd_messages_total{log_app="toi-maa-behandle-tidligere-cv",log_level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/app/r/s/fs550"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-maa-behandle-tidligere-cv
-      severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-maa-behandle-tidligere-cv",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-maa-behandle-tidligere-cv"}[5m]))) > 20
-      for: 5m
-      description: Økning i warnings
-      action: "https://logs.adeo.no/goto/d1f60616b27d3a4a095b0e15989510e7"
+        - alert: toi-maa-behandle-tidligere-cv
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-maa-behandle-tidligere-cv  ",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-maa-behandle-tidligere-cv  "}[5m]))) > 5
+          for: 3m
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/app/r/s/fs550"
+          labels:
+            namespace: toi
+            severity: warning
