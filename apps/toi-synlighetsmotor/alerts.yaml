@@ -10,7 +10,7 @@ spec:
     - name: toi-synlighetsmotor
       rules:
         - alert: toi-synlighetsmotor
-          expr: sum(up{app="toi-synlighetsmotor", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-synlighetsmotor"} == 0
           for: 1s
           annotations:
             summary: Applikasjonen er nede
