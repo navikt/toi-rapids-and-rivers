@@ -13,7 +13,7 @@ spec:
           expr: sum(up{app="toi-veileder", job="nais-system/monitoring-apps-tenant"}) == 0
           for: 1s
           annotations:
-            summary: Appen er nede
+            summary: Applikasjonen er nede
             action: "https://logs.adeo.no/goto/0897adc0-3992-11ed-8607-d590fd125f80"
           labels:
             namespace: toi
@@ -23,7 +23,7 @@ spec:
           expr: sum(increase(logd_messages_total{log_app="toi-veileder",log_level="Error"}[10m])) > 0
           for: 1s
           annotations:
-            summary: Appen har logget en error
+            summary: Applikasjonen har logget en error
             action: "https://logs.adeo.no/goto/0897adc0-3992-11ed-8607-d590fd125f80"
           labels:
             namespace: toi

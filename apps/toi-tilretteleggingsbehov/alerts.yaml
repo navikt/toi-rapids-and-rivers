@@ -1,31 +1,40 @@
-apiVersion: 'nais.io/v1'
-kind: 'Alert'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: toi-tilretteleggingsbehov
   namespace: toi
   labels:
     team: toi
 spec:
-  receivers:
-    slack:
-      channel: 'inkludering-alerts-prod'
-  alerts:
-    - alert: toi-tilretteleggingsbehov
-      severity: danger
-      expr: sum(up{app="toi-tilretteleggingsbehov", job="kubernetes-pods"}) == 0
-      for: 1m
-      description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/4f51178b9391a24b915215f4914f7b2f"
+  groups:
+    - name: toi-tilretteleggingsbehov
+      rules:
+        - alert: toi-tilretteleggingsbehov
+          expr: sum(up{app="toi-tilretteleggingsbehov", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1s
+          annotations:
+            summary: Applikasjonen er nede
+            action: "https://logs.adeo.no/goto/4f51178b9391a24b915215f4914f7b2f"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-tilretteleggingsbehov
-      expr: sum(increase(logd_messages_total{log_app="toi-tilretteleggingsbehov",log_level="Error"}[10m])) > 0
-      for: 1s
-      description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/4f51178b9391a24b915215f4914f7b2f"
+        - alert: toi-tilretteleggingsbehov
+          expr: sum(increase(logd_messages_total{log_app="toi-tilretteleggingsbehov",log_level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Applikasjonen har logget en error
+            action: "https://logs.adeo.no/goto/4f51178b9391a24b915215f4914f7b2f"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-tilretteleggingsbehov
-      severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-tilretteleggingsbehov",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-tilretteleggingsbehov"}[5m]))) > 20
-      for: 5m
-      description: Økning i warnings
-      action: "https://logs.adeo.no/goto/4f51178b9391a24b915215f4914f7b2f"
+        - alert: toi-tilretteleggingsbehov
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-tilretteleggingsbehov",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-tilretteleggingsbehov"}[5m]))) > 5
+          for: 5m
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/goto/4f51178b9391a24b915215f4914f7b2f"
+          labels:
+            namespace: toi
+            severity: warning
