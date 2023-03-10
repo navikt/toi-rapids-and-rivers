@@ -1,31 +1,39 @@
-apiVersion: 'nais.io/v1'
-kind: 'Alert'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: toi-hjemmel
   namespace: toi
   labels:
     team: toi
+
 spec:
-  receivers:
-    slack:
-      channel: 'inkludering-alerts-prod'
-  alerts:
-    - alert: toi-hjemmel
-      severity: danger
-      expr: sum(up{app="toi-hjemmel", job="kubernetes-pods"}) == 0
-      for: 1m
-      description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/2d0c4901f6f1a387789e63b77a9293cb"
-
-    - alert: toi-hjemmel
-      expr: sum(increase(logd_messages_total{log_app="toi-hjemmel",log_level="Error"}[10m])) > 0
-      for: 1s
-      description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/2d0c4901f6f1a387789e63b77a9293cb"
-
-    - alert: toi-hjemmel
-      severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-hjemmel",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-hjemmel"}[5m]))) > 20
-      for: 5m
-      description: Økning i warnings
-      action: "https://logs.adeo.no/goto/2d0c4901f6f1a387789e63b77a9293cb"
+  groups:
+    - name: toi-hjemmel
+      rules:
+        - alert: toi-hjemmel
+          expr: sum(up{app="toi-hjemmel", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1m
+          annotations:
+            summary: Applikasjonen er nede
+            action: "https://logs.adeo.no/app/r/s/zrHA2"
+          labels:
+            namespace: toi
+            severity: critical
+        - alert: toi-hjemmel
+          expr: sum(increase(logd_messages_total{log_app="toi-hjemmel",log_level="Error"}[10m])) > 0
+          for: 1m
+          annotations:
+            summary: Applikasjonen har logget en error
+            action: "https://logs.adeo.no/app/r/s/zrHA2"
+          labels:
+            namespace: toi
+            severity: danger
+        - alert: toi-hjemmel
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-hjemmel",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-hjemmel"}[5m]))) > 20
+          for: 5m
+          annotations:
+            summary: Økning i warning
+            action: "https://logs.adeo.no/app/r/s/zrHA2"
+          labels:
+            namespace: toi
+            severity: warning
