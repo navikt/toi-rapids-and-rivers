@@ -1,32 +1,40 @@
-apiVersion: 'nais.io/v1'
-kind: 'Alert'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
   name: toi-oppfolgingsperiode
   namespace: toi
   labels:
     team: toi
 spec:
-  receivers:
-    slack:
-      channel: 'inkludering-alerts-prod'
-  alerts:
-    - alert: toi-oppfolgingsperiode
-      severity: danger
-      expr: sum(up{app="toi-oppfolgingsperiode", job="kubernetes-pods"}) == 0
-      for: 1m
-      description: Appen er nede (ingen Kubernetes-pods er oppe)
-      action: "https://logs.adeo.no/goto/808e54a0-64d0-11ed-9d6c-8305350409f6"
+  groups:
+    - name: toi-oppfolgingsperiode
+      rules:
+        - alert: toi-oppfolgingsperiode
+          expr: sum(up{app="toi-oppfolgingsperiode", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1s
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/app/r/s/u5tEV"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-oppfolgingsperiode
-      severity: danger
-      expr: sum(increase(logd_messages_total{log_app="toi-oppfolgingsperiode",log_level="Error"}[10m])) > 0
-      for: 1s
-      description: Appen har logget en error
-      action: "https://logs.adeo.no/goto/808e54a0-64d0-11ed-9d6c-8305350409f6"
+        - alert: toi-oppfolgingsperiode
+          expr: sum(increase(logd_messages_total{log_app="toi-oppfolgingsperiode",log_level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/app/r/s/u5tEV"
+          labels:
+            namespace: toi
+            severity: critical
 
-    - alert: toi-oppfolgingsperiode
-      severity: warning
-      expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsperiode",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsperiode"}[5m]))) > 20
-      for: 5m
-      description: Økning i warnings
-      action: "https://logs.adeo.no/goto/808e54a0-64d0-11ed-9d6c-8305350409f6"
+        - alert: toi-oppfolgingsperiode
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsperiode  ",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-oppfolgingsperiode  "}[5m]))) > 5
+          for: 3m
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/app/r/s/u5tEV"
+          labels:
+            namespace: toi
+            severity: warning
