@@ -10,7 +10,7 @@ spec:
     - name: toi-siste-14a-vedtak
       rules:
         - alert: toi-siste-14a-vedtak
-          expr: sum(up{app="toi-siste-14a-vedtak", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-siste-14a-vedtak"} == 0
           for: 1s
           annotations:
             summary: Applikasjonen er nede

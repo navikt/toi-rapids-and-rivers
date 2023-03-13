@@ -10,7 +10,7 @@ spec:
     - name: toi-identmapper
       rules:
         - alert: toi-identmapper
-          expr: sum(up{app="toi-identmapper", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-identmapper"} == 0
           for: 1s
           annotations:
             summary: Appen er nede

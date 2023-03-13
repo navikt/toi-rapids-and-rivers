@@ -10,7 +10,7 @@ spec:
     - name: toi-fritatt-kandidatsok
       rules:
         - alert: toi-fritatt-kandidatsok
-          expr: sum(up{app="toi-fritatt-kandidatsok", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-fritatt-kandidatsok"} == 0
           for: 1s
           annotations:
             summary: Appen er nede

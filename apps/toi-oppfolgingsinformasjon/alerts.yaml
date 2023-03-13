@@ -10,7 +10,7 @@ spec:
     - name: toi-oppfolgingsinformasjon
       rules:
         - alert: toi-oppfolgingsinformasjon
-          expr: sum(up{app="toi-oppfolgingsinformasjon", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-oppfolgingsinformasjon"} == 0
           for: 1s
           annotations:
             summary: Appen er nede

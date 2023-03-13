@@ -10,7 +10,7 @@ spec:
     - name: toi-veileder
       rules:
         - alert: toi-veileder
-          expr: sum(up{app="toi-veileder", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-veileder"} == 0
           for: 1s
           annotations:
             summary: Applikasjonen er nede

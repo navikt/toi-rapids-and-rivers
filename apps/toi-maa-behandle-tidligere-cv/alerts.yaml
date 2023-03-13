@@ -10,7 +10,7 @@ spec:
     - name: toi-maa-behandle-tidligere-cv
       rules:
         - alert: toi-maa-behandle-tidligere-cv
-          expr: sum(up{app="toi-maa-behandle-tidligere-cv", job="nais-system/monitoring-apps-tenant"}) == 0
+          expr: kube_deployment_status_replicas_available{deployment="toi-maa-behandle-tidligere-cv"} == 0
           for: 1s
           annotations:
             summary: Appen er nede
