@@ -17,14 +17,11 @@ spec:
     retentionBytes: -1
     retentionHours: -1
   acl:
-    - team: toi
-      application: toi-kandidatfeed
+    - application: toi-kandidatfeed
       access: readwrite
-    - team: toi
-      application: toi-kafkamanager
+    - application: toi-kafkamanager
       access: readwrite
-    - team: arbeidsgiver
-      application: rekrutteringsbistand-kandidat-indekser
+    - application: rekrutteringsbistand-kandidat-indekser
       access: read
     - team: team-ai
       application: cv-consumer
