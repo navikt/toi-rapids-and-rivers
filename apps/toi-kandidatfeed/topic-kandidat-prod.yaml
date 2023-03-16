@@ -23,7 +23,7 @@ spec:
     - team: toi
       application: toi-kafkamanager
       access: readwrite
-    - team: arbeidsgiver
+    - team: toi
       application: rekrutteringsbistand-kandidat-indekser
       access: read
     - team: team-ai
