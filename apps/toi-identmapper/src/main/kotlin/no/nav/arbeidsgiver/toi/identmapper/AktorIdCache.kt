@@ -1,21 +1,28 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
+import org.slf4j.LoggerFactory
+
 
 class AktorIdCache(
     private val repository: Repository,
     private val cacheNårAktørIdErNull: Boolean,
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     fun hentAktørId(fødselsnummer: String): String? {
         val cachetAktørId = hentCachetAktørId(fødselsnummer)
 
         if (cachetAktørId.harHentetFraPdl) {
-            log.info("Mappet fra fødselsnummer til aktørId ${cachetAktørId.verdi}, brukte cache")
+            log.info("Mappet fra fødselsnummer til aktørId, brukte cache, se securelog for aktørid")
+            secureLog.info("Mappet fra fødselsnummer til aktørId ${cachetAktørId.verdi}, brukte cache")
             return cachetAktørId.verdi
         }
 
         return hentAktørIdFraPdl(fødselsnummer).also { nyAktørId ->
-            log.info("Mappet fra fødselsnummer til aktørId $nyAktørId, hentet fra PDL")
+            log.info("Mappet fra fødselsnummer til aktørId, hentet fra PDL, se securelog for aktørid")
+            secureLog.info("Mappet fra fødselsnummer til aktørId $nyAktørId, hentet fra PDL")
 
             if (nyAktørId != null || cacheNårAktørIdErNull) {
                 cacheAktørId(

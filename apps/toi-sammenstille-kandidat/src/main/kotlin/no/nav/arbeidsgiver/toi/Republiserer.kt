@@ -9,6 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
+import org.slf4j.LoggerFactory
 
 class Republiserer(
     private val repository: Repository,
@@ -16,6 +17,8 @@ class Republiserer(
     javalin: Javalin,
     private val passord: String
 ) {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     private val republiseringspath = "republiser"
 
@@ -48,7 +51,8 @@ class Republiserer(
         if (kandidat == null) {
             context.status(404)
         } else {
-            log.info("Skal republisere $aktørId")
+            log.info("Skal republisere aktør (se securelog)")
+            secureLog.info("Skal republisere $aktørId")
             val pakke = lagPakke(kandidat)
             rapidsConnection.publish(aktørId, pakke.toJson())
             context.status(200)

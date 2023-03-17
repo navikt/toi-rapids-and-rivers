@@ -7,8 +7,12 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import org.slf4j.LoggerFactory
 
 class MaaBehandleTidligereCvLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     init {
         River(rapidsConnection).apply {
             validate {
@@ -27,7 +31,8 @@ class MaaBehandleTidligereCvLytter(private val rapidsConnection: RapidsConnectio
             "@event_name" to "må-behandle-tidligere-cv",
         )
 
-        log.info("Skal publisere måBehandleTidligereCv-melding for aktørId $aktørId")
+        log.info("Skal publisere måBehandleTidligereCv-melding for aktørId (se securelog)")
+        secureLog.info("Skal publisere måBehandleTidligereCv-melding for aktørId $aktørId")
         val nyPacket = JsonMessage.newMessage(melding).toJson()
         rapidsConnection.publish(aktørId, nyPacket)
     }

@@ -7,8 +7,12 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import org.slf4j.LoggerFactory
 
 class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     init {
         River(rapidsConnection).apply {
             validate {
@@ -29,7 +33,8 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
         val nyPacket = JsonMessage.newMessage(melding)
         val aktørId = packet["aktorId"].asText()
 
-        log.info("Skal publisere veiledermelding for aktørId $aktørId")
+        log.info("Skal publisere veiledermelding for aktørId (se securelog)")
+        secureLog.info("Skal publisere veiledermelding for aktørId $aktørId")
         rapidsConnection.publish(aktørId, nyPacket.toJson())
     }
 

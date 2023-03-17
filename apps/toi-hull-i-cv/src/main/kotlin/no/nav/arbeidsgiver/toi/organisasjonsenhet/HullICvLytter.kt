@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.*
+import org.slf4j.LoggerFactory
 
 class HullICvLytter(rapidsConnection: RapidsConnection) :
     River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     private val HullICv = "hullICv"
 
@@ -43,7 +46,8 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         aktørid: String
     ): PerioderMedInaktivitet {
         if (packet["arbeidsmarkedCv"]["slettCv"]["cv"] == null) {
-            log.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har cv")
+            log.error("Hull i cv for aktørid (se securelog) har mottatt melding som ikke har cv")
+            secureLog.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har cv")
         }
         return PerioderMedInaktivitet(null, emptyList())
     }

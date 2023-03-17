@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.*
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.slf4j.LoggerFactory
 
 const val topicName = "toi.kandidat-3"
 
@@ -14,6 +15,8 @@ class SynligKandidatfeedLytter(
     private val producer: Producer<String, String>
 ) :
     River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     init {
         River(rapidsConnection).apply {
@@ -40,9 +43,11 @@ class SynligKandidatfeedLytter(
 
         producer.send(melding) { _, exception ->
             if (exception == null) {
-                log.info("Sendte kandidat med aktørId $aktørId, synlighet er true")
+                log.info("Sendte kandidat med aktørId (se securelog), synlighet er true")
+                secureLog.info("Sendte kandidat med aktørId $aktørId, synlighet er true")
             } else {
-                log.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
+                log.error("Klarte ikke å sende kandidat med aktørId (se securelog)", exception)
+                secureLog.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
             packet["@slutt_av_hendelseskjede"] = true
             context.publish(packet.toJson())

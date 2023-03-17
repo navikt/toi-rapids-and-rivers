@@ -56,7 +56,8 @@ class NotifikasjonKlient(
 
 
         if (erDev) {
-            log.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
+            log.info("graphqlmelding (bør ikke vises i prod), se securelog for detaljer")
+            secureLog.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
         } else if (erLokal) {
             println("query: $spørring")
         }
@@ -86,7 +87,7 @@ class NotifikasjonKlient(
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api, se secureLog")
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
             secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
             throw e
         }
@@ -97,6 +98,7 @@ class NotifikasjonKlient(
         response: Response,
         body: String,
     ) {
+        log.error("Feilet kall til notifikasjon-api med følgende body: (se securelog)")
         secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
         val errors = json["errors"]
         if (errors != null && errors.size() > 0) {

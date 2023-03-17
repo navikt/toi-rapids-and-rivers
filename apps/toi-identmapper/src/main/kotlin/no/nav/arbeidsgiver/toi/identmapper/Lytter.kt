@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import org.slf4j.LoggerFactory
 
 class Lytter(
     private val fnrKey: String,
@@ -12,6 +13,8 @@ class Lytter(
     private val hentAktørId: (fødselsnummer: String) -> String?,
 ) : River.PacketListener {
     private val aktørIdKey = "aktørId"
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     init {
         River(rapidsConnection).apply {
@@ -28,7 +31,8 @@ class Lytter(
         if (aktørId == null) {
             if (cluster == "prod-gcp") {
                 val identtype = if (erDnr(packet[fnrKey].asText())) "D-nummer" else "fødselsnummer"
-                log.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
+                log.info("Fant ikke gitt person i PDL, klarte ikke å mappe identtype (se securelog) til aktørId")
+                secureLog.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }
         } else {
             packet[aktørIdKey] = aktørId

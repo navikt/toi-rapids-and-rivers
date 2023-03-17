@@ -2,9 +2,12 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*
+import org.slf4j.LoggerFactory
 
 class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConnection: RapidsConnection) :
     River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     init {
         River(rapidsConnection).apply {
@@ -23,16 +26,19 @@ class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConne
         val orgnavn = norg2Klient.hentOrgenhetNavn(enhetsnummer)
         if (orgnavn == null) {
             if (norg2Klient.erKjentProblematiskEnhet(enhetsnummer)) {
-                log.info("Mangler mapping for kjent problematisk enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
+                log.info("Mangler mapping for kjent problematisk enhet $enhetsnummer på aktørid: (se securelog), setter navn lik tom string")
+                secureLog.info("Mangler mapping for kjent problematisk enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
             } else {
-                log.error("Mangler mapping for enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
+                log.error("Mangler mapping for enhet $enhetsnummer på aktørid: (se securelog), setter navn lik tom string")
+                secureLog.error("Mangler mapping for enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
             }
 
             packet["organisasjonsenhetsnavn"] = ""
         } else {
             packet["organisasjonsenhetsnavn"] = orgnavn
         }
-        log.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${orgnavn ?: "''"}")
+        log.info("Sender løsning på behov for aktørid: (se securelog) enhet: $enhetsnummer ${orgnavn ?: "''"}")
+        secureLog.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${orgnavn ?: "''"}")
 
         context.publish(aktørid, packet.toJson())
     }

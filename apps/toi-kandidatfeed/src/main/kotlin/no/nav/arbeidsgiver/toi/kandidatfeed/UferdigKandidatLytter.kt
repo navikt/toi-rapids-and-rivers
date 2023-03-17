@@ -2,11 +2,15 @@ package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.*
+import org.slf4j.LoggerFactory
 
 class UferdigKandidatLytter(
     rapidsConnection: RapidsConnection
 ) :
     River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     init {
         River(rapidsConnection).apply {
             validate {
@@ -28,7 +32,8 @@ class UferdigKandidatLytter(
 
         leggTilOntologiBehovFelt(packet)
 
-        log.info("Sender behov for $aktørId")
+        log.info("Sender behov for aktørid (se securelog)")
+        secureLog.info("Sender behov for $aktørId")
         context.publish(aktørId, packet.toJson())
     }
 
