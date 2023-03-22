@@ -151,7 +151,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
                     ${
         mottakerEpostAdresser.mapIndexed { idx, verdi ->
             """
-                        "epostadresse${idx + 1}": "$verdi",
+                        "epostadresse${idx + 1}": "${verdi.fjernTabsOgSpaces()}",
                     """.trimIndent()
         }.joinToString("\n ")
     }
@@ -178,4 +178,7 @@ tailrec fun String.utenLangeMellomrom(): String =
 private fun String.htmlEscape(): String =
     replace("\n", "<br/>")
         .let { StringEscapeUtils.escapeJson(it) }
+
+private fun String.fjernTabsOgSpaces(): String =
+    replace("\t", "").replace(" ", "")
 
