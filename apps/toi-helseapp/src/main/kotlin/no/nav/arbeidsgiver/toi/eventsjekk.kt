@@ -18,10 +18,7 @@ private val uinteressanteHendelser = listOf(
     "republisert.sammenstilt",
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
-private val hendelserSomIkkeSendesLenger = listOf("kandidat.annullert", "kandidat.fjern-registrering-fått-jobben",
-    "kandidat.fjern-registrering-av-cv-delt", "kandidat.registrer-cv-delt", "kandidat.kandidatliste-lukket-ingen-fikk-jobben",
-    "kandidat.registrer-fått-jobben", "kandidat.kandidatliste-lukket-noen-andre-fikk-jobben",
-    "kandidat.cv-delt-med-arbeidsgiver-via-rekrutteringsbistand", "tiltakAvtaleIngått")
+private val hendelserSomIkkeSendesLenger = listOf("tiltakAvtaleIngått")
 
 val grenseverdiForAlarm = Duration.ofHours(1)
 
