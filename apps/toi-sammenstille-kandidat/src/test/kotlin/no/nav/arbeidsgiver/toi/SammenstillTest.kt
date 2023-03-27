@@ -50,7 +50,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(2)
 
         val førsteMelding = rapidInspektør.message(0)
-        assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
+        assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("veileder")
         assertThat(førsteMelding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(førsteMelding.has("arbeidsmarkedCv")).isFalse
         assertThat(førsteMelding.get("veileder").get("aktorId").asText()).isEqualTo(aktørId)
@@ -58,7 +58,7 @@ class SammenstillTest {
         assertThat(førsteMelding.get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
 
         val andreMelding = rapidInspektør.message(1)
-        assertThat(andreMelding.get("@event_name").asText()).isEqualTo("arbeidsmarked-cv.sammenstilt")
+        assertThat(andreMelding.get("@event_name").asText()).isEqualTo("arbeidsmarked-cv")
         assertThat(andreMelding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(andreMelding.get("veileder").get("aktorId").asText()).isEqualTo(aktørId)
         assertThat(andreMelding.get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
@@ -86,7 +86,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(2)
 
         val førsteMelding = rapidInspektør.message(0)
-        assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("arbeidsmarked-cv.sammenstilt")
+        assertThat(førsteMelding.get("@event_name").asText()).isEqualTo("arbeidsmarked-cv")
         assertThat(førsteMelding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(førsteMelding)).containsExactlyInAnyOrder("arbeidsmarkedCv")
 
@@ -102,7 +102,7 @@ class SammenstillTest {
 
         val andreMelding = rapidInspektør.message(1)
         assertThat(andreMelding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(andreMelding.get("@event_name").asText()).isEqualTo("veileder.sammenstilt")
+        assertThat(andreMelding.get("@event_name").asText()).isEqualTo("veileder")
         assertThat(andreMelding.get("veileder").get("aktorId").asText()).isEqualTo(aktørId)
         assertThat(andreMelding.get("veileder").get("veilederId").asText()).isEqualTo("Z994526")
         assertThat(andreMelding.get("veileder").get("tilordnet").asText()).isEqualTo("2020-12-21T10:58:19.023+01:00")
@@ -128,7 +128,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("arbeidsmarked-cv.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("arbeidsmarked-cv")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("arbeidsmarkedCv")
 
@@ -154,7 +154,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("oppfølgingsinformasjon")
 
@@ -189,7 +189,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("siste14avedtak.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("siste14avedtak")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("siste14avedtak")
 
@@ -213,7 +213,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsperiode.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("oppfølgingsperiode")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("oppfølgingsperiode")
 
@@ -237,7 +237,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("fritattKandidatsøk")
 
@@ -257,7 +257,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("hjemmel.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("hjemmel")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("hjemmel")
 
@@ -286,7 +286,7 @@ class SammenstillTest {
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("må-behandle-tidligere-cv.sammenstilt")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("må-behandle-tidligere-cv")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("måBehandleTidligereCv")
 

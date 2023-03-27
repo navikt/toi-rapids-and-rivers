@@ -15,7 +15,7 @@ private val uinteressanteHendelser = listOf(
     "application_not_ready",
     "application_stop",
     "application_down",
-    "republisert.sammenstilt",
+    "republisert",
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf("tiltakAvtaleIngått")

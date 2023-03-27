@@ -16,7 +16,7 @@ fun rapidMelding(
     sluttAvHendelseskjede: Boolean? = null
 ): String = """
         {
-          "@event_name": "arbeidsmarked-cv.sammenstilt",
+          "@event_name": "arbeidsmarked-cv",
           "aktørId": "123",
           "oppfølgingsinformasjon": {
                 "oppfolgingsenhet":"1234"

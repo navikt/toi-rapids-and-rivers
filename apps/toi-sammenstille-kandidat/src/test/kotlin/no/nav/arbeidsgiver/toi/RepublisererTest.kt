@@ -44,7 +44,7 @@ class RepublisererTest {
 
         lagredeKandidater.forEachIndexed { index, kandidat ->
             assertThat(Kandidat.fraJson(inspektør.message(index)).toJson()).isEqualTo(kandidat.toJson())
-            assertThat(inspektør.message(index).get("@event_name").asText()).isEqualTo("republisert.sammenstilt")
+            assertThat(inspektør.message(index).get("@event_name").asText()).isEqualTo("republisert")
         }
     }
 
@@ -84,7 +84,7 @@ class RepublisererTest {
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         assertThat(Kandidat.fraJson(inspektør.message(0)).aktørId).isEqualTo(aktørIdTilKandidatSomSkalRepubliseres)
-        assertThat(inspektør.message(0).get("@event_name").asText()).isEqualTo("republisert.sammenstilt")
+        assertThat(inspektør.message(0).get("@event_name").asText()).isEqualTo("republisert")
     }
 
     @Test

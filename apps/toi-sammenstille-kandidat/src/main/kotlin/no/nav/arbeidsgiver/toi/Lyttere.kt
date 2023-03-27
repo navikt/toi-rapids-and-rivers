@@ -28,7 +28,7 @@ class Lytter(
         repository.lagreKandidat(oppdatertKandidat)
 
         val nyPakke = oppdatertKandidat.somJsonMessage()
-        nyPakke["@event_name"] = packet["@event_name"].asText() + ".sammenstilt"
+        nyPakke["@event_name"] = packet["@event_name"].asText()
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]
 
