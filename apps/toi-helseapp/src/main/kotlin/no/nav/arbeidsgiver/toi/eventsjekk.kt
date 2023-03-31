@@ -22,7 +22,7 @@ private val hendelserSomIkkeSendesLenger = listOf(
     "tiltakAvtaleIngått", "tilretteleggingsbehov.sammenstilt", "må-behandle-tidligere-cv.sammenstilt",
     "hjemmel.sammenstilt", "oppfølgingsperiode.sammenstilt", "siste14avedtak.sammenstilt",
     "arbeidsmarked-cv.sammenstilt", "fritatt-kandidatsøk.sammenstilt", "oppfølgingsinformasjon.sammenstilt",
-    "veileder.sammenstilt"
+    "veileder.sammenstilt, republisert.sammenstilt"
 )
 
 val grenseverdiForAlarm = Duration.ofHours(1)
