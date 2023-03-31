@@ -80,7 +80,7 @@ class Republiserer(
 
     private fun lagPakke(kandidat: Kandidat): JsonMessage {
         val pakke = kandidat.somJsonMessage()
-        pakke["@event_name"] = "republisert.sammenstilt"
+        pakke["@event_name"] = "republisert"
         return pakke
     }
 
