@@ -15,6 +15,7 @@ class Lytter(
                 it.demandValue("@event_name", eventNavn)
                 it.demandKey("aktørId")
                 it.demandKey(feltSomSkalBehandles)
+                it.rejectValue("sammenstilt", true)
                 it.interestedIn("system_participating_services", "system_read_count")
             }
         }.register(this)
@@ -31,6 +32,7 @@ class Lytter(
         nyPakke["@event_name"] = packet["@event_name"].asText()
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]
+        nyPakke["sammenstilt"] = true
 
         rapidsConnection.publish(aktørId, nyPakke.toJson())
     }

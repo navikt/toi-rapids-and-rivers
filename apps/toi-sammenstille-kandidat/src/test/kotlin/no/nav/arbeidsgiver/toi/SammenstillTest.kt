@@ -415,4 +415,21 @@ class SammenstillTest {
         val melding = rapidInspektør.message(0)
         assertThat(melding.get("system_read_count").asInt()).isEqualTo(2)
     }
+
+    @Test
+    fun `Sammenstiller skal ikke republisere en melding som allerede har blitt republisert`() {
+        val aktørId = "123"
+        val testRapid = TestRapid()
+
+        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
+        testRapid.sendTestMessage(fritattKandidatsøkMelding(aktørId, true))
+
+        val rapidInspektør = testRapid.inspektør
+        assertThat(rapidInspektør.size).isEqualTo(1)
+
+        val melding = rapidInspektør.message(0)
+        testRapid.sendTestMessage(melding.toPrettyString())
+
+        assertThat(testRapid.inspektør.size).isEqualTo(1)
+    }
 }
