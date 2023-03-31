@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
 
 jobs:
