@@ -62,7 +62,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
     val epostTittel = "Kandidater fra NAV";
 
     val erProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
-    val hostprefix = if (erProd) "arbeidsgiver" else "presenterte-kandidater.dev"
+    val hostprefix = if (erProd) "arbeidsgiver" else "presenterte-kandidater.intern.dev"
     val lenke = "https://$hostprefix.nav.no/kandidatliste/$stillingsId?virksomhet=$virksomhetsnummer"
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
     val utløperOm = Period.of(0, 3, 0)
