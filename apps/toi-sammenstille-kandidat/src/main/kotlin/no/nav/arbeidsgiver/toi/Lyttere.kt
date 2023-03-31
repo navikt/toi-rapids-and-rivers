@@ -28,13 +28,13 @@ class Lytter(
         val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
         repository.lagreKandidat(oppdatertKandidat)
 
-        val nyPakke = oppdatertKandidat.somJsonMessage()
+        /*val nyPakke = oppdatertKandidat.somJsonMessage()
         nyPakke["@event_name"] = packet["@event_name"].asText()
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]
         nyPakke["sammenstilt"] = true
 
-        rapidsConnection.publish(aktørId, nyPakke.toJson())
+        rapidsConnection.publish(aktørId, nyPakke.toJson())*/
     }
 
     private fun oppdaterKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat {
