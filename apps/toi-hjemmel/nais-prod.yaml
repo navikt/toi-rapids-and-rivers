@@ -1,2 +1,2 @@
 kafka_pool: nav-prod
-kafka_consumer_group_id: toi-hjemmel-rapidconsumer-1
+kafka_consumer_group_id: toi-hjemmel-rapidconsumer-2
