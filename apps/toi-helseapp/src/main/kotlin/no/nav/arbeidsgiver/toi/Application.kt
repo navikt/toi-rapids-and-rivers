@@ -65,7 +65,7 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
         "toi-hjemmel" to "toi-hjemmel-rapidconsumer-2",
         "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
         "toi-kandidatfeed" to "toi-kandidatfeed-rapidconsumer-6",
-        "toi-maa-behandle-tidligere-cv" to "toi-maa-behandle-tidligere-cv-rapidconsumer-4",
+        "toi-maa-behandle-tidligere-cv" to "toi-maa-behandle-tidligere-cv-rapidconsumer-5",
         "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-4",
         "toi-oppfolgingsperiode" to "toi-oppfølgingsperiode-rapidconsumer-2",
         "toi-organisasjonsenhet" to "toi-organisasjonsenhet-rapidconsumer-1",
