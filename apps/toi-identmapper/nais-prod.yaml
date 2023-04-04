@@ -3,6 +3,7 @@ kafka_consumer_group_id: toi-identmapper-rapidconsumer-4
 kafka_bootstrap_on_prem_url: SSL://a01apvl00145.adeo.no:8443, SSL://a01apvl00146.adeo.no:8443, SSL://a01apvl00147.adeo.no:8443, SSL://a01apvl00148.adeo.no:8443, SSL://a01apvl00149.adeo.no:8443, SSL://a01apvl00150.adeo.no:8443
 kafka_schema_on_prem_url: https://kafka-schema-registry.nais.adeo.no
 pdl_scope: api://prod-fss.pdl.pdl-api/.default
+pdl_host: https://pdl-api.prod-fss-pub.nais.io
 pdl_url: https://pdl-api.prod-fss-pub.nais.io/graphql
 pdl_kafka_group_id: toi-identmapper-1
 gcp_db_tier: db-custom-1-3840

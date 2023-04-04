@@ -30,7 +30,7 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: pdl-api.dev-fss-pub.nais.io
+        - host: {{ pdl_host }}
   kafka:
     pool: {{ kafka_pool }}
   gcp:
