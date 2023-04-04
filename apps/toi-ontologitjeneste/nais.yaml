@@ -27,6 +27,10 @@ spec:
       memory: 512Mi
   secureLogs:
     enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ ontologi_host }}
   kafka:
     pool: {{ kafka_pool }}
   env:
