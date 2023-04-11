@@ -41,7 +41,7 @@ fun main() {
                         }
                     }
                 )
-            }
+            }.also(::SystemCountLytter)
             .start()
 
     } catch (e: Exception) {
