@@ -12,7 +12,7 @@ Henter ut CV og veilederinformasjon, lagrer i database, og legger sammenstillt k
 Republisering for alle kandidater leser alle radene i databasetabellen og legger de som meldinger på rapid.
 
 Gjør en POST-request til 
- - dev: `https://toi-sammenstille-kandidat.dev.intern.nav.no/republiser`
+ - dev: `https://toi-sammenstille-kandidat.intern.dev.nav.no/republiser`
  - prod: `https://toi-sammenstille-kandidat.intern.nav.no/republiser`
 
 Med følgende body:
@@ -25,7 +25,7 @@ Med følgende body:
 Republisering av én kandidat henter den aktuelle kandidaten fra databasen og republiserer på rapid. Endepunktet gir 404 ved ugyldig aktørId.
 
 Gjør en POST-request til
-- dev: `https://toi-sammenstille-kandidat.dev.intern.nav.no/republiser/<aktørid>`
+- dev: `https://toi-sammenstille-kandidat.intern.dev.nav.no/republiser/<aktørid>`
 - prod: `https://toi-sammenstille-kandidat.intern.nav.no/republiser/<aktørid>`
 
 Med følgende body:
