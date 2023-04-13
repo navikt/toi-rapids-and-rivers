@@ -5,7 +5,7 @@
 #### Veiledertoken (Azure obo token)
 #### Token audience applikasjon: toi-synlighetsmotor, cluster: dev-gcp/prod-gcp team: toi
 ### Url dev
-#### GET https://toi-synlighetsmotor.dev.intern.nav.no/evaluering
+#### GET https://toi-synlighetsmotor.intern.dev.nav.no/evaluering
 ### Url prod
 #### GET https://toi-synlighetsmotor.intern.nav.no/evaluering
 
@@ -14,7 +14,7 @@
 #### Arbeidsgivertoken (TokenX obo token)
 #### Token audience applikasjon: toi-synlighetsmotor, cluster: dev-gcp/prod-gcp team: toi 
 ### Url dev
-#### POST https://toi-synlighetsmotor.dev.intern.nav.no/synlighet
+#### POST https://toi-synlighetsmotor.intern.dev.nav.no/synlighet
 ### Url prod
 #### POST https://toi-synlighetsmotor.intern.nav.no/synlighet
 ### Inputbody
