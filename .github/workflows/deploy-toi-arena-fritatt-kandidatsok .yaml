@@ -11,7 +11,7 @@ on:
     - oppdatere-dependencies
     paths:
     - apps/toi-oppfolgingsinformasjon/**
-    - .github/workflows/deploy-toi-oppfolgingsinformasjon.yaml
+    - .github/workflows/deploy-toi-arenafritattkandidatsok.yaml
     - buildSrc/**
 
 jobs:
