@@ -12,32 +12,43 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandKey("fodselsnummer")
-                it.demandKey("oppfolgingsenhet")
-                it.demandKey("harOppfolgingssak")
-                it.interestedIn("sistEndretDato")
-                it.rejectKey("@event_name")
+                it.demandValue("table", "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK")
+                it.interestedIn("before", "after")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val fnr = fnr(packet)
+        if (fnr == null) return
+
         val melding = mapOf(
-            "fodselsnummer" to packet["fodselsnummer"],
-            "oppfølgingsinformasjon" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "oppfølgingsinformasjon",
+            "fodselsnummer" to fnr,
+            "arenafritattkandidatsok" to packet.fjernMetadataOgKonverter(),
+            "@event_name" to "arenafritattkandidatsok",
         )
 
-        log.info("Skal publisere oppfølgingsinformasjonmelding med sistEndretDato ${packet["sistEndretDato"]}")
+        log.info("Skal publisere arenafritattkandidatsok-melding: " + packet.toJson()) // TODO: Ikke i prod, secure-log?
 
         val nyPacket = JsonMessage.newMessage(melding)
-        rapidsConnection.publish(nyPacket.toJson())
+        rapidsConnection.publish(fnr, nyPacket.toJson())
+    }
+
+    private fun fnr(packet: JsonMessage): String? {
+        val fnr: String? = packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
+        if (fnr == null) {
+            log.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding=" + packet.toJson())
+        }
+        return fnr
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
+        val metadataFelter =
+            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
         jsonNode.remove(metadataFelter)
         return jsonNode
     }
+
+
 }
