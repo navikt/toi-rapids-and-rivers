@@ -6,16 +6,14 @@ import org.junit.jupiter.api.Test
 
 class ArenaFritattKandidatsokTest {
 
-    // TODO: Testene er kopiert fra annen app, oppdateres
-
     @Test
-    fun `Lesing av oppfølgingsinformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
+    fun `Lesing av fritatt melding fra eksternt topic skal produsere ny melding på rapid`() {
         val testRapid = TestRapid()
         val fødselsnummer = "123"
 
         ArenaFritattKandidatsokLytter(testRapid)
 
-        testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(fødselsnummer))
+        testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer))
         Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
@@ -25,75 +23,59 @@ class ArenaFritattKandidatsokTest {
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "oppfølgingsinformasjon",
-            "fodselsnummer",
+            "after",
             "system_read_count",
             "@id",
-            "@opprettet",
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")
-        assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
+        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("arenafritattkandidatsok")
 
-        val oppfølgingsinformasjonJson = meldingJson.get("oppfølgingsinformasjon")
-        assertThat(oppfølgingsinformasjonJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "fodselsnummer",
-            "formidlingsgruppe",
-            "iservFraDato",
-            "fornavn",
-            "etternavn",
-            "oppfolgingsenhet",
-            "kvalifiseringsgruppe",
-            "rettighetsgruppe",
-            "hovedmaal",
-            "sikkerhetstiltakType",
-            "diskresjonskode",
-            "harOppfolgingssak",
-            "sperretAnsatt",
-            "erDoed",
-            "doedFraDato",
-            "sistEndretDato"
+        val fritattJson = meldingJson.get("after")
+        assertThat(fritattJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+            "PERSON_ID",
+            "FODSELSNR",
+            "PERSONFORHOLDKODE",
+            "START_DATO",
+            "SLUTT_DATO",
+            "OPPRETTET_DATO",
+            "OPPRETTET_AV",
+            "ENDRET_DATO",
+            "ENDRET_AV"
         )
 
-        meldingJson.get("oppfølgingsinformasjon").apply {
-            assertThat(get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
-            assertThat(get("formidlingsgruppe").asText()).isEqualTo("IARBS")
-            assertThat(get("iservFraDato").isNull).isTrue
-            assertThat(get("fornavn").asText()).isEqualTo("TULLETE")
-            assertThat(get("etternavn").asText()).isEqualTo("TABBE")
-            assertThat(get("oppfolgingsenhet").asText()).isEqualTo("0318")
-            assertThat(get("kvalifiseringsgruppe").asText()).isEqualTo("BATT")
-            assertThat(get("rettighetsgruppe").asText()).isEqualTo("AAP")
-            assertThat(get("hovedmaal").asText()).isEqualTo("BEHOLDEA")
-            assertThat(get("sikkerhetstiltakType").isNull).isTrue
-            assertThat(get("diskresjonskode").isNull).isTrue
-            assertThat(get("harOppfolgingssak").asBoolean()).isTrue
-            assertThat(get("sperretAnsatt").asBoolean()).isFalse
-            assertThat(get("erDoed").asBoolean()).isFalse
-            assertThat(get("doedFraDato").isNull).isTrue
-            assertThat(get("sistEndretDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
+        meldingJson.get("after").apply {
+            assertThat(get("PERSON_ID").asInt()).isEqualTo(12345678)
+            assertThat(get("FODSELSNR").asText()).isEqualTo(fødselsnummer)
+            assertThat(get("PERSONFORHOLDKODE").asText()).isEqualTo("FRKAS")
+            assertThat(get("START_DATO").asText()).isEqualTo("2023-04-10 00:00:00")
+            assertThat(get("SLUTT_DATO").asText()).isEqualTo("2025-09-30 00:00:00")
+            assertThat(get("OPPRETTET_DATO").asText()).isEqualTo("2023-04-10 16:29:58")
+            assertThat(get("OPPRETTET_AV").asText()).isEqualTo("SKRIPT")
+            assertThat(get("ENDRET_DATO").asText()).isEqualTo("2023-04-10 16:29:58")
+            assertThat(get("ENDRET_AV").asText()).isEqualTo("SKRIPT")
         }
     }
 
-    private fun oppfølgingsinformasjonMeldingFraEksterntTopic(fødselsnummer: String) = """
-        {
-            "fodselsnummer": "$fødselsnummer",
-            "formidlingsgruppe": "IARBS",
-            "iservFraDato": null,
-            "fornavn": "TULLETE",
-            "etternavn": "TABBE",
-            "oppfolgingsenhet": "0318",
-            "kvalifiseringsgruppe": "BATT",
-            "rettighetsgruppe": "AAP",
-            "hovedmaal": "BEHOLDEA",
-            "sikkerhetstiltakType": null,
-            "diskresjonskode": null,
-            "harOppfolgingssak": true,
-            "sperretAnsatt": false,
-            "erDoed": false,
-            "doedFraDato": null,
-            "sistEndretDato": "2020-10-30T14:15:38+01:00"
-        }
+    private fun fritattMeldingFraEksterntTopic(fødselsnummer: String) = """
+    {
+      "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
+      "op_type": "I",
+      "op_ts": "2023-04-10 16:29:58.000000",
+      "current_ts": "2023-04-10T16:30:13.509027",
+      "pos": "00000000080112267275",
+      "tokens": {},
+      "after": {
+        "PERSON_ID": 12345678,
+        "FODSELSNR": "$fødselsnummer",
+        "PERSONFORHOLDKODE": "FRKAS",
+        "START_DATO": "2023-04-10 00:00:00",
+        "SLUTT_DATO": "2025-09-30 00:00:00",
+        "OPPRETTET_DATO": "2023-04-10 16:29:58",
+        "OPPRETTET_AV": "SKRIPT",
+        "ENDRET_DATO": "2023-04-10 16:29:58",
+        "ENDRET_AV": "SKRIPT"
+      }
+    }
     """.trimIndent()
 }
