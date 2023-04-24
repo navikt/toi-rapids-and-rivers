@@ -19,19 +19,22 @@ class ArenaFritattKandidatsokTest {
         val inspektør = testRapid.inspektør
 
         assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.key(0)).isEqualTo(fødselsnummer)
         val meldingJson = inspektør.message(0)
-
+        
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "after",
+            "fodselsnummer",
+            "arenafritattkandidatsok",
             "system_read_count",
             "@id",
+            "@opprettet",
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("arenafritattkandidatsok")
-
-        val fritattJson = meldingJson.get("after")
+        assertThat(meldingJson["@event_name"].asText()).isEqualTo("arenafritattkandidatsok")
+        assertThat(meldingJson["arenafritattkandidatsok"]["op_type"].asText()).isEqualTo("I")
+        val fritattJson = meldingJson["arenafritattkandidatsok"]["after"]
         assertThat(fritattJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "PERSON_ID",
             "FODSELSNR",
@@ -44,7 +47,7 @@ class ArenaFritattKandidatsokTest {
             "ENDRET_AV"
         )
 
-        meldingJson.get("after").apply {
+        fritattJson.apply {
             assertThat(get("PERSON_ID").asInt()).isEqualTo(12345678)
             assertThat(get("FODSELSNR").asText()).isEqualTo(fødselsnummer)
             assertThat(get("PERSONFORHOLDKODE").asText()).isEqualTo("FRKAS")
