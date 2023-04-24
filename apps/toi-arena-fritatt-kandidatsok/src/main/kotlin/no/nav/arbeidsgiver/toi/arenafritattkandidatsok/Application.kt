@@ -1,11 +1,11 @@
-package no.nav.arbeidsgiver.toi.oppfolgingsinformasjon
+package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    OppfolgingsinformasjonLytter(rapidsConnection)
+    ArenaFritattKandidatsokLytter(rapidsConnection)
 }.start()
 
 val Any.log: Logger

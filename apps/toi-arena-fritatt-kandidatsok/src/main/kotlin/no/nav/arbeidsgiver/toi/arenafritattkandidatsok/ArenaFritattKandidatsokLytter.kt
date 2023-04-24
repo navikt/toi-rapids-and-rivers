@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.oppfolgingsinformasjon
+package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -8,7 +8,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {

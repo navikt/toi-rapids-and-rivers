@@ -1,17 +1,19 @@
-package no.nav.arbeidsgiver.toi.oppfolgingsinformasjon
+package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class OppfolgingsinformasjonTest {
+class ArenaFritattKandidatsokTest {
+
+    // TODO: Testene er kopiert fra annen app, oppdateres
 
     @Test
     fun `Lesing av oppfølgingsinformasjonMelding fra eksternt topic skal produsere ny melding på rapid`() {
         val testRapid = TestRapid()
         val fødselsnummer = "123"
 
-        OppfolgingsinformasjonLytter(testRapid)
+        ArenaFritattKandidatsokLytter(testRapid)
 
         testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(fødselsnummer))
         Thread.sleep(300)

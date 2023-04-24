@@ -1,1 +1,1 @@
-# Henter ut oppfølgingsinformasjon og legger den på rapid
+# TODO
