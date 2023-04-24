@@ -24,27 +24,18 @@ jobs:
         language: [ 'java' ]
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
-        
-      - name: Setup Java v17.x
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17.x'
-          cache: 'gradle'
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
 
-      - name: Compile for CodeQL scan
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ./gradlew
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
