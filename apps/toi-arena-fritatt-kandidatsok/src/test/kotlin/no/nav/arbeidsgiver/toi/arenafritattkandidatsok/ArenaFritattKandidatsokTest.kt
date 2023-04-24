@@ -21,7 +21,7 @@ class ArenaFritattKandidatsokTest {
         assertThat(inspektør.size).isEqualTo(1)
         assertThat(inspektør.key(0)).isEqualTo(fødselsnummer)
         val meldingJson = inspektør.message(0)
-        
+
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "fodselsnummer",

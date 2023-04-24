@@ -7,8 +7,12 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import org.slf4j.LoggerFactory
 
 class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     init {
         River(rapidsConnection).apply {
             validate {
@@ -21,6 +25,7 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fnr = fnr(packet)
         if (fnr == null) return
+        log.info("Skal publisere arenafritattkandidatsok-melding")
 
         val melding = mapOf(
             "fodselsnummer" to fnr,
@@ -28,7 +33,7 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
             "@event_name" to "arenafritattkandidatsok",
         )
 
-        log.info("Skal publisere arenafritattkandidatsok-melding: " + packet.toJson()) // TODO: Ikke i prod, secure-log?
+        secureLog.info("Skal publisere arenafritattkandidatsok-melding: " + packet.toJson())
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(fnr, nyPacket.toJson())
@@ -37,7 +42,8 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
     private fun fnr(packet: JsonMessage): String? {
         val fnr: String? = packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
         if (fnr == null) {
-            log.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding=" + packet.toJson())
+            log.error("Melding fra Arena med FRKAS-kode mangler, se securelog")
+            secureLog.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding=" + packet.toJson())
         }
         return fnr
     }
