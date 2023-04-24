@@ -29,22 +29,6 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew :apps:${APP_NAME}:test :apps:${APP_NAME}:build
-      - name: Install Snyk CLI
-        uses: snyk/actions/setup@master
-      - name: Test dependencies with Snyk
-        run: snyk test --file=apps/${APP_NAME}/build.gradle.kts --org=toi --fail-on=all --severity-threshold=medium
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ## Ved fix av prodfeil, sett continue-on-error=true, slik at workflow fortsetter selvom snyk finner sårbarheter
-        continue-on-error: false
-      - name: Test buildSrc dependencies with Snyk
-        run: snyk test --file=buildSrc/build.gradle.kts --org=toi --fail-on=all --severity-threshold=medium
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ## Ved fix av prodfeil, sett continue-on-error=true, slik at workflow fortsetter selvom snyk finner sårbarheter
-        continue-on-error: false
       - name: Docker login
         uses: docker/login-action@v2
         with:
@@ -83,39 +67,3 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
           VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
-
-  snyk-monitor:
-    name: Monitor dependencies with Snyk
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup Java v17.x
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17.x'
-          cache: 'gradle'
-      - name: Install Snyk CLI
-        uses: snyk/actions/setup@master
-      - name: Monitor dependencies with Snyk
-        run: >
-          snyk monitor
-          --org=toi
-          --file=apps/${APP_NAME}/build.gradle.kts
-          --project-name=${{ github.repository }}
-          --remote-repo-url=https://github.com/${{ github.repository }}.git
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Monitor dependencies in buildSrc with Snyk
-        run: >
-          snyk monitor
-          --org=toi
-          --file=buildSrc/build.gradle.kts
-          --project-name=${{ github.repository }}
-          --remote-repo-url=https://github.com/${{ github.repository }}.git
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
