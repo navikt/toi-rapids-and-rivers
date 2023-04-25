@@ -1,4 +1,4 @@
-name: toi-arenafritattkandidatsok
+name: toi-arena-fritatt-kandidatsok
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
@@ -10,8 +10,8 @@ on:
     - main
     - ny-app-frkas
     paths:
-    - apps/toi-arenafritattkandidatsok/**
-    - .github/workflows/deploy-toi-arenafritattkandidatsok.yaml
+    - apps/toi-arena-fritatt-kandidatsok/**
+    - .github/workflows/deploy-toi-arena-fritatt-kandidatsok.yaml
     - buildSrc/**
 
 jobs:
