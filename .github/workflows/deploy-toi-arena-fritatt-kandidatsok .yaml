@@ -1,4 +1,4 @@
-name: toi-oppfolgingsinformasjon
+name: toi-arenafritattkandidatsok
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
@@ -8,9 +8,9 @@ on:
   push:
     branches:
     - main
-    - oppdatere-dependencies
+    - ny-app-frkas
     paths:
-    - apps/toi-oppfolgingsinformasjon/**
+    - apps/toi-arenafritattkandidatsok/**
     - .github/workflows/deploy-toi-arenafritattkandidatsok.yaml
     - buildSrc/**
 
