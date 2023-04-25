@@ -48,37 +48,36 @@ class ArenaFritattKandidatsokTest {
         )
 
         fritattJson.apply {
-            assertThat(get("PERSON_ID").asInt()).isEqualTo(12345678)
+            assertThat(get("PERSON_ID").asInt()).isEqualTo(4836878)
             assertThat(get("FODSELSNR").asText()).isEqualTo(fødselsnummer)
             assertThat(get("PERSONFORHOLDKODE").asText()).isEqualTo("FRKAS")
-            assertThat(get("START_DATO").asText()).isEqualTo("2023-04-10 00:00:00")
-            assertThat(get("SLUTT_DATO").asText()).isEqualTo("2025-09-30 00:00:00")
-            assertThat(get("OPPRETTET_DATO").asText()).isEqualTo("2023-04-10 16:29:58")
+            assertThat(get("START_DATO").asText()).isEqualTo("2022-02-11 00:00:00")
+            assertThat(get("SLUTT_DATO").isNull).isTrue()
+            assertThat(get("OPPRETTET_DATO").asText()).isEqualTo("2023-04-19 20:28:10")
             assertThat(get("OPPRETTET_AV").asText()).isEqualTo("SKRIPT")
-            assertThat(get("ENDRET_DATO").asText()).isEqualTo("2023-04-10 16:29:58")
+            assertThat(get("ENDRET_DATO").asText()).isEqualTo("2023-04-19 20:28:10")
             assertThat(get("ENDRET_AV").asText()).isEqualTo("SKRIPT")
         }
     }
 
     private fun fritattMeldingFraEksterntTopic(fødselsnummer: String) = """
-    {
-      "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
-      "op_type": "I",
-      "op_ts": "2023-04-10 16:29:58.000000",
-      "current_ts": "2023-04-10T16:30:13.509027",
-      "pos": "00000000080112267275",
-      "tokens": {},
-      "after": {
-        "PERSON_ID": 12345678,
-        "FODSELSNR": "$fødselsnummer",
-        "PERSONFORHOLDKODE": "FRKAS",
-        "START_DATO": "2023-04-10 00:00:00",
-        "SLUTT_DATO": "2025-09-30 00:00:00",
-        "OPPRETTET_DATO": "2023-04-10 16:29:58",
-        "OPPRETTET_AV": "SKRIPT",
-        "ENDRET_DATO": "2023-04-10 16:29:58",
-        "ENDRET_AV": "SKRIPT"
-      }
-    }
+         {
+            "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
+            "op_type": "I",
+            "op_ts": "2023-04-20 15:29:13.740624",
+            "current_ts": "2023-04-20 15:35:13.471005",
+            "pos": "00000000000001207184",
+            "after": {
+              "PERSON_ID": 4836878,
+              "FODSELSNR": "$fødselsnummer",
+              "PERSONFORHOLDKODE": "FRKAS",
+              "START_DATO": "2022-02-11 00:00:00",
+              "SLUTT_DATO": null,
+              "OPPRETTET_DATO": "2023-04-19 20:28:10",
+              "OPPRETTET_AV": "SKRIPT",
+              "ENDRET_DATO": "2023-04-19 20:28:10",
+              "ENDRET_AV": "SKRIPT"
+            }
+          }
     """.trimIndent()
 }
