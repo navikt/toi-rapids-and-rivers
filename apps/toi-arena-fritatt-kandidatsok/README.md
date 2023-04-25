@@ -1,1 +1,1 @@
-# TODO
+# Henter ut FRKAS koden fra Arena og legger den på rapid
