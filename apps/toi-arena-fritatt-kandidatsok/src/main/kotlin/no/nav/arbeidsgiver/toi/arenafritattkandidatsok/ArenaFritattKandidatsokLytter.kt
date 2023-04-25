@@ -18,13 +18,15 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
             validate {
                 it.demandValue("table", "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK")
                 it.interestedIn("before", "after")
+                it.interestedIn("op_type")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fnr = fnr(packet)
-        if (fnr == null) return
+        val operasjonstype = operasjonstype(packet)
+        if (fnr == null || operasjonstype == null) return
         log.info("Skal publisere arenafritattkandidatsok-melding")
 
         val melding = mapOf(
@@ -33,7 +35,7 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
             "@event_name" to "arenafritattkandidatsok",
         )
 
-        secureLog.info("Skal publisere arenafritattkandidatsok: ${packet.toJson()}")
+        secureLog.info("Skal publisere arenafritattkandidatsok med fnr ${fnr} operasjonstype ${operasjonstype}: ${packet.toJson()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(fnr, nyPacket.toJson())
@@ -46,6 +48,15 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
             secureLog.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding= ${packet.toJson()}")
         }
         return fnr
+    }
+
+    private fun operasjonstype(packet: JsonMessage): String? {
+        val operasjonstype: String? = packet["op_type"].asText()
+        if (operasjonstype == null) {
+            log.error("Melding fra Arena med operasjonstype mangler, se securelog")
+            secureLog.error("Melding fra Arena med operasjonstype mangler operasjonstype. melding= ${packet.toJson()}")
+        }
+        return operasjonstype
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
