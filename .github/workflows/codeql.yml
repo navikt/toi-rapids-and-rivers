@@ -36,8 +36,8 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Compile for CodeQL scan
-        run: ./gradlew build
-        
+        run: ./gradlew build -x test
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
