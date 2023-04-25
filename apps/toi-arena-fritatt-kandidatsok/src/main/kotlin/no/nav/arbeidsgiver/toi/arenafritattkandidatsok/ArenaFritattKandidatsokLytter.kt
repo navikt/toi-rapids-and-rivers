@@ -33,7 +33,7 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
             "@event_name" to "arenafritattkandidatsok",
         )
 
-        secureLog.info("Skal publisere arenafritattkandidatsok-melding: todo fnr") //+ packet.toJson())
+        secureLog.info("Skal publisere arenafritattkandidatsok: ${packet.toJson()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(fnr, nyPacket.toJson())
@@ -43,7 +43,7 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
         val fnr: String? = packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
         if (fnr == null) {
             log.error("Melding fra Arena med FRKAS-kode mangler, se securelog")
-            secureLog.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding=todo") // + packet.toJson())
+            secureLog.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding= ${packet.toJson()}")
         }
         return fnr
     }
