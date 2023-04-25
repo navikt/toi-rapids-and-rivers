@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.*
+import org.slf4j.LoggerFactory
 
 class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     init {
         River(rapidsConnection).apply {
             validate {
@@ -26,7 +30,8 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
             "@event_name" to "siste14avedtak",
         )
 
-        log.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asText()} og fattetDato ${packet["fattetDato"].asText()}")
+        log.info("Skal publisere siste14aVedtakmelding med aktørid (se securelog) og fattetDato ${packet["fattetDato"].asText()}")
+        secureLog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asText()} og fattetDato ${packet["fattetDato"].asText()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
