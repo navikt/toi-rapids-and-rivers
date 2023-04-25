@@ -1,1 +1,1 @@
-# Henter ut FRKAS koden fra Arena og legger den på rapid
+# Henter ut FRKAS kode fra Arena og legger den på rapid
