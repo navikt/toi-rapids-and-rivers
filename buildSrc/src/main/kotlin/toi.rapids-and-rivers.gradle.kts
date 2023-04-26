@@ -8,5 +8,5 @@ repositories {
 }
 
 dependencies {
-    implementation("no.nav.arbeidsgiver.toi:toi-rapids-and-rivers-fork:1.1")
+    implementation("com.github.navikt:rapids-and-rivers:2023041310341681374880.67ced5ad4dda")
 }
