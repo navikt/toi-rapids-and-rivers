@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - oppdatere-dependencies
     paths:
     - apps/toi-oppfolgingsinformasjon/**
     - .github/workflows/deploy-toi-oppfolgingsinformasjon.yaml

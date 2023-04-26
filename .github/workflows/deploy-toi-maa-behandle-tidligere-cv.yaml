@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - oppdatere-dependencies
     paths:
     - apps/toi-maa-behandle-tidligere-cv/**
     - .github/workflows/deploy-toi-maa-behandle-tidligere-cv.yaml

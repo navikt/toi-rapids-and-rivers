@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - oppdatere-dependencies
     paths:
     - apps/toi-siste-14a-vedtak/**
     - .github/workflows/deploy-toi-siste-14a-vedtak.yaml

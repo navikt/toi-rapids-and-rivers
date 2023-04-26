@@ -6,13 +6,10 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - oppdatere-dependencies
     paths:
-    - apps/toi-arbeidsmarked-cv/**
-    - .github/workflows/deploy-toi-arbeidsmarked-cv.yaml
-    - buildSrc/**
+      - apps/toi-arbeidsmarked-cv/**
+      - .github/workflows/deploy-toi-arbeidsmarked-cv.yaml
+      - buildSrc/**
 
 jobs:
   build-and-publish:

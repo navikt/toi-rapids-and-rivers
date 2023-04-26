@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - oppdatere-dependencies
     paths:
     - apps/toi-hjemmel/**
     - .github/workflows/deploy-toi-hjemmel.yaml

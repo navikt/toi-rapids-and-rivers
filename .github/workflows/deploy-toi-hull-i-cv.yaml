@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - oppdatere-dependencies
     paths:
     - apps/toi-hull-i-cv/**
     - .github/workflows/deploy-toi-hull-i-cv.yaml
