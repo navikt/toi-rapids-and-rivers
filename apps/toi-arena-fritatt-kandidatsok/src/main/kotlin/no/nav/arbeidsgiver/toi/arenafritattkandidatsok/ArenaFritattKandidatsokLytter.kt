@@ -8,8 +8,15 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import org.slf4j.LoggerFactory
+import java.sql.Timestamp
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class ArenaFritattKandidatsokLytter(
+    rapidsConnection: RapidsConnection,
+    private val fritattRepository: FritattRepository,
+) : River.PacketListener {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
@@ -24,21 +31,63 @@ class ArenaFritattKandidatsokLytter(private val rapidsConnection: RapidsConnecti
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+
         val fnr = fnr(packet)
         val operasjonstype = operasjonstype(packet)
         if (fnr == null || operasjonstype == null) return
         log.info("Skal publisere arenafritattkandidatsok-melding")
 
-        val melding = mapOf(
+        /*val melding = mapOf(
             "fodselsnummer" to fnr,
             "arenafritattkandidatsok" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "arenafritattkandidatsok",
-        )
+        )*/
 
         secureLog.info("Skal publisere arenafritattkandidatsok med fnr ${fnr} operasjonstype ${operasjonstype}: ${packet.toJson()}")
 
-        val nyPacket = JsonMessage.newMessage(melding)
-        rapidsConnection.publish(fnr, nyPacket.toJson())
+        if (operasjonstype == "D") {
+            fritattRepository.slettFritatt(fnr)
+            secureLog.info("Slettet $fnr")
+            return
+        }
+
+        val data = packet["after"];
+        if (data == null) {
+            secureLog.error("Operasjon $operasjonstype mangler data for fnr $fnr")
+            log.error("Operasjon $operasjonstype mangler data")
+            return
+        }
+        val fritatt = mapJsonNodeToFritatt(data, packet)
+        fritattRepository.upsertFritatt(fritatt)
+        secureLog.info("Oppdaterte $fnr: $fritatt")
+    }
+
+    fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage): Fritatt {
+        val id = data["PERSON_ID"].asInt()
+        val fnr = data["FODSELSNR"].asText()
+        val melding = originalmelding.toJson()
+
+        val startDatoString = data["START_DATO"].asText()
+        val startDato = LocalDate.parse(startDatoString.substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE)
+
+        val sluttDatoString = data["SLUTT_DATO"]?.asText()
+        val sluttDato = sluttDatoString?.substring(0, 10)?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }
+
+        val endretDatoString = data["ENDRET_DATO"].asText()
+        val endretDato = LocalDateTime.parse(endretDatoString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
+        return Fritatt(
+            id = id,
+            fnr = fnr,
+            melding = melding,
+            startdato = startDato,
+            sluttdato = sluttDato ?: startDato,
+            sendingStatusAktivertFritatt = "ikke_sendt",
+            forsoktSendtAktivertFritatt = null,
+            sendingStatusDektivertFritatt = "ikke_sendt",
+            forsoktSendtDektivertFritatt = null,
+            sistEndret = endretDato
+        )
     }
 
     private fun fnr(packet: JsonMessage): String? {

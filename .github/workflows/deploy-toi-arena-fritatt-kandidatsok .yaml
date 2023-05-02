@@ -8,7 +8,6 @@ on:
   push:
     branches:
     - main
-    - ny-app-frkas
     paths:
     - apps/toi-arena-fritatt-kandidatsok/**
     - .github/workflows/deploy-toi-arena-fritatt-kandidatsok.yaml
@@ -62,7 +61,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ny-app-frkas'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ny-app-frkas_ikke_deploy'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
