@@ -10,7 +10,6 @@ import no.nav.helse.rapids_rivers.River
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class ArenaFritattKandidatsokLytter(
@@ -37,32 +36,42 @@ class ArenaFritattKandidatsokLytter(
         if (fnr == null || operasjonstype == null) return
         log.info("Skal publisere arenafritattkandidatsok-melding")
 
-        /*val melding = mapOf(
-            "fodselsnummer" to fnr,
-            "arenafritattkandidatsok" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "arenafritattkandidatsok",
-        )*/
-
         secureLog.info("Skal publisere arenafritattkandidatsok med fnr ${fnr} operasjonstype ${operasjonstype}: ${packet.toJson()}")
 
         if (operasjonstype == "D") {
-            fritattRepository.slettFritatt(fnr)
-            secureLog.info("Slettet $fnr")
+            val data = packet["before"];
+            if (data.isNull) {
+                secureLog.error("Operasjon $operasjonstype mangler data for fnr $fnr")
+                log.error("Operasjon $operasjonstype mangler data")
+                return
+            }
+            val fritatt = mapJsonNodeToFritatt(data, packet, true)
+            fritattRepository.upsertFritatt(fritatt)
+            secureLog.info("Oppdaterte $fnr: $fritatt")
             return
         }
 
         val data = packet["after"];
-        if (data == null) {
+        oppdaterDatabase(data, operasjonstype, fnr, packet)
+    }
+
+    private fun oppdaterDatabase(
+        data: JsonNode,
+        operasjonstype: String?,
+        fnr: String?,
+        packet: JsonMessage,
+    ) {
+        if (data.isNull) {
             secureLog.error("Operasjon $operasjonstype mangler data for fnr $fnr")
             log.error("Operasjon $operasjonstype mangler data")
             return
         }
-        val fritatt = mapJsonNodeToFritatt(data, packet)
+        val fritatt = mapJsonNodeToFritatt(data=data, originalmelding = packet, operasjonstype=="D")
         fritattRepository.upsertFritatt(fritatt)
         secureLog.info("Oppdaterte $fnr: $fritatt")
     }
 
-    fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage): Fritatt {
+    fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt {
         val id = data["PERSON_ID"].asInt()
         val fnr = data["FODSELSNR"].asText()
         val melding = originalmelding.toJson()
@@ -70,7 +79,7 @@ class ArenaFritattKandidatsokLytter(
         val startDatoString = data["START_DATO"].asText()
         val startDato = LocalDate.parse(startDatoString.substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE)
 
-        val sluttDatoString = if(data["SLUTT_DATO"].isNull) null else  data["SLUTT_DATO"].asText()
+        val sluttDatoString = if (data["SLUTT_DATO"].isNull) null else data["SLUTT_DATO"].asText()
         val sluttDato = sluttDatoString?.substring(0, 10)?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }
 
         val endretDatoString = data["ENDRET_DATO"].asText()
@@ -81,14 +90,15 @@ class ArenaFritattKandidatsokLytter(
         return Fritatt(
             id = id,
             fnr = fnr,
-            melding = melding,
             startdato = startDato,
             sluttdato = sluttDato,
             sendingStatusAktivertFritatt = "ikke_sendt",
             forsoktSendtAktivertFritatt = null,
             sendingStatusDektivertFritatt = "ikke_sendt",
             forsoktSendtDektivertFritatt = null,
-            sistEndret = endretDato
+            sistEndret = endretDato,
+            slettet = slettet,
+            melding = melding,
         )
     }
 

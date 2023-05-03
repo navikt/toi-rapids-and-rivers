@@ -52,6 +52,7 @@ class ArenaFritattKandidatsokTest {
                 arenaTidsformat
             ).atOsloSameInstant()
         )
+        assertThat(fritatt.slettet).isFalse
         assertThat(fritatt.melding).contains(
             """
             {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
@@ -106,6 +107,7 @@ class ArenaFritattKandidatsokTest {
                 arenaTidsformat
             ).atOsloSameInstant()
         )
+        assertThat(fritatt.slettet).isFalse
         assertThat(fritatt.melding).contains(
             """
             {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2020-02-11 00:00:00","SLUTT_DATO":"2021-02-11 00:00:00","OPPRETTET_DATO":"2021-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2021-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
@@ -130,6 +132,7 @@ class ArenaFritattKandidatsokTest {
                 arenaTidsformat
             ).atOsloSameInstant()
         )
+        assertThat(fritatt.slettet).isFalse
         assertThat(fritattNy.melding).contains(
             """
             {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
@@ -162,12 +165,14 @@ class ArenaFritattKandidatsokTest {
         assertThat(fritatt.forsoktSendtAktivertFritatt).isNull()
         assertThat(fritatt.sendingStatusDektivertFritatt).isEqualTo("ikke_sendt")
         assertThat(fritatt.forsoktSendtDektivertFritatt).isNull()
+        assertThat(fritatt.slettet).isFalse
         assertThat(fritatt.sistEndret).isEqualTo(
             LocalDateTime.parse(
                 "2021-04-19 20:28:10",
                 arenaTidsformat
             ).atOsloSameInstant()
         )
+        assertThat(fritatt.slettet).isFalse
         assertThat(fritatt.melding).contains(
             """
             {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"111","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2020-02-11 00:00:00","SLUTT_DATO":"2021-02-11 00:00:00","OPPRETTET_DATO":"2021-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2021-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
@@ -188,6 +193,7 @@ class ArenaFritattKandidatsokTest {
                 arenaTidsformat
             ).atOsloSameInstant()
         )
+        assertThat(fritatt.slettet).isFalse
         assertThat(fritattNy.melding).contains(
             """
             {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"222","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}

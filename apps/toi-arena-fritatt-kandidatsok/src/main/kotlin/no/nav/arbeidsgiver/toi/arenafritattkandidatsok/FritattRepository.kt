@@ -43,9 +43,9 @@ data class Fritatt(
     val sendingStatusDektivertFritatt: String,
     val forsoktSendtDektivertFritatt: ZonedDateTime?,
     val sistEndret: ZonedDateTime,
+    val slettet: Boolean,
     val melding: String,
-
-    )
+)
 
 class FritattRepository(private val dataSource: DataSource) {
 
@@ -89,6 +89,7 @@ class FritattRepository(private val dataSource: DataSource) {
             forsoktSendtDektivertFritatt = resultSet.getTimestamp("forsoktsendt_dektivert_fritatt")?.toInstant()
                 ?.atZone(ZoneId.of("Europe/Oslo")),
             sistEndret = resultSet.getTimestamp("sistendret").toInstant().atOslo(),
+            slettet = resultSet.getBoolean("slettet"),
             melding = resultSet.getString("melding")
         )
     }
@@ -96,7 +97,7 @@ class FritattRepository(private val dataSource: DataSource) {
     fun opprettFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
-                "INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, melding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, slettet, melding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
             ).apply {
                 setString(1, fritatt.fnr)
@@ -120,7 +121,8 @@ class FritattRepository(private val dataSource: DataSource) {
                     setNull(7, Types.TIMESTAMP)
                 }
                 setTimestamp(8, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
-                setString(9, fritatt.melding)
+                setBoolean(9, fritatt.slettet)
+                setString(10, fritatt.melding)
                 executeUpdate()
             }
         }
@@ -130,7 +132,7 @@ class FritattRepository(private val dataSource: DataSource) {
     fun oppdaterFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
-                "UPDATE fritatt SET startdato = ?, sluttdato = ?, sendingstatus_aktivert_fritatt = ?, forsoktsendt_aktivert_fritatt = ?, sendingstatus_dektivert_fritatt = ?, forsoktsendt_dektivert_fritatt = ?, sistendret = ?, melding = ? WHERE fnr = ?"
+                "UPDATE fritatt SET startdato = ?, sluttdato = ?, sendingstatus_aktivert_fritatt = ?, forsoktsendt_aktivert_fritatt = ?, sendingstatus_dektivert_fritatt = ?, forsoktsendt_dektivert_fritatt = ?, sistendret = ?, slettet = ?, melding = ? WHERE fnr = ?"
             ).apply {
                 setDate(1, Date.valueOf(fritatt.startdato))
                 if (fritatt.sluttdato != null) {
@@ -152,8 +154,9 @@ class FritattRepository(private val dataSource: DataSource) {
                     setNull(6, Types.TIMESTAMP)
                 }
                 setTimestamp(7, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
-                setString(8, fritatt.melding)
-                setString(9, fritatt.fnr)
+                setBoolean(8, fritatt.slettet)
+                setString(9, fritatt.melding)
+                setString(10, fritatt.fnr)
                 executeUpdate()
             }
         }
@@ -173,7 +176,7 @@ class FritattRepository(private val dataSource: DataSource) {
     fun hentAlle(): List<Fritatt> {
         dataSource.connection.use { connection ->
             val statement = connection.prepareStatement(
-                "SELECT id, fnr, melding, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret FROM fritatt"
+                "SELECT id, fnr, melding, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, slettet FROM fritatt"
             )
             val resultSet = statement.executeQuery()
 
