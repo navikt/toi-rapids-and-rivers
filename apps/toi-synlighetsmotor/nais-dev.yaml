@@ -7,3 +7,4 @@ gcp_db_tier: db-f1-micro
 gcp_disk_autoresize: false
 ad_gruppe_modia_generell_tilgang: 67a06857-0028-4a90-bf4c-9c9a92c7d733
 ad_gruppe_modia_oppfølging: 554a66fb-fbec-4b92-90c1-0d9c085c362c
+max_replicas: 1
