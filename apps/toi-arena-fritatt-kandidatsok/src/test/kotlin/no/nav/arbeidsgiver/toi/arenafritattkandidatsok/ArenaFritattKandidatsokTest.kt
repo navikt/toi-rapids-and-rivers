@@ -202,19 +202,58 @@ class ArenaFritattKandidatsokTest {
 
     }
 
+    @Test
+    fun `Sletting av fritatt melding fra eksternt topic skal lagres i databasen`() {
+
+        val testRapid = TestRapid()
+        val fødselsnummer = "123"
+
+        ArenaFritattKandidatsokLytter(testRapid, repository)
+
+        testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer=fødselsnummer, opType = "D", beforeEllerAfter = "before"))
+        Thread.sleep(300)
+
+        val fritattListe = repository.hentAlle()
+        assertThat(fritattListe).hasSize(1)
+        val fritatt = fritattListe.first()
+
+        assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
+        assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
+        assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
+        assertThat(fritatt.sendingStatusAktivertFritatt).isEqualTo("ikke_sendt")
+        assertThat(fritatt.forsoktSendtAktivertFritatt).isNull()
+        assertThat(fritatt.sendingStatusDektivertFritatt).isEqualTo("ikke_sendt")
+        assertThat(fritatt.forsoktSendtDektivertFritatt).isNull()
+        assertThat(fritatt.sistEndret).isEqualTo(
+            LocalDateTime.parse(
+                "2023-04-19 20:28:10",
+                arenaTidsformat
+            ).atOsloSameInstant()
+        )
+        assertThat(fritatt.slettet).isTrue
+        assertThat(fritatt.melding).contains(
+            """
+            {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"D","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","before":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
+        """.trimIndent()
+        )
+
+    }
+
 
     private fun fritattMeldingFraEksterntTopic(
         fødselsnummer: String,
         sluttdato: String? = """"2023-02-11 00:00:00"""",
+        opType: String = "I",
+        beforeEllerAfter: String = "after"
     ) =
         """
          {
             "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
-            "op_type": "I",
+            "op_type": "$opType",
             "op_ts": "2023-04-20 15:29:13.740624",
             "current_ts": "2023-04-20 15:35:13.471005",
             "pos": "00000000000001207184",
-            "after": {
+            "${beforeEllerAfter}": {
               "PERSON_ID": 4836878,
               "FODSELSNR": "$fødselsnummer",
               "PERSONFORHOLDKODE": "FRKAS",
