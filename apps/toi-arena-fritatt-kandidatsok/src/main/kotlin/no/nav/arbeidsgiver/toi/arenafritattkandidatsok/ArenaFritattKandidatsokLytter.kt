@@ -63,6 +63,7 @@ class ArenaFritattKandidatsokLytter(
     }
 
     fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage): Fritatt {
+        println("jjjj ${data["SLUTT_DATO"]}")
         val id = data["PERSON_ID"].asInt()
         val fnr = data["FODSELSNR"].asText()
         val melding = originalmelding.toJson()
@@ -70,7 +71,7 @@ class ArenaFritattKandidatsokLytter(
         val startDatoString = data["START_DATO"].asText()
         val startDato = LocalDate.parse(startDatoString.substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE)
 
-        val sluttDatoString = data["SLUTT_DATO"]?.asText()
+        val sluttDatoString = if(data["SLUTT_DATO"].isNull) null else  data["SLUTT_DATO"].asText()
         val sluttDato = sluttDatoString?.substring(0, 10)?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }
 
         val endretDatoString = data["ENDRET_DATO"].asText()
@@ -83,7 +84,7 @@ class ArenaFritattKandidatsokLytter(
             fnr = fnr,
             melding = melding,
             startdato = startDato,
-            sluttdato = sluttDato ?: startDato,
+            sluttdato = sluttDato,
             sendingStatusAktivertFritatt = "ikke_sendt",
             forsoktSendtAktivertFritatt = null,
             sendingStatusDektivertFritatt = "ikke_sendt",

@@ -41,10 +41,7 @@ fun slettAllDataIDatabase() {
     val connection = dataSource.connection
 
     connection.use {
-        it.prepareStatement("delete from kandidat").execute()
-        it.prepareStatement("delete from kandidatliste").execute()
-        it.prepareStatement("delete from samtykke").execute()
-        it.prepareStatement("delete from visning_kontaktinfo").execute()
+        it.prepareStatement("delete from fritatt").execute()
     }
 }
 

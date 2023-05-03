@@ -2,18 +2,30 @@ package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ArenaFritattKandidatsokTest {
+
+    lateinit var repository: FritattRepository
+
+    @BeforeAll
+    fun beforeALl() {
+        repository = kandidatlisteRepositoryMedLokalPostgres()
+    }
+
+    @AfterEach
+    fun afterEach() {
+        slettAllDataIDatabase()
+    }
 
     @Test
     fun `Lesing av fritatt melding fra eksternt topic skal lagres i databasen`() {
-
-        val repository = kandidatlisteRepositoryMedLokalPostgres()
 
         val testRapid = TestRapid()
         val fødselsnummer = "123"
@@ -48,7 +60,48 @@ class ArenaFritattKandidatsokTest {
 
     }
 
-    private fun fritattMeldingFraEksterntTopic(fødselsnummer: String) = """
+    @Test
+    fun `Lesing av fritatt melding uten tildato skal lagres i databasen med nullverdi for tildato`() {
+
+        val testRapid = TestRapid()
+        val fødselsnummer = "123"
+
+        ArenaFritattKandidatsokLytter(testRapid, repository)
+
+        testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
+        Thread.sleep(300)
+
+        val fritattListe = repository.hentAlle()
+        assertThat(fritattListe).hasSize(1)
+        val fritatt = fritattListe.first()
+        println("jjjj $fritatt")
+
+        assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
+        assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
+        assertThat(fritatt.sluttdato).isNull()
+        assertThat(fritatt.sendingStatusAktivertFritatt).isEqualTo("ikke_sendt")
+        assertThat(fritatt.forsoktSendtAktivertFritatt).isNull()
+        assertThat(fritatt.sendingStatusDektivertFritatt).isEqualTo("ikke_sendt")
+        assertThat(fritatt.forsoktSendtDektivertFritatt).isNull()
+        assertThat(fritatt.sistEndret).isEqualTo(
+            LocalDateTime.parse(
+                "2023-04-19 20:28:10",
+                arenaTidsformat
+            ).atOsloSameInstant()
+        )
+        assertThat(fritatt.melding).contains(
+            """
+            {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":null,"OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
+        """.trimIndent()
+        )
+
+    }
+
+    private fun fritattMeldingFraEksterntTopic(
+        fødselsnummer: String,
+        sluttdato: String? = """"2023-02-11 00:00:00"""",
+    ) =
+        """
          {
             "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
             "op_type": "I",
@@ -60,7 +113,7 @@ class ArenaFritattKandidatsokTest {
               "FODSELSNR": "$fødselsnummer",
               "PERSONFORHOLDKODE": "FRKAS",
               "START_DATO": "2022-02-11 00:00:00",
-              "SLUTT_DATO": "2023-02-11 00:00:00",
+              "SLUTT_DATO": ${sluttdato},
               "OPPRETTET_DATO": "2023-04-19 20:28:10",
               "OPPRETTET_AV": "SKRIPT",
               "ENDRET_DATO": "2023-04-19 20:28:10",

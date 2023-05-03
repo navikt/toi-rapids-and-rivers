@@ -96,32 +96,31 @@ class FritattRepository(private val dataSource: DataSource) {
     fun opprettFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
-                "INSERT INTO fritatt (id, fnr, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, melding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, melding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
             ).apply {
-                setInt(1, fritatt.id)
-                setString(2, fritatt.fnr)
-                setDate(3, Date.valueOf(fritatt.startdato))
+                setString(1, fritatt.fnr)
+                setDate(2, Date.valueOf(fritatt.startdato))
                 if (fritatt.sluttdato != null) {
-                    setDate(4, Date.valueOf(fritatt.sluttdato))
+                    setDate(3, Date.valueOf(fritatt.sluttdato))
                 } else {
-                    setNull(4, Types.DATE)
+                    setNull(3, Types.DATE)
                 }
-                setString(5, fritatt.sendingStatusAktivertFritatt)
+                setString(4, fritatt.sendingStatusAktivertFritatt)
                 if (fritatt.forsoktSendtAktivertFritatt != null) {
 
-                    setTimestamp(6, Timestamp(fritatt.forsoktSendtAktivertFritatt.toInstant().toEpochMilli()))
+                    setTimestamp(5, Timestamp(fritatt.forsoktSendtAktivertFritatt.toInstant().toEpochMilli()))
                 } else {
-                    setNull(6, Types.TIMESTAMP)
+                    setNull(5, Types.TIMESTAMP)
                 }
-                setString(7, fritatt.sendingStatusDektivertFritatt)
+                setString(6, fritatt.sendingStatusDektivertFritatt)
                 if (fritatt.forsoktSendtDektivertFritatt != null) {
-                    setTimestamp(8, Timestamp(fritatt.forsoktSendtDektivertFritatt.toInstant().toEpochMilli()))
+                    setTimestamp(7, Timestamp(fritatt.forsoktSendtDektivertFritatt.toInstant().toEpochMilli()))
                 } else {
-                    setNull(8, Types.TIMESTAMP)
+                    setNull(7, Types.TIMESTAMP)
                 }
-                setTimestamp(9, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
-                setString(10, fritatt.melding)
+                setTimestamp(8, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
+                setString(9, fritatt.melding)
                 executeUpdate()
             }
         }
@@ -131,10 +130,29 @@ class FritattRepository(private val dataSource: DataSource) {
     fun oppdaterFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
-                "UPDATE fritatt SET melding = ?, startdato = ?, sluttdato = ?, sendingstatus_aktivert_fritatt = ?, forsoktsendt_aktivert_fritatt = ?, sendingstatus_dektivert_fritatt = ?, forsoktsendt_dektivert_fritatt = ?, sistendret = ? WHERE fnr = ?"
+                "UPDATE fritatt SET startdato = ?, sluttdato = ?, sendingstatus_aktivert_fritatt = ?, forsoktsendt_aktivert_fritatt = ?, sendingstatus_dektivert_fritatt = ?, forsoktsendt_dektivert_fritatt = ?, sistendret = ?, melding = ? WHERE fnr = ?"
             ).apply {
-                setString(1, fritatt.melding)
-                // ...
+                setDate(1, Date.valueOf(fritatt.startdato))
+                if (fritatt.sluttdato != null) {
+                    setDate(2, Date.valueOf(fritatt.sluttdato))
+                } else {
+                    setNull(2, Types.DATE)
+                }
+                setString(3, fritatt.sendingStatusAktivertFritatt)
+                if (fritatt.forsoktSendtAktivertFritatt != null) {
+
+                    setTimestamp(4, Timestamp(fritatt.forsoktSendtAktivertFritatt.toInstant().toEpochMilli()))
+                } else {
+                    setNull(4, Types.TIMESTAMP)
+                }
+                setString(5, fritatt.sendingStatusDektivertFritatt)
+                if (fritatt.forsoktSendtDektivertFritatt != null) {
+                    setTimestamp(6, Timestamp(fritatt.forsoktSendtDektivertFritatt.toInstant().toEpochMilli()))
+                } else {
+                    setNull(6, Types.TIMESTAMP)
+                }
+                setTimestamp(7, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
+                setString(8, fritatt.melding)
                 setString(9, fritatt.fnr)
                 executeUpdate()
             }
