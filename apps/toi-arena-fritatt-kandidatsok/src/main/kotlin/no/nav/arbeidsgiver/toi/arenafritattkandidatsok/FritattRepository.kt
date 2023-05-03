@@ -49,17 +49,6 @@ data class Fritatt(
 
 class FritattRepository(private val dataSource: DataSource) {
 
-    fun slettFritatt(fodselsnummer: String) {
-        dataSource.connection.use { connection ->
-            connection.prepareStatement(
-                "DELETE FROM fritatt WHERE fnr = ?"
-            ).apply {
-                setString(1, fodselsnummer)
-                executeUpdate()
-            }
-        }
-    }
-
     fun hentFritatt(fnr: String): Fritatt? {
         dataSource.connection.use { connection ->
             val resultSet = connection.prepareStatement(

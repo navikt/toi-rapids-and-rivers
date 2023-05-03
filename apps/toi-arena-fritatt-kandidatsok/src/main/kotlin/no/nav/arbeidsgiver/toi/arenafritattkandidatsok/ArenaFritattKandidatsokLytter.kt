@@ -1,8 +1,7 @@
+
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -30,48 +29,40 @@ class ArenaFritattKandidatsokLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val fnr = fnr(packet) ?: return logManglendeFnr(packet)
+        val operasjonstype = operasjonstype(packet) ?: return logManglendeOperasjonstype(packet)
 
-        val fnr = fnr(packet)
-        val operasjonstype = operasjonstype(packet)
-        if (fnr == null || operasjonstype == null) return
         log.info("Skal publisere arenafritattkandidatsok-melding")
+        secureLog.info("Skal publisere arenafritattkandidatsok med fnr $fnr operasjonstype $operasjonstype: ${packet.toJson()}")
 
-        secureLog.info("Skal publisere arenafritattkandidatsok med fnr ${fnr} operasjonstype ${operasjonstype}: ${packet.toJson()}")
+        val data = if (operasjonstype == "D") packet["before"] else packet["after"]
 
-        if (operasjonstype == "D") {
-            val data = packet["before"];
-            if (data.isNull) {
-                secureLog.error("Operasjon $operasjonstype mangler data for fnr $fnr")
-                log.error("Operasjon $operasjonstype mangler data")
-                return
-            }
-            val fritatt = mapJsonNodeToFritatt(data, packet, true)
-            fritattRepository.upsertFritatt(fritatt)
-            secureLog.info("Oppdaterte $fnr: $fritatt")
-            return
-        }
-
-        val data = packet["after"];
-        oppdaterDatabase(data, operasjonstype, fnr, packet)
-    }
-
-    private fun oppdaterDatabase(
-        data: JsonNode,
-        operasjonstype: String?,
-        fnr: String?,
-        packet: JsonMessage,
-    ) {
         if (data.isNull) {
-            secureLog.error("Operasjon $operasjonstype mangler data for fnr $fnr")
-            log.error("Operasjon $operasjonstype mangler data")
+            logManglendeData(operasjonstype, fnr)
             return
         }
-        val fritatt = mapJsonNodeToFritatt(data=data, originalmelding = packet, operasjonstype=="D")
+
+        val fritatt = mapJsonNodeToFritatt(data, packet, operasjonstype == "D")
         fritattRepository.upsertFritatt(fritatt)
         secureLog.info("Oppdaterte $fnr: $fritatt")
     }
 
-    fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt {
+    private fun logManglendeFnr(packet: JsonMessage) {
+        log.error("Melding fra Arena med FRKAS-kode mangler, se securelog")
+        secureLog.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding= ${packet.toJson()}")
+    }
+
+    private fun logManglendeOperasjonstype(packet: JsonMessage) {
+        log.error("Melding fra Arena med operasjonstype mangler, se securelog")
+        secureLog.error("Melding fra Arena med operasjonstype mangler operasjonstype. melding= ${packet.toJson()}")
+    }
+
+    private fun logManglendeData(operasjonstype: String, fnr: String) {
+        secureLog.error("Operasjon $operasjonstype mangler data for fnr $fnr")
+        log.error("Operasjon $operasjonstype mangler data")
+    }
+
+    private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt {
         val id = data["PERSON_ID"].asInt()
         val fnr = data["FODSELSNR"].asText()
         val melding = originalmelding.toJson()
@@ -85,7 +76,6 @@ class ArenaFritattKandidatsokLytter(
         val endretDatoString = data["ENDRET_DATO"].asText()
         val endretDato = LocalDateTime.parse(endretDatoString, arenaTidsformat)
             .atOsloSameInstant()
-
 
         return Fritatt(
             id = id,
@@ -103,30 +93,10 @@ class ArenaFritattKandidatsokLytter(
     }
 
     private fun fnr(packet: JsonMessage): String? {
-        val fnr: String? = packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
-        if (fnr == null) {
-            log.error("Melding fra Arena med FRKAS-kode mangler, se securelog")
-            secureLog.error("Melding fra Arena med FRKAS-kode mangler fødselnummer. melding= ${packet.toJson()}")
-        }
-        return fnr
+        return packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
     }
 
     private fun operasjonstype(packet: JsonMessage): String? {
-        val operasjonstype: String? = packet["op_type"].asText()
-        if (operasjonstype == null) {
-            log.error("Melding fra Arena med operasjonstype mangler, se securelog")
-            secureLog.error("Melding fra Arena med operasjonstype mangler operasjonstype. melding= ${packet.toJson()}")
-        }
-        return operasjonstype
+        return packet["op_type"].asText()
     }
-
-    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter =
-            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
-        jsonNode.remove(metadataFelter)
-        return jsonNode
-    }
-
-
 }
