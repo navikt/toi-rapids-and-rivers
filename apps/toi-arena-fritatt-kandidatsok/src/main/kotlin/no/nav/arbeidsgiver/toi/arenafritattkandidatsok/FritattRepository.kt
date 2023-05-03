@@ -157,11 +157,11 @@ class FritattRepository(private val dataSource: DataSource) {
         sluttdato = getDate("sluttdato")?.toLocalDate(),
         sendingStatusAktivertFritatt = getString("sendingstatus_aktivert_fritatt"),
         forsoktSendtAktivertFritatt = getTimestamp("forsoktsendt_aktivert_fritatt")?.toInstant()
-            ?.atZone(ZoneId.of("Europe/Oslo")),
+            ?.atOslo(),
         sendingStatusDektivertFritatt = getString("sendingstatus_dektivert_fritatt"),
         forsoktSendtDektivertFritatt = getTimestamp("forsoktsendt_dektivert_fritatt")?.toInstant()
-            ?.atZone(ZoneId.of("Europe/Oslo")),
-        sistEndret = getTimestamp("sistendret").toInstant().atZone(ZoneId.of("Europe/Oslo")),
+            ?.atOslo(),
+        sistEndret = getTimestamp("sistendret").toInstant().atOslo(),
         slettet = getBoolean("slettet"),
         melding = getString("melding")
     )
