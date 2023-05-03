@@ -37,10 +37,8 @@ class ArenaFritattKandidatsokTest {
         assertThat(fritatt.sistEndret).isEqualTo(
             LocalDateTime.parse(
                 "2023-04-19 20:28:10",
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            ).atZone(ZoneId.systemDefault()).withZoneSameInstant(
-                ZoneId.of("Europe/Oslo")
-            )
+                arenaTidsformat
+            ).atOsloSameInstant()
         )
         assertThat(fritatt.melding).contains(
             """

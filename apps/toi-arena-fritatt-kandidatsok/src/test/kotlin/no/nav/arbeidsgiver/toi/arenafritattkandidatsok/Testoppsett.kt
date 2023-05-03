@@ -36,6 +36,7 @@ fun kandidatlisteRepositoryMedLokalPostgres(): FritattRepository {
     }
     return FritattRepository(dataSource).apply { flywayMigrate(dataSource) }
 }
+
 fun slettAllDataIDatabase() {
     val connection = dataSource.connection
 

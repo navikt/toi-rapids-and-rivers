@@ -88,7 +88,7 @@ class FritattRepository(private val dataSource: DataSource) {
             sendingStatusDektivertFritatt = resultSet.getString("sendingstatus_dektivert_fritatt"),
             forsoktSendtDektivertFritatt = resultSet.getTimestamp("forsoktsendt_dektivert_fritatt")?.toInstant()
                 ?.atZone(ZoneId.of("Europe/Oslo")),
-            sistEndret = resultSet.getTimestamp("sistendret").toInstant().atZone(ZoneId.of("Europe/Oslo")),
+            sistEndret = resultSet.getTimestamp("sistendret").toInstant().atOslo(),
             melding = resultSet.getString("melding")
         )
     }

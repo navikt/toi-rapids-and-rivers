@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class ArenaFritattKandidatsokLytter(
@@ -75,8 +74,8 @@ class ArenaFritattKandidatsokLytter(
         val sluttDato = sluttDatoString?.substring(0, 10)?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }
 
         val endretDatoString = data["ENDRET_DATO"].asText()
-        val endretDato = LocalDateTime.parse(endretDatoString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            .atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("Europe/Oslo"))
+        val endretDato = LocalDateTime.parse(endretDatoString, arenaTidsformat)
+            .atOsloSameInstant()
 
 
         return Fritatt(
