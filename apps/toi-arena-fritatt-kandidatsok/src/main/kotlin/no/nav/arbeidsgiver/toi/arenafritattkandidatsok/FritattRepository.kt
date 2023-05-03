@@ -140,13 +140,13 @@ class FritattRepository(private val dataSource: DataSource) {
             )
             val resultSet = statement.executeQuery()
 
-            val fritatte = mutableListOf<Fritatt>()
-
-            while (resultSet.next()) {
-                fritatte.add(resultSet.toFritatt())
-            }
-
-            return fritatte
+            return generateSequence {
+                if (resultSet.next()) {
+                    resultSet.toFritatt()
+                } else {
+                    null
+                }
+            }.toList()
         }
     }
 
