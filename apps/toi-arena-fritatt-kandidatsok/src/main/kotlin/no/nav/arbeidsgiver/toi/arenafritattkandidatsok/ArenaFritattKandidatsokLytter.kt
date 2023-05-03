@@ -63,7 +63,6 @@ class ArenaFritattKandidatsokLytter(
     }
 
     fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage): Fritatt {
-        println("jjjj ${data["SLUTT_DATO"]}")
         val id = data["PERSON_ID"].asInt()
         val fnr = data["FODSELSNR"].asText()
         val melding = originalmelding.toJson()
