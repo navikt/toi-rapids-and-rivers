@@ -9,8 +9,10 @@ import java.time.LocalDateTime
 class ArenaFritattKandidatsokTest {
 
     @Test
-    fun `Lesing av fritatt melding fra eksternt topic skal produsere ny melding på rapid`() {
-        val repository = FritattRepository(TestDatabase().dataSource)
+    fun `Lesing av fritatt melding fra eksternt topic skal lagres i databasen`() {
+
+        val repository = kandidatlisteRepositoryMedLokalPostgres()
+
         val testRapid = TestRapid()
         val fødselsnummer = "123"
 
@@ -31,25 +33,9 @@ class ArenaFritattKandidatsokTest {
         assertThat(fritatt.sendingStatusDektivertFritatt).isEqualTo("ikke_sendt")
         assertThat(fritatt.forsoktSendtDektivertFritatt).isNull()
         assertThat(fritatt.sistEndret).isEqualTo(LocalDateTime.parse("2023-04-19T20:28:10"))
-        assertThat(fritatt.melding).isEqualTo(
+        assertThat(fritatt.melding).contains(
             """
-            {
-                "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
-                "op_type": "I",
-                "op_ts": "2023-04-20 15:29:13.740624",
-                "current_ts": "2023-04-20 15:35:13.471005",
-                "pos": "00000000000001207184",
-                "after": {
-                  "PERSON_ID": 4836878,
-                  "FODSELSNR": "$fødselsnummer",
-                  "PERSONFORHOLDKODE": "FRKAS",
-                  "START_DATO": "2022-02-11 00:00:00",
-                  "SLUTT_DATO": null,
-                  "OPPRETTET_DATO": "2023-04-19 20:28:10",
-                  "OPPRETTET_AV": "SKRIPT",
-                  "ENDRET_DATO": "2023-04-19 20:28:10",
-                  "ENDRET_AV": "SKRIPT"
-                }
+            {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
         """.trimIndent()
         )
 

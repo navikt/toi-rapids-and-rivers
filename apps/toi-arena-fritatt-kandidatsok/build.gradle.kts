@@ -10,4 +10,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
     testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
     testImplementation("com.h2database:h2:2.1.214")
+    testImplementation("org.testcontainers:testcontainers:1.17.5")
+    testImplementation("org.testcontainers:postgresql:1.17.5")
+    testImplementation("org.testcontainers:junit-jupiter:1.17.5")
 }
