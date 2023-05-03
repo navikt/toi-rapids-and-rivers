@@ -31,9 +31,9 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
         StringDeserializer()
     )
     val sisteEvent = mutableMapOf<String, Instant>()
-    val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
-    consument.assign(listOf(topicPartition))
-    consument.seekToBeginning(listOf(topicPartition))
+    val topicPartitions = consument.partitionsFor(envs["KAFKA_RAPID_TOPIC"]).map { TopicPartition(it.topic(), it.partition()) }
+    consument.assign(topicPartitions)
+    consument.seekToBeginning(topicPartitions)
     while (true) {
         val records = consument.poll(Duration.ofMinutes(1))
 
