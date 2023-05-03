@@ -5,6 +5,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class ArenaFritattKandidatsokTest {
 
@@ -27,12 +29,19 @@ class ArenaFritattKandidatsokTest {
 
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
         assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
-        assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2023-02-11")) // Endret SLUTT_DATO til "2023-02-11"
+        assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
         assertThat(fritatt.sendingStatusAktivertFritatt).isEqualTo("ikke_sendt")
         assertThat(fritatt.forsoktSendtAktivertFritatt).isNull()
         assertThat(fritatt.sendingStatusDektivertFritatt).isEqualTo("ikke_sendt")
         assertThat(fritatt.forsoktSendtDektivertFritatt).isNull()
-        assertThat(fritatt.sistEndret).isEqualTo(LocalDateTime.parse("2023-04-19T20:28:10"))
+        assertThat(fritatt.sistEndret).isEqualTo(
+            LocalDateTime.parse(
+                "2023-04-19 20:28:10",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            ).atZone(ZoneId.systemDefault()).withZoneSameInstant(
+                ZoneId.of("Europe/Oslo")
+            )
+        )
         assertThat(fritatt.melding).contains(
             """
             {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"I","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}

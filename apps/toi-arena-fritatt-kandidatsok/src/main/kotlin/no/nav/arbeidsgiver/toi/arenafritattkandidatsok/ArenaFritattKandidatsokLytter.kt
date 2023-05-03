@@ -8,9 +8,10 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import org.slf4j.LoggerFactory
-import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class ArenaFritattKandidatsokLytter(
@@ -75,6 +76,8 @@ class ArenaFritattKandidatsokLytter(
 
         val endretDatoString = data["ENDRET_DATO"].asText()
         val endretDato = LocalDateTime.parse(endretDatoString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            .atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("Europe/Oslo"))
+
 
         return Fritatt(
             id = id,

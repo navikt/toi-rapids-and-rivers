@@ -19,7 +19,5 @@ fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
 }.start()
 
 
-
-
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
