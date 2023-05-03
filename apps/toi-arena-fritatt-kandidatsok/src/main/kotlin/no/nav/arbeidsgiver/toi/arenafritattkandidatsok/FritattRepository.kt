@@ -29,8 +29,6 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
         password = pw
         validate()
     }.let(::HikariDataSource)
-
-
 }
 
 data class Fritatt(
@@ -58,36 +56,17 @@ class FritattRepository(private val dataSource: DataSource) {
             }.executeQuery()
 
             return if (resultSet.next()) {
-                mapResultSetToFritatt(resultSet)
+                resultSet.toFritatt()
             } else {
                 null
             }
         }
     }
 
-    fun mapResultSetToFritatt(resultSet: ResultSet): Fritatt {
-        return Fritatt(
-            id = resultSet.getInt("id"),
-            fnr = resultSet.getString("fnr"),
-            startdato = resultSet.getDate("startdato").toLocalDate(),
-            sluttdato = resultSet.getDate("sluttdato")?.toLocalDate(),
-            sendingStatusAktivertFritatt = resultSet.getString("sendingstatus_aktivert_fritatt"),
-            forsoktSendtAktivertFritatt = resultSet.getTimestamp("forsoktsendt_aktivert_fritatt")?.toInstant()
-                ?.atZone(ZoneId.of("Europe/Oslo")),
-            sendingStatusDektivertFritatt = resultSet.getString("sendingstatus_dektivert_fritatt"),
-            forsoktSendtDektivertFritatt = resultSet.getTimestamp("forsoktsendt_dektivert_fritatt")?.toInstant()
-                ?.atZone(ZoneId.of("Europe/Oslo")),
-            sistEndret = resultSet.getTimestamp("sistendret").toInstant().atOslo(),
-            slettet = resultSet.getBoolean("slettet"),
-            melding = resultSet.getString("melding")
-        )
-    }
-
     fun opprettFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
                 "INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, slettet, melding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
             ).apply {
                 setString(1, fritatt.fnr)
                 setDate(2, Date.valueOf(fritatt.startdato))
@@ -97,25 +76,21 @@ class FritattRepository(private val dataSource: DataSource) {
                     setNull(3, Types.DATE)
                 }
                 setString(4, fritatt.sendingStatusAktivertFritatt)
-                if (fritatt.forsoktSendtAktivertFritatt != null) {
+                fritatt.forsoktSendtAktivertFritatt?.let {
+                    setTimestamp(5, Timestamp(it.toInstant().toEpochMilli()))
+                } ?: setNull(5, Types.TIMESTAMP)
 
-                    setTimestamp(5, Timestamp(fritatt.forsoktSendtAktivertFritatt.toInstant().toEpochMilli()))
-                } else {
-                    setNull(5, Types.TIMESTAMP)
-                }
                 setString(6, fritatt.sendingStatusDektivertFritatt)
-                if (fritatt.forsoktSendtDektivertFritatt != null) {
-                    setTimestamp(7, Timestamp(fritatt.forsoktSendtDektivertFritatt.toInstant().toEpochMilli()))
-                } else {
-                    setNull(7, Types.TIMESTAMP)
-                }
+                fritatt.forsoktSendtDektivertFritatt?.let {
+                    setTimestamp(7, Timestamp(it.toInstant().toEpochMilli()))
+                } ?: setNull(7, Types.TIMESTAMP)
+
                 setTimestamp(8, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
                 setBoolean(9, fritatt.slettet)
                 setString(10, fritatt.melding)
                 executeUpdate()
             }
         }
-
     }
 
     fun oppdaterFritatt(fritatt: Fritatt) {
@@ -130,18 +105,15 @@ class FritattRepository(private val dataSource: DataSource) {
                     setNull(2, Types.DATE)
                 }
                 setString(3, fritatt.sendingStatusAktivertFritatt)
-                if (fritatt.forsoktSendtAktivertFritatt != null) {
+                fritatt.forsoktSendtAktivertFritatt?.let {
+                    setTimestamp(4, Timestamp(it.toInstant().toEpochMilli()))
+                } ?: setNull(4, Types.TIMESTAMP)
 
-                    setTimestamp(4, Timestamp(fritatt.forsoktSendtAktivertFritatt.toInstant().toEpochMilli()))
-                } else {
-                    setNull(4, Types.TIMESTAMP)
-                }
                 setString(5, fritatt.sendingStatusDektivertFritatt)
-                if (fritatt.forsoktSendtDektivertFritatt != null) {
-                    setTimestamp(6, Timestamp(fritatt.forsoktSendtDektivertFritatt.toInstant().toEpochMilli()))
-                } else {
-                    setNull(6, Types.TIMESTAMP)
-                }
+                fritatt.forsoktSendtDektivertFritatt?.let {
+                    setTimestamp(6, Timestamp(it.toInstant().toEpochMilli()))
+                } ?: setNull(6, Types.TIMESTAMP)
+
                 setTimestamp(7, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
                 setBoolean(8, fritatt.slettet)
                 setString(9, fritatt.melding)
@@ -161,23 +133,38 @@ class FritattRepository(private val dataSource: DataSource) {
         }
     }
 
-
     fun hentAlle(): List<Fritatt> {
         dataSource.connection.use { connection ->
             val statement = connection.prepareStatement(
-                "SELECT id, fnr, melding, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, slettet FROM fritatt"
+                "SELECT * FROM fritatt"
             )
             val resultSet = statement.executeQuery()
 
             val fritatte = mutableListOf<Fritatt>()
 
             while (resultSet.next()) {
-                fritatte.add(mapResultSetToFritatt(resultSet))
+                fritatte.add(resultSet.toFritatt())
             }
 
             return fritatte
         }
     }
+
+    private fun ResultSet.toFritatt() = Fritatt(
+        id = getInt("id"),
+        fnr = getString("fnr"),
+        startdato = getDate("startdato").toLocalDate(),
+        sluttdato = getDate("sluttdato")?.toLocalDate(),
+        sendingStatusAktivertFritatt = getString("sendingstatus_aktivert_fritatt"),
+        forsoktSendtAktivertFritatt = getTimestamp("forsoktsendt_aktivert_fritatt")?.toInstant()
+            ?.atZone(ZoneId.of("Europe/Oslo")),
+        sendingStatusDektivertFritatt = getString("sendingstatus_dektivert_fritatt"),
+        forsoktSendtDektivertFritatt = getTimestamp("forsoktsendt_dektivert_fritatt")?.toInstant()
+            ?.atZone(ZoneId.of("Europe/Oslo")),
+        sistEndret = getTimestamp("sistendret").toInstant().atZone(ZoneId.of("Europe/Oslo")),
+        slettet = getBoolean("slettet"),
+        melding = getString("melding")
+    )
 
     fun flywayMigrate(dataSource: DataSource) {
         Flyway.configure()
