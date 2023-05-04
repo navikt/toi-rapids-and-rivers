@@ -1,14 +1,16 @@
-create table fritatt
+CREATE TABLE fritatt
 (
-    id                              serial primary key,
-    fnr                             varchar(11)              not null,
-    startdato                       date                     not null,
-    sluttdato                       date,
-    sendingstatus_aktivert_fritatt  text                     not null,
-    forsoktsendt_aktivert_fritatt   timestamp with time zone,
-    sendingstatus_dektivert_fritatt text                     not null,
-    forsoktsendt_dektivert_fritatt  timestamp with time zone,
-    sistendret                      timestamp with time zone not null,
-    slettet                         boolean                  not null,
-    melding                         text                     not null
+    db_id                    SERIAL PRIMARY KEY,
+    fnr                      VARCHAR(11)              NOT NULL,
+    startdato                DATE                     NOT NULL,
+    sluttdato                DATE,
+    sendingstatus_aktivert   TEXT                     NOT NULL,
+    forsoktsendt_aktivert    TIMESTAMP WITH TIME ZONE,
+    sendingstatus_deaktivert TEXT                     NOT NULL,
+    forsoktsendt_deaktivert  TIMESTAMP WITH TIME ZONE,
+    sistendret_i_arena       TIMESTAMP WITH TIME ZONE NOT NULL,
+    slettet_i_arena          BOOLEAN                  NOT NULL,
+    opprettet_rad            TIMESTAMP WITH TIME ZONE NOT NULL,
+    sist_endret_rad          TIMESTAMP WITH TIME ZONE NOT NULL,
+    melding_fra_arena        TEXT                     NOT NULL
 );

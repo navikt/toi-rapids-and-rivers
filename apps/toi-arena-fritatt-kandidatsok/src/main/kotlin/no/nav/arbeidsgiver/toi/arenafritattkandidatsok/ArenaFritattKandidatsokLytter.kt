@@ -9,6 +9,7 @@ import no.nav.helse.rapids_rivers.River
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class ArenaFritattKandidatsokLytter(
@@ -77,18 +78,23 @@ class ArenaFritattKandidatsokLytter(
         val endretDato = LocalDateTime.parse(endretDatoString, arenaTidsformat)
             .atOsloSameInstant()
 
+        val opprettetRad = ZonedDateTime.now()
+        val sistEndretRad = ZonedDateTime.now()
+
         return Fritatt(
             id = id,
             fnr = fnr,
             startdato = startDato,
             sluttdato = sluttDato,
-            sendingStatusAktivertFritatt = "ikke_sendt",
-            forsoktSendtAktivertFritatt = null,
-            sendingStatusDektivertFritatt = "ikke_sendt",
-            forsoktSendtDektivertFritatt = null,
-            sistEndret = endretDato,
-            slettet = slettet,
-            melding = melding,
+            sendingStatusAktivert = "ikke_sendt",
+            forsoktSendtAktivert = null,
+            sendingStatusDeaktivert = "ikke_sendt",
+            forsoktSendtDeaktivert = null,
+            sistEndretIArena = endretDato,
+            slettetIArena = slettet,
+            opprettetRad = opprettetRad,
+            sistEndretRad = sistEndretRad,
+            meldingFraArena = melding
         )
     }
 

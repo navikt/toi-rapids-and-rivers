@@ -8,7 +8,6 @@ import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.sql.DataSource
 
@@ -36,13 +35,15 @@ data class Fritatt(
     val fnr: String,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
-    val sendingStatusAktivertFritatt: String,
-    val forsoktSendtAktivertFritatt: ZonedDateTime?,
-    val sendingStatusDektivertFritatt: String,
-    val forsoktSendtDektivertFritatt: ZonedDateTime?,
-    val sistEndret: ZonedDateTime,
-    val slettet: Boolean,
-    val melding: String,
+    val sendingStatusAktivert: String,
+    val forsoktSendtAktivert: ZonedDateTime?,
+    val sendingStatusDeaktivert: String,
+    val forsoktSendtDeaktivert: ZonedDateTime?,
+    val sistEndretIArena: ZonedDateTime,
+    val slettetIArena: Boolean,
+    val opprettetRad: ZonedDateTime,
+    val sistEndretRad: ZonedDateTime,
+    val meldingFraArena: String,
 )
 
 class FritattRepository(private val dataSource: DataSource) {
@@ -66,7 +67,10 @@ class FritattRepository(private val dataSource: DataSource) {
     fun opprettFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
-                "INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert_fritatt, forsoktsendt_aktivert_fritatt, sendingstatus_dektivert_fritatt, forsoktsendt_dektivert_fritatt, sistendret, slettet, melding) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                """
+                INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert, forsoktsendt_aktivert, sendingstatus_deaktivert, forsoktsendt_deaktivert, sistendret_i_arena, slettet_i_arena, opprettet_rad, sist_endret_rad, melding_fra_arena)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """.trimIndent()
             ).apply {
                 setString(1, fritatt.fnr)
                 setDate(2, Date.valueOf(fritatt.startdato))
@@ -75,28 +79,35 @@ class FritattRepository(private val dataSource: DataSource) {
                 } else {
                     setNull(3, Types.DATE)
                 }
-                setString(4, fritatt.sendingStatusAktivertFritatt)
-                fritatt.forsoktSendtAktivertFritatt?.let {
+                setString(4, fritatt.sendingStatusAktivert)
+                fritatt.forsoktSendtAktivert?.let {
                     setTimestamp(5, Timestamp(it.toInstant().toEpochMilli()))
                 } ?: setNull(5, Types.TIMESTAMP)
 
-                setString(6, fritatt.sendingStatusDektivertFritatt)
-                fritatt.forsoktSendtDektivertFritatt?.let {
+                setString(6, fritatt.sendingStatusDeaktivert)
+                fritatt.forsoktSendtDeaktivert?.let {
                     setTimestamp(7, Timestamp(it.toInstant().toEpochMilli()))
                 } ?: setNull(7, Types.TIMESTAMP)
 
-                setTimestamp(8, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
-                setBoolean(9, fritatt.slettet)
-                setString(10, fritatt.melding)
+                setTimestamp(8, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
+                setBoolean(9, fritatt.slettetIArena)
+                setTimestamp(10, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
+                setTimestamp(11, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
+                setString(12, fritatt.meldingFraArena)
                 executeUpdate()
             }
         }
     }
 
+
     fun oppdaterFritatt(fritatt: Fritatt) {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
-                "UPDATE fritatt SET startdato = ?, sluttdato = ?, sendingstatus_aktivert_fritatt = ?, forsoktsendt_aktivert_fritatt = ?, sendingstatus_dektivert_fritatt = ?, forsoktsendt_dektivert_fritatt = ?, sistendret = ?, slettet = ?, melding = ? WHERE fnr = ?"
+                """
+                UPDATE fritatt
+                SET startdato = ?, sluttdato = ?, sendingstatus_aktivert = ?, forsoktsendt_aktivert = ?, sendingstatus_deaktivert = ?, forsoktsendt_deaktivert = ?, sistendret_i_arena = ?, slettet_i_arena = ?, opprettet_rad = ?, sist_endret_rad = ?, melding_fra_arena = ?
+                WHERE fnr = ?
+                """.trimIndent()
             ).apply {
                 setDate(1, Date.valueOf(fritatt.startdato))
                 if (fritatt.sluttdato != null) {
@@ -104,22 +115,24 @@ class FritattRepository(private val dataSource: DataSource) {
                 } else {
                     setNull(2, Types.DATE)
                 }
-                setString(3, fritatt.sendingStatusAktivertFritatt)
-                fritatt.forsoktSendtAktivertFritatt?.let {
+                setString(3, fritatt.sendingStatusAktivert)
+                fritatt.forsoktSendtAktivert?.let {
                     setTimestamp(4, Timestamp(it.toInstant().toEpochMilli()))
                 } ?: setNull(4, Types.TIMESTAMP)
 
-                setString(5, fritatt.sendingStatusDektivertFritatt)
-                fritatt.forsoktSendtDektivertFritatt?.let {
+                setString(5, fritatt.sendingStatusDeaktivert)
+                fritatt.forsoktSendtDeaktivert?.let {
                     setTimestamp(6, Timestamp(it.toInstant().toEpochMilli()))
                 } ?: setNull(6, Types.TIMESTAMP)
-
-                setTimestamp(7, Timestamp(fritatt.sistEndret.toInstant().toEpochMilli()))
-                setBoolean(8, fritatt.slettet)
-                setString(9, fritatt.melding)
-                setString(10, fritatt.fnr)
+                setTimestamp(7, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
+                setBoolean(8, fritatt.slettetIArena)
+                setTimestamp(9, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
+                setTimestamp(10, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
+                setString(11, fritatt.meldingFraArena)
+                setString(12, fritatt.fnr)
                 executeUpdate()
             }
+
         }
     }
 
@@ -151,19 +164,19 @@ class FritattRepository(private val dataSource: DataSource) {
     }
 
     private fun ResultSet.toFritatt() = Fritatt(
-        id = getInt("id"),
+        id = getInt("db_id"),
         fnr = getString("fnr"),
         startdato = getDate("startdato").toLocalDate(),
         sluttdato = getDate("sluttdato")?.toLocalDate(),
-        sendingStatusAktivertFritatt = getString("sendingstatus_aktivert_fritatt"),
-        forsoktSendtAktivertFritatt = getTimestamp("forsoktsendt_aktivert_fritatt")?.toInstant()
-            ?.atOslo(),
-        sendingStatusDektivertFritatt = getString("sendingstatus_dektivert_fritatt"),
-        forsoktSendtDektivertFritatt = getTimestamp("forsoktsendt_dektivert_fritatt")?.toInstant()
-            ?.atOslo(),
-        sistEndret = getTimestamp("sistendret").toInstant().atOslo(),
-        slettet = getBoolean("slettet"),
-        melding = getString("melding")
+        sendingStatusAktivert = getString("sendingstatus_aktivert"),
+        forsoktSendtAktivert = getTimestamp("forsoktsendt_aktivert")?.toInstant()?.atOslo(),
+        sendingStatusDeaktivert = getString("sendingstatus_deaktivert"),
+        forsoktSendtDeaktivert = getTimestamp("forsoktsendt_deaktivert")?.toInstant()?.atOslo(),
+        sistEndretIArena = getTimestamp("sistendret_i_arena").toInstant().atOslo(),
+        slettetIArena = getBoolean("slettet_i_arena"),
+        opprettetRad = getTimestamp("opprettet_rad").toInstant().atOslo(),
+        sistEndretRad = getTimestamp("sist_endret_rad").toInstant().atOslo(),
+        meldingFraArena = getString("melding_fra_arena")
     )
 
     fun flywayMigrate(dataSource: DataSource) {
