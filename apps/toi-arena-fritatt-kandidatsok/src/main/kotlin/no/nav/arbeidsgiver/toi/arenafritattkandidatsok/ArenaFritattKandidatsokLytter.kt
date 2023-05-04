@@ -39,7 +39,7 @@ class ArenaFritattKandidatsokLytter(
 
         if (data.isNull) {
             logManglendeData(operasjonstype, fnr)
-            return
+            throw RuntimeException("Mangler data for operasjnstype $operasjonstype, se securelog")
         }
 
         val fritatt = mapJsonNodeToFritatt(data, packet, operasjonstype == "D")
@@ -63,22 +63,13 @@ class ArenaFritattKandidatsokLytter(
     }
 
     private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt {
+        val now = ZonedDateTime.now()
         val id = data["PERSON_ID"].asInt()
         val fnr = data["FODSELSNR"].asText()
-        val melding = originalmelding.toJson()
-
-        val startDatoString = data["START_DATO"].asText()
-        val startDato = LocalDate.parse(startDatoString.substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE)
-
-        val sluttDatoString = if (data["SLUTT_DATO"].isNull) null else data["SLUTT_DATO"].asText()
-        val sluttDato = sluttDatoString?.substring(0, 10)?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }
-
+        val startDato = localIsoDate(data["START_DATO"].asText().substring(0, 10))
+        val sluttDato = data["SLUTT_DATO"].tekstEllerNull()?.let { localIsoDate(it.substring(0, 10)) }
         val endretDatoString = data["ENDRET_DATO"].asText()
-        val endretDato = LocalDateTime.parse(endretDatoString, arenaTidsformat)
-            .atOsloSameInstant()
-
-        val opprettetRad = ZonedDateTime.now()
-        val sistEndretRad = ZonedDateTime.now()
+        val endretDato = LocalDateTime.parse(endretDatoString, arenaTidsformat).atOsloSameInstant()
 
         return Fritatt(
             id = id,
@@ -91,9 +82,9 @@ class ArenaFritattKandidatsokLytter(
             forsoktSendtDeaktivert = null,
             sistEndretIArena = endretDato,
             slettetIArena = slettet,
-            opprettetRad = opprettetRad,
-            sistEndretRad = sistEndretRad,
-            meldingFraArena = melding
+            opprettetRad = now,
+            sistEndretRad = now,
+            meldingFraArena = originalmelding.toJson()
         )
     }
 
@@ -104,4 +95,11 @@ class ArenaFritattKandidatsokLytter(
     private fun operasjonstype(packet: JsonMessage): String? {
         return packet["op_type"].asText()
     }
+
+    private fun localIsoDate(input: String) = LocalDate.parse(input, DateTimeFormatter.ISO_LOCAL_DATE)
+
+
+    private fun JsonNode.tekstEllerNull() = this.takeIf { !it.isNull }?.asText()
+
 }
+
