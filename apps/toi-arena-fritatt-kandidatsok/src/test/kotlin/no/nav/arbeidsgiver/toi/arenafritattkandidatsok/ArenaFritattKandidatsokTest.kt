@@ -204,7 +204,7 @@ class ArenaFritattKandidatsokTest {
         assertThat(fritattNy.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
         assertThat(fritattNy.sendingStatusAktivert).isEqualTo("ikke_sendt")
         assertThat(fritattNy.forsoktSendtAktivert).isNull()
-        assertThat(fritattNy.forsoktSendtDeaktivert).isEqualTo("ikke_sendt")
+        assertThat(fritattNy.sendingStatusDeaktivert).isEqualTo("ikke_sendt")
         assertThat(fritattNy.forsoktSendtDeaktivert).isNull()
         assertThat(fritattNy.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
@@ -300,7 +300,7 @@ class ArenaFritattKandidatsokTest {
                 arenaTidsformat
             ).atOsloSameInstant()
         )
-        assertThat(fritatt.slettetIArena).isFalse
+        assertThat(fritatt.slettetIArena).isTrue
         assertThat(fritatt.opprettetRad).isCloseTo(now, within(1, ChronoUnit.MINUTES))
         assertThat(fritatt.sistEndretRad).isCloseTo(now, within(1, ChronoUnit.MINUTES))
         assertThat(fritatt.meldingFraArena).contains(

@@ -12,11 +12,12 @@ import java.time.ZonedDateTime
 import javax.sql.DataSource
 
 class DatabaseKonfigurasjon(env: Map<String, String>) {
-    private val host = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_DB_HOST"]
-    private val port = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_DB_PORT"]
-    private val database = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_DB_DATABASE"]
-    private val user = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_DB_USERNAME"]
-    private val pw = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_DB_PASSWORD"]
+
+    private val host = env["NAIS_DATABASE_TOI_ARENA_FRITATT_KANDIDATSOK_FRKAS_DB_HOST"]
+    private val port = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_FRKAS_DB_PORT"]
+    private val database = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_FRKAS_DB_DATABASE"]
+    private val user = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_FRKAS_DB_USERNAME"]
+    private val pw = env["NAIS_DATABASE_ARENA_FRITATT_KANDIDATSOK_FRKAS_DB_PASSWORD"]
 
     fun lagDatasource() = HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://$host:$port/$database"

@@ -29,6 +29,13 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_14
+        tier: { { gcp_db_tier } }
+        diskAutoresize: { { gcp_disk_autoresize } }
+        databases:
+          - name: frkas-db
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
