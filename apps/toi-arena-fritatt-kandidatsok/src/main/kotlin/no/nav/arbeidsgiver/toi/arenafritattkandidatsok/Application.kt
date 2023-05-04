@@ -30,7 +30,7 @@ val Any.log: Logger
 fun Instant.atOslo(): ZonedDateTime = this.atZone(ZoneId.of("Europe/Oslo"))
 
 fun LocalDateTime.atOsloSameInstant() = atZone(ZoneId.systemDefault()).withZoneSameInstant(
-        ZoneId.of("Europe/Oslo")
-    )
+    ZoneId.of("Europe/Oslo")
+)
 
 val arenaTidsformat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

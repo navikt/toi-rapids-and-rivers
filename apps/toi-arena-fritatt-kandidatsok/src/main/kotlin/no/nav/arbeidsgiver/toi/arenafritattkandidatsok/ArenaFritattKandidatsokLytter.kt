@@ -1,4 +1,3 @@
-
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.fasterxml.jackson.databind.JsonNode
