@@ -3,13 +3,12 @@ plugins {
 }
 
 dependencies {
-    implementation("org.postgresql:postgresql:42.5.1")
-    implementation("org.flywaydb:flyway-core:9.8.2")
+    implementation("org.postgresql:postgresql:42.6.0")
+    implementation("org.flywaydb:flyway-core:9.17.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("io.javalin:javalin:5.1.3")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
-    testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
-    testImplementation("org.testcontainers:testcontainers:1.17.5")
-    testImplementation("org.testcontainers:postgresql:1.17.5")
-    testImplementation("org.testcontainers:junit-jupiter:1.17.5")
+    implementation("io.javalin:javalin:5.5.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.0")
+    testImplementation("org.testcontainers:testcontainers:1.18.0")
+    testImplementation("org.testcontainers:postgresql:1.18.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.18.0")
 }
