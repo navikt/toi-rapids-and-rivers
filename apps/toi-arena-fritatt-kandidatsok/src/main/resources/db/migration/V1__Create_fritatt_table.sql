@@ -1,7 +1,7 @@
 CREATE TABLE fritatt
 (
     db_id                    SERIAL PRIMARY KEY,
-    fnr                      VARCHAR(11)              NOT NULL,
+    fnr                      VARCHAR(11)              UNIQUE NOT NULL,
     startdato                DATE                     NOT NULL,
     sluttdato                DATE,
     sendingstatus_aktivert   TEXT                     NOT NULL,

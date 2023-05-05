@@ -98,7 +98,6 @@ class ArenaFritattKandidatsokLytter(
 
     private fun localIsoDate(input: String) = LocalDate.parse(input, DateTimeFormatter.ISO_LOCAL_DATE)
 
-
     private fun JsonNode.tekstEllerNull() = this.takeIf { !it.isNull }?.asText()
 
 }
