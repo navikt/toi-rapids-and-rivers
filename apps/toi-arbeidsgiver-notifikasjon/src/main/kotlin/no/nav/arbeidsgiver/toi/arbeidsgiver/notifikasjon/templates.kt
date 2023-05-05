@@ -25,7 +25,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
         <div style='font-size: 1rem; padding: 12px 16px; border-radius: 12px; background-color:#F7F7F7;'>
             <p>
             <ol style='margin-block: 0px; padding-inline-start: 24px;'>
-                <li style='margin-block-end: 0.5rem;'>Åpne <b>arbeidsgiver.nav.no/min-side-arbeidsgiver/</b></li>
+                <li style='margin-block-end: 0.5rem;'>Åpne <b>arbeidsgiver.nav .no/min-side-arbeidsgiver/</b></li>
                 <li style='margin-block-end: 0.5rem;'><b>Logg inn</b></li>
                 <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
             </ol>
@@ -43,7 +43,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
 
     <div style='font-size: 1rem; padding:24px 24px; border-radius: 12px; background-color:#F7F7F7;'>
         <p style='padding-block: 0px; margin-block-end: 0.5rem; margin-block-start: 0px'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
-        <p style='margin-block-end: 0.5rem;'>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden I virksomheten.</p>
+        <p style='margin-block-end: 0.5rem;'>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
         <p style='margin-block-end: 0.5rem;'>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
 
         <h3 style='font-size: 1rem;line-height: 1rem; font-weight:500; margin-block: 40px 32px'>Kopier den gjerne og send den til vedkommende:</h3>
@@ -66,7 +66,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
             <ul>
                 <li>Du er registrert i Enhetsregisteret som daglig leder, styrets leder, bestyrende reder eller innehaver.</li>
                 <li>Du er registert  som hovedadministrator i Altinn.</li>
-                <li>Du er 'Tilgangsstyrer' I Altinn og har én, eller flere av rollene: 'Rekruttering', 'Lønn og personalmedarbeider', eller 'Utfyller/innsender'.</li>
+                <li>Du er 'Tilgangsstyrer' i Altinn og har én, eller flere av rollene: 'Rekruttering', 'Lønn og personalmedarbeider', eller 'Utfyller/innsender'.</li>
             </ul>
         </div>
     </div>
