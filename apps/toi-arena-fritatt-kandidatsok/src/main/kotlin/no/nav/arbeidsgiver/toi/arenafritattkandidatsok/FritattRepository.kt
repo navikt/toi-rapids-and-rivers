@@ -6,7 +6,6 @@ import org.flywaydb.core.Flyway
 import java.sql.Date
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.sql.Types
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.sql.DataSource
@@ -49,47 +48,35 @@ data class Fritatt(
 
 class FritattRepository(private val dataSource: DataSource) {
 
-    fun upsertFritatt(fritatt: Fritatt) {
-        dataSource.connection.use { connection ->
-            connection.prepareStatement(
-                """
+    fun upsertFritatt(fritatt: Fritatt) = dataSource.connection.use { connection ->
+        connection.prepareStatement(
+            """
         INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert, forsoktsendt_aktivert, sendingstatus_deaktivert, forsoktsendt_deaktivert, sistendret_i_arena, slettet_i_arena, opprettet_rad, sist_endret_rad, melding_fra_arena)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (fnr) 
         DO UPDATE SET startdato = excluded.startdato, sluttdato = excluded.sluttdato, sendingstatus_aktivert = excluded.sendingstatus_aktivert, forsoktsendt_aktivert = excluded.forsoktsendt_aktivert, sendingstatus_deaktivert = excluded.sendingstatus_deaktivert, forsoktsendt_deaktivert = excluded.forsoktsendt_deaktivert, sistendret_i_arena = excluded.sistendret_i_arena, slettet_i_arena = excluded.slettet_i_arena, opprettet_rad = excluded.opprettet_rad, sist_endret_rad = excluded.sist_endret_rad, melding_fra_arena = excluded.melding_fra_arena
         """.trimIndent()
-            ).apply {
-                setString(1, fritatt.fnr)
-                setDate(2, Date.valueOf(fritatt.startdato))
-                setDate(3, fritatt.sluttdato?.let { Date.valueOf(it) })
-                setString(4, fritatt.sendingStatusAktivert)
-                setTimestamp(5, fritatt.forsoktSendtAktivert?.let { Timestamp(it.toInstant().toEpochMilli()) })
-                setString(6, fritatt.sendingStatusDeaktivert)
-                setTimestamp(7, fritatt.forsoktSendtDeaktivert?.let { Timestamp(it.toInstant().toEpochMilli()) })
-                setTimestamp(8, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
-                setBoolean(9, fritatt.slettetIArena)
-                setTimestamp(10, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
-                setTimestamp(11, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
-                setString(12, fritatt.meldingFraArena)
-                executeUpdate()
-            }
+        ).apply {
+            setString(1, fritatt.fnr)
+            setDate(2, Date.valueOf(fritatt.startdato))
+            setDate(3, fritatt.sluttdato?.let { Date.valueOf(it) })
+            setString(4, fritatt.sendingStatusAktivert)
+            setTimestamp(5, fritatt.forsoktSendtAktivert?.let { Timestamp(it.toInstant().toEpochMilli()) })
+            setString(6, fritatt.sendingStatusDeaktivert)
+            setTimestamp(7, fritatt.forsoktSendtDeaktivert?.let { Timestamp(it.toInstant().toEpochMilli()) })
+            setTimestamp(8, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
+            setBoolean(9, fritatt.slettetIArena)
+            setTimestamp(10, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
+            setTimestamp(11, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
+            setString(12, fritatt.meldingFraArena)
+            executeUpdate()
         }
     }
 
-    fun hentAlle(): List<Fritatt> {
-        dataSource.connection.use { connection ->
-            val statement = connection.prepareStatement(
-                "SELECT * FROM fritatt"
-            )
-            val resultSet = statement.executeQuery()
 
-            return generateSequence {
-                if (resultSet.next()) {
-                    resultSet.toFritatt()
-                } else {
-                    null
-                }
-            }.toList()
+    fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
+        connection.prepareStatement("SELECT * FROM fritatt").executeQuery().let { resultSet ->
+            generateSequence { if (resultSet.next()) resultSet.toFritatt() else null }.toList()
         }
     }
 
@@ -110,9 +97,6 @@ class FritattRepository(private val dataSource: DataSource) {
     )
 
     fun flywayMigrate(dataSource: DataSource) {
-        Flyway.configure()
-            .dataSource(dataSource)
-            .load()
-            .migrate()
+        Flyway.configure().dataSource(dataSource).load().migrate()
     }
 }
