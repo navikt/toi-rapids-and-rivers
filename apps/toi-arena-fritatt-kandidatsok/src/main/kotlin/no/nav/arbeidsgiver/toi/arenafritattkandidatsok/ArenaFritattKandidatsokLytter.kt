@@ -62,39 +62,27 @@ class ArenaFritattKandidatsokLytter(
         log.error("Operasjon $operasjonstype mangler data")
     }
 
-    private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt {
-        val now = ZonedDateTime.now()
-        val id = data["PERSON_ID"].asInt()
-        val fnr = data["FODSELSNR"].asText()
-        val startDato = localIsoDate(data["START_DATO"].asText().substring(0, 10))
-        val sluttDato = data["SLUTT_DATO"].tekstEllerNull()?.let { localIsoDate(it.substring(0, 10)) }
-        val endretDatoString = data["ENDRET_DATO"].asText()
-        val endretDato = LocalDateTime.parse(endretDatoString, arenaTidsformat).atOsloSameInstant()
-
-        return Fritatt(
-            id = id,
-            fnr = fnr,
-            startdato = startDato,
-            sluttdato = sluttDato,
+    private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt =
+        Fritatt(
+            id = data["PERSON_ID"].asInt(),
+            fnr = data["FODSELSNR"].asText(),
+            startdato = localIsoDate(data["START_DATO"].asText().substring(0, 10)),
+            sluttdato = data["SLUTT_DATO"].tekstEllerNull()?.let { localIsoDate(it.substring(0, 10)) },
             sendingStatusAktivert = "ikke_sendt",
             forsoktSendtAktivert = null,
             sendingStatusDeaktivert = "ikke_sendt",
             forsoktSendtDeaktivert = null,
-            sistEndretIArena = endretDato,
+            sistEndretIArena = LocalDateTime.parse(data["ENDRET_DATO"].asText(), arenaTidsformat).atOsloSameInstant(),
             slettetIArena = slettet,
-            opprettetRad = now,
-            sistEndretRad = now,
+            opprettetRad = ZonedDateTime.now(),
+            sistEndretRad = ZonedDateTime.now(),
             meldingFraArena = originalmelding.toJson()
         )
-    }
 
-    private fun fnr(packet: JsonMessage): String? {
-        return packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
-    }
+    private fun fnr(packet: JsonMessage): String? =
+        packet["after"]["FODSELSNR"]?.asText() ?: packet["before"]["FODSELSNR"]?.asText()
 
-    private fun operasjonstype(packet: JsonMessage): String? {
-        return packet["op_type"].asText()
-    }
+    private fun operasjonstype(packet: JsonMessage): String? = packet["op_type"].asText()
 
     private fun localIsoDate(input: String) = LocalDate.parse(input, DateTimeFormatter.ISO_LOCAL_DATE)
 
