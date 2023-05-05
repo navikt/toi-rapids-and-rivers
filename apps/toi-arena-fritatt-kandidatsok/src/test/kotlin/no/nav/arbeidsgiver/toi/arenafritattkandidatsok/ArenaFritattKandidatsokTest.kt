@@ -307,19 +307,10 @@ class ArenaFritattKandidatsokTest {
 
     @Test
     fun `Lesing av fritatt melding som mangler before og after gir feilmelding`() {
-
-        val testRapid = TestRapid()
-        val fødselsnummer = "123"
-
-        ArenaFritattKandidatsokLytter(testRapid, repository)
-
-        testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
-
-        val fritattListe = hentAlle()
-        assertThat(fritattListe).hasSize(1)
-        val fritatt = fritattListe.first()
-
-        assertThat(fritatt.sluttdato).isNull()
+        TestRapid().apply {
+            ArenaFritattKandidatsokLytter(this, repository)
+            sendTestMessage(meldingMedMangledeBeforeAfterFraEksterntTopic())
+        }
     }
 
 
@@ -375,7 +366,7 @@ class ArenaFritattKandidatsokTest {
           }
     """.trimIndent()
 
-    private fun manglendeMeldingFraEksterntTopic() =
+    private fun meldingMedMangledeBeforeAfterFraEksterntTopic() =
         """
          {
             "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",

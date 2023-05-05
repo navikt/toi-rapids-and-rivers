@@ -1,10 +1,7 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -37,7 +34,7 @@ class ArenaFritattKandidatsokLytter(
 
         val data = if (operasjonstype == "D") packet["before"] else packet["after"]
 
-        if (data.isNull) {
+        if (data.isMissingOrNull()) {
             logManglendeData(operasjonstype, fnr)
             throw RuntimeException("Mangler data for operasjnstype $operasjonstype, se securelog")
         }
