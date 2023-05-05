@@ -73,29 +73,6 @@ class FritattRepository(private val dataSource: DataSource) {
         }
     }
 
-
-    fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
-        connection.prepareStatement("SELECT * FROM fritatt").executeQuery().let { resultSet ->
-            generateSequence { if (resultSet.next()) resultSet.toFritatt() else null }.toList()
-        }
-    }
-
-    private fun ResultSet.toFritatt() = Fritatt(
-        id = getInt("db_id"),
-        fnr = getString("fnr"),
-        startdato = getDate("startdato").toLocalDate(),
-        sluttdato = getDate("sluttdato")?.toLocalDate(),
-        sendingStatusAktivert = getString("sendingstatus_aktivert"),
-        forsoktSendtAktivert = getTimestamp("forsoktsendt_aktivert")?.toInstant()?.atOslo(),
-        sendingStatusDeaktivert = getString("sendingstatus_deaktivert"),
-        forsoktSendtDeaktivert = getTimestamp("forsoktsendt_deaktivert")?.toInstant()?.atOslo(),
-        sistEndretIArena = getTimestamp("sistendret_i_arena").toInstant().atOslo(),
-        slettetIArena = getBoolean("slettet_i_arena"),
-        opprettetRad = getTimestamp("opprettet_rad").toInstant().atOslo(),
-        sistEndretRad = getTimestamp("sist_endret_rad").toInstant().atOslo(),
-        meldingFraArena = getString("melding_fra_arena")
-    )
-
     fun flywayMigrate(dataSource: DataSource) {
         Flyway.configure().dataSource(dataSource).load().migrate()
     }

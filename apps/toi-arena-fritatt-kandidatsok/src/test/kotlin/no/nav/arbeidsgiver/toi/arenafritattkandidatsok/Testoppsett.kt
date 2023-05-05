@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
+import java.sql.ResultSet
 
 
 val lokalPostgres: PostgreSQLContainer<*>
@@ -43,6 +44,30 @@ fun slettAllDataIDatabase() {
     connection.use {
         it.prepareStatement("delete from fritatt").execute()
     }
+}
+
+fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
+    fun ResultSet.toFritatt() = Fritatt(
+        id = getInt("db_id"),
+        fnr = getString("fnr"),
+        startdato = getDate("startdato").toLocalDate(),
+        sluttdato = getDate("sluttdato")?.toLocalDate(),
+        sendingStatusAktivert = getString("sendingstatus_aktivert"),
+        forsoktSendtAktivert = getTimestamp("forsoktsendt_aktivert")?.toInstant()?.atOslo(),
+        sendingStatusDeaktivert = getString("sendingstatus_deaktivert"),
+        forsoktSendtDeaktivert = getTimestamp("forsoktsendt_deaktivert")?.toInstant()?.atOslo(),
+        sistEndretIArena = getTimestamp("sistendret_i_arena").toInstant().atOslo(),
+        slettetIArena = getBoolean("slettet_i_arena"),
+        opprettetRad = getTimestamp("opprettet_rad").toInstant().atOslo(),
+        sistEndretRad = getTimestamp("sist_endret_rad").toInstant().atOslo(),
+        meldingFraArena = getString("melding_fra_arena")
+    )
+
+    connection.prepareStatement("SELECT * FROM fritatt").executeQuery().let { resultSet ->
+        generateSequence { if (resultSet.next()) resultSet.toFritatt() else null }.toList()
+    }
+
+
 }
 
 

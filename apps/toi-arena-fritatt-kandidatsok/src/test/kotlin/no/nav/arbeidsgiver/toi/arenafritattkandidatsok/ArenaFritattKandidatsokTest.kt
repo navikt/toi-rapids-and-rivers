@@ -42,7 +42,7 @@ class ArenaFritattKandidatsokTest {
 
         Thread.sleep(300)
 
-        val fritattListe = repository.hentAlle()
+        val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -81,7 +81,7 @@ class ArenaFritattKandidatsokTest {
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
         Thread.sleep(300)
 
-        val fritattListe = repository.hentAlle()
+        val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -101,7 +101,7 @@ class ArenaFritattKandidatsokTest {
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer = fødselsnummer))
         Thread.sleep(300)
 
-        val fritattListe = repository.hentAlle()
+        val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -129,7 +129,7 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
         Thread.sleep(300)
-        val fritattListeNy = repository.hentAlle()
+        val fritattListeNy = hentAlle()
         assertThat(fritattListeNy).hasSize(1)
         val fritattNy = fritattListeNy.first()
         assertThat(fritattNy.fnr).isEqualTo(fødselsnummer)
@@ -173,7 +173,7 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer2))
         Thread.sleep(3600)
-        val fritattListe = repository.hentAlle()
+        val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(2)
         val fritatt = fritattListe[0]
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer1)
@@ -236,7 +236,7 @@ class ArenaFritattKandidatsokTest {
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
         Thread.sleep(300)
 
-        val fritattListe = repository.hentAlle()
+        val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -283,7 +283,7 @@ class ArenaFritattKandidatsokTest {
         )
         Thread.sleep(300)
 
-        val fritattListe = repository.hentAlle()
+        val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 

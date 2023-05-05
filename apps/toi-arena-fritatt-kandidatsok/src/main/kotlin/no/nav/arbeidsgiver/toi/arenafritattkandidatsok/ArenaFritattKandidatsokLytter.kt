@@ -62,7 +62,7 @@ class ArenaFritattKandidatsokLytter(
         log.error("Operasjon $operasjonstype mangler data")
     }
 
-    private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean): Fritatt =
+    private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, slettet: Boolean) =
         Fritatt(
             id = data["PERSON_ID"].asInt(),
             fnr = data["FODSELSNR"].asText(),
