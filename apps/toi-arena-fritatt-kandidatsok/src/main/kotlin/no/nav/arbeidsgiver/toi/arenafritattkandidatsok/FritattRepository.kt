@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import java.sql.Date
-import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -35,9 +34,9 @@ data class Fritatt(
     val fnr: String,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
-    val sendingStatusAktivert: String,
+    val sendingAktivertStatus: String,
     val forsoktSendtAktivert: ZonedDateTime?,
-    val sendingStatusDeaktivert: String,
+    val sendingDeaktivertStatus: String,
     val forsoktSendtDeaktivert: ZonedDateTime?,
     val sistEndretIArena: ZonedDateTime,
     val slettetIArena: Boolean,
@@ -51,18 +50,18 @@ class FritattRepository(private val dataSource: DataSource) {
     fun upsertFritatt(fritatt: Fritatt) = dataSource.connection.use { connection ->
         connection.prepareStatement(
             """
-        INSERT INTO fritatt (fnr, startdato, sluttdato, sendingstatus_aktivert, forsoktsendt_aktivert, sendingstatus_deaktivert, forsoktsendt_deaktivert, sistendret_i_arena, slettet_i_arena, opprettet_rad, sist_endret_rad, melding_fra_arena)
+        INSERT INTO fritatt (fnr, startdato, sluttdato, sending_aktivert_status, forsoktsendt_aktivert, sending_deaktivert_status, forsoktsendt_deaktivert, sistendret_i_arena, slettet_i_arena, opprettet_rad, sist_endret_rad, melding_fra_arena)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (fnr) 
-        DO UPDATE SET startdato = excluded.startdato, sluttdato = excluded.sluttdato, sendingstatus_aktivert = excluded.sendingstatus_aktivert, forsoktsendt_aktivert = excluded.forsoktsendt_aktivert, sendingstatus_deaktivert = excluded.sendingstatus_deaktivert, forsoktsendt_deaktivert = excluded.forsoktsendt_deaktivert, sistendret_i_arena = excluded.sistendret_i_arena, slettet_i_arena = excluded.slettet_i_arena, opprettet_rad = excluded.opprettet_rad, sist_endret_rad = excluded.sist_endret_rad, melding_fra_arena = excluded.melding_fra_arena
+        DO UPDATE SET startdato = excluded.startdato, sluttdato = excluded.sluttdato, sending_aktivert_status = excluded.sending_aktivert_status, forsoktsendt_aktivert = excluded.forsoktsendt_aktivert, sending_deaktivert_status = excluded.sending_deaktivert_status, forsoktsendt_deaktivert = excluded.forsoktsendt_deaktivert, sistendret_i_arena = excluded.sistendret_i_arena, slettet_i_arena = excluded.slettet_i_arena, opprettet_rad = excluded.opprettet_rad, sist_endret_rad = excluded.sist_endret_rad, melding_fra_arena = excluded.melding_fra_arena
         """.trimIndent()
         ).apply {
             setString(1, fritatt.fnr)
             setDate(2, Date.valueOf(fritatt.startdato))
             setDate(3, fritatt.sluttdato?.let { Date.valueOf(it) })
-            setString(4, fritatt.sendingStatusAktivert)
+            setString(4, fritatt.sendingAktivertStatus)
             setTimestamp(5, fritatt.forsoktSendtAktivert?.let { Timestamp(it.toInstant().toEpochMilli()) })
-            setString(6, fritatt.sendingStatusDeaktivert)
+            setString(6, fritatt.sendingDeaktivertStatus)
             setTimestamp(7, fritatt.forsoktSendtDeaktivert?.let { Timestamp(it.toInstant().toEpochMilli()) })
             setTimestamp(8, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
             setBoolean(9, fritatt.slettetIArena)
