@@ -79,7 +79,6 @@ class ArenaFritattKandidatsokTest {
         ArenaFritattKandidatsokLytter(testRapid, repository)
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
-        Thread.sleep(300)
 
         val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
@@ -99,7 +98,6 @@ class ArenaFritattKandidatsokTest {
         ArenaFritattKandidatsokLytter(testRapid, repository)
 
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer = fødselsnummer))
-        Thread.sleep(300)
 
         val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
@@ -128,7 +126,6 @@ class ArenaFritattKandidatsokTest {
         )
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
-        Thread.sleep(300)
         val fritattListeNy = hentAlle()
         assertThat(fritattListeNy).hasSize(1)
         val fritattNy = fritattListeNy.first()
@@ -172,7 +169,6 @@ class ArenaFritattKandidatsokTest {
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer1))
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer2))
-        Thread.sleep(3600)
         val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(2)
         val fritatt = fritattListe[0]
@@ -234,7 +230,6 @@ class ArenaFritattKandidatsokTest {
         ArenaFritattKandidatsokLytter(testRapid, repository)
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
-        Thread.sleep(300)
 
         val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
@@ -281,7 +276,6 @@ class ArenaFritattKandidatsokTest {
                 beforeEllerAfter = "before"
             )
         )
-        Thread.sleep(300)
 
         val fritattListe = hentAlle()
         assertThat(fritattListe).hasSize(1)
@@ -309,6 +303,23 @@ class ArenaFritattKandidatsokTest {
         """.trimIndent()
         )
 
+    }
+
+    @Test
+    fun `Lesing av fritatt melding som mangler before og after gir feilmelding`() {
+
+        val testRapid = TestRapid()
+        val fødselsnummer = "123"
+
+        ArenaFritattKandidatsokLytter(testRapid, repository)
+
+        testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
+
+        val fritattListe = hentAlle()
+        assertThat(fritattListe).hasSize(1)
+        val fritatt = fritattListe.first()
+
+        assertThat(fritatt.sluttdato).isNull()
     }
 
 
@@ -361,6 +372,17 @@ class ArenaFritattKandidatsokTest {
               "ENDRET_DATO": "2021-04-19 20:28:10",
               "ENDRET_AV": "SKRIPT"
             }
+          }
+    """.trimIndent()
+
+    private fun manglendeMeldingFraEksterntTopic() =
+        """
+         {
+            "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
+            "op_type": "I",
+            "op_ts": "2023-04-20 15:29:13.740624",
+            "current_ts": "2023-04-20 15:35:13.471005",
+            "pos": "00000000000001207184",
           }
     """.trimIndent()
 }
