@@ -122,13 +122,13 @@ class ArenaFritattKandidatsokTest {
         """.trimIndent()
         )
 
-        testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
+        testRapid.sendTestMessage(oppdateringsmelding(fødselsnummer = fødselsnummer))
         val fritattListeNy = hentAlle()
         assertThat(fritattListeNy).hasSize(1)
         val fritattNy = fritattListeNy.first()
         assertThat(fritattNy.fnr).isEqualTo(fødselsnummer)
-        assertThat(fritattNy.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
-        assertThat(fritattNy.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
+        assertThat(fritattNy.startdato).isEqualTo(LocalDate.parse("2023-04-04"))
+        assertThat(fritattNy.sluttdato).isEqualTo(LocalDate.parse("2023-05-07"))
         assertThat(fritattNy.sendingAktivertStatus).isEqualTo("ikke_sendt")
         assertThat(fritattNy.forsoktSendtAktivert).isNull()
         assertThat(fritattNy.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
@@ -136,7 +136,7 @@ class ArenaFritattKandidatsokTest {
 
         assertThat(fritattNy.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
-                "2023-04-19 20:28:10",
+                "2023-05-03 07:49:24",
                 arenaTidsformat
             ).atOsloSameInstant()
         )
@@ -145,12 +145,10 @@ class ArenaFritattKandidatsokTest {
         assertThat(fritattNy.sistEndretRad).isCloseTo(now, within(1, ChronoUnit.MINUTES))
         assertThat(fritattNy.meldingFraArena).contains(
             """
-            {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"U","op_ts":"2023-04-20 15:29:13.740624","current_ts":"2023-04-20 15:35:13.471005","pos":"00000000000001207184","after":{"PERSON_ID":4836878,"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2022-02-11 00:00:00","SLUTT_DATO":"2023-02-11 00:00:00","OPPRETTET_DATO":"2023-04-19 20:28:10","OPPRETTET_AV":"SKRIPT","ENDRET_DATO":"2023-04-19 20:28:10","ENDRET_AV":"SKRIPT"}
+            {"table":"ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK","op_type":"U","op_ts":"2023-05-03 07:49:26.000000","current_ts":"2023-05-03 07:49:30.480000","pos":"00000001900005332345","before":{"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2023-04-04 00:00:00","SLUTT_DATO":"2099-12-31 00:00:00","ENDRET_DATO":"2023-04-26 23:51:56","ENDRET_AV":"SKRIPT"},"after":{"FODSELSNR":"123","PERSONFORHOLDKODE":"FRKAS","START_DATO":"2023-04-04 00:00:00","SLUTT_DATO":"2023-05-07 00:00:00","ENDRET_DATO":"2023-05-03 07:49:24","ENDRET_AV":"SH4407"}
         """.trimIndent()
         )
-
     }
-
 
     @Test
     fun `To meldinger med ulikt fnr skal gi to innslag`() {
@@ -306,8 +304,8 @@ class ArenaFritattKandidatsokTest {
     fun `Lesing av fritatt melding som mangler before og after gir feilmelding`() {
         TestRapid().apply {
             ArenaFritattKandidatsokLytter(this, repository)
-            assertThrows<Exception>{ sendTestMessage(meldingMedMangledeBeforeAfterFraEksterntTopic()) }
-            assertThrows<Exception>{ sendTestMessage(meldingMedBeforeSattTiNullFraEksterntTopic()) }
+            assertThrows<Exception> { sendTestMessage(meldingMedMangledeBeforeAfterFraEksterntTopic()) }
+            assertThrows<Exception> { sendTestMessage(meldingMedBeforeSattTiNullFraEksterntTopic()) }
         }
     }
 
@@ -315,8 +313,8 @@ class ArenaFritattKandidatsokTest {
     fun `Lesing av fritatt melding som mangler fnr gir feilmelding`() {
         TestRapid().apply {
             ArenaFritattKandidatsokLytter(this, repository)
-            assertThrows<Exception>{ sendTestMessage(meldingMedManglendeFnrFraEksterntTopic()) }
-            assertThrows<Exception>{ sendTestMessage(meldingMedFnrSattTilNullFraEksterntTopic()) }
+            assertThrows<Exception> { sendTestMessage(meldingMedManglendeFnrFraEksterntTopic()) }
+            assertThrows<Exception> { sendTestMessage(meldingMedFnrSattTilNullFraEksterntTopic()) }
         }
     }
 
@@ -324,8 +322,8 @@ class ArenaFritattKandidatsokTest {
     fun `Lesing av fritatt melding som mangler optype gir feilmelding`() {
         TestRapid().apply {
             ArenaFritattKandidatsokLytter(this, repository)
-            assertThrows<Exception>{ sendTestMessage(meldingMedManglendeOpTypeFraEksterntTopic("123")) }
-            assertThrows<Exception>{ sendTestMessage(meldingOpTypeSattTilNullFraEksterntTopic("123")) }
+            assertThrows<Exception> { sendTestMessage(meldingMedManglendeOpTypeFraEksterntTopic("123")) }
+            assertThrows<Exception> { sendTestMessage(meldingOpTypeSattTilNullFraEksterntTopic("123")) }
         }
     }
 
@@ -495,3 +493,45 @@ class ArenaFritattKandidatsokTest {
           }
     """.trimIndent()
 }
+
+private fun oppdateringsmelding(
+    fødselsnummer: String,
+) =
+    """
+        {
+            "table": "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK",
+            "op_type": "U",
+            "op_ts": "2023-05-03 07:49:26.000000",
+            "current_ts": "2023-05-03 07:49:30.480000",
+            "pos": "00000001900005332345",
+            "before": {
+                "FODSELSNR": "${fødselsnummer}",
+                "PERSONFORHOLDKODE": "FRKAS",
+                "START_DATO": "2023-04-04 00:00:00",
+                "SLUTT_DATO": "2099-12-31 00:00:00",
+                "ENDRET_DATO": "2023-04-26 23:51:56",
+                "ENDRET_AV": "SKRIPT"
+            },
+            "after": {
+                "FODSELSNR": "${fødselsnummer}",
+                "PERSONFORHOLDKODE": "FRKAS",
+                "START_DATO": "2023-04-04 00:00:00",
+                "SLUTT_DATO": "2023-05-07 00:00:00",
+                "ENDRET_DATO": "2023-05-03 07:49:24",
+                "ENDRET_AV": "SH4407"
+            },
+            "@id": "ff77a5e5-8d6f-4d38-b5e9-0d869159a18a",
+            "@opprettet": "2023-05-08T15:46:55.941370852",
+            "system_read_count": 0,
+            "system_participating_services": [
+            {
+                "id": "ff77a5e5-8d6f-4d38-b5e9-0d869159a18a",
+                "time": "2023-05-08T15:46:55.941370852",
+                "service": "toi-arena-fritatt-kandidatsok",
+                "instance": "toi-arena-fritatt-kandidatsok-6644f7f7-4c7sf",
+                "image": "ghcr.io/navikt/toi-rapids-and-rivers/toi-arena-fritatt-kandidatsok:a831b8cef2a2fe987bd74a1d6b8215f04d7f6ff2"
+            }
+            ]
+        }
+""".trimIndent()
+

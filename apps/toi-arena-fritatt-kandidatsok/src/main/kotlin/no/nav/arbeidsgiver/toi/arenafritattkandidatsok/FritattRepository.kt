@@ -30,7 +30,7 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
 }
 
 data class Fritatt(
-    val id: Int,
+    val id: Int?,
     val fnr: String,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
