@@ -93,5 +93,5 @@ spec:
       application: toi-arbeidsgiver-notifikasjon
       access: readwrite
     - team: toi
-      application: toi-kafkamanager
+      application: toi-arena-fritatt-kandidatsok
       access: readwrite
