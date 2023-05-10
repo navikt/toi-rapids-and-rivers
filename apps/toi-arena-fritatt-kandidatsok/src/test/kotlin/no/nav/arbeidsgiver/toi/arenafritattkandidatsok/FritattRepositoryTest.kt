@@ -136,6 +136,7 @@ class FritattRepositoryTest {
         hentAlle().apply {
             assertThat(this).isEmpty()
         }
-    }
 
+        opprettStatusTabell()
+    }
 }

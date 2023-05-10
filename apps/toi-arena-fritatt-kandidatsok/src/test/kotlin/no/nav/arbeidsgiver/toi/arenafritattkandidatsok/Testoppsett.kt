@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import java.sql.ResultSet
@@ -50,6 +51,15 @@ fun slettStatusTabell() {
     }
 }
 
+fun opprettStatusTabell() = droppTabellOgKjørFlywayPåNytt()
+
+private fun droppTabellOgKjørFlywayPåNytt() {
+    FritattRepository(dataSource).apply {
+        val flyway = Flyway.configure().dataSource(dataSource).cleanDisabled(false).load()
+        flyway.clean()
+        flyway.migrate()
+    }
+}
 
 fun slettAllDataIDatabase() {
     val connection = dataSource.connection
