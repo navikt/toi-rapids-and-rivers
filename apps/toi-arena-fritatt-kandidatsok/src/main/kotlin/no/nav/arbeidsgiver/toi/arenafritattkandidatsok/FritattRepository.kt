@@ -38,44 +38,90 @@ class Fritatt private constructor(
     val slettetIArena: Boolean,
     val meldingFraArena: String,
     val opprettetRad: ZonedDateTime,
-    val sistEndretRad: ZonedDateTime
+    val sistEndretRad: ZonedDateTime,
 ) {
     companion object {
-        fun ny(fnr: String, startdato: LocalDate, sluttdato: LocalDate?, sistEndretIArena: ZonedDateTime, slettetIArena: Boolean, meldingFraArena: String) = Fritatt(null, fnr,startdato, sluttdato, sistEndretIArena, slettetIArena, meldingFraArena,ZonedDateTime.now(),ZonedDateTime.now())
-        fun fraDatabase(id: Int, fnr: String, startdato: LocalDate, sluttdato: LocalDate?, sistEndretIArena: ZonedDateTime, slettetIArena: Boolean, meldingFraArena: String, opprettetRad: ZonedDateTime, sistEndretRad: ZonedDateTime) = Fritatt(id, fnr, startdato, sluttdato, sistEndretIArena, slettetIArena, meldingFraArena, opprettetRad, sistEndretRad)
+        fun ny(
+            fnr: String,
+            startdato: LocalDate,
+            sluttdato: LocalDate?,
+            sistEndretIArena: ZonedDateTime,
+            slettetIArena: Boolean,
+            meldingFraArena: String,
+        ) = Fritatt(
+            null,
+            fnr,
+            startdato,
+            sluttdato,
+            sistEndretIArena,
+            slettetIArena,
+            meldingFraArena,
+            ZonedDateTime.now(),
+            ZonedDateTime.now()
+        )
+
+        fun fraDatabase(
+            id: Int,
+            fnr: String,
+            startdato: LocalDate,
+            sluttdato: LocalDate?,
+            sistEndretIArena: ZonedDateTime,
+            slettetIArena: Boolean,
+            meldingFraArena: String,
+            opprettetRad: ZonedDateTime,
+            sistEndretRad: ZonedDateTime,
+        ) = Fritatt(
+            id,
+            fnr,
+            startdato,
+            sluttdato,
+            sistEndretIArena,
+            slettetIArena,
+            meldingFraArena,
+            opprettetRad,
+            sistEndretRad
+        )
     }
 }
 
 class FritattRepository(private val dataSource: DataSource) {
 
     fun upsertFritatt(fritatt: Fritatt) = dataSource.connection.use { connection ->
-        connection.prepareStatement(
-            """
+
+        connection.autoCommit = false
+        try {
+            connection.prepareStatement(
+                """
         INSERT INTO fritatt (fnr, startdato, sluttdato, sistendret_i_arena, slettet_i_arena, opprettet_rad, sist_endret_rad, melding_fra_arena)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (fnr) 
         DO UPDATE SET startdato = excluded.startdato, sluttdato = excluded.sluttdato, sistendret_i_arena = excluded.sistendret_i_arena, slettet_i_arena = excluded.slettet_i_arena, sist_endret_rad = excluded.sist_endret_rad, melding_fra_arena = excluded.melding_fra_arena
         """.trimIndent()
-        ).apply {
-            setString(1, fritatt.fnr)
-            setDate(2, Date.valueOf(fritatt.startdato))
-            setDate(3, fritatt.sluttdato?.let { Date.valueOf(it) })
-            setTimestamp(4, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
-            setBoolean(5, fritatt.slettetIArena)
-            setTimestamp(6, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
-            setTimestamp(7, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
-            setString(8, fritatt.meldingFraArena)
-            executeUpdate()
-        }
-        connection.prepareStatement(
-            """
+            ).apply {
+                setString(1, fritatt.fnr)
+                setDate(2, Date.valueOf(fritatt.startdato))
+                setDate(3, fritatt.sluttdato?.let { Date.valueOf(it) })
+                setTimestamp(4, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
+                setBoolean(5, fritatt.slettetIArena)
+                setTimestamp(6, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
+                setTimestamp(7, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
+                setString(8, fritatt.meldingFraArena)
+                executeUpdate()
+            }
+            connection.prepareStatement(
+                """
         DELETE FROM sendingstatus
         WHERE fnr = ?
         """.trimIndent()
-        ).apply {
-            setString(1, fritatt.fnr)
-            executeUpdate()
+            ).apply {
+                setString(1, fritatt.fnr)
+                executeUpdate()
+            }
+        } catch (e: Exception) {
+            connection.rollback()
+            throw e
         }
+        connection.commit()
     }
 
     fun flywayMigrate(dataSource: DataSource) {
