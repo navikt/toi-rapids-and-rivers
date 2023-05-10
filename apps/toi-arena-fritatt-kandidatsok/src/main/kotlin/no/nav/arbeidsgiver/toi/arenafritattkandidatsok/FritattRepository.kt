@@ -30,15 +30,15 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
 }
 
 data class Fritatt(
-    val id: Int?,
     val fnr: String,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
     val sistEndretIArena: ZonedDateTime,
     val slettetIArena: Boolean,
-    val opprettetRad: ZonedDateTime,
-    val sistEndretRad: ZonedDateTime,
     val meldingFraArena: String,
+    val opprettetRad: ZonedDateTime = ZonedDateTime.now(),
+    val sistEndretRad: ZonedDateTime = ZonedDateTime.now(),
+    val id: Int? = null
 )
 
 class FritattRepository(private val dataSource: DataSource) {
@@ -46,19 +46,10 @@ class FritattRepository(private val dataSource: DataSource) {
     fun upsertFritatt(fritatt: Fritatt) = dataSource.connection.use { connection ->
         connection.prepareStatement(
             """
-        DELETE FROM sendingstatus
-        WHERE fnr = ?
-        """.trimIndent()
-        ).apply {
-            setString(1, fritatt.fnr)
-            executeUpdate()
-        }
-        connection.prepareStatement(
-            """
         INSERT INTO fritatt (fnr, startdato, sluttdato, sistendret_i_arena, slettet_i_arena, opprettet_rad, sist_endret_rad, melding_fra_arena)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (fnr) 
-        DO UPDATE SET startdato = excluded.startdato, sluttdato = excluded.sluttdato, sistendret_i_arena = excluded.sistendret_i_arena, slettet_i_arena = excluded.slettet_i_arena, opprettet_rad = excluded.opprettet_rad, sist_endret_rad = excluded.sist_endret_rad, melding_fra_arena = excluded.melding_fra_arena
+        DO UPDATE SET startdato = excluded.startdato, sluttdato = excluded.sluttdato, sistendret_i_arena = excluded.sistendret_i_arena, slettet_i_arena = excluded.slettet_i_arena, sist_endret_rad = excluded.sist_endret_rad, melding_fra_arena = excluded.melding_fra_arena
         """.trimIndent()
         ).apply {
             setString(1, fritatt.fnr)
@@ -69,6 +60,15 @@ class FritattRepository(private val dataSource: DataSource) {
             setTimestamp(6, Timestamp(fritatt.opprettetRad.toInstant().toEpochMilli()))
             setTimestamp(7, Timestamp(fritatt.sistEndretRad.toInstant().toEpochMilli()))
             setString(8, fritatt.meldingFraArena)
+            executeUpdate()
+        }
+        connection.prepareStatement(
+            """
+        DELETE FROM sendingstatus
+        WHERE fnr = ?
+        """.trimIndent()
+        ).apply {
+            setString(1, fritatt.fnr)
             executeUpdate()
         }
     }

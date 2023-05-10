@@ -75,8 +75,6 @@ class ArenaFritattKandidatsokLytter(
             sluttdato = data["SLUTT_DATO"].asTextNullable()?.let { localIsoDate(it.substring(0, 10)) },
             sistEndretIArena = LocalDateTime.parse(data["ENDRET_DATO"].asText(), arenaTidsformat).atOsloSameInstant(),
             slettetIArena = operasjonstype == "D",
-            opprettetRad = ZonedDateTime.now(),
-            sistEndretRad = ZonedDateTime.now(),
             meldingFraArena = originalmelding.toJson()
         )
 
