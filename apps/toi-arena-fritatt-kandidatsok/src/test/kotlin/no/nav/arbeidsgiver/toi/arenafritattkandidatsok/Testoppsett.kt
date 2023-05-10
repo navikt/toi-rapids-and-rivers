@@ -38,6 +38,19 @@ fun kandidatlisteRepositoryMedLokalPostgres(): FritattRepository {
     return FritattRepository(dataSource).apply { flywayMigrate(dataSource) }
 }
 
+fun slettStatusTabell() {
+    try {
+        val connection = dataSource.connection
+
+        connection.use {
+            it.prepareStatement("drop table sendingstatus").execute()
+        }
+    } catch (e: Exception) {
+        println("Trenger ikke slette fordi db-skjema ikke opprettet ennå")
+    }
+}
+
+
 fun slettAllDataIDatabase() {
     val connection = dataSource.connection
 
