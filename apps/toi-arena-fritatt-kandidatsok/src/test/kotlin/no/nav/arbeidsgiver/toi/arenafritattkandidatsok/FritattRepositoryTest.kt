@@ -33,7 +33,7 @@ class FritattRepositoryTest {
         val meldingFraArena = """{}"""
         val opprettetRad = ZonedDateTime.now().minusDays(1)
         val sistEndretRad = ZonedDateTime.now().minusHours(1)
-        val fritatt = Fritatt(fnr, startdato, sluttdato, sistEndretIArena, slettetIArena, meldingFraArena, opprettetRad, sistEndretRad)
+        val fritatt = Fritatt.fraDatabase(1, fnr, startdato, sluttdato, sistEndretIArena, slettetIArena, meldingFraArena, opprettetRad, sistEndretRad)
         repository.upsertFritatt(fritatt)
         hentAlle().apply {
             assertThat(this).hasSize(1)
@@ -60,7 +60,8 @@ class FritattRepositoryTest {
         val meldingFraArena = """{}"""
         val gammelRadOppdatert = ZonedDateTime.now().minusDays(3)
         val nyRadOppdatert = ZonedDateTime.now().minusHours(3)
-        repository.upsertFritatt(Fritatt(
+        repository.upsertFritatt(Fritatt.fraDatabase(
+            1,
             fnr,
             startdato.minusMonths(1),
             sluttdato.minusMonths(1),
@@ -71,7 +72,8 @@ class FritattRepositoryTest {
             gammelRadOppdatert
         ))
         val id = hentAlle().first().id
-        val fritatt = Fritatt(
+        val fritatt = Fritatt.fraDatabase(
+            42,
             fnr,
             startdato,
             sluttdato,

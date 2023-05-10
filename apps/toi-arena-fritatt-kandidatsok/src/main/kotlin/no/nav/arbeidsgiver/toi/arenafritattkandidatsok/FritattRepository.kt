@@ -29,17 +29,22 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
     }.let(::HikariDataSource)
 }
 
-data class Fritatt(
+class Fritatt private constructor(
+    val id: Int?,
     val fnr: String,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
     val sistEndretIArena: ZonedDateTime,
     val slettetIArena: Boolean,
     val meldingFraArena: String,
-    val opprettetRad: ZonedDateTime = ZonedDateTime.now(),
-    val sistEndretRad: ZonedDateTime = ZonedDateTime.now(),
-    val id: Int? = null
-)
+    val opprettetRad: ZonedDateTime,
+    val sistEndretRad: ZonedDateTime
+) {
+    companion object {
+        fun ny(fnr: String, startdato: LocalDate, sluttdato: LocalDate?, sistEndretIArena: ZonedDateTime, slettetIArena: Boolean, meldingFraArena: String) = Fritatt(null, fnr,startdato, sluttdato, sistEndretIArena, slettetIArena, meldingFraArena,ZonedDateTime.now(),ZonedDateTime.now())
+        fun fraDatabase(id: Int, fnr: String, startdato: LocalDate, sluttdato: LocalDate?, sistEndretIArena: ZonedDateTime, slettetIArena: Boolean, meldingFraArena: String, opprettetRad: ZonedDateTime, sistEndretRad: ZonedDateTime) = Fritatt(id, fnr, startdato, sluttdato, sistEndretIArena, slettetIArena, meldingFraArena, opprettetRad, sistEndretRad)
+    }
+}
 
 class FritattRepository(private val dataSource: DataSource) {
 

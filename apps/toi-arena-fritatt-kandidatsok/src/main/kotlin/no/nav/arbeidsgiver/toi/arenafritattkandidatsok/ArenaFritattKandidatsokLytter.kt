@@ -68,8 +68,7 @@ class ArenaFritattKandidatsokLytter(
     }
 
     private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, operasjonstype: String) =
-        Fritatt(
-            id = null,
+        Fritatt.ny(
             fnr = data["FODSELSNR"].asText(),
             startdato = localIsoDate(data["START_DATO"].asText().substring(0, 10)),
             sluttdato = data["SLUTT_DATO"].asTextNullable()?.let { localIsoDate(it.substring(0, 10)) },

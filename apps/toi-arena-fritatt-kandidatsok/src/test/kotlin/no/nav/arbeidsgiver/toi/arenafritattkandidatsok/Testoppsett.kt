@@ -47,7 +47,7 @@ fun slettAllDataIDatabase() {
 }
 
 fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
-    fun ResultSet.toFritatt() = Fritatt(
+    fun ResultSet.toFritatt() = Fritatt.fraDatabase(
         id = getInt("db_id"),
         fnr = getString("fnr"),
         startdato = getDate("startdato").toLocalDate(),
