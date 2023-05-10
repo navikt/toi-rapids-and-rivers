@@ -25,7 +25,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
         <div style='font-size: 1rem; padding: 12px 16px; border-radius: 12px; background-color:#F7F7F7;'>
             <p>
             <ol style='margin-block: 0px; padding-inline-start: 24px;'>
-                <li style='margin-block-end: 0.5rem;'>Åpne <a href="#" style="text-decoration:none; color:#000; cursor: default; font-weight: bold;">arbeidsgiver.nav.no/min-side-arbeidsgiver</a></li>
+                <li style='margin-block-end: 0.5rem;'>Åpne <a href='#' style='text-decoration:none; color:#000; cursor: default; font-weight: bold;'>arbeidsgiver.nav.no/min-side-arbeidsgiver</a></li>
                 <li style='margin-block-end: 0.5rem;'><b>Logg inn</b></li>
                 <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
             </ol>
