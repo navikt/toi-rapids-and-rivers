@@ -58,7 +58,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
                 <li>Velg 'Legge til ny person eller virksomhet'</li>
                 <li>Legg inn personnummeret og etternavnet til personen som skal ha tilgang</li>
                 <li>Velg 'Gi tilgang til enkelttjenester'</li>
-                <li>Skriv 'Rekruttering', så vil alternativet komme opp som et valg. Velg 'Rekruttering'. Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på arbeidsgiver.nav .no/min-side-arbeidsgiver/</li>
+                <li>Skriv 'Rekruttering', så vil alternativet komme opp som et valg. Velg 'Rekruttering'. Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på <a href='#' style='text-decoration:none; color:#000; cursor: default; font-weight: bold;'>arbeidsgiver.nav.no/min-side-arbeidsgiver</a></li>
                 <li>Bekreft</li>
             </ol>
             <b>Ga ikke Altinn deg muligheten til å gi tilgang?</b>
