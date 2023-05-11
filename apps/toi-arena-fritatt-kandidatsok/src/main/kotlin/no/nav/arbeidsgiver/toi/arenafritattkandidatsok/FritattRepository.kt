@@ -127,6 +127,10 @@ class FritattRepository(private val dataSource: DataSource) {
     fun flywayMigrate(dataSource: DataSource) {
         Flyway.configure().dataSource(dataSource).load().migrate()
     }
+
+    fun markerSomSendt(fritatt: Fritatt, foerFritattPeriode: Status) {
+        TODO("Not yet implemented")
+    }
 }
 
 enum class Status {
