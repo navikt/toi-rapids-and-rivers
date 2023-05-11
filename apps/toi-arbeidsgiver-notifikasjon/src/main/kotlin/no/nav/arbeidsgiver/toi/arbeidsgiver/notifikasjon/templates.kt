@@ -48,7 +48,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
 
         <h3 style='font-size: 1rem;line-height: 1rem; font-weight:500; margin-block: 40px 32px'>Kopier den gjerne og send den til vedkommende:</h3>
         <div style='font-size: 1rem; padding:24px 24px; border-radius: 12px; border: 3px dashed rgba(0, 0, 0, 0.1); background-color:#fff;'>
-            <p style='padding-block: 0px; margin-block-end: 0.5rem; margin-block-start: 0px'>Du får denne meldingen fordi avsender ønsker å få tilgang til CVer fra NAV på vegne av virksomheten din. </p>
+            <p style='padding-block: 0px; margin-block-end: 0.5rem; margin-block-start: 0px'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra NAV på vegne av virksomheten din. </p>
             <b>Gi tilganger til CV-er fra NAV:</b>
             <ol>
                 <li>Logg inn i Altinn</li>
@@ -58,9 +58,12 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String) = """
                 <li>Velg 'Legge til ny person eller virksomhet'</li>
                 <li>Legg inn personnummeret og etternavnet til personen som skal ha tilgang</li>
                 <li>Velg 'Gi tilgang til enkelttjenester'</li>
-                <li>Skriv 'Rekruttering', så vil alternativet komme opp som et valg. Velg 'Rekruttering'. Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på <a href='#' style='text-decoration:none; color:#000; cursor: default; font-weight: bold;'>arbeidsgiver.nav.no/min-side-arbeidsgiver</a></li>
+                <li>Skriv 'Rekruttering', så vil alternativet komme opp som et valg. Velg 'Rekruttering'.</li>
                 <li>Bekreft</li>
             </ol>
+            <p>
+                Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på <a href='#' style='text-decoration:none; color:#000; cursor: default; font-weight: bold;'>arbeidsgiver.nav.no/min-side-arbeidsgiver</a>.
+            </p>
             <b>Ga ikke Altinn deg muligheten til å gi tilgang?</b>
             <p>Du kan gi tilgang hvis du har en av disse rollene:</p>
             <ul>
