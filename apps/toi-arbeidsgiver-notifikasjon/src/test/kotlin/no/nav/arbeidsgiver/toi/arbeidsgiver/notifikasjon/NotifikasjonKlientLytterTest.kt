@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import java.util.*
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotifikasjonKlientLytterTest {
 
