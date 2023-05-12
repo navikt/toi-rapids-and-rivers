@@ -84,12 +84,13 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
     )
     while (true) {
         val sisteOffset = sisteOffset(envs)
-        val resultsPerApplication = listOfGroupIds.map { (application, groupId) ->
-            val consumerOffset = consumerOffset(groupId, envs)
-            ResultsPerApplication(application, consumerOffset, sisteOffset - consumerOffset)
-        }.sortedByDescending(ResultsPerApplication::behind)
-        val result = formatResults(resultsPerApplication, sisteOffset)
-        if(resultsPerApplication.any(ResultsPerApplication::erFeilsituasjon)) {
+        val resultsPerApplicationPerPartitions = listOfGroupIds.map { (application, groupId) ->
+            consumerOffset(groupId, envs).map { (partition, consumerOffset) ->
+                ResultsPerApplicationPerPartition(application, consumerOffset, sisteOffset[partition]!! - consumerOffset, partition)
+            }
+        }.flatten().sortedByDescending(ResultsPerApplicationPerPartition::behind)
+        val result = formatResults(resultsPerApplicationPerPartitions, sisteOffset)
+        if(resultsPerApplicationPerPartitions.any(ResultsPerApplicationPerPartition::erFeilsituasjon)) {
             log.error(result)
         } else {
             log.info(result)
@@ -99,42 +100,45 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
 }
 
 private fun formatResults(
-    resultsPerApplication: List<ResultsPerApplication>,
-    sisteOffset: Long
+    resultsPerApplicationPerPartition: List<ResultsPerApplicationPerPartition>,
+    sisteOffset: Map<Int, Long>
 ) = """
-${resultsPerApplication.joinToString(separator = "\n",transform = ResultsPerApplication::printFriendly)}
+${resultsPerApplicationPerPartition.joinToString(separator = "\n",transform = ResultsPerApplicationPerPartition::printFriendly)}
 
 Siste offset er $sisteOffset
 """.trimIndent()
 
-data class ResultsPerApplication(val name: String, val offset: Long, val behind: Long) {
+data class ResultsPerApplicationPerPartition(val name: String, val offset: Long, val behind: Long, val partition: Int) {
     private val offsetMargin = 1000
-    fun printFriendly() = "$name is on offset: $offset ( $behind behind last offset)${if (erFeilsituasjon()) " Denne er over $offsetMargin bak offset" else ""}"
+    fun printFriendly() = "$name (partition $partition) is on offset: $offset ( $behind behind last offset)${if (erFeilsituasjon()) " Denne er over $offsetMargin bak offset" else ""}"
     fun erFeilsituasjon() = behind > offsetMargin
 }
 
-fun consumerOffset(groupId: String, envs: Map<String, String>): Long {
-    val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
-    val consumer = KafkaConsumer(consumerProperties(envs, groupId), StringDeserializer(), StringDeserializer())
-    val res = (consumer.committed(setOf(topicPartition))[topicPartition]?.offset()
-        ?: throw Exception("Fant ingen offset for groupId: $groupId"))
-    consumer.close()
-    return res
-}
+fun consumerOffset(groupId: String, envs: Map<String, String>) =
+    KafkaConsumer(consumerProperties(envs, groupId), StringDeserializer(), StringDeserializer()).use { kafkaConsumer ->
+        kafkaConsumer.partitionsFor(envs["KAFKA_RAPID_TOPIC"])
+            .map { TopicPartition(it.topic(), it.partition()) }
+            .associate { topicPartition ->
+                topicPartition.partition() to (kafkaConsumer.committed(setOf(topicPartition))[topicPartition]?.offset()
+                    ?: throw Exception("Fant ingen offset for groupId: $groupId på partisjon ${topicPartition.partition()}"))
+            }
+    }
 
-fun sisteOffset(envs: Map<String, String>): Long {
-    val kafkaConsumer = KafkaConsumer(
+fun sisteOffset(envs: Map<String, String>) =
+    KafkaConsumer(
         consumerProperties(envs, envs["KAFKA_CONSUMER_GROUP_ID"]!!, clientId = "toi-helseapp"),
         StringDeserializer(),
         StringDeserializer()
-    )
+    ).use { kafkaConsumer ->
+        kafkaConsumer.partitionsFor(envs["KAFKA_RAPID_TOPIC"])
+            .map { TopicPartition(it.topic(), it.partition()) }
+            .associate { it.partition() to sisteOffsetForPartisjon(it, kafkaConsumer) }
+    }
 
-    val topicPartition = TopicPartition(envs["KAFKA_RAPID_TOPIC"], 0)
+fun sisteOffsetForPartisjon(topicPartition: TopicPartition, kafkaConsumer: KafkaConsumer<String, String>): Long {
     kafkaConsumer.assign(listOf(topicPartition))
     kafkaConsumer.seekToEnd(listOf(topicPartition))
-    val position = kafkaConsumer.position(topicPartition)
-    kafkaConsumer.close()
-    return position
+    return kafkaConsumer.position(topicPartition)
 }
 
 internal fun consumerProperties(envs: Map<String, String>, groupId: String, clientId: String = "consumer-toi-helseapp-$groupId") = Properties().apply {

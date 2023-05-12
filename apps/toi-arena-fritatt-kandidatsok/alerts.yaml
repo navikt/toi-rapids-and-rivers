@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: toi-arena-fritatt-kandidatsok
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  groups:
+    - name: toi-arena-fritatt-kandidatsok
+      rules:
+        - alert: toi-arena-fritatt-kandidatsok
+          expr: kube_deployment_status_replicas_available{deployment="toi-arena-fritatt-kandidatsok"} == 0
+          for: 1s
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/app/r/s/eWXnv"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-arena-fritatt-kandidatsok
+          expr: sum(increase(logd_messages_total{log_app="toi-arena-fritatt-kandidatsok",log_level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/app/r/s/eWXnv"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-arena-fritatt-kandidatsok
+          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-arena-fritatt-kandidatsok  ",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-arena-fritatt-kandidatsok  "}[5m]))) > 5
+          for: 3m
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/app/r/s/eWXnv"
+          labels:
+            namespace: toi
+            severity: warning

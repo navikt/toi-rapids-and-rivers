@@ -12,7 +12,7 @@ spec:
   config:
     cleanupPolicy: delete
     minimumInSyncReplicas: 1
-    partitions: 1
+    partitions: 6
     replication: 3
     retentionBytes: -1
     retentionHours: 336
@@ -93,5 +93,5 @@ spec:
       application: toi-arbeidsgiver-notifikasjon
       access: readwrite
     - team: toi
-      application: toi-kafkamanager
+      application: toi-arena-fritatt-kandidatsok
       access: readwrite

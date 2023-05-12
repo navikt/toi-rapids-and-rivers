@@ -2,3 +2,4 @@ kafka_pool: nav-prod
 kafka_consumer_group_id: toi-ontologitjeneste-rapidconsumer-1
 ontologi_url: https://pam-ontologi.intern.nav.no/rest/synonymer
 ontologi_host: https://pam-ontologi.intern.nav.no
+max_replicas: 6
