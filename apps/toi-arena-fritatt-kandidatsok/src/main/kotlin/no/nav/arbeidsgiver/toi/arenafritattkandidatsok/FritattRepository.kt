@@ -163,7 +163,7 @@ class FritattRepository(private val dataSource: DataSource) {
                     select * from fritatt 
                     left join sendingstatus on fritatt.fnr = sendingstatus.fnr
                     where sendingstatus.fnr is null
-                    and fritatt.startdato <= ? and fritatt.sluttdato >= ?
+                    and fritatt.startdato <= ? and (fritatt.sluttdato >= ? or fritatt.sluttdato is null)
             """.trimIndent()
             ).apply {
                 setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
