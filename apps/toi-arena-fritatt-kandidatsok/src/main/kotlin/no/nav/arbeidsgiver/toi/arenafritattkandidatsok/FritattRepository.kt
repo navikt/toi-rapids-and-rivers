@@ -152,12 +152,33 @@ class FritattRepository(private val dataSource: DataSource) {
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
-                    select * from fritatt 
-                    left join sendingstatus on fritatt.fnr = sendingstatus.fnr
-                    where sendingstatus.fnr is null 
-                    and fritatt.slettet_i_arena = true OR
-                        fritatt.startdato > ? or 
-                        fritatt.sluttdato < ?
+                WITH cte AS (
+                    SELECT 
+                        fritatt.*,
+                        sendingstatus.fnr AS sendingstatus_fnr,
+                        CASE 
+                            WHEN fritatt.slettet_i_arena = true THEN 'slettet'
+                            WHEN fritatt.startdato > ? THEN 'FOER_FRITATT_PERIODE'
+                            WHEN fritatt.sluttdato < ? THEN 'ETTER_FRITATT_PERIODE'
+                            ELSE 'UKJENT_STATUS'
+                        END AS ekstra_status
+                    FROM 
+                        fritatt 
+                    LEFT JOIN 
+                        sendingstatus 
+                    ON 
+                        fritatt.fnr = sendingstatus.fnr
+                )
+                SELECT *
+                FROM cte
+                WHERE 
+                    sendingstatus_fnr IS NULL 
+                    AND (
+                        ekstra_status = 'slettet' 
+                        OR ekstra_status = 'FOER_FRITATT_PERIODE' 
+                        OR ekstra_status = 'ETTER_FRITATT_PERIODE'
+                    )
+
             """.trimIndent()
             ).apply {
                 val nå = Timestamp(ZonedDateTime.now().toInstant().toEpochMilli())
@@ -201,10 +222,11 @@ class FritattRepository(private val dataSource: DataSource) {
             slettetIArena = rs.getBoolean("slettet_i_arena"),
             opprettetRad = rs.getTimestamp("opprettet_rad").toInstant().atOslo(),
             sistEndretRad = rs.getTimestamp("sist_endret_rad").toInstant().atOslo()
-        )
+        ) to
 }
 
 
 enum class Status {
     FOER_FRITATT_PERIODE, I_FRITATT_PERIODE, ETTER_FRITATT_PERIODE, SLETTET
+
 }

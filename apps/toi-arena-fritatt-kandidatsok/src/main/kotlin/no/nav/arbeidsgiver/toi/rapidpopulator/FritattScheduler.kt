@@ -1,10 +1,7 @@
 package no.nav.arbeidsgiver.toi.rapidpopulator
 
 import kotlinx.coroutines.*
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattRepository
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.Status
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.atOslo
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.log
+import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.*
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.time.*
 import java.time.temporal.ChronoUnit
@@ -36,11 +33,12 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
         log.info("Kjører FritattJobb")
         repository.hentAlleSomIkkeErFritatt().forEach {
             rapidsConnection.publish(it.fnr, it.tilJsonMelding(false))
-            repository.markerSomSendt(it, )
+            repository.markerSomSendt(it, Status.I_FRITATT_PERIODE)
         }
         repository.hentAlleSomIkkeHarSendtPeriodeStartetMenErIPeriode().forEach {
             rapidsConnection.publish(it.fnr, it.tilJsonMelding(true))
             repository.markerSomSendt(it, Status.I_FRITATT_PERIODE)
         }
     }
+
 }
