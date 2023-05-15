@@ -32,8 +32,11 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
     fun run() {
         log.info("Kjører FritattJobb")
         repository.hentAlle().forEach {
-            rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(false))
-            repository.markerSomSendt(it.fritatt, Status.I_FRITATT_PERIODE)
+            val status = Status.finnStatus(it.fritatt)
+            if(status !in it.status) {
+                rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(status.erFritatt()))
+                repository.markerSomSendt(it.fritatt, status)
+            }
         }
     }
 

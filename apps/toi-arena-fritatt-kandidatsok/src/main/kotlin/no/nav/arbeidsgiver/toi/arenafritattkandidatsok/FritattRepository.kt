@@ -152,14 +152,19 @@ class FritattRepository(private val dataSource: DataSource) {
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
-                    select * from fritatt 
-                    left join sendingstatus on fritatt.fnr = sendingstatus.fnr
+                    SELECT f.db_id, f.fnr, f.startdato, f.sluttdato, f.sistendret_i_arena, f.slettet_i_arena,
+                    f.opprettet_rad, f.sist_endret_rad, f.melding_fra_arena,
+                    array_agg(s.status) AS statuser
+                    FROM fritatt f
+                    LEFT JOIN sendingstatus s ON f.fnr = s.fnr
+                    GROUP BY f.db_id, f.fnr, f.startdato, f.sluttdato, f.sistendret_i_arena, f.slettet_i_arena,
+                     f.opprettet_rad, f.sist_endret_rad, f.melding_fra_arena;
                     """.trimIndent()
             ).executeQuery()
             return generateSequence {
                 if (rs.next()) {
                     val fritatt = fraDatabase(rs)
-                    FritattOgStatus(fritatt, Status.finnStatus(fritatt))
+                    FritattOgStatus(fritatt, Status.fraDatabaseArray(rs.getString("statuser")))
                 } else null
             }.toList()
         }
@@ -181,18 +186,20 @@ class FritattRepository(private val dataSource: DataSource) {
 
 
 class FritattOgStatus(
-    val fritatt: Fritatt, status: Status,
+    val fritatt: Fritatt, val status: List<Status>,
 )
 
 
 enum class Status {
     FOER_FRITATT_PERIODE, I_FRITATT_PERIODE, ETTER_FRITATT_PERIODE, SLETTET;
 
+    fun erFritatt() = this == I_FRITATT_PERIODE
+
     companion object {
         fun finnStatus(fritatt: Fritatt): Status {
             val now = ZonedDateTime.now().toLocalDate()
             return when {
-                fritatt.slettetIArena == true -> SLETTET
+                fritatt.slettetIArena -> SLETTET
                 fritatt.startdato > now -> FOER_FRITATT_PERIODE
                 fritatt.sluttdato != null && fritatt.sluttdato < now -> ETTER_FRITATT_PERIODE
                 fritatt.startdato <= now && (fritatt.sluttdato == null || fritatt.sluttdato >= now) -> I_FRITATT_PERIODE
@@ -201,6 +208,12 @@ enum class Status {
                 }
             }
         }
+
+        fun fraDatabaseArray(statuser: String) = if(statuser=="{NULL}") emptyList() else statuser
+            .substring(1, statuser.length - 1)
+            .replace("\"", "")  // Hackish løsning på at det tilfeldigvis kommer hermetegn fra database-spørringen iblant.
+            .split(",")
+            .map(::valueOf)
     }
 
 }
