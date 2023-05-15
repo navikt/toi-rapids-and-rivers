@@ -148,7 +148,7 @@ class FritattRepository(private val dataSource: DataSource) {
         }
     }
 
-    fun hentAlle(): Sequence<FritattOgStatus> =
+    fun hentAlle(callback: Sequence<FritattOgStatus>.() -> Unit): Unit =
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
@@ -164,7 +164,7 @@ class FritattRepository(private val dataSource: DataSource) {
                     val fritatt = fraDatabase(rs)
                     FritattOgStatus(fritatt, Status.fraDatabaseArray(rs.getString("statuser")))
                 } else null
-            }
+            }.run(callback)
         }
 
 

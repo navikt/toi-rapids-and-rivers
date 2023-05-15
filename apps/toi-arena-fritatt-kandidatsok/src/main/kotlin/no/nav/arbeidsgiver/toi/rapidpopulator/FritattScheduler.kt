@@ -42,12 +42,13 @@ fun startFritattScedulerKlokken(
 class FritattJobb(private val repository: FritattRepository, private val rapidsConnection: RapidsConnection) {
     fun run() {
         log.info("Kjører FritattJobb")
-        repository.hentAlle()
-            .filter { it.skalPubliseres() }
+        repository.hentAlle {
+            filter { it.skalPubliseres() }
             .forEach {
                 rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(it.gjeldendestatus().erFritatt()))
                 repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
             }
+        }
     }
 
 }
