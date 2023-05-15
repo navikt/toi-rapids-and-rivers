@@ -9,6 +9,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -17,6 +18,7 @@ import java.time.ZonedDateTime
 
 private const val FRITATT_KANDIDATSØK_KEY = "erFritatt"
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FritattJobbTest {
     private val repository = kandidatlisteRepositoryMedLokalPostgres()
 
@@ -27,6 +29,7 @@ class FritattJobbTest {
     @AfterEach
     fun cleanUp() {
         slettAllDataIDatabase()
+        testRapid.reset()
     }
 
     @Test
@@ -118,16 +121,16 @@ class FritattJobbTest {
     @MethodSource("testFunksjoner")
     fun `skal ikke sende melding på nytt neste kjøring om den allerede er blitt kjørt`(testCase: () -> Unit) {
         testCase()
-        assertThat(testRapid.inspektør.size).isEqualTo(1)
+        assertThat(testRapid.inspektør.size).isEqualTo(0)
         fritattJobb.run()
-        assertThat(testRapid.inspektør.size).isEqualTo(1)
+        assertThat(testRapid.inspektør.size).isEqualTo(0)
     }
 
     companion object {
         @JvmStatic
         private fun testFunksjoner() = FritattJobbTest().run { listOf(
-                Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med periode som ikke har startet`),
-                Arguments.of(::`skal dytte true-melding på rapid om det kommer en første melding med tidsbegrenset periode som har startet`),
+            Arguments.of(::`skal dytte true-melding på rapid om det kommer en første melding med tidsbegrenset periode som har startet`),
+            Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med periode som ikke har startet`),
                 Arguments.of(::`skal dytte true-melding på rapid om det kommer en første melding med periode uten sluttdato som har startet`),
                 Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med periode som har sluttet`),
                 Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med slettet satt til true, og vi er i en aktiv periode`),

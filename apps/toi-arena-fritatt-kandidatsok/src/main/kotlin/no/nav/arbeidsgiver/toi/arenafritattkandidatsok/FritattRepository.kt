@@ -143,7 +143,7 @@ class FritattRepository(private val dataSource: DataSource) {
         ).apply {
             setString(1, fritatt.fnr)
             setString(2, status.name)
-            setDate(3, fritatt.sluttdato?.let(Date::valueOf))
+            setTimestamp(3, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
             executeUpdate()
         }
     }
