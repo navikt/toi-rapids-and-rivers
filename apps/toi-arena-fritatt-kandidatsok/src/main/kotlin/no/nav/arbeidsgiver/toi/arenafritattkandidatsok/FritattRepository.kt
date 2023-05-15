@@ -185,7 +185,21 @@ class FritattRepository(private val dataSource: DataSource) {
 
 class FritattOgStatus(
     val fritatt: Fritatt, val status: List<Status>,
-)
+) {
+    fun skalPubliseres() = gjeldendestatus() !in status
+    fun gjeldendestatus(): Status {
+        val now = LocalDate.now()
+        return when {
+            fritatt.slettetIArena -> Status.SLETTET
+            now < fritatt.startdato -> Status.FOER_FRITATT_PERIODE
+            fritatt.sluttdato != null && fritatt.sluttdato < now -> Status.ETTER_FRITATT_PERIODE
+            fritatt.startdato <= now && (fritatt.sluttdato == null || now <= fritatt.sluttdato) -> Status.I_FRITATT_PERIODE
+            else -> {
+                throw Exception("Ukjent status for fritattid ${fritatt.id}")
+            }
+        }
+    }
+}
 
 
 enum class Status {
@@ -194,22 +208,12 @@ enum class Status {
     fun erFritatt() = this == I_FRITATT_PERIODE
 
     companion object {
-        fun finnStatus(fritatt: Fritatt): Status {
-            val now = ZonedDateTime.now().toLocalDate()
-            return when {
-                fritatt.slettetIArena -> SLETTET
-                fritatt.startdato > now -> FOER_FRITATT_PERIODE
-                fritatt.sluttdato != null && fritatt.sluttdato < now -> ETTER_FRITATT_PERIODE
-                fritatt.startdato <= now && (fritatt.sluttdato == null || fritatt.sluttdato >= now) -> I_FRITATT_PERIODE
-                else -> {
-                    throw Exception("Ukjent status for fritattid ${fritatt.id}")
-                }
-            }
-        }
-
-        fun fraDatabaseArray(statuser: String) = if(statuser=="{NULL}") emptyList() else statuser
+        fun fraDatabaseArray(statuser: String) = if (statuser == "{NULL}") emptyList() else statuser
             .substring(1, statuser.length - 1)
-            .replace("\"", "")  // Hackish løsning på at det tilfeldigvis kommer hermetegn fra database-spørringen iblant.
+            .replace(
+                "\"",
+                ""
+            )  // Hackish løsning på at det tilfeldigvis kommer hermetegn fra database-spørringen iblant.
             .split(",")
             .map(::valueOf)
     }
