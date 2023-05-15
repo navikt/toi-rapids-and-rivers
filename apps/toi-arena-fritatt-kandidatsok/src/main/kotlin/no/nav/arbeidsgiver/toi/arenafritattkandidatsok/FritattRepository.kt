@@ -152,9 +152,7 @@ class FritattRepository(private val dataSource: DataSource) {
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
-                    SELECT f.db_id, f.fnr, f.startdato, f.sluttdato, f.sistendret_i_arena, f.slettet_i_arena,
-                    f.opprettet_rad, f.sist_endret_rad, f.melding_fra_arena,
-                    array_agg(s.status) AS statuser
+                    SELECT f.*, array_agg(s.status) AS statuser
                     FROM fritatt f
                     LEFT JOIN sendingstatus s ON f.fnr = s.fnr
                     GROUP BY f.db_id, f.fnr, f.startdato, f.sluttdato, f.sistendret_i_arena, f.slettet_i_arena,
