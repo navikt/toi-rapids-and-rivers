@@ -30,7 +30,7 @@ class FritattJobbTest {
     }
 
     @Test
-    fun `skal dytte false-melding på rapid om det finnes en ny melding med periode som ikke har startet`() {
+    fun `skal dytte false-melding på rapid om det kommer en første melding med periode som ikke har startet`() {
         repository.upsertFritatt(lagFritatt(periode = IkkeStartet))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
@@ -39,7 +39,7 @@ class FritattJobbTest {
     }
 
     @Test
-    fun `skal dytte true-melding på rapid om det finnes en ny melding med tidsbegrenset periode som har startet`() {
+    fun `skal dytte true-melding på rapid om det kommer en første melding med tidsbegrenset periode som har startet`() {
         repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrenset))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
@@ -48,7 +48,7 @@ class FritattJobbTest {
     }
 
     @Test
-    fun `skal dytte true-melding på rapid om det finnes en ny melding med periode uten sluttdato som har startet`() {
+    fun `skal dytte true-melding på rapid om det kommer en første melding med periode uten sluttdato som har startet`() {
         repository.upsertFritatt(lagFritatt(periode = AktivUtenSluttDato))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
@@ -57,7 +57,7 @@ class FritattJobbTest {
     }
 
     @Test
-    fun `skal dytte false-melding på rapid om det finnes en ny melding med periode som har sluttet`() {
+    fun `skal dytte false-melding på rapid om det kommer en første melding med periode som har sluttet`() {
         repository.upsertFritatt(lagFritatt(periode = Avsluttet))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
@@ -66,7 +66,7 @@ class FritattJobbTest {
     }
 
     @Test
-    fun `skal dytte false-melding på rapid om det finnes en ny melding med slettet satt til true`() {
+    fun `skal dytte false-melding på rapid om det kommer en første melding med slettet satt til true, og vi er i en aktiv periode`() {
         repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrenset, slettetIArena = true))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
@@ -86,12 +86,28 @@ class FritattJobbTest {
     }
 
     @Test
-    fun `skal dytte true-melding på rapid om det finnes en ny melding med periode som har startet der det allerede eksisterte en melding som tidligere hadde rapportert å ha sluttet`() {
-        val fritatt = lagFritatt(periode = AktivTidsbegrenset)
-        repository.markerSomSendt(fritatt, Status.FOER_FRITATT_PERIODE)
-        repository.markerSomSendt(fritatt, Status.I_FRITATT_PERIODE)
-        repository.markerSomSendt(fritatt, Status.ETTER_FRITATT_PERIODE)
+    fun `skal dytte false-melding på rapid om det finnes en melding som har tidligere rapportert at den har startet men har stanset nå`() {
+        val fritatt = lagFritatt(periode = Avsluttet)
         repository.upsertFritatt(fritatt)
+        repository.markerSomSendt(fritatt, Status.I_FRITATT_PERIODE)
+        fritattJobb.run()
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
+    }
+
+    @Test
+    fun `skal dytte true-melding på rapid om det finnes en ny melding med periode som har startet der det allerede eksisterte en melding som tidligere hadde rapportert å ha sluttet`() {
+
+
+        val fritattGammel= lagFritatt(periode = Avsluttet)
+        repository.markerSomSendt(fritattGammel, Status.FOER_FRITATT_PERIODE)
+        repository.markerSomSendt(fritattGammel, Status.I_FRITATT_PERIODE)
+        repository.markerSomSendt(fritattGammel, Status.ETTER_FRITATT_PERIODE)
+        repository.upsertFritatt(fritattGammel)
+
+        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrenset))
+
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -110,11 +126,11 @@ class FritattJobbTest {
     companion object {
         @JvmStatic
         private fun testFunksjoner() = FritattJobbTest().run { listOf(
-                Arguments.of(::`skal dytte false-melding på rapid om det finnes en ny melding med periode som ikke har startet`),
-                Arguments.of(::`skal dytte true-melding på rapid om det finnes en ny melding med tidsbegrenset periode som har startet`),
-                Arguments.of(::`skal dytte true-melding på rapid om det finnes en ny melding med periode uten sluttdato som har startet`),
-                Arguments.of(::`skal dytte false-melding på rapid om det finnes en ny melding med periode som har sluttet`),
-                Arguments.of(::`skal dytte false-melding på rapid om det finnes en ny melding med slettet satt til true`),
+                Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med periode som ikke har startet`),
+                Arguments.of(::`skal dytte true-melding på rapid om det kommer en første melding med tidsbegrenset periode som har startet`),
+                Arguments.of(::`skal dytte true-melding på rapid om det kommer en første melding med periode uten sluttdato som har startet`),
+                Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med periode som har sluttet`),
+                Arguments.of(::`skal dytte false-melding på rapid om det kommer en første melding med slettet satt til true, og vi er i en aktiv periode`),
                 Arguments.of(::`skal dytte true-melding på rapid om det finnes en melding som har tidligere rapportert at den ikke har startet men har startet nå`),
                 Arguments.of(::`skal dytte true-melding på rapid om det finnes en ny melding med periode som har startet der det allerede eksisterte en melding som tidligere hadde rapportert å ha sluttet`)
             ).stream()

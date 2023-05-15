@@ -32,7 +32,7 @@ fun startFritattScedulerKlokken(hour: Int, minute: Int, second: Int, nano: Int, 
 
 class FritattJobb(repository: FritattRepository, rapidsConnection: RapidsConnection) {
     fun run() {
-        // Your job logic here.
         log.info("Kjører FritattJobb")
+        TODO()
     }
 }
