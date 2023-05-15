@@ -45,6 +45,7 @@ class Fritatt private constructor(
 
     private fun erFritatt() = false
 
+
     fun tilJsonMelding() =
         JsonMessage.newMessage("fritattFraArena", mapOf("fnr" to fnr, "erFritatt" to erFritatt())).toJson()
 
@@ -144,7 +145,10 @@ class FritattRepository(private val dataSource: DataSource) {
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
-                
+                    select * from fritatt 
+                    left join sendingstatus on fritatt.fnr = sendingstatus.fnr
+                    where sendingstatus.fnr is null 
+                    and fritatt.startdato > ?
             """.trimIndent()
             ).apply {
                 setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
@@ -160,7 +164,7 @@ class FritattRepository(private val dataSource: DataSource) {
             id = rs.getInt("db_id"),
             fnr = rs.getString("fnr"),
             startdato = rs.getDate("startdato").toLocalDate(),
-            sluttdato = rs.getDate("sluttdato").toLocalDate(),
+            sluttdato = rs.getDate("sluttdato")?.toLocalDate(),
             sistEndretIArena = rs.getTimestamp("sistendret_i_arena").toInstant().atOslo(),
             meldingFraArena = rs.getString("melding_fra_arena"),
             slettetIArena = rs.getBoolean("slettet_i_arena"),

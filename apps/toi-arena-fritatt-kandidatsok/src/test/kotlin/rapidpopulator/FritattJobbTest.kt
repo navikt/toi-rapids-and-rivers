@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
-private const val FRITATT_KANDIDATSØK_KEY = "fritattKandidatsøk"
+private const val FRITATT_KANDIDATSØK_KEY = "erFritatt"
 
 class FritattJobbTest {
     private val repository = kandidatlisteRepositoryMedLokalPostgres()
