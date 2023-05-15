@@ -2,8 +2,10 @@ package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import no.nav.helse.rapids_rivers.JsonMessage
 import org.flywaydb.core.Flyway
 import java.sql.Date
+import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -40,6 +42,12 @@ class Fritatt private constructor(
     val opprettetRad: ZonedDateTime,
     val sistEndretRad: ZonedDateTime,
 ) {
+
+    private fun erFritatt() = false
+
+    fun tilJsonMelding() =
+        JsonMessage.newMessage("fritattFraArena", mapOf("fnr" to fnr, "erFritatt" to erFritatt())).toJson()
+
     companion object {
         fun ny(
             fnr: String,
@@ -131,7 +139,36 @@ class FritattRepository(private val dataSource: DataSource) {
     fun markerSomSendt(fritatt: Fritatt, foerFritattPeriode: Status) {
         TODO("Not yet implemented")
     }
+
+    fun hentAlleSomIkkeFinnesISendingsstatusOgMedPeriodeSomIkkeHarStartet(): List<Fritatt> =
+        dataSource.connection.use { connection ->
+            val rs = connection.prepareStatement(
+                """
+                
+            """.trimIndent()
+            ).apply {
+                setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
+            }.executeQuery()
+
+            return generateSequence {
+                if (rs.next()) fraDatabase(rs) else null
+            }.toList()
+        }
+
+    private fun fraDatabase(rs: ResultSet) =
+        Fritatt.fraDatabase(
+            id = rs.getInt("db_id"),
+            fnr = rs.getString("fnr"),
+            startdato = rs.getDate("startdato").toLocalDate(),
+            sluttdato = rs.getDate("sluttdato").toLocalDate(),
+            sistEndretIArena = rs.getTimestamp("sistendret_i_arena").toInstant().atOslo(),
+            meldingFraArena = rs.getString("melding_fra_arena"),
+            slettetIArena = rs.getBoolean("slettet_i_arena"),
+            opprettetRad = rs.getTimestamp("opprettet_rad").toInstant().atOslo(),
+            sistEndretRad = rs.getTimestamp("sist_endret_rad").toInstant().atOslo()
+        )
 }
+
 
 enum class Status {
     FOER_FRITATT_PERIODE, I_FRITATT_PERIODE, ETTER_FRITATT_PERIODE, SLETTET

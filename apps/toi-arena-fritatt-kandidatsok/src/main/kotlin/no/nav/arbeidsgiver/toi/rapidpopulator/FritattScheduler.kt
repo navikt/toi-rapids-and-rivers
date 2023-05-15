@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.rapidpopulator
 
 import kotlinx.coroutines.*
+import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.Fritatt
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattRepository
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.atOslo
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.log
@@ -30,9 +31,13 @@ fun startFritattScedulerKlokken(hour: Int, minute: Int, second: Int, nano: Int, 
     scheduledExecutor.scheduleAtFixedRate(task, delay, TimeUnit.DAYS.toMillis(1), TimeUnit.MILLISECONDS)
 }
 
-class FritattJobb(repository: FritattRepository, rapidsConnection: RapidsConnection) {
+class FritattJobb(private val repository: FritattRepository, private val rapidsConnection: RapidsConnection) {
     fun run() {
         log.info("Kjører FritattJobb")
-        TODO()
+        val fritattListe:  List<Fritatt> = repository.hentAlleSomIkkeFinnesISendingsstatusOgMedPeriodeSomIkkeHarStartet()
+        // Send false-meldinger  til rapid
+        fritattListe.forEach{
+            rapidsConnection.publish(it.fnr, it.tilJsonMelding())
+        }
     }
 }
