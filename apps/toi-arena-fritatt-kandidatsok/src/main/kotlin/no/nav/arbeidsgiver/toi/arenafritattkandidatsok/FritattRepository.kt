@@ -138,17 +138,20 @@ class FritattRepository(private val dataSource: DataSource) {
         TODO("Not yet implemented")
     }
 
-    fun hentAlleSomIkkeFinnesISendingsstatusOgMedPeriodeSomIkkeHarStartet(): List<Fritatt> =
+    fun hentAlleSomIkkeErFritatt(): List<Fritatt> =
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
                     select * from fritatt 
                     left join sendingstatus on fritatt.fnr = sendingstatus.fnr
                     where sendingstatus.fnr is null 
-                    and fritatt.startdato > ?
+                    and fritatt.startdato > ? or 
+                        fritatt.sluttdato < ?
             """.trimIndent()
             ).apply {
-                setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
+                val nå = Timestamp(ZonedDateTime.now().toInstant().toEpochMilli())
+                setTimestamp(1, nå)
+                setTimestamp(2, nå)
             }.executeQuery()
 
             return generateSequence {
@@ -166,8 +169,9 @@ class FritattRepository(private val dataSource: DataSource) {
                     and fritatt.startdato <= ? and (fritatt.sluttdato >= ? or fritatt.sluttdato is null)
             """.trimIndent()
             ).apply {
-                setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
-                setTimestamp(2, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
+                val nå = Timestamp(ZonedDateTime.now().toInstant().toEpochMilli())
+                setTimestamp(1, nå)
+                setTimestamp(2, nå)
             }.executeQuery()
 
             return generateSequence {
