@@ -148,68 +148,22 @@ class FritattRepository(private val dataSource: DataSource) {
         }
     }
 
-    fun hentAlleSomIkkeErFritatt(): List<Fritatt> =
-        dataSource.connection.use { connection ->
-            val rs = connection.prepareStatement(
-                """
-                WITH cte AS (
-                    SELECT 
-                        fritatt.*,
-                        sendingstatus.fnr AS sendingstatus_fnr,
-                        CASE 
-                            WHEN fritatt.slettet_i_arena = true THEN 'slettet'
-                            WHEN fritatt.startdato > ? THEN 'FOER_FRITATT_PERIODE'
-                            WHEN fritatt.sluttdato < ? THEN 'ETTER_FRITATT_PERIODE'
-                            ELSE 'UKJENT_STATUS'
-                        END AS ekstra_status
-                    FROM 
-                        fritatt 
-                    LEFT JOIN 
-                        sendingstatus 
-                    ON 
-                        fritatt.fnr = sendingstatus.fnr
-                )
-                SELECT *
-                FROM cte
-                WHERE 
-                    sendingstatus_fnr IS NULL 
-                    AND (
-                        ekstra_status = 'slettet' 
-                        OR ekstra_status = 'FOER_FRITATT_PERIODE' 
-                        OR ekstra_status = 'ETTER_FRITATT_PERIODE'
-                    )
-
-            """.trimIndent()
-            ).apply {
-                val nå = Timestamp(ZonedDateTime.now().toInstant().toEpochMilli())
-                setTimestamp(1, nå)
-                setTimestamp(2, nå)
-            }.executeQuery()
-
-            return generateSequence {
-                if (rs.next()) fraDatabase(rs) else null
-            }.toList()
-        }
-
-    fun hentAlleSomIkkeHarSendtPeriodeStartetMenErIPeriode(): List<Fritatt> =
+    fun hentAlle(): List<FritattOgStatus> =
         dataSource.connection.use { connection ->
             val rs = connection.prepareStatement(
                 """
                     select * from fritatt 
                     left join sendingstatus on fritatt.fnr = sendingstatus.fnr
-                    where (sendingstatus.fnr is null or sendingstatus.status <> 'I_FRITATT_PERIODE')
-                    and fritatt.slettet_i_arena = false AND fritatt.startdato <= ? and (fritatt.sluttdato >= ? or fritatt.sluttdato is null)
-            """.trimIndent()
-            ).apply {
-                val nå = Timestamp(ZonedDateTime.now().toInstant().toEpochMilli())
-                setTimestamp(1, nå)
-                setTimestamp(2, nå)
-            }.executeQuery()
-
+                    """.trimIndent()
+            ).executeQuery()
             return generateSequence {
-                if (rs.next()) fraDatabase(rs) else null
+                if (rs.next()) {
+                    val fritatt = fraDatabase(rs)
+                    FritattOgStatus(fritatt, Status.finnStatus(fritatt))
+                } else null
             }.toList()
         }
+
 
     private fun fraDatabase(rs: ResultSet) =
         Fritatt.fraDatabase(
@@ -222,11 +176,31 @@ class FritattRepository(private val dataSource: DataSource) {
             slettetIArena = rs.getBoolean("slettet_i_arena"),
             opprettetRad = rs.getTimestamp("opprettet_rad").toInstant().atOslo(),
             sistEndretRad = rs.getTimestamp("sist_endret_rad").toInstant().atOslo()
-        ) to
+        )
 }
 
 
+class FritattOgStatus(
+    val fritatt: Fritatt, status: Status,
+)
+
+
 enum class Status {
-    FOER_FRITATT_PERIODE, I_FRITATT_PERIODE, ETTER_FRITATT_PERIODE, SLETTET
+    FOER_FRITATT_PERIODE, I_FRITATT_PERIODE, ETTER_FRITATT_PERIODE, SLETTET;
+
+    companion object {
+        fun finnStatus(fritatt: Fritatt): Status {
+            val now = ZonedDateTime.now().toLocalDate()
+            return when {
+                fritatt.slettetIArena == true -> SLETTET
+                fritatt.startdato > now -> FOER_FRITATT_PERIODE
+                fritatt.sluttdato != null && fritatt.sluttdato < now -> ETTER_FRITATT_PERIODE
+                fritatt.startdato <= now && (fritatt.sluttdato == null || fritatt.sluttdato >= now) -> I_FRITATT_PERIODE
+                else -> {
+                    throw Exception("Ukjent status for fritattid ${fritatt.id}")
+                }
+            }
+        }
+    }
 
 }

@@ -31,13 +31,9 @@ fun startFritattScedulerKlokken(hour: Int, minute: Int, second: Int, nano: Int, 
 class FritattJobb(private val repository: FritattRepository, private val rapidsConnection: RapidsConnection) {
     fun run() {
         log.info("Kjører FritattJobb")
-        repository.hentAlleSomIkkeErFritatt().forEach {
-            rapidsConnection.publish(it.fnr, it.tilJsonMelding(false))
-            repository.markerSomSendt(it, Status.I_FRITATT_PERIODE)
-        }
-        repository.hentAlleSomIkkeHarSendtPeriodeStartetMenErIPeriode().forEach {
-            rapidsConnection.publish(it.fnr, it.tilJsonMelding(true))
-            repository.markerSomSendt(it, Status.I_FRITATT_PERIODE)
+        repository.hentAlle().forEach {
+            rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(false))
+            repository.markerSomSendt(it.fritatt, Status.I_FRITATT_PERIODE)
         }
     }
 
