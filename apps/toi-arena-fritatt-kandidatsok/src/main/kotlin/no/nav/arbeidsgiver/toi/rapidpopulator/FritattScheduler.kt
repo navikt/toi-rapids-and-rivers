@@ -37,7 +37,10 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
         val fritattListe:  List<Fritatt> = repository.hentAlleSomIkkeFinnesISendingsstatusOgMedPeriodeSomIkkeHarStartet()
         // Send false-meldinger  til rapid
         fritattListe.forEach{
-            rapidsConnection.publish(it.fnr, it.tilJsonMelding())
+            rapidsConnection.publish(it.fnr, it.tilJsonMelding(false))
+        }
+        repository.hentAlleSomIkkeHarSendtPeriodeStartetMenErIPeriode().forEach{
+            rapidsConnection.publish(it.fnr, it.tilJsonMelding(true))
         }
     }
 }

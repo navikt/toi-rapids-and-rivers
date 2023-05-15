@@ -31,7 +31,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte false-melding på rapid om det kommer en første melding med periode som ikke har startet`() {
-        repository.upsertFritatt(lagFritatt(periode = IkkeStartet))
+        repository.upsertFritatt(lagFritatt(periode = IkkeStartetFørIMorgen))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -40,7 +40,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte true-melding på rapid om det kommer en første melding med tidsbegrenset periode som har startet`() {
-        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrenset))
+        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrensetTilOgMedIDag))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -49,7 +49,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte true-melding på rapid om det kommer en første melding med periode uten sluttdato som har startet`() {
-        repository.upsertFritatt(lagFritatt(periode = AktivUtenSluttDato))
+        repository.upsertFritatt(lagFritatt(periode = AktivUtenSluttDatoFraOgMedIDag))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -58,7 +58,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte false-melding på rapid om det kommer en første melding med periode som har sluttet`() {
-        repository.upsertFritatt(lagFritatt(periode = Avsluttet))
+        repository.upsertFritatt(lagFritatt(periode = AvsluttetIGår))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -67,7 +67,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte false-melding på rapid om det kommer en første melding med slettet satt til true, og vi er i en aktiv periode`() {
-        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrenset, slettetIArena = true))
+        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrensetTilOgMedIDag, slettetIArena = true))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -76,7 +76,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte true-melding på rapid om det finnes en melding som har tidligere rapportert at den ikke har startet men har startet nå`() {
-        val fritatt = lagFritatt(periode = AktivTidsbegrenset)
+        val fritatt = lagFritatt(periode = AktivTidsbegrensetTilOgMedIDag)
         repository.upsertFritatt(fritatt)
         repository.markerSomSendt(fritatt, Status.FOER_FRITATT_PERIODE)
         fritattJobb.run()
@@ -87,7 +87,7 @@ class FritattJobbTest {
 
     @Test
     fun `skal dytte false-melding på rapid om det finnes en melding som har tidligere rapportert at den har startet men har stanset nå`() {
-        val fritatt = lagFritatt(periode = Avsluttet)
+        val fritatt = lagFritatt(periode = AvsluttetIGår)
         repository.upsertFritatt(fritatt)
         repository.markerSomSendt(fritatt, Status.I_FRITATT_PERIODE)
         fritattJobb.run()
@@ -100,13 +100,13 @@ class FritattJobbTest {
     fun `skal dytte true-melding på rapid om det finnes en ny melding med periode som har startet der det allerede eksisterte en melding som tidligere hadde rapportert å ha sluttet`() {
 
 
-        val fritattGammel= lagFritatt(periode = Avsluttet)
+        val fritattGammel= lagFritatt(periode = AvsluttetIGår)
         repository.markerSomSendt(fritattGammel, Status.FOER_FRITATT_PERIODE)
         repository.markerSomSendt(fritattGammel, Status.I_FRITATT_PERIODE)
         repository.markerSomSendt(fritattGammel, Status.ETTER_FRITATT_PERIODE)
         repository.upsertFritatt(fritattGammel)
 
-        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrenset))
+        repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrensetTilOgMedIDag))
 
         fritattJobb.run()
         val inspektør = testRapid.inspektør
@@ -144,23 +144,23 @@ class FritattJobbTest {
             fun sluttDato(): LocalDate?
         }
 
-        private object IkkeStartet: Periode {
-            override fun startDato() = LocalDate.now().plusDays(10)
+        private object IkkeStartetFørIMorgen: Periode {
+            override fun startDato() = LocalDate.now().plusDays(1)
             override fun sluttDato() = null
         }
 
-        private object Avsluttet: Periode {
+        private object AvsluttetIGår: Periode {
             override fun startDato() = LocalDate.now().minusDays(10)
-            override fun sluttDato() = LocalDate.now().minusDays(5)
+            override fun sluttDato() = LocalDate.now().minusDays(1)
         }
 
-        private object AktivTidsbegrenset: Periode {
+        private object AktivTidsbegrensetTilOgMedIDag: Periode {
             override fun startDato() = LocalDate.now().minusDays(5)
-            override fun sluttDato() = LocalDate.now().plusDays(5)
+            override fun sluttDato() = LocalDate.now()
         }
 
-        private object AktivUtenSluttDato: Periode {
-            override fun startDato() = LocalDate.now().minusDays(5)
+        private object AktivUtenSluttDatoFraOgMedIDag: Periode {
+            override fun startDato() = LocalDate.now()
             override fun sluttDato() = null
         }
     }

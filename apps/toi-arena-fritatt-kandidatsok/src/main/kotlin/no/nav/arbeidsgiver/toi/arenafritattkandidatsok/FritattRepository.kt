@@ -43,11 +43,8 @@ class Fritatt private constructor(
     val sistEndretRad: ZonedDateTime,
 ) {
 
-    private fun erFritatt() = false
-
-
-    fun tilJsonMelding() =
-        JsonMessage.newMessage("fritattFraArena", mapOf("fnr" to fnr, "erFritatt" to erFritatt())).toJson()
+    fun tilJsonMelding(erFritatt: Boolean) =
+        JsonMessage.newMessage("fritattFraArena", mapOf("fnr" to fnr, "erFritatt" to erFritatt)).toJson()
 
     companion object {
         fun ny(
@@ -152,6 +149,25 @@ class FritattRepository(private val dataSource: DataSource) {
             """.trimIndent()
             ).apply {
                 setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
+            }.executeQuery()
+
+            return generateSequence {
+                if (rs.next()) fraDatabase(rs) else null
+            }.toList()
+        }
+
+    fun hentAlleSomIkkeHarSendtPeriodeStartetMenErIPeriode(): List<Fritatt> =
+        dataSource.connection.use { connection ->
+            val rs = connection.prepareStatement(
+                """
+                    select * from fritatt 
+                    left join sendingstatus on fritatt.fnr = sendingstatus.fnr
+                    where sendingstatus.fnr is null
+                    and fritatt.startdato <= ? and fritatt.sluttdato >= ?
+            """.trimIndent()
+            ).apply {
+                setTimestamp(1, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
+                setTimestamp(2, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
             }.executeQuery()
 
             return generateSequence {
