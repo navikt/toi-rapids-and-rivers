@@ -134,8 +134,18 @@ class FritattRepository(private val dataSource: DataSource) {
         Flyway.configure().dataSource(dataSource).load().migrate()
     }
 
-    fun markerSomSendt(fritatt: Fritatt, foerFritattPeriode: Status) {
-        TODO("Not yet implemented")
+    fun markerSomSendt(fritatt: Fritatt, status: Status) = dataSource.connection.use { connection ->
+        connection.prepareStatement(
+            """
+        INSERT INTO sendingstatus (fnr, status, opprettet_rad)
+        VALUES (?, ?, ?)
+        """.trimIndent()
+        ).apply {
+            setString(1, fritatt.fnr)
+            setString(2, status.name)
+            setDate(3, fritatt.sluttdato?.let(Date::valueOf))
+            executeUpdate()
+        }
     }
 
     fun hentAlleSomIkkeErFritatt(): List<Fritatt> =
@@ -166,7 +176,7 @@ class FritattRepository(private val dataSource: DataSource) {
                 """
                     select * from fritatt 
                     left join sendingstatus on fritatt.fnr = sendingstatus.fnr
-                    where sendingstatus.fnr is null
+                    where (sendingstatus.fnr is null or sendingstatus.status <> 'I_FRITATT_PERIODE')
                     and fritatt.slettet_i_arena = false AND fritatt.startdato <= ? and (fritatt.sluttdato >= ? or fritatt.sluttdato is null)
             """.trimIndent()
             ).apply {
