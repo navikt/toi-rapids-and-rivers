@@ -145,7 +145,8 @@ class FritattRepository(private val dataSource: DataSource) {
                     select * from fritatt 
                     left join sendingstatus on fritatt.fnr = sendingstatus.fnr
                     where sendingstatus.fnr is null 
-                    and fritatt.startdato > ? or 
+                    and fritatt.slettet_i_arena = true OR
+                        fritatt.startdato > ? or 
                         fritatt.sluttdato < ?
             """.trimIndent()
             ).apply {
@@ -166,7 +167,7 @@ class FritattRepository(private val dataSource: DataSource) {
                     select * from fritatt 
                     left join sendingstatus on fritatt.fnr = sendingstatus.fnr
                     where sendingstatus.fnr is null
-                    and fritatt.startdato <= ? and (fritatt.sluttdato >= ? or fritatt.sluttdato is null)
+                    and fritatt.slettet_i_arena = false AND fritatt.startdato <= ? and (fritatt.sluttdato >= ? or fritatt.sluttdato is null)
             """.trimIndent()
             ).apply {
                 val nå = Timestamp(ZonedDateTime.now().toInstant().toEpochMilli())
