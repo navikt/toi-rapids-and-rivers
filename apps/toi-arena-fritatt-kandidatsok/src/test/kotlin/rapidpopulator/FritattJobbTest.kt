@@ -18,11 +18,9 @@ import java.time.ZonedDateTime
 
 private const val FRITATT_KANDIDATSØK_KEY = "erFritatt"
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class FritattJobbTest {
     private val repository = kandidatlisteRepositoryMedLokalPostgres()
-
-    private val testRapid = TestRapid()
 
     private val fritattJobb = FritattJobb(repository, testRapid)
 
@@ -121,9 +119,9 @@ class FritattJobbTest {
     @MethodSource("testFunksjoner")
     fun `skal ikke sende melding på nytt neste kjøring om den allerede er blitt kjørt`(testCase: () -> Unit) {
         testCase()
-        assertThat(testRapid.inspektør.size).isEqualTo(0)
+        assertThat(testRapid.inspektør.size).isEqualTo(1)
         fritattJobb.run()
-        assertThat(testRapid.inspektør.size).isEqualTo(0)
+        assertThat(testRapid.inspektør.size).isEqualTo(1)
     }
 
     companion object {
@@ -166,5 +164,8 @@ class FritattJobbTest {
             override fun startDato() = LocalDate.now()
             override fun sluttDato() = null
         }
+
+        private val testRapid = TestRapid()
+
     }
 }
