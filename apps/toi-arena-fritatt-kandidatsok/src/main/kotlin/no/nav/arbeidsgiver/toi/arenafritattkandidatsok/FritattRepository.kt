@@ -140,12 +140,20 @@ class FritattRepository(private val dataSource: DataSource) {
         connection.prepareStatement(
             """
         INSERT INTO sendingstatus (fnr, status, opprettet_rad)
-        VALUES (?, ?, ?)
+        SELECT fnr, status, CAST(opprettet_rad AS timestamp with time zone)
+        FROM (VALUES (?, ?, ?)) AS data(fnr, status, opprettet_rad)
+        WHERE EXISTS (
+          SELECT 1
+          FROM fritatt
+          WHERE fnr = ? AND sistendret_i_arena = ?
+        )
         """.trimIndent()
         ).apply {
             setString(1, fritatt.fnr)
             setString(2, status.name)
             setTimestamp(3, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
+            setString(4, fritatt.fnr)
+            setTimestamp(5, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
             executeUpdate()
         }
     }

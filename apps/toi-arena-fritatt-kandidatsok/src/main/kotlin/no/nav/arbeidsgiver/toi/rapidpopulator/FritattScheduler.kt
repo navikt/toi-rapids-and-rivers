@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.rapidpopulator
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattOgStatus
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattRepository
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.atOslo
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.log
@@ -44,11 +45,13 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
         log.info("Kjører FritattJobb")
         repository.hentAlle {
             filter { it.skalPubliseres() }
-            .forEach {
-                rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(it.gjeldendestatus().erFritatt()))
-                repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
-            }
+            .forEach(::sendMelding)
         }
+    }
+
+    fun sendMelding(it: FritattOgStatus) {
+        rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(it.gjeldendestatus().erFritatt()))
+        repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
     }
 
 }

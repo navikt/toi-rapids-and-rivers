@@ -127,7 +127,7 @@ class FritattJobbTest {
         repository.upsertFritatt(
             fritattSomKommmerIMellom
         )
-        repository.markerSomSendt(fritatt = fritattFraSchedulerspørring, Status.FOER_FRITATT_PERIODE)
+        fritattJobb.sendMelding(FritattOgStatus(fritattFraSchedulerspørring, listOf(Status.FOER_FRITATT_PERIODE)))
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
