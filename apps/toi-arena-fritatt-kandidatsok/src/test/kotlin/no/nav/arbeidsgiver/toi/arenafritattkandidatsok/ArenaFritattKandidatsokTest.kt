@@ -39,17 +39,13 @@ class ArenaFritattKandidatsokTest {
 
         Thread.sleep(300)
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
         assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
         assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
-        assertThat(fritatt.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtAktivert).isNull()
-        assertThat(fritatt.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtDeaktivert).isNull()
         assertThat(fritatt.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
                 "2023-04-19 20:28:10",
@@ -77,7 +73,7 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -96,17 +92,13 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer = fødselsnummer))
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
         assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2020-02-11"))
         assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2021-02-11"))
-        assertThat(fritatt.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtAktivert).isNull()
-        assertThat(fritatt.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtDeaktivert).isNull()
         assertThat(fritatt.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
                 "2021-04-19 20:28:10",
@@ -123,16 +115,12 @@ class ArenaFritattKandidatsokTest {
         )
 
         testRapid.sendTestMessage(oppdateringsmelding(fødselsnummer = fødselsnummer))
-        val fritattListeNy = hentAlle()
+        val fritattListeNy = hentAlleFritatt()
         assertThat(fritattListeNy).hasSize(1)
         val fritattNy = fritattListeNy.first()
         assertThat(fritattNy.fnr).isEqualTo(fødselsnummer)
         assertThat(fritattNy.startdato).isEqualTo(LocalDate.parse("2023-04-04"))
         assertThat(fritattNy.sluttdato).isEqualTo(LocalDate.parse("2023-05-07"))
-        assertThat(fritattNy.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritattNy.forsoktSendtAktivert).isNull()
-        assertThat(fritattNy.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritattNy.forsoktSendtDeaktivert).isNull()
 
         assertThat(fritattNy.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
@@ -164,16 +152,12 @@ class ArenaFritattKandidatsokTest {
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer1))
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer2))
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(2)
         val fritatt = fritattListe[0]
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer1)
         assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2020-02-11"))
         assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2021-02-11"))
-        assertThat(fritatt.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtAktivert).isNull()
-        assertThat(fritatt.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtDeaktivert).isNull()
         assertThat(fritatt.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
                 "2021-04-19 20:28:10",
@@ -193,10 +177,6 @@ class ArenaFritattKandidatsokTest {
         assertThat(fritattNy.fnr).isEqualTo(fødselsnummer2)
         assertThat(fritattNy.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
         assertThat(fritattNy.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
-        assertThat(fritattNy.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritattNy.forsoktSendtAktivert).isNull()
-        assertThat(fritattNy.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritattNy.forsoktSendtDeaktivert).isNull()
         assertThat(fritattNy.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
                 "2023-04-19 20:28:10",
@@ -226,17 +206,13 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
         assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
         assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
-        assertThat(fritatt.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtAktivert).isNull()
-        assertThat(fritatt.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtDeaktivert).isNull()
         assertThat(fritatt.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
                 "2023-04-19 20:28:10",
@@ -272,17 +248,13 @@ class ArenaFritattKandidatsokTest {
             )
         )
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer)
         assertThat(fritatt.startdato).isEqualTo(LocalDate.parse("2022-02-11"))
         assertThat(fritatt.sluttdato).isEqualTo(LocalDate.parse("2023-02-11"))
-        assertThat(fritatt.sendingAktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtAktivert).isNull()
-        assertThat(fritatt.sendingDeaktivertStatus).isEqualTo("ikke_sendt")
-        assertThat(fritatt.forsoktSendtDeaktivert).isNull()
         assertThat(fritatt.sistEndretIArena).isEqualTo(
             LocalDateTime.parse(
                 "2023-04-19 20:28:10",

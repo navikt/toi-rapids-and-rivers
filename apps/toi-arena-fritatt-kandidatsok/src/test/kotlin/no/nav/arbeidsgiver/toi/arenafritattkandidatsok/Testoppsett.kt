@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import java.sql.ResultSet
@@ -9,10 +10,8 @@ import java.sql.ResultSet
 
 val lokalPostgres: PostgreSQLContainer<*>
     get() {
-        val postgres = PostgreSQLContainer(DockerImageName.parse("postgres:14.4-alpine"))
-            .withDatabaseName("dbname")
-            .withUsername("username")
-            .withPassword("pwd")
+        val postgres = PostgreSQLContainer(DockerImageName.parse("postgres:14.4-alpine")).withDatabaseName("dbname")
+            .withUsername("username").withPassword("pwd")
 
         postgres.start()
         return postgres
@@ -38,6 +37,28 @@ fun kandidatlisteRepositoryMedLokalPostgres(): FritattRepository {
     return FritattRepository(dataSource).apply { flywayMigrate(dataSource) }
 }
 
+fun slettStatusTabell() {
+    try {
+        val connection = dataSource.connection
+
+        connection.use {
+            it.prepareStatement("drop table sendingstatus").execute()
+        }
+    } catch (e: Exception) {
+        println("Trenger ikke slette fordi db-skjema ikke opprettet ennå")
+    }
+}
+
+fun opprettStatusTabell() = droppTabellOgKjørFlywayPåNytt()
+
+private fun droppTabellOgKjørFlywayPåNytt() {
+    FritattRepository(dataSource).apply {
+        val flyway = Flyway.configure().dataSource(dataSource).cleanDisabled(false).load()
+        flyway.clean()
+        flyway.migrate()
+    }
+}
+
 fun slettAllDataIDatabase() {
     val connection = dataSource.connection
 
@@ -46,16 +67,12 @@ fun slettAllDataIDatabase() {
     }
 }
 
-fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
-    fun ResultSet.toFritatt() = Fritatt(
+fun hentAlleFritatt(): List<Fritatt> = dataSource.connection.use { connection ->
+    fun ResultSet.toFritatt() = Fritatt.fraDatabase(
         id = getInt("db_id"),
         fnr = getString("fnr"),
         startdato = getDate("startdato").toLocalDate(),
         sluttdato = getDate("sluttdato")?.toLocalDate(),
-        sendingAktivertStatus = getString("sending_aktivert_status"),
-        forsoktSendtAktivert = getTimestamp("forsoktsendt_aktivert")?.toInstant()?.atOslo(),
-        sendingDeaktivertStatus = getString("sending_deaktivert_status"),
-        forsoktSendtDeaktivert = getTimestamp("forsoktsendt_deaktivert")?.toInstant()?.atOslo(),
         sistEndretIArena = getTimestamp("sistendret_i_arena").toInstant().atOslo(),
         slettetIArena = getBoolean("slettet_i_arena"),
         opprettetRad = getTimestamp("opprettet_rad").toInstant().atOslo(),
@@ -68,6 +85,16 @@ fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
     }
 
 
+}
+
+fun hentAlleStatusene() = dataSource.connection.use {
+    it.prepareStatement("select * from sendingstatus").executeQuery().let { resultSet ->
+        generateSequence {
+            if (resultSet.next())
+                resultSet.getString("fnr")!! to Status.valueOf(resultSet.getString("status")!!)
+            else null
+        }.toList()
+    }
 }
 
 

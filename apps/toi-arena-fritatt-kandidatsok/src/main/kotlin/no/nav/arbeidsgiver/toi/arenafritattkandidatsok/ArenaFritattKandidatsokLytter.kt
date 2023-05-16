@@ -68,19 +68,12 @@ class ArenaFritattKandidatsokLytter(
     }
 
     private fun mapJsonNodeToFritatt(data: JsonNode, originalmelding: JsonMessage, operasjonstype: String) =
-        Fritatt(
-            id = null,
+        Fritatt.ny(
             fnr = data["FODSELSNR"].asText(),
             startdato = localIsoDate(data["START_DATO"].asText().substring(0, 10)),
             sluttdato = data["SLUTT_DATO"].asTextNullable()?.let { localIsoDate(it.substring(0, 10)) },
-            sendingAktivertStatus = "ikke_sendt",
-            forsoktSendtAktivert = null,
-            sendingDeaktivertStatus = "ikke_sendt",
-            forsoktSendtDeaktivert = null,
             sistEndretIArena = LocalDateTime.parse(data["ENDRET_DATO"].asText(), arenaTidsformat).atOsloSameInstant(),
             slettetIArena = operasjonstype == "D",
-            opprettetRad = ZonedDateTime.now(),
-            sistEndretRad = ZonedDateTime.now(),
             meldingFraArena = originalmelding.toJson()
         )
 
