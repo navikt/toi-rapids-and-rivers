@@ -144,7 +144,7 @@ class FritattRepository(private val dataSource: DataSource) {
             WHERE EXISTS (
               SELECT 1
               FROM fritatt
-              WHERE fnr = ? AND sistendret_i_arena = ?
+              WHERE fnr = ? AND melding_fra_arena = ?
             )
             """.trimIndent()
         ).run {
@@ -152,7 +152,7 @@ class FritattRepository(private val dataSource: DataSource) {
             setString(2, status.name)
             setTimestamp(3, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
             setString(4, fritatt.fnr)
-            setTimestamp(5, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
+            setString(5, fritatt.meldingFraArena)
             execute()
         }
     }

@@ -115,11 +115,11 @@ class FritattJobbTest {
     @Test
     fun `skal ikke sende melding dersom fritatt melding har blitt endret mens scheduleren kjører`() {
         val fritattFraSchedulerspørring =
-            lagFritatt(periode = IkkeStartetFørIMorgen, sistEndretIArena = ZonedDateTime.now().minusDays(1))
+            lagFritatt(periode = IkkeStartetFørIMorgen, meldingFraArena = """{"hei": "hei"}""")
 
         val fritattSomKommmerIMellom = lagFritatt(
             periode = AktivUtenSluttDatoFraOgMedIDag,
-            sistEndretIArena = ZonedDateTime.now()
+            meldingFraArena = """{"heisan": "heisan"}"""
         )
         repository.upsertFritatt(
             fritattFraSchedulerspørring
@@ -172,10 +172,10 @@ class FritattJobbTest {
         private fun lagFritatt(
             periode: Periode,
             slettetIArena: Boolean = false,
-            sistEndretIArena: ZonedDateTime = ZonedDateTime.now(),
+            meldingFraArena: String = "{}",
         ) = Fritatt.ny(
             "12345678910", periode.startDato(), periode.sluttDato(),
-            sistEndretIArena, slettetIArena, "{}"
+            ZonedDateTime.now(), slettetIArena, meldingFraArena
         )
 
         private sealed interface Periode {
