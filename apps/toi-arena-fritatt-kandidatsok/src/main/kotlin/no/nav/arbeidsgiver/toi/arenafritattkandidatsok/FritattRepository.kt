@@ -135,25 +135,24 @@ class FritattRepository(private val dataSource: DataSource) {
     }
 
     fun markerSomSendt(fritatt: Fritatt, status: Status): Boolean = dataSource.connection.use { connection ->
-        // TODO: Ikke lagre hvis et timestamp er endret i databasen.
         connection.prepareStatement(
             """
-            INSERT INTO sendingstatus (fnr, status, opprettet_rad)
-            SELECT fnr, status, CAST(opprettet_rad AS timestamp with time zone)
-            FROM (VALUES (?, ?, ?)) AS data(fnr, status, opprettet_rad)
-            WHERE EXISTS (
-              SELECT 1
-              FROM fritatt
-              WHERE fnr = ? AND melding_fra_arena = ?
-            )
-            """.trimIndent()
+        INSERT INTO sendingstatus (fnr, status, opprettet_rad)
+        SELECT fnr, status, CAST(opprettet_rad AS timestamp with time zone)
+        FROM (VALUES (?, ?, ?)) AS data(fnr, status, opprettet_rad)
+        WHERE EXISTS (
+          SELECT 1
+          FROM fritatt
+          WHERE fnr = ? AND melding_fra_arena = ?
+        )
+        """.trimIndent()
         ).run {
             setString(1, fritatt.fnr)
             setString(2, status.name)
             setTimestamp(3, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
             setString(4, fritatt.fnr)
             setString(5, fritatt.meldingFraArena)
-            execute()
+            executeUpdate() > 0
         }
     }
 
