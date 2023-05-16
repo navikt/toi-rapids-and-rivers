@@ -12,6 +12,3 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.18.0")
     testImplementation("org.testcontainers:junit-jupiter:1.18.0")
 }
-tasks.withType<Test> {
-    useJUnitPlatform()
-}

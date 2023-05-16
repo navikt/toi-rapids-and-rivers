@@ -8,6 +8,7 @@ on:
   push:
     branches:
     - main
+    - scheduler-for-fritatt-arena
     paths:
     - apps/toi-arena-fritatt-kandidatsok/**
     - .github/workflows/deploy-toi-arena-fritatt-kandidatsok.yaml
