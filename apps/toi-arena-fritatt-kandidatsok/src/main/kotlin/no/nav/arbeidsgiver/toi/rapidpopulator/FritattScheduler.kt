@@ -55,7 +55,12 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
         val melding = it.fritatt.tilJsonMelding(it.gjeldendestatus().erFritatt())
         secureLog.info("Sender melding for fnr $fnr ${it.status} $melding ")
         rapidsConnection.publish(it.fritatt.fnr, melding)
-        repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
+        val blelagret = repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
+        if(!blelagret) {
+            secureLog.error("Konflikt ved lagring for fnr $fnr: ${blelagret} ${it.fritatt} ${it.gjeldendestatus()}")
+            log.info("Konflikt ved lagring, se securelog")
+        }
+        secureLog.info("Resultat markerSomSendt for $fnr: ${blelagret} ${it.fritatt} ${it.gjeldendestatus()}")
     }
 
 }
