@@ -135,6 +135,8 @@ class FritattRepository(private val dataSource: DataSource) {
     }
 
     fun markerSomSendt(fritatt: Fritatt, status: Status) = dataSource.connection.use { connection ->
+
+        // TODO: Ikke lagre hvis et timestamp er endret i databasen.
         connection.prepareStatement(
             """
         INSERT INTO sendingstatus (fnr, status, opprettet_rad)

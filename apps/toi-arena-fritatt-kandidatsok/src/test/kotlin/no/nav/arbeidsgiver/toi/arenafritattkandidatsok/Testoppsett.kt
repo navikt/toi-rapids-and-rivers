@@ -10,10 +10,8 @@ import java.sql.ResultSet
 
 val lokalPostgres: PostgreSQLContainer<*>
     get() {
-        val postgres = PostgreSQLContainer(DockerImageName.parse("postgres:14.4-alpine"))
-            .withDatabaseName("dbname")
-            .withUsername("username")
-            .withPassword("pwd")
+        val postgres = PostgreSQLContainer(DockerImageName.parse("postgres:14.4-alpine")).withDatabaseName("dbname")
+            .withUsername("username").withPassword("pwd")
 
         postgres.start()
         return postgres
@@ -69,7 +67,7 @@ fun slettAllDataIDatabase() {
     }
 }
 
-fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
+fun hentAlleFritatt(): List<Fritatt> = dataSource.connection.use { connection ->
     fun ResultSet.toFritatt() = Fritatt.fraDatabase(
         id = getInt("db_id"),
         fnr = getString("fnr"),
@@ -87,6 +85,16 @@ fun hentAlle(): List<Fritatt> = dataSource.connection.use { connection ->
     }
 
 
+}
+
+fun hentAlleStatusene() = dataSource.connection.use {
+    it.prepareStatement("select * from sendingstatus").executeQuery().let { resultSet ->
+        generateSequence {
+            if (resultSet.next())
+                resultSet.getString("fnr")!! to Status.valueOf(resultSet.getString("status")!!)
+            else null
+        }.toList()
+    }
 }
 
 

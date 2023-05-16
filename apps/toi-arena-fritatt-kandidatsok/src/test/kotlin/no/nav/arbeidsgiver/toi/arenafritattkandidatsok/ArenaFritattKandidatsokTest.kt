@@ -39,7 +39,7 @@ class ArenaFritattKandidatsokTest {
 
         Thread.sleep(300)
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -73,7 +73,7 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, sluttdato = null))
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -92,7 +92,7 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer = fødselsnummer))
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -115,7 +115,7 @@ class ArenaFritattKandidatsokTest {
         )
 
         testRapid.sendTestMessage(oppdateringsmelding(fødselsnummer = fødselsnummer))
-        val fritattListeNy = hentAlle()
+        val fritattListeNy = hentAlleFritatt()
         assertThat(fritattListeNy).hasSize(1)
         val fritattNy = fritattListeNy.first()
         assertThat(fritattNy.fnr).isEqualTo(fødselsnummer)
@@ -152,7 +152,7 @@ class ArenaFritattKandidatsokTest {
         testRapid.sendTestMessage(annenMeldingFraEksterntTopic(fødselsnummer1))
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer2))
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(2)
         val fritatt = fritattListe[0]
         assertThat(fritatt.fnr).isEqualTo(fødselsnummer1)
@@ -206,7 +206,7 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer = fødselsnummer, opType = "U"))
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 
@@ -248,7 +248,7 @@ class ArenaFritattKandidatsokTest {
             )
         )
 
-        val fritattListe = hentAlle()
+        val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
 

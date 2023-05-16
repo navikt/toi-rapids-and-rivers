@@ -42,7 +42,7 @@ class FritattRepositoryTest {
             sistEndretRad
         )
         repository.upsertFritatt(fritatt)
-        hentAlle().apply {
+        hentAlleFritatt().apply {
             assertThat(this).hasSize(1)
             first().also {
                 assertThat(it.fnr).isEqualTo(fnr)
@@ -80,7 +80,7 @@ class FritattRepositoryTest {
                 gammelRadOppdatert
             )
         )
-        val id = hentAlle().first().id
+        val id = hentAlleFritatt().first().id
         val fritatt = Fritatt.fraDatabase(
             42,
             fnr,
@@ -93,7 +93,7 @@ class FritattRepositoryTest {
             nyRadOppdatert
         )
         repository.upsertFritatt(fritatt)
-        hentAlle().apply {
+        hentAlleFritatt().apply {
             assertThat(this).hasSize(1)
             first().also {
                 assertThat(it.id).isEqualTo(id)
@@ -133,7 +133,7 @@ class FritattRepositoryTest {
             sistEndretRad
         )
         assertThrows<Exception> { repository.upsertFritatt(fritatt) }
-        hentAlle().apply {
+        hentAlleFritatt().apply {
             assertThat(this).isEmpty()
         }
 
