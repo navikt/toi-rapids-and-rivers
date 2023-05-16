@@ -8,6 +8,7 @@ import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattRepository
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.atOslo
 import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.log
 import no.nav.helse.rapids_rivers.RapidsConnection
+import org.slf4j.LoggerFactory
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
@@ -45,13 +46,19 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
         log.info("Kjører FritattJobb")
         repository.hentAlle {
             filter { it.skalPubliseres() }
-            .forEach(::sendMelding)
+                .forEach(::sendMelding)
         }
     }
 
     fun sendMelding(it: FritattOgStatus) {
-        rapidsConnection.publish(it.fritatt.fnr, it.fritatt.tilJsonMelding(it.gjeldendestatus().erFritatt()))
+        val fnr = it.fritatt.fnr
+        val melding = it.fritatt.tilJsonMelding(it.gjeldendestatus().erFritatt())
+        secureLog.info("Sender melding for fnr $fnr ${it.status} $melding ")
+        rapidsConnection.publish(it.fritatt.fnr, melding)
         repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
     }
 
 }
+
+private val secureLog = LoggerFactory.getLogger("secureLog")
+

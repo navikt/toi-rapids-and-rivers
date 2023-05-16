@@ -31,7 +31,7 @@ class DatabaseKonfigurasjon(env: Map<String, String>) {
     }.let(::HikariDataSource)
 }
 
-class Fritatt private constructor(
+data class Fritatt private constructor(
     val id: Int?,
     val fnr: String,
     val startdato: LocalDate,
@@ -134,29 +134,29 @@ class FritattRepository(private val dataSource: DataSource) {
         Flyway.configure().dataSource(dataSource).load().migrate()
     }
 
-    fun markerSomSendt(fritatt: Fritatt, status: Status) = dataSource.connection.use { connection ->
-
+    fun markerSomSendt(fritatt: Fritatt, status: Status): Boolean = dataSource.connection.use { connection ->
         // TODO: Ikke lagre hvis et timestamp er endret i databasen.
         connection.prepareStatement(
             """
-        INSERT INTO sendingstatus (fnr, status, opprettet_rad)
-        SELECT fnr, status, CAST(opprettet_rad AS timestamp with time zone)
-        FROM (VALUES (?, ?, ?)) AS data(fnr, status, opprettet_rad)
-        WHERE EXISTS (
-          SELECT 1
-          FROM fritatt
-          WHERE fnr = ? AND sistendret_i_arena = ?
-        )
-        """.trimIndent()
-        ).apply {
+            INSERT INTO sendingstatus (fnr, status, opprettet_rad)
+            SELECT fnr, status, CAST(opprettet_rad AS timestamp with time zone)
+            FROM (VALUES (?, ?, ?)) AS data(fnr, status, opprettet_rad)
+            WHERE EXISTS (
+              SELECT 1
+              FROM fritatt
+              WHERE fnr = ? AND sistendret_i_arena = ?
+            )
+            """.trimIndent()
+        ).run {
             setString(1, fritatt.fnr)
             setString(2, status.name)
             setTimestamp(3, Timestamp(ZonedDateTime.now().toInstant().toEpochMilli()))
             setString(4, fritatt.fnr)
             setTimestamp(5, Timestamp(fritatt.sistEndretIArena.toInstant().toEpochMilli()))
-            executeUpdate()
+            execute()
         }
     }
+
 
     fun hentAlle(callback: Sequence<FritattOgStatus>.() -> Unit): Unit =
         dataSource.connection.use { connection ->
