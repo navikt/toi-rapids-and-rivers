@@ -13,7 +13,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
-private const val FRITATT_KANDIDATSØK_KEY = "erFritatt"
+private const val FRITATT_KANDIDATSØK_WRAPPER_KEY = "arenaFritattKandidatsøk"
+private const val FRITATT_KANDIDATSØK_KEY = "erFritattKandidatsøk"
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class FritattJobbTest {
@@ -33,7 +34,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
     }
 
     @Test
@@ -42,7 +43,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
     }
 
     @Test
@@ -51,7 +52,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
     }
 
     @Test
@@ -60,7 +61,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
     }
 
     @Test
@@ -69,7 +70,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
     }
 
     @Test
@@ -80,7 +81,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
     }
 
     @Test
@@ -91,7 +92,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
     }
 
     @Test
@@ -109,7 +110,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
     }
 
     @Test
@@ -131,7 +132,7 @@ class FritattJobbTest {
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
+        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
 
         val statuser = hentAlleStatusene()
         assertThat(statuser).hasSize(0)
@@ -139,7 +140,7 @@ class FritattJobbTest {
         fritattJobb.run()
         val inspektørNesteNatt = testRapid.inspektør
         assertThat(inspektørNesteNatt.size).isEqualTo(2)
-        assertThat(inspektørNesteNatt.message(1).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
+        assertThat(inspektørNesteNatt.message(1).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
 
         val statuserNesteNatt = hentAlleStatusene()
         assertThat(statuserNesteNatt).hasSize(1)
