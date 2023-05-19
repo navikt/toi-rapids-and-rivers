@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - scheduler-for-fritatt-arena
     paths:
     - apps/toi-arena-fritatt-kandidatsok/**
     - .github/workflows/deploy-toi-arena-fritatt-kandidatsok.yaml
@@ -62,7 +59,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/scheduler-for-fritatt-arena'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/rekjør_nytt_arena_fritatt_i_dev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
