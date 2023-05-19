@@ -19,7 +19,7 @@ fun startRapid(
             Lytter(rapid, repository, "siste14avedtak")
             Lytter(rapid, repository, "oppfølgingsperiode")
             Lytter(rapid, repository, "fritatt-kandidatsøk", "fritattKandidatsøk")
-            Lytter(rapid, repository, "arena-fritatt-kandidatsøk", "erFritattKandidatsøk")
+            Lytter(rapid, repository, "arena-fritatt-kandidatsøk", "arenaFritattKandidatsøk")
             Lytter(rapid, repository, "hjemmel")
             Lytter(rapid, repository, "må-behandle-tidligere-cv", "måBehandleTidligereCv")
             Lytter(rapid, repository, "tilretteleggingsbehov")

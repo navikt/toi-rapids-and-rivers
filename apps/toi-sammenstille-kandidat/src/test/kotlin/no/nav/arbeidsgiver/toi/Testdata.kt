@@ -149,7 +149,7 @@ fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boo
             "fnr": "123",
             "@event_name": "arena-fritatt-kandidatsøk",
             "arenaFritattKandidatsøk": {
-                "erFritattKandidatsøk": $erFritattKandidatsøk,
+                "erFritattKandidatsøk": $erFritattKandidatsøk
             }
         }
     """.trimIndent()
