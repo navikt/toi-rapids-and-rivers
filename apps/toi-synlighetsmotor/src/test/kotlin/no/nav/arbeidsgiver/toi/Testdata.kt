@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions
 import java.time.ZonedDateTime
 
 fun testProgramMedHendelse(
-    oppfølgingsinformasjonHendelse: String,
+    hendelse: String,
     assertion: TestRapid.RapidInspector.() -> Unit,
     repository: Repository = Repository(TestDatabase().dataSource)
 ) {
@@ -14,7 +14,7 @@ fun testProgramMedHendelse(
 
     startApp(repository, Javalin.create(), rapid) { true }
 
-    rapid.sendTestMessage(oppfølgingsinformasjonHendelse)
+    rapid.sendTestMessage(hendelse)
     rapid.inspektør.assertion()
 }
 
@@ -43,7 +43,7 @@ class Testdata {
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
             fritattKandidatsøk: String = fritattKandidatsøk(),
-            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(),
+            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(fnr="12312312312"),
             hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
@@ -207,10 +207,11 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun arenaFritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
+        fun arenaFritattKandidatsøk(fritattKandidatsøk: Boolean = false, fnr: String?) =
             """
             "arenaFritattKandidatsøk" : {
-                "erFritattKandidatsøk" : $fritattKandidatsøk
+                "erFritattKandidatsøk" : $fritattKandidatsøk,
+                "fnr" : ${fnr?.let{ """"$it"""" }}
             }
         """.trimIndent()
 

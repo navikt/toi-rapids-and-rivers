@@ -132,11 +132,11 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person er fritatt fra kandidatsøk i arena skal synlighet være false når denne blir implementert i fremtiden men siden dette ikke skal være implementert enda så skal synlighet ikke påvirkes av denne TODO`() {
         testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(true)),
+            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(true, "12312312312")),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
         )
         testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(false)),
+            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(false, "12312312312")),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
         )
     }
@@ -220,7 +220,7 @@ class SynlighetsmotorTest {
     @Test
     fun `ignorer uinteressante hendelser`() {
         testProgramMedHendelse(
-            oppfølgingsinformasjonHendelse = """{ "@event_name":"uinteressant_hendelse" }""",
+            hendelse = """{ "@event_name":"uinteressant_hendelse" }""",
             assertion = {
                 assertThat(size).isZero()
             }

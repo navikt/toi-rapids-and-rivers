@@ -44,10 +44,20 @@ data class Fritatt private constructor(
 ) {
 
     fun tilJsonMelding(erFritattKandidatsøk: Boolean) =
-        JsonMessage.newMessage("arena-fritatt-kandidatsøk", mapOf("fnr" to fnr, "arenaFritattKandidatsøk" to ArenaFritattKandidatsøk(erFritattKandidatsøk))).toJson()
+        JsonMessage.newMessage(
+            "arena-fritatt-kandidatsøk",
+            mapOf(
+                "fnr" to fnr,
+                "arenaFritattKandidatsøk" to ArenaFritattKandidatsøk(
+                    erFritattKandidatsøk = erFritattKandidatsøk,
+                    fnr = fnr
+                )
+            )
+        ).toJson()
 
     companion object {
-        private data class ArenaFritattKandidatsøk(val erFritattKandidatsøk: Boolean)
+        private data class ArenaFritattKandidatsøk(val erFritattKandidatsøk: Boolean, val fnr: String)
+
         fun ny(
             fnr: String,
             startdato: LocalDate,

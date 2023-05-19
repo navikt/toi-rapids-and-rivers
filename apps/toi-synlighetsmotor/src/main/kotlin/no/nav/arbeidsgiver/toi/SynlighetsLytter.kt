@@ -52,5 +52,6 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         kandidat.arbeidsmarkedCv?.opprettCv?.cv?.fodselsnummer ?:
         kandidat.arbeidsmarkedCv?.endreCv?.cv?.fodselsnummer ?:
         kandidat.hjemmel?.fnr ?:
-        kandidat.oppfølgingsinformasjon?.fodselsnummer
+        kandidat.oppfølgingsinformasjon?.fodselsnummer ?:
+        kandidat.arenaFritattKandidatsøk?.fnr
 }
