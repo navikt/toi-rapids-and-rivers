@@ -50,7 +50,7 @@ fun arbeidsmarkedCvMelding(aktørId: String) = """
         }
     """.trimIndent()
 
-fun cvMeldingMedSystemParticipatingServices(aktørid: String  = "123") = """
+fun cvMeldingMedSystemParticipatingServices(aktørid: String = "123") = """
         {
           "aktørId": "$aktørid",
           "arbeidsmarkedCv": {
@@ -116,6 +116,7 @@ fun siste14avedtakMelding(aktørId: String) = """
               }
             }
 """.trimIndent()
+
 fun oppfølgingsperiodeMelding(aktørId: String) = """
         {
             "aktørId": "$aktørId",
@@ -136,6 +137,19 @@ fun fritattKandidatsøkMelding(aktørId: String, fritattKandidatsøk: Boolean) =
             "@event_name": "fritatt-kandidatsøk",
             "fritattKandidatsøk": {
                 "fritattKandidatsok": $fritattKandidatsøk
+            }
+        }
+    """.trimIndent()
+
+
+
+fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boolean) = """
+        {
+            "aktørId": "$aktørId",
+            "fnr": "123",
+            "@event_name": "arena-fritatt-kandidatsøk",
+            "arenaFritattKandidatsøk": {
+                "erFritattKandidatsøk": $erFritattKandidatsøk,
             }
         }
     """.trimIndent()

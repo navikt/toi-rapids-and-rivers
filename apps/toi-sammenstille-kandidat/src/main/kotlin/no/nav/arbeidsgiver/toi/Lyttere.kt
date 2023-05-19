@@ -47,6 +47,7 @@ class Lytter(
             "siste14avedtak" -> kandidat.copy(siste14avedtak = verdi)
             "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = verdi)
             "fritatt-kandidatsøk" -> kandidat.copy(fritattKandidatsøk = verdi)
+            "arena-fritatt-kandidatsøk" -> kandidat.copy(arenaFritattKandidatsøk = verdi)
             "hjemmel" -> kandidat.copy(hjemmel = verdi)
             "må-behandle-tidligere-cv" -> kandidat.copy(måBehandleTidligereCv = verdi)
             "tilretteleggingsbehov" -> kandidat.copy(tilretteleggingsbehov = verdi)
