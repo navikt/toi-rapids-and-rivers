@@ -11,6 +11,7 @@ data class Kandidat(
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
     val fritattKandidatsøk: FritattKandidatsøk?,
+    val arenaFritattKandidatsøk: ArenaFritattKandidatsøk?,
     val hjemmel: Hjemmel?,
     val måBehandleTidligereCv: MåBehandleTidligereCv?,
 ) {
@@ -68,6 +69,10 @@ enum class Formidlingsgruppe {
 
 data class FritattKandidatsøk(
     val fritattKandidatsok: Boolean
+)
+
+data class ArenaFritattKandidatsøk(
+    val erFritattKandidatsøk: Boolean
 )
 
 data class Hjemmel(

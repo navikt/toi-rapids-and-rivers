@@ -43,6 +43,7 @@ class Testdata {
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
             fritattKandidatsøk: String = fritattKandidatsøk(),
+            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(),
             hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
@@ -55,6 +56,7 @@ class Testdata {
                 oppfølgingsinformasjon = oppfølgingsinformasjon,
                 arbeidsmarkedCv = arbeidsmarkedCv,
                 fritattKandidatsøk = fritattKandidatsøk,
+                arenaFritattKandidatsøk = arenaFritattKandidatsøk,
                 hjemmel = hjemmel,
                 participatingService = participatingService,
                 måBehandleTidligereCv = måBehandleTidligereCv,
@@ -75,6 +77,7 @@ class Testdata {
             oppfølgingsinformasjon: String? = null,
             arbeidsmarkedCv: String? = null,
             fritattKandidatsøk: String? = null,
+            arenaFritattKandidatsøk: String? = null,
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
@@ -88,6 +91,7 @@ class Testdata {
                 oppfølgingsinformasjon,
                 oppfølgingsperiode,
                 fritattKandidatsøk,
+                arenaFritattKandidatsøk,
                 hjemmel,
                 participatingService,
                 måBehandleTidligereCv,
@@ -200,6 +204,13 @@ class Testdata {
             """
             "fritattKandidatsøk" : {
                 "fritattKandidatsok" : $fritattKandidatsøk
+            }
+        """.trimIndent()
+
+        fun arenaFritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
+            """
+            "arenaFritattKandidatsøk" : {
+                "erFritattKandidatsøk" : $fritattKandidatsøk
             }
         """.trimIndent()
 

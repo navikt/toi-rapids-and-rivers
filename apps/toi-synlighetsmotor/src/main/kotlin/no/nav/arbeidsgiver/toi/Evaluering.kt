@@ -6,6 +6,7 @@ data class Evaluering(
     val harSettHjemmel: Boolean,
     val maaIkkeBehandleTidligereCv: Boolean,
     val erIkkeFritattKandidatsøk: Boolean,
+    val arenaIkkeFritattKandidatsøk: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeKode6eller7: Boolean,

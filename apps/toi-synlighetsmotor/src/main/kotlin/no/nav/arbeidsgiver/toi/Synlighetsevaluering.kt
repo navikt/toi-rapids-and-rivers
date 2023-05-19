@@ -11,6 +11,7 @@ fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
         harSettHjemmel = harSettHjemmel(kandidat),
         maaIkkeBehandleTidligereCv = kandidat.måBehandleTidligereCv?.maaBehandleTidligereCv != true,
         erIkkeFritattKandidatsøk = kandidat.fritattKandidatsøk == null || !kandidat.fritattKandidatsøk.fritattKandidatsok,
+        arenaIkkeFritattKandidatsøk = kandidat.arenaFritattKandidatsøk == null || !kandidat.arenaFritattKandidatsøk.erFritattKandidatsøk,
         erUnderOppfoelging = erUnderOppfølging(kandidat),
         harRiktigFormidlingsgruppe = kandidat.oppfølgingsinformasjon?.formidlingsgruppe in listOf(
             Formidlingsgruppe.ARBS,

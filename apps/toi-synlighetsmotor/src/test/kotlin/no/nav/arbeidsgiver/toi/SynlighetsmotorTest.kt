@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.fritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
@@ -127,6 +128,19 @@ class SynlighetsmotorTest {
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
+    //TODO
+    @Test
+    fun `om Person er fritatt fra kandidatsøk i arena skal synlighet være false når denne blir implementert i fremtiden men siden dette ikke skal være implementert enda så skal synlighet ikke påvirkes av denne TODO`() {
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(true)),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
+        )
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(false)),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
+        )
+    }
+
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = manglendeCV()),
@@ -234,6 +248,7 @@ private fun evalueringMedAltTrue() = Evaluering(
     harSettHjemmel = true,
     maaIkkeBehandleTidligereCv = true,
     erIkkeFritattKandidatsøk = true,
+    arenaIkkeFritattKandidatsøk = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
     erIkkeKode6eller7 = true,

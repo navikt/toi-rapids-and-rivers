@@ -16,6 +16,7 @@ class Repository(private val dataSource: DataSource) {
     private val harSettHjemmelKolonne = "har_sett_hjemmel"
     private val måIkkeBehandleTidligereCvKolonne = "maa_ikke_behandle_tidligere_cv"
     private val ikkeFritattFraKandidatsøkKolonne = "ikke_fritatt_kandidatsok"
+    private val arenaIkkeFritattKandidatsøkKolonne = "arena_ikke_fritatt_kandidatsok"
     private val erIkkeUnderOppfølgingKolonne = "er_under_oppfolging"
     private val harRiktigFormidlingsgruppeKolonne = "har_riktig_formidlingsgruppe"
     private val erIkkeKode6Eller7Kolonne = "er_ikke_kode6_eller_kode7"
@@ -103,6 +104,7 @@ class Repository(private val dataSource: DataSource) {
         harSettHjemmel = resultset.getBoolean(harSettHjemmelKolonne),
         maaIkkeBehandleTidligereCv = resultset.getBoolean(måIkkeBehandleTidligereCvKolonne),
         erIkkeFritattKandidatsøk = resultset.getBoolean(ikkeFritattFraKandidatsøkKolonne),
+        arenaIkkeFritattKandidatsøk = resultset.getBoolean(arenaIkkeFritattKandidatsøkKolonne),
         erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne),
         harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne),
         erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne),
@@ -126,6 +128,7 @@ class Repository(private val dataSource: DataSource) {
             harSettHjemmelKolonne to harSettHjemmel,
             måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv,
             ikkeFritattFraKandidatsøkKolonne to erIkkeFritattKandidatsøk,
+            arenaIkkeFritattKandidatsøkKolonne to arenaIkkeFritattKandidatsøk,
             erIkkeUnderOppfølgingKolonne to erUnderOppfoelging,
             harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe,
             erIkkeKode6Eller7Kolonne to erIkkeKode6eller7,
