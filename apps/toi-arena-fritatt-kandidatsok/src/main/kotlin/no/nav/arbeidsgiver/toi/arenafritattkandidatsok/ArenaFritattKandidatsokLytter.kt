@@ -31,8 +31,8 @@ class ArenaFritattKandidatsokLytter(
         validerData(data, operasjonstype, packet.toJson())
         val fnr = data["FODSELSNR"]?.asTextNullable() ?: feilMedManglendeFnr(packet)
 
-        log.info("Skal publisere arenafritattkandidatsok-melding")
-        secureLog.info("Skal publisere arenafritattkandidatsok med fnr $fnr operasjonstype $operasjonstype: ${packet.toJson()}")
+        log.info("Skal lagre arenafritattkandidatsok-melding")
+        secureLog.info("Skal lagre arenafritattkandidatsok med fnr $fnr operasjonstype $operasjonstype: ${packet.toJson()}")
 
 
         val fritatt = mapJsonNodeToFritatt(data, packet, operasjonstype)

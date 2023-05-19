@@ -17,7 +17,7 @@ fun main() {
         register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 repository.flywayMigrate(dataSource)
-                startFritattScedulerKlokken(14,25,0,0, repository, this@apply)
+                startFritattScedulerKlokken(15,35,0,0, repository, this@apply)
             }
         })
 
