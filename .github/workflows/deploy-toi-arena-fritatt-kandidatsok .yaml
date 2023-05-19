@@ -6,9 +6,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
-    - rekjør_nytt_arena_fritatt_i_dev
     paths:
     - apps/toi-arena-fritatt-kandidatsok/**
     - .github/workflows/deploy-toi-arena-fritatt-kandidatsok.yaml
