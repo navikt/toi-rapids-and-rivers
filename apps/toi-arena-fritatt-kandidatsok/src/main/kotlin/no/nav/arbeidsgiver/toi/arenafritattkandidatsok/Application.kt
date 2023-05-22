@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
-import no.nav.arbeidsgiver.toi.rapidpopulator.startFritattScedulerKlokken
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.LoggerFactory
@@ -17,7 +16,7 @@ fun main() {
         register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 repository.flywayMigrate(dataSource)
-                startFritattScedulerKlokken(16,35,0,0, repository, this@apply)
+                startFritattScedulerKlokken(9, 45, 0, 0, repository, this@apply)
             }
         })
 

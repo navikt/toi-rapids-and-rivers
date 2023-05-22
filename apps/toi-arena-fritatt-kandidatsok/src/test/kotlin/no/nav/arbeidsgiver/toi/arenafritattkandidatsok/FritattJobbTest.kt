@@ -1,9 +1,7 @@
-package rapidpopulator
+package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.*
-import no.nav.arbeidsgiver.toi.rapidpopulator.FritattJobb
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,9 +32,12 @@ class FritattJobbTest {
         repository.upsertFritatt(lagFritatt(periode = IkkeStartetFørIMorgen))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isFalse()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -44,9 +45,12 @@ class FritattJobbTest {
         repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrensetTilOgMedIDag))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isTrue()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
 
     }
 
@@ -55,9 +59,12 @@ class FritattJobbTest {
         repository.upsertFritatt(lagFritatt(periode = AktivUtenSluttDatoFraOgMedIDag))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isTrue()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -65,9 +72,12 @@ class FritattJobbTest {
         repository.upsertFritatt(lagFritatt(periode = AvsluttetIGår))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isFalse()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -75,9 +85,12 @@ class FritattJobbTest {
         repository.upsertFritatt(lagFritatt(periode = AktivTidsbegrensetTilOgMedIDag, slettetIArena = true))
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isFalse()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -87,9 +100,12 @@ class FritattJobbTest {
         repository.markerSomSendt(fritatt, Status.FOER_FRITATT_PERIODE)
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isTrue()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -99,9 +115,12 @@ class FritattJobbTest {
         repository.markerSomSendt(fritatt, Status.I_FRITATT_PERIODE)
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isFalse()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -118,9 +137,12 @@ class FritattJobbTest {
 
         fritattJobb.run()
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isTrue()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
     }
 
     @Test
@@ -141,31 +163,39 @@ class FritattJobbTest {
         fritattJobb.sendMelding(FritattOgStatus(fritattFraSchedulerspørring, listOf(Status.FOER_FRITATT_PERIODE)))
 
         val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isFalse()
-        assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        Assertions.assertThat(
+            inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()
+        ).isFalse()
+        Assertions.assertThat(inspektør.message(0).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText())
+            .isEqualTo("12345678910")
 
         val statuser = hentAlleStatusene()
-        assertThat(statuser).hasSize(0)
+        Assertions.assertThat(statuser).hasSize(0)
 
         fritattJobb.run()
         val inspektørNesteNatt = testRapid.inspektør
-        assertThat(inspektørNesteNatt.size).isEqualTo(2)
-        assertThat(inspektørNesteNatt.message(1).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY).booleanValue()).isTrue()
-        assertThat(inspektørNesteNatt.message(1).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()).isEqualTo("12345678910")
+        Assertions.assertThat(inspektørNesteNatt.size).isEqualTo(2)
+        Assertions.assertThat(
+            inspektørNesteNatt.message(1).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_KANDIDATSØK_KEY)
+                .booleanValue()
+        ).isTrue()
+        Assertions.assertThat(
+            inspektørNesteNatt.message(1).get(FRITATT_KANDIDATSØK_WRAPPER_KEY).get(FRITATT_FNR_KEY).asText()
+        ).isEqualTo("12345678910")
 
         val statuserNesteNatt = hentAlleStatusene()
-        assertThat(statuserNesteNatt).hasSize(1)
-        assertThat(statuserNesteNatt.first().second).isEqualTo(Status.I_FRITATT_PERIODE)
+        Assertions.assertThat(statuserNesteNatt).hasSize(1)
+        Assertions.assertThat(statuserNesteNatt.first().second).isEqualTo(Status.I_FRITATT_PERIODE)
     }
 
     @ParameterizedTest
     @MethodSource("testFunksjoner")
     fun `skal ikke sende melding på nytt neste kjøring om den allerede er blitt kjørt`(testCase: () -> Unit) {
         testCase()
-        assertThat(testRapid.inspektør.size).isEqualTo(1)
+        Assertions.assertThat(testRapid.inspektør.size).isEqualTo(1)
         fritattJobb.run()
-        assertThat(testRapid.inspektør.size).isEqualTo(1)
+        Assertions.assertThat(testRapid.inspektør.size).isEqualTo(1)
     }
 
     companion object {

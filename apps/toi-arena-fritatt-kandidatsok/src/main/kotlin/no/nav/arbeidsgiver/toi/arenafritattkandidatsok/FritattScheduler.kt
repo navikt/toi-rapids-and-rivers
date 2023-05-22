@@ -1,12 +1,8 @@
-package no.nav.arbeidsgiver.toi.rapidpopulator
+package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattOgStatus
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.FritattRepository
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.atOslo
-import no.nav.arbeidsgiver.toi.arenafritattkandidatsok.log
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.LoggerFactory
 import java.time.ZonedDateTime
@@ -56,7 +52,7 @@ class FritattJobb(private val repository: FritattRepository, private val rapidsC
         secureLog.info("Sender melding for fnr $fnr ${it.status} $melding ")
         rapidsConnection.publish(it.fritatt.fnr, melding)
         val blelagret = repository.markerSomSendt(it.fritatt, it.gjeldendestatus())
-        if(!blelagret) {
+        if (!blelagret) {
             secureLog.error("Konflikt ved lagring for fnr $fnr: ${blelagret} ${it.fritatt} ${it.gjeldendestatus()}")
             log.info("Konflikt ved lagring, se securelog")
         }
