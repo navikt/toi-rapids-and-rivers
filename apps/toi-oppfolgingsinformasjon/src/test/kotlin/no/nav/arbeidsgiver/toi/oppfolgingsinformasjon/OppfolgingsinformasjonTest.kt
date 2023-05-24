@@ -14,7 +14,6 @@ class OppfolgingsinformasjonTest {
         OppfolgingsinformasjonLytter(testRapid)
 
         testRapid.sendTestMessage(oppfølgingsinformasjonMeldingFraEksterntTopic(fødselsnummer))
-        Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
 

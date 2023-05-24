@@ -14,7 +14,6 @@ class Siste14aVedtakTest {
         Siste14aVedtakLytter(testRapid)
 
         testRapid.sendTestMessage(siste14aVedtakMeldingFraEksterntTopic(aktørid))
-        Thread.sleep(300)
 
         val inspektør = testRapid.inspektør
 

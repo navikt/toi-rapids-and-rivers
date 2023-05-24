@@ -37,8 +37,6 @@ class ArenaFritattKandidatsokTest {
 
         testRapid.sendTestMessage(fritattMeldingFraEksterntTopic(fødselsnummer))
 
-        Thread.sleep(300)
-
         val fritattListe = hentAlleFritatt()
         assertThat(fritattListe).hasSize(1)
         val fritatt = fritattListe.first()
