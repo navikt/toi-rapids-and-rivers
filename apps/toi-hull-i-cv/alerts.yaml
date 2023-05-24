@@ -19,18 +19,20 @@ spec:
           labels:
             namespace: toi
             severity: critical
+
         - alert: toi-hull-i-cv
-          expr: sum(increase(logd_messages_total{log_app="toi-hull-i-cv",log_level="Error"}[10m])) > 0
-          for: 1m
+          expr: sum(increase(log_messages_errors{app="toi-hull-i-cv", level="Error"}[10m])) > 0
+          for: 1s
           annotations:
             summary: Applikasjonen har logget en error
             action: "https://logs.adeo.no/app/r/s/wnqTp"
           labels:
             namespace: toi
             severity: danger
+
         - alert: toi-hull-i-cv
-          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-hull-i-cv",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-hull-i-cv"}[5m]))) > 20
-          for: 5m
+          expr: sum(increase(log_messages_errors{app="toi-hull-i-cv", level="Warning"}[10m])) > 3
+          for: 1s
           annotations:
             summary: Økning i warning
             action: "https://logs.adeo.no/app/r/s/wnqTp"
