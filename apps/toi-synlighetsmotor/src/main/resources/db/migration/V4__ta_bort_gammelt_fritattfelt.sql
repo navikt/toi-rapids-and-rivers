@@ -1,0 +1,1 @@
+ALTER TABLE evaluering DROP COLUMN ikke_fritatt_kandidatsok;

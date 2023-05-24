@@ -5,7 +5,6 @@ data class Evaluering(
     val harJobbprofil: Boolean,
     val harSettHjemmel: Boolean,
     val maaIkkeBehandleTidligereCv: Boolean,
-    val erIkkeFritattKandidatsøk: Boolean,
     val arenaIkkeFritattKandidatsøk: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
@@ -18,7 +17,7 @@ data class Evaluering(
             harJobbprofil &&
             harSettHjemmel &&
             maaIkkeBehandleTidligereCv &&
-            erIkkeFritattKandidatsøk &&
+            arenaIkkeFritattKandidatsøk &&
             erUnderOppfoelging &&
             harRiktigFormidlingsgruppe &&
             erIkkeKode6eller7 &&
@@ -31,7 +30,7 @@ data class Evaluering(
         harJobbprofil = harJobbprofil,
         harSettHjemmel = harSettHjemmel,
         maaIkkeBehandleTidligereCv = maaIkkeBehandleTidligereCv,
-        erIkkeFritattKandidatsøk = erIkkeFritattKandidatsøk,
+        arenaIkkeFritattKandidatsøk = arenaIkkeFritattKandidatsøk,
         erUnderOppfoelging = erUnderOppfoelging,
         harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe,
         erIkkeSperretAnsatt = erIkkeSperretAnsatt,
@@ -64,7 +63,7 @@ data class EvalueringUtenDiskresjonskode(
     val harJobbprofil: Boolean,
     val harSettHjemmel: Boolean,
     val maaIkkeBehandleTidligereCv: Boolean,
-    val erIkkeFritattKandidatsøk: Boolean,
+    val arenaIkkeFritattKandidatsøk: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
@@ -76,7 +75,7 @@ data class EvalueringUtenDiskresjonskode(
             harJobbprofil = false,
             harSettHjemmel = false,
             maaIkkeBehandleTidligereCv = false,
-            erIkkeFritattKandidatsøk = false,
+            arenaIkkeFritattKandidatsøk = false,
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,

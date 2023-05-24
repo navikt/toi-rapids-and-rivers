@@ -124,22 +124,11 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(fritattKandidatsøk = fritattKandidatsøk(true)),
+        komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(
+            fritattKandidatsøk=true,
+            fnr="12312312312")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
-
-    //TODO
-    @Test
-    fun `om Person er fritatt fra kandidatsøk i arena skal synlighet være false når denne blir implementert i fremtiden men siden dette ikke skal være implementert enda så skal synlighet ikke påvirkes av denne TODO`() {
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(true, "12312312312")),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
-        )
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(false, "12312312312")),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
-        )
-    }
 
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
@@ -247,7 +236,6 @@ private fun evalueringMedAltTrue() = Evaluering(
     harJobbprofil = true,
     harSettHjemmel = true,
     maaIkkeBehandleTidligereCv = true,
-    erIkkeFritattKandidatsøk = true,
     arenaIkkeFritattKandidatsøk = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
