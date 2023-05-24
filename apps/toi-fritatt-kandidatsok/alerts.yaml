@@ -20,7 +20,7 @@ spec:
             severity: critical
 
         - alert: toi-fritatt-kandidatsok
-          expr: sum(increase(logd_messages_total{log_app="toi-fritatt-kandidatsok",log_level="Error"}[10m])) > 0
+          expr: sum(increase(log_messages_errors{app="toi-fritatt-kandidatsok", level="Error"}[10m])) > 0
           for: 1s
           annotations:
             summary: Appen har logget en error
@@ -30,8 +30,8 @@ spec:
             severity: critical
 
         - alert: toi-fritatt-kandidatsok
-          expr: (100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-fritatt-kandidatsok  ",log_level=~"Warning"}[5m])) / sum by (log_app, log_namespace) (rate(logd_messages_total{log_app="toi-fritatt-kandidatsok  "}[5m]))) > 5
-          for: 3m
+          expr: sum(increase(log_messages_errors{app="toi-fritatt-kandidatsok", level="Warning"}[10m])) > 3
+          for: 1s
           annotations:
             summary: Økning i warnings
             action: "https://logs.adeo.no/goto/3f6e0ef0-64e1-11ed-9d6c-8305350409f6"
