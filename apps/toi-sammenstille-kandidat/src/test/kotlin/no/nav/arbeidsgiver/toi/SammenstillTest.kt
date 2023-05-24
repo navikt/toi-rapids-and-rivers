@@ -16,7 +16,6 @@ class SammenstillTest {
         "oppfølgingsinformasjon",
         "siste14avedtak",
         "oppfølgingsperiode",
-        "fritattKandidatsøk",
         "arenaFritattKandidatsøk",
         "hjemmel",
         "måBehandleTidligereCv",
@@ -227,26 +226,6 @@ class SammenstillTest {
     }
 
     @Test
-    fun `Når fritattKandidatsøk har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
-        val aktørId = "123"
-        val testRapid = TestRapid()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(fritattKandidatsøkMelding(aktørId, true))
-
-        val rapidInspektør = testRapid.inspektør
-        assertThat(rapidInspektør.size).isEqualTo(1)
-
-        val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("fritatt-kandidatsøk")
-        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("fritattKandidatsøk")
-
-        val fritattKandidatsøkPåMelding = melding.get("fritattKandidatsøk")
-        assertThat(fritattKandidatsøkPåMelding.get("fritattKandidatsok").asBoolean()).isTrue
-    }
-
-    @Test
     fun `Når arenaFritattKandidatsøk har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "123"
         val testRapid = TestRapid()
@@ -443,7 +422,7 @@ class SammenstillTest {
         val testRapid = TestRapid()
 
         startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(fritattKandidatsøkMelding(aktørId, true))
+        testRapid.sendTestMessage(arenaFritattKandidatsøkMelding(aktørId, true))
 
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(1)
