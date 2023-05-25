@@ -10,7 +10,6 @@ include(
     "apps:toi-identmapper",
     "apps:toi-synlighetsmotor",
     "apps:toi-oppfolgingsperiode",
-    "apps:toi-fritatt-kandidatsok",
     "apps:toi-hjemmel",
     "apps:toi-maa-behandle-tidligere-cv",
     "apps:toi-organisasjonsenhet",
