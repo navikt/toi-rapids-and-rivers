@@ -130,23 +130,12 @@ fun oppfølgingsperiodeMelding(aktørId: String) = """
         }
     """.trimIndent()
 
-fun fritattKandidatsøkMelding(aktørId: String, fritattKandidatsøk: Boolean) = """
-        {
-            "aktørId": "$aktørId",
-            "fodselsnummer": "123",
-            "@event_name": "fritatt-kandidatsøk",
-            "fritattKandidatsøk": {
-                "fritattKandidatsok": $fritattKandidatsøk
-            }
-        }
-    """.trimIndent()
-
 
 
 fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boolean) = """
         {
             "aktørId": "$aktørId",
-            "fnr": "123",
+            "fnr": "1234",
             "@event_name": "arena-fritatt-kandidatsøk",
             "arenaFritattKandidatsøk": {
                 "erFritattKandidatsøk": $erFritattKandidatsøk

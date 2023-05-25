@@ -1,6 +1,0 @@
-kafka_pool: nav-prod
-kafka_consumer_group_id: toi-arena-cv-reader-rapidconsumer-1
-arena_cv_kafka_group_id: toi-fritatt-kandidatsok-4
-arena_cv_kafka_topic: arbeid-arenaCvEndret-v2-p
-kafka-bootstrap-on-prem-url: SSL://a01apvl00145.adeo.no:8443, SSL://a01apvl00146.adeo.no:8443, SSL://a01apvl00147.adeo.no:8443, SSL://a01apvl00148.adeo.no:8443, SSL://a01apvl00149.adeo.no:8443, SSL://a01apvl00150.adeo.no:8443
-schema-on-prem-url: https://kafka-schema-registry.nais.adeo.no

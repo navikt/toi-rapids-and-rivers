@@ -88,11 +88,10 @@ class EvalueringTest {
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
-                fritattKandidatsøk = """
-            "fritattKandidatsøk" : {
-                "fritattKandidatsok" : true
-            }
-        """
+                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
+                    fritattKandidatsøk = true,
+                    fnr = "12312312312"
+                )
             )
         )
 

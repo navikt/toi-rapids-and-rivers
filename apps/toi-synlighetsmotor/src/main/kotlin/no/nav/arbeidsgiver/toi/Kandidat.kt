@@ -10,7 +10,6 @@ data class Kandidat(
     val arbeidsmarkedCv: CvMelding?,
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,
-    val fritattKandidatsøk: FritattKandidatsøk?,
     val arenaFritattKandidatsøk: ArenaFritattKandidatsøk?,
     val hjemmel: Hjemmel?,
     val måBehandleTidligereCv: MåBehandleTidligereCv?,

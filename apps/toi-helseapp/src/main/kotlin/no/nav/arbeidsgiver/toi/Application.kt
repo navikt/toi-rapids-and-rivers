@@ -61,7 +61,7 @@ suspend fun logException(jobbNavn: String, envs: Map<String, String>, funksjon: 
 suspend fun sjekkOffsets(envs: Map<String, String>) {
     val listOfGroupIds = listOf(
         "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
-        "toi-fritatt-kandidatsøk" to "toi-arena-cv-reader-rapidconsumer-1",
+        "toi-arena-fritatt-kandidatsøk" to "toi-arena-fritatt-kandidatsok-3",
         "toi-hjemmel" to "toi-hjemmel-rapidconsumer-2",
         "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
         "toi-kandidatfeed" to "toi-kandidatfeed-rapidconsumer-6",
