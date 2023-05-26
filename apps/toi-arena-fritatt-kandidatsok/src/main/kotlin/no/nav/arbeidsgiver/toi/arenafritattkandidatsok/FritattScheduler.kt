@@ -34,7 +34,7 @@ fun startFritattScedulerKlokken(
         }
     }
 
-    scheduledExecutor.scheduleAtFixedRate(task, delay, TimeUnit.DAYS.toMillis(1), TimeUnit.MILLISECONDS)
+    scheduledExecutor.scheduleAtFixedRate(task, 0, TimeUnit.MINUTES.toMillis(1), TimeUnit.MILLISECONDS)
 }
 
 class FritattJobb(private val repository: FritattRepository, private val rapidsConnection: RapidsConnection) {
