@@ -7,6 +7,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import java.time.ZonedDateTime
 
 data class Kandidat(
+    val aktørId: String,
     val arbeidsmarkedCv: CvMelding?,
     val oppfølgingsinformasjon: Oppfølgingsinformasjon?,
     val oppfølgingsperiode: Oppfølgingsperiode?,

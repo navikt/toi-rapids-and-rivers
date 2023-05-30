@@ -40,12 +40,11 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         val synlighet = synlighetsevaluering()
 
         packet["synlighet"] = synlighet
-        val aktørId = packet["aktørId"].asText()
         val fødselsnummer = finnFødselsnummer(kandidat)
 
-        repository.lagre(evaluering = synlighetsevaluering, aktørId = aktørId, fødselsnummer = fødselsnummer)
+        repository.lagre(evaluering = synlighetsevaluering, aktørId = kandidat.aktørId, fødselsnummer = fødselsnummer)
 
-        rapidsConnection.publish(aktørId, packet.toJson())
+        rapidsConnection.publish(kandidat.aktørId, packet.toJson())
     }
 
     private fun finnFødselsnummer(kandidat: Kandidat): String? =

@@ -57,7 +57,8 @@ class SynlighetsmotorTest {
 
     @Test
     fun `kandidat med kun cv skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(arbeidsmarkedCv = arbeidsmarkedCv()), enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
+        hendelse(arbeidsmarkedCv = arbeidsmarkedCv()),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
     )
 
     @Test

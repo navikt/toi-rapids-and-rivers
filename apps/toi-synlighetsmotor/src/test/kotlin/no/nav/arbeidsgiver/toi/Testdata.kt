@@ -85,6 +85,7 @@ class Testdata {
                 ${
             listOfNotNull(
                 """"@event_name": "hendelse"""",
+                """"aktørId": "123456789"""",
                 arbeidsmarkedCv,
                 oppfølgingsinformasjon,
                 oppfølgingsperiode,

@@ -1,6 +1,9 @@
 package no.nav.arbeidsgiver.toi
 
+import org.slf4j.LoggerFactory
 import java.time.Instant
+
+private val secureLog = LoggerFactory.getLogger("secureLog")
 
 fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
     Evaluering(
@@ -40,9 +43,16 @@ private fun erUnderOppfølging(kandidat: Kandidat): Boolean {
 
     val now = Instant.now()
     val startDato = kandidat.oppfølgingsperiode.startDato.toInstant()
-    val sluttDato = kandidat.oppfølgingsperiode.sluttDato?.toInstant() ?: Instant.MAX
-
-    return startDato.isBefore(now) && sluttDato.isAfter(now)
+    val sluttDato = kandidat.oppfølgingsperiode.sluttDato?.toInstant()
+    if(startDato.isAfter(now)) {
+        log("erUnderOppfølging").error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
+        secureLog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
+    }
+    if(sluttDato != null && sluttDato.isAfter(now)) {
+        log("erUnderOppfølging").error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
+        secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
+    }
+    return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
 }
 
 private fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
