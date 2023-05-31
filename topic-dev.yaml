@@ -57,9 +57,6 @@ spec:
       application: toi-organisasjonsenhet
       access: readwrite
     - team: toi
-      application: toi-tilretteleggingsbehov
-      access: readwrite
-    - team: toi
       application: toi-kafkamanager
       access: readwrite
     - team: toi
