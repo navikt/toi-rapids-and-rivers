@@ -15,6 +15,9 @@ data class Kandidat(
     val hjemmel: Hjemmel?,
     val måBehandleTidligereCv: MåBehandleTidligereCv?,
 ) {
+    val erAAP: Boolean
+        get() = oppfølgingsinformasjon?.erAAP == true
+
     companion object {
         private val mapper = jacksonObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -57,8 +60,13 @@ data class Oppfølgingsinformasjon(
     val sperretAnsatt: Boolean,
     val formidlingsgruppe: Formidlingsgruppe?,
     val diskresjonskode: Diskresjonskode?,
-    val fodselsnummer: String
-)
+    val fodselsnummer: String,
+    val hovedmaal: String?,
+    val rettighetsgruppe: String?
+) {
+    val erAAP: Boolean
+        get() = rettighetsgruppe == "AAP"
+}
 
 typealias Diskresjonskode = String
 

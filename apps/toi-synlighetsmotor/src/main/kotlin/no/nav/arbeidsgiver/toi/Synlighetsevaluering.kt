@@ -44,15 +44,28 @@ private fun erUnderOppfølging(kandidat: Kandidat): Boolean {
     val now = Instant.now()
     val startDato = kandidat.oppfølgingsperiode.startDato.toInstant()
     val sluttDato = kandidat.oppfølgingsperiode.sluttDato?.toInstant()
-    if(startDato.isAfter(now)) {
+    sanityCheck(now, kandidat, startDato, sluttDato)
+    return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
+}
+
+private fun sanityCheck(
+    now: Instant?,
+    kandidat: Kandidat,
+    startDatoOppfølging: Instant,
+    sluttDatoOppfølging: Instant?
+) {
+    if (startDatoOppfølging.isAfter(now)) {
         log("erUnderOppfølging").error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
         secureLog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
     }
-    if(sluttDato != null && sluttDato.isAfter(now)) {
+    if (sluttDatoOppfølging?.isAfter(now) == true) {
         log("erUnderOppfølging").error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
         secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
     }
-    return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
+    if(kandidat.arenaFritattKandidatsøk?.erFritattKandidatsøk == true && !kandidat.erAAP) {
+        log("erUnderOppfølging").error("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
+        secureLog.error("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, hovedmål: ${kandidat.oppfølgingsinformasjon?.hovedmaal} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon?.formidlingsgruppe}")
+    }
 }
 
 private fun erIkkeKode6EllerKode7(kandidat: Kandidat): Boolean =
