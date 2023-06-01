@@ -26,6 +26,12 @@ data class Kandidat(
 
         fun fraJson(jsonMessage: JsonMessage) = mapper.readValue(jsonMessage.toJson(), Kandidat::class.java)
     }
+
+    fun fødselsNummer() = arbeidsmarkedCv?.opprettCv?.cv?.fodselsnummer ?:
+        arbeidsmarkedCv?.endreCv?.cv?.fodselsnummer ?:
+        hjemmel?.fnr ?:
+        oppfølgingsinformasjon?.fodselsnummer ?:
+        arenaFritattKandidatsøk?.fnr
 }
 
 data class CvMelding(
