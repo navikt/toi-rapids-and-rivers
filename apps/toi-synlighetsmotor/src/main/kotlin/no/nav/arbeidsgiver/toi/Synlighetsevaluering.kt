@@ -63,8 +63,8 @@ private fun sanityCheck(
         secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
     }
     if(kandidat.arenaFritattKandidatsøk?.erFritattKandidatsøk == true && !kandidat.erAAP) {
-        log("erUnderOppfølging").error("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
-        secureLog.error("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, hovedmål: ${kandidat.oppfølgingsinformasjon?.hovedmaal} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon?.formidlingsgruppe}")
+        log("erUnderOppfølging").warn("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
+        secureLog.warn("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, hovedmål: ${kandidat.oppfølgingsinformasjon?.hovedmaal} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon?.formidlingsgruppe}, rettighetsgruppe: ${kandidat.oppfølgingsinformasjon?.rettighetsgruppe}")
     }
 }
 
