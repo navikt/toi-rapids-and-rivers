@@ -107,7 +107,6 @@ data class Kandidat(
     val arenaFritattKandidatsøk: JsonNode? = null,
     val hjemmel: JsonNode? = null,
     val måBehandleTidligereCv: JsonNode? = null,
-    val tilretteleggingsbehov: JsonNode? = null
 ) {
     companion object {
         private val objectMapper = jacksonObjectMapper()
@@ -122,7 +121,6 @@ data class Kandidat(
             arenaFritattKandidatsøk = json["arenaFritattKandidatsøk"],
             hjemmel = json["hjemmel"],
             måBehandleTidligereCv = json["måBehandleTidligereCv"],
-            tilretteleggingsbehov = json["tilretteleggingsbehov"]
         )
     }
 

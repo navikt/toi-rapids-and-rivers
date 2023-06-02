@@ -171,23 +171,3 @@ fun måBehandleTidligereCvMelding(aktørId: String) = """
             }
         }
     """.trimIndent()
-
-fun tilretteleggingsbehovEndretMelding(aktørId: String) = """
-        {
-            "@event_name": "tilretteleggingsbehov",
-            "aktørId": "$aktørId",
-            "tilretteleggingsbehov": {
-                "aktoerId": "$aktørId",
-                "harTilretteleggingsbehov": false,
-                "behov": ["behov1"]
-            }
-        }
-    """.trimIndent()
-
-val modifiserbareSystemVariabler: MutableMap<String, String>
-    get() {
-        val unmodifiableEnv = System.getenv()
-        val felt = unmodifiableEnv.javaClass.getDeclaredField("m")
-        felt.isAccessible = true
-        return felt.get(unmodifiableEnv) as MutableMap<String, String>
-    }
