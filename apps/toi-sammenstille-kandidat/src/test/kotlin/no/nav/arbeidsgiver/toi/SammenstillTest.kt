@@ -18,8 +18,7 @@ class SammenstillTest {
         "oppfølgingsperiode",
         "arenaFritattKandidatsøk",
         "hjemmel",
-        "måBehandleTidligereCv",
-        "tilretteleggingsbehov"
+        "måBehandleTidligereCv"
     )
 
     private lateinit var javalin: Javalin
