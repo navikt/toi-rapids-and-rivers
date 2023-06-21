@@ -89,3 +89,6 @@ spec:
     - team: toi
       application: toi-arena-fritatt-kandidatsok
       access: readwrite
+    - team: toi
+      application: toi-kvp
+      access: readwrite
