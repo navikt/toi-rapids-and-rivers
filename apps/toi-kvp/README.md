@@ -1,0 +1,1 @@
+# Henter ut KVP-informasjon og legger den på rapid

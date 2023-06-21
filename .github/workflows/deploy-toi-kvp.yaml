@@ -1,0 +1,69 @@
+name: toi-kvp
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
+  APP_NAME: ${{ github.workflow }}
+
+on:
+  push:
+    paths:
+    - apps/toi-kvp/**
+    - .github/workflows/deploy-toi-kvp.yaml
+    - buildSrc/**
+
+jobs:
+  build-and-publish:
+    name: Build, test, and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Java v17.x
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17.x'
+      - name: Gradle test and build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :apps:${APP_NAME}:test :apps:${APP_NAME}:build
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish docker image
+        run: |
+          docker build --tag ${IMAGE} apps/${APP_NAME}
+          docker push ${IMAGE}
+
+  deploy-to-dev-gcp:
+    name: Deploy to dev-gcp
+    needs: build-and-publish
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/vekk-fra-fork'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml
+          VARS: apps/${{ env.APP_NAME }}/nais-dev.yaml
+
+  deploy-to-prod-gcp:
+    name: Deploy to prod-gcp
+    needs: build-and-publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
+          VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml

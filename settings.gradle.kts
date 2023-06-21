@@ -17,5 +17,6 @@ include(
     "apps:toi-hull-i-cv",
     "apps:toi-ontologitjeneste",
     "apps:toi-arbeidsgiver-notifikasjon",
-    "apps:toi-arena-fritatt-kandidatsok"
+    "apps:toi-arena-fritatt-kandidatsok",
+    "apps:toi-kvp"
 )
