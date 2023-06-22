@@ -48,7 +48,9 @@ class Testdata {
             måBehandleTidligereCv: String? = null,
             aktørId: String = """
             "aktørId": "123456789"
-        """.trimIndent()
+        """.trimIndent(),
+            kvpOpprettet: String? = null,
+            kvpAvsluttet: String? = null
         ) =
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
@@ -58,7 +60,9 @@ class Testdata {
                 hjemmel = hjemmel,
                 participatingService = participatingService,
                 måBehandleTidligereCv = måBehandleTidligereCv,
-                aktørId = aktørId
+                aktørId = aktørId,
+                kvpOpprettet = kvpOpprettet,
+                kvpAvsluttet = kvpAvsluttet
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -79,7 +83,9 @@ class Testdata {
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
-            aktørId: String? = null
+            aktørId: String? = null,
+            kvpOpprettet: String? = null,
+            kvpAvsluttet: String? = null
         ) = """
             {
                 ${
@@ -94,7 +100,9 @@ class Testdata {
                 hjemmel,
                 participatingService,
                 måBehandleTidligereCv,
-                aktørId
+                aktørId,
+                kvpOpprettet,
+                kvpAvsluttet
             ).joinToString()
         }
             }
@@ -236,6 +244,20 @@ class Testdata {
                 "maaBehandleTidligereCv": "$maaBehandleTidligereCv"
             }
         """.trimIndent()
+
+        fun kvpOpprettet() =
+            """
+                "kvpOpprettet": {
+                    "opprettetDato": "2023-06-22T12:21:18.895143217+02:00"
+                  }
+            """.trimIndent()
+
+        fun kvpAvsluttet(avsluttetDatoErFørOpprettetDato: Boolean = false) =
+            """
+                "kvpAvsluttet": {
+                    "avsluttetDato": "${if(avsluttetDatoErFørOpprettetDato) "2023-06-22T12:21:17.895143217+02:00" else "2023-06-22T12:21:19.895143217+02:00"}"
+                  }
+            """.trimIndent()
 
         fun manglendeHjemmel() =
             """

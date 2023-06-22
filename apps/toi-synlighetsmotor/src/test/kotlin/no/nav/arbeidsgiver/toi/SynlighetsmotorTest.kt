@@ -3,13 +3,14 @@ package no.nav.arbeidsgiver.toi
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
-import no.nav.arbeidsgiver.toi.Testdata.Companion.fritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelse
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
+import no.nav.arbeidsgiver.toi.Testdata.Companion.kvpAvsluttet
+import no.nav.arbeidsgiver.toi.Testdata.Companion.kvpOpprettet
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeCV
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeHjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
@@ -18,6 +19,8 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendels
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -205,6 +208,61 @@ class SynlighetsmotorTest {
                 måBehandleTidligereCv = null
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
+        )
+
+    @Disabled
+    @Test
+    fun `Om person har opprettet kvp og avsluttet kvp skal synlighet være true`() =
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = kvpOpprettet(),
+                kvpAvsluttet = kvpAvsluttet()
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
+        )
+
+    @Disabled
+    @Test
+    fun `Om person har opprettet kvp og avsluttet kvp men avsluttetDato er før opprettetDato skal synlighet være false`() =
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = kvpOpprettet(),
+                kvpAvsluttet = kvpAvsluttet(avsluttetDatoErFørOpprettetDato = true)
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
+        )
+
+    @Disabled
+    @Test
+    fun `Om person har opprettet kvp og ingen avsluttet kvp skal synlighet være false`() =
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = kvpOpprettet(),
+                kvpAvsluttet = null
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
+        )
+
+    @Disabled
+    @Test
+    fun `Om person ikke har opprettet kvp eller avsluttet kvp skal synlighet være true`() =
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = null,
+                kvpAvsluttet = null
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
+        )
+
+    @Disabled
+    @Test
+    fun `Om person ikke har opprettet kvp men har avsluttet kvp skal synlighet være true`() =
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = null,
+                kvpAvsluttet = kvpAvsluttet()
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
 
     @Test
