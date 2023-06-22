@@ -11,6 +11,7 @@ data class Evaluering(
     val erIkkeKode6eller7: Boolean,
     val erIkkeSperretAnsatt: Boolean,
     val erIkkeDoed: Boolean,
+    val erIkkeKvp: Boolean,
     val erFerdigBeregnet: Boolean
 ) {
     fun erSynlig() = harAktivCv &&
@@ -39,7 +40,7 @@ data class Evaluering(
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this != null && erIkkeKode6eller7) {
+            if (this != null && erIkkeKode6eller7) { //TODO Pass på kvp her når det tas i bruk
                 tilEvalueringUtenDiskresjonskode()
             } else {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()

@@ -21,6 +21,7 @@ class Repository(private val dataSource: DataSource) {
     private val erIkkeKode6Eller7Kolonne = "er_ikke_kode6_eller_kode7"
     private val erIkkeSperretAnsattKolonne = "er_ikke_sperret_ansatt"
     private val erIkkeDødKolonne = "er_ikke_doed"
+    private val erIkkeKvpKolonne = "er_ikke_kvp"
     private val erFerdigBeregnetKolonne = "er_ferdig_beregnet"
 
     fun lagre(evaluering: Evaluering, aktørId: String, fødselsnummer: String?) {
@@ -108,7 +109,8 @@ class Repository(private val dataSource: DataSource) {
         erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne),
         erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne),
         erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne),
-        erFerdigBeregnet = resultset.getBoolean(erFerdigBeregnetKolonne),
+        erIkkeKvp = resultset.getBoolean(erIkkeKvpKolonne),
+        erFerdigBeregnet = resultset.getBoolean(erFerdigBeregnetKolonne)
     )
 
     private fun kolonneString(kolonner: List<String>) =
@@ -131,6 +133,7 @@ class Repository(private val dataSource: DataSource) {
             erIkkeKode6Eller7Kolonne to erIkkeKode6eller7,
             erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt,
             erIkkeDødKolonne to erIkkeDoed,
+            erIkkeKvpKolonne to erIkkeKvp,
             erFerdigBeregnetKolonne to erFerdigBeregnet
         )
     }

@@ -19,7 +19,6 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendels
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -266,6 +265,25 @@ class SynlighetsmotorTest {
         )
 
     @Test
+    fun `kvp skal ikke påvirke synlighet enda`() {
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = kvpOpprettet(),
+                kvpAvsluttet = kvpAvsluttet(avsluttetDatoErFørOpprettetDato = true)
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
+        )
+
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                kvpOpprettet = kvpOpprettet(),
+                kvpAvsluttet = null
+            ),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
+        )
+    }
+
+    @Test
     fun `ignorer uinteressante hendelser`() {
         testProgramMedHendelse(
             hendelse = """{ "@event_name":"uinteressant_hendelse" }""",
@@ -301,5 +319,6 @@ private fun evalueringMedAltTrue() = Evaluering(
     erIkkeKode6eller7 = true,
     erIkkeSperretAnsatt = true,
     erIkkeDoed = true,
+    erIkkeKvp = true,
     erFerdigBeregnet = true
 )

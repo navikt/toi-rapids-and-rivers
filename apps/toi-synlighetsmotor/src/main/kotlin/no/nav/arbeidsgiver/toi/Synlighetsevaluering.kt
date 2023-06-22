@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
-private val secureLog = LoggerFactory.getLogger("secureLog")
+val secureLog = LoggerFactory.getLogger("secureLog")
 
 fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
     Evaluering(
@@ -22,6 +22,7 @@ fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
         erIkkeKode6eller7 = erIkkeKode6EllerKode7(kandidat),
         erIkkeSperretAnsatt = kandidat.oppfølgingsinformasjon?.sperretAnsatt == false,
         erIkkeDoed = kandidat.oppfølgingsinformasjon?.erDoed == false,
+        erIkkeKvp = !kandidat.erKvp,
         erFerdigBeregnet = beregningsgrunnlag(kandidat)
     )
 

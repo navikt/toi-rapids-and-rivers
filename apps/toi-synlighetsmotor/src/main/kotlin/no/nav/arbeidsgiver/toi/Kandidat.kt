@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 
 data class Kandidat(
@@ -14,9 +15,19 @@ data class Kandidat(
     val arenaFritattKandidatsøk: ArenaFritattKandidatsøk?,
     val hjemmel: Hjemmel?,
     val måBehandleTidligereCv: MåBehandleTidligereCv?,
+    val kvpOpprettet: KvpOpprettet?,
+    val kvpAvsluttet: KvpAvsluttet?
 ) {
     val erAAP: Boolean
         get() = oppfølgingsinformasjon?.erAAP == true
+
+    val erKvp: Boolean
+        get() = when {
+            kvpOpprettet == null -> false
+            kvpAvsluttet == null -> true
+            kvpAvsluttet.avsluttetDato.isBefore(kvpOpprettet.opprettetDato) -> true
+            else -> false
+        }
 
     companion object {
         private val mapper = jacksonObjectMapper()
@@ -103,4 +114,12 @@ enum class Samtykkeressurs {
 
 data class MåBehandleTidligereCv(
     val maaBehandleTidligereCv: Boolean
+)
+
+data class KvpOpprettet(
+    val opprettetDato: OffsetDateTime
+)
+
+data class KvpAvsluttet(
+    val avsluttetDato: OffsetDateTime
 )

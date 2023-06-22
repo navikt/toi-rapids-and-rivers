@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
 import no.nav.helse.rapids_rivers.*
+import java.time.OffsetDateTime.now
 
 class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
     River.PacketListener {
@@ -36,6 +37,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         val kandidat = Kandidat.fraJson(packet)
 
+        validerKvp(kandidat)
         val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
         val synlighet = synlighetsevaluering()
 
@@ -44,5 +46,21 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         repository.lagre(evaluering = synlighetsevaluering, aktørId = kandidat.aktørId, fødselsnummer = kandidat.fødselsNummer())
 
         rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+    }
+
+    private fun validerKvp(kandidat: Kandidat) {
+        if(kandidat.kvpOpprettet?.opprettetDato?.isAfter(now()) == true) {
+            log("SynlighetsLytter").error("opprettetDato er etter nåværende tidspunkt se secureLog")
+            secureLog.error("opprettetDato er etter nåværende tidspunkt: aktørId: ${kandidat.aktørId}, opprettetDato: ${kandidat.kvpOpprettet.opprettetDato}, now: ${now()}")
+            throw Exception("opprettetDato er etter nåværende tidspunkt")
+        }
+        if(kandidat.kvpAvsluttet?.avsluttetDato?.isAfter(now()) == true) {
+            log("SynlighetsLytter").error("avsluttetDato er etter nåværende tidspunkt se secureLog")
+            secureLog.error("avsluttetDato er etter nåværende tidspunkt: aktørId: ${kandidat.aktørId}, opprettetDato: ${kandidat.kvpAvsluttet.avsluttetDato}, now: ${now()}")
+            throw Exception("avsluttetDato er etter nåværende tidspunkt")
+        }
+        if(kandidat.kvpOpprettet != null) {
+            secureLog.info("Fant opprettet kvp for person (${kandidat.aktørId}, opprettet: ${kandidat.kvpOpprettet}, avsluttet: ${kandidat.kvpAvsluttet}")
+        }
     }
 }
