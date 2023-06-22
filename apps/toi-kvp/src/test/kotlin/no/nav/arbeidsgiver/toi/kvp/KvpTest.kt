@@ -23,7 +23,7 @@ class KvpTest {
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "kvp_opprettet",
+            "kvpOpprettet",
             "aktørId",
             "system_read_count",
             "@id",
@@ -31,10 +31,10 @@ class KvpTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp.opprettet")
+        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp-opprettet")
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
-        val kvpOpprettet = meldingJson.get("kvp_opprettet")
+        val kvpOpprettet = meldingJson.get("kvpOpprettet")
         assertThat(kvpOpprettet.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "aktorId",
             "enhetId",
@@ -43,7 +43,7 @@ class KvpTest {
             "opprettetBegrunnelse",
         )
 
-        meldingJson.get("kvp_opprettet").apply {
+        meldingJson.get("kvpOpprettet").apply {
             assertThat(get("aktorId").asText()).isEqualTo(aktørId)
             assertThat(get("enhetId").asText()).isEqualTo("0123")
             assertThat(get("opprettetAv").asText()).isEqualTo("A100000")
@@ -70,7 +70,7 @@ class KvpTest {
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "kvp_avsluttet",
+            "kvpAvsluttet",
             "aktørId",
             "system_read_count",
             "@id",
@@ -78,10 +78,10 @@ class KvpTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp.avsluttet")
+        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp-avsluttet")
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
-        val kvpOpprettet = meldingJson.get("kvp_avsluttet")
+        val kvpOpprettet = meldingJson.get("kvpAvsluttet")
         assertThat(kvpOpprettet.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "aktorId",
             "avsluttetAv",
@@ -89,7 +89,7 @@ class KvpTest {
             "avsluttetBegrunnelse",
         )
 
-        meldingJson.get("kvp_avsluttet").apply {
+        meldingJson.get("kvpAvsluttet").apply {
             assertThat(get("aktorId").asText()).isEqualTo(aktørId)
             assertThat(get("avsluttetAv").asText()).isEqualTo("A100001")
             assertThat(get("avsluttetDato").asText()).isEqualTo("2020-10-31")
@@ -115,7 +115,7 @@ class KvpTest {
 
     private fun kvpOpprettetFraEksterntTopic(aktørId: String, eventName: Boolean = false) = """
         {
-            ${if(eventName) """"@event_name":"kvp.opprettet",""" else ""}
+            ${if(eventName) """"@event_name":"kvp-opprettet",""" else ""}
             "aktorId": "$aktørId",
             "enhetId": "0123",
             "opprettetAv": "A100000",
@@ -126,7 +126,7 @@ class KvpTest {
 
     private fun kvpAvsluttetFraEksterntTopic(aktørId: String, eventName: Boolean = false) = """
         {
-            ${if(eventName) """"@event_name":"kvp.avsluttet",""" else ""}
+            ${if(eventName) """"@event_name":"kvp-avsluttet",""" else ""}
             "aktorId": "$aktørId",
             "avsluttetAv": "A100001",
             "avsluttetDato": "2020-10-31",

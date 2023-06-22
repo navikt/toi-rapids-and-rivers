@@ -19,11 +19,11 @@ class StartetLytter(private val rapidsConnection: RapidsConnection) : River.Pack
         val aktørId = packet["aktorId"].asText()
         val melding = mapOf(
             "aktørId" to aktørId,
-            "kvp_opprettet" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "kvp.opprettet",
+            "kvpOpprettet" to packet.fjernMetadataOgKonverter(),
+            "@event_name" to "kvp-opprettet",
         )
 
-        log.info("Skal publisere kvp.opprettet-melding med opprettetDato ${packet["opprettetDato"]}")
+        log.info("Skal publisere kvp-opprettet-melding med opprettetDato ${packet["opprettetDato"]}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())

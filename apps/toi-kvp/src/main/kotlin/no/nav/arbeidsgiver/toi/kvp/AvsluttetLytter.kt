@@ -18,11 +18,11 @@ class AvsluttetLytter(private val rapidsConnection: RapidsConnection) : River.Pa
         val aktørId = packet["aktorId"].asText()
         val melding = mapOf(
             "aktørId" to aktørId,
-            "kvp_avsluttet" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "kvp.avsluttet",
+            "kvpAvsluttet" to packet.fjernMetadataOgKonverter(),
+            "@event_name" to "kvp-avsluttet",
         )
 
-        log.info("Skal publisere kvp.avsluttet-melding med avsluttetDato ${packet["avsluttetDato"]}")
+        log.info("Skal publisere kvp-avsluttet-melding med avsluttetDato ${packet["avsluttetDato"]}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
