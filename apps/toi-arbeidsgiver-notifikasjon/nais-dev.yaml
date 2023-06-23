@@ -1,6 +1,6 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-arbeidsgiver-notifikasjon-rapid-1
 notifikasjon_api_url: https://ag-notifikasjon-produsent-api.intern.dev.nav.no/api/graphql
-notifikasjon_api_host: https://ag-notifikasjon-produsent-api.intern.dev.nav.no
+notifikasjon_api_host: ag-notifikasjon-produsent-api.intern.dev.nav.no
 notifikasjon_api_scope: api://dev-gcp.fager.notifikasjon-produsent-api/.default
 max_replicas: 1
