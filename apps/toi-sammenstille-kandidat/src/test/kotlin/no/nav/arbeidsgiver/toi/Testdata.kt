@@ -143,30 +143,17 @@ fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boo
         }
     """.trimIndent()
 
-fun kvpOpprettet(aktørId: String) = """
+fun kvp(aktørId: String) = """
         {
           "aktørId": "$aktørId",
-          "kvpOpprettet": {
+          "kvp": {
             "aktorId": "$aktørId",
             "enhetId": "0219",
-            "opprettetAv": "Z100000",
+            "endretAv": "Z100000",
             "opprettetDato": "2023-06-22T12:21:18.895143217+02:00",
-            "opprettetBegrunnelse": "Test 2 kvp start"
+            "avsluttetDato": "2023-06-23T12:21:18.895143217+02:00",
           },
-          "@event_name": "kvp-opprettet"
-        }
-    """.trimIndent()
-
-fun kvpAvsluttet(aktørId: String) = """
-        {
-          "aktørId": "$aktørId",
-          "kvpAvsluttet": {
-            "aktorId": "$aktørId",
-            "avsluttetAv": "Z100000",
-            "avsluttetDato": "2023-06-22T12:21:58.748120974+02:00",
-            "avsluttetBegrunnelse": "Test 2 avslutt kvp"
-          },
-          "@event_name": "kvp-avsluttet"
+          "@event_name": "kvp"
         }
     """.trimIndent()
 
