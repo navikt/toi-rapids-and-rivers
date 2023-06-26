@@ -7,14 +7,13 @@ import org.junit.jupiter.api.Test
 class KvpTest {
 
     @Test
-    fun `Lesing av kvp-opprettet-melding fra eksternt topic skal produsere ny melding på rapid`() {
+    fun `Lesing av kvp-melding fra eksternt topic skal produsere ny melding på rapid`() {
         val testRapid = TestRapid()
         val aktørId = "123"
 
-        StartetLytter(testRapid)
-        AvsluttetLytter(testRapid)
+        KvpLytter(testRapid)
 
-        testRapid.sendTestMessage(kvpOpprettetFraEksterntTopic(aktørId))
+        testRapid.sendTestMessage(kvpFraEksterntTopic(aktørId))
 
         val inspektør = testRapid.inspektør
 
@@ -23,7 +22,7 @@ class KvpTest {
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
-            "kvpOpprettet",
+            "kvp",
             "aktørId",
             "system_read_count",
             "@id",
@@ -31,69 +30,24 @@ class KvpTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp-opprettet")
+        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp")
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
-        val kvpOpprettet = meldingJson.get("kvpOpprettet")
-        assertThat(kvpOpprettet.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        val kvp = meldingJson.get("kvp")
+        assertThat(kvp.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "aktorId",
             "enhetId",
-            "opprettetAv",
+            "endretAv",
             "opprettetDato",
-            "opprettetBegrunnelse",
+            "avsluttetDato",
         )
 
-        meldingJson.get("kvpOpprettet").apply {
+        meldingJson.get("kvp").apply {
             assertThat(get("aktorId").asText()).isEqualTo(aktørId)
             assertThat(get("enhetId").asText()).isEqualTo("0123")
-            assertThat(get("opprettetAv").asText()).isEqualTo("A100000")
+            assertThat(get("endretAv").asText()).isEqualTo("A100000")
             assertThat(get("opprettetDato").asText()).isEqualTo("2020-10-30")
-            assertThat(get("opprettetBegrunnelse").asText()).isEqualTo("Derfor")
-        }
-    }
-
-
-    @Test
-    fun `Lesing av kvp-avsluttet-melding fra eksternt topic skal produsere ny melding på rapid`() {
-        val testRapid = TestRapid()
-        val aktørId = "123"
-
-        StartetLytter(testRapid)
-        AvsluttetLytter(testRapid)
-
-        testRapid.sendTestMessage(kvpAvsluttetFraEksterntTopic(aktørId))
-
-        val inspektør = testRapid.inspektør
-
-        assertThat(inspektør.size).isEqualTo(1)
-        val meldingJson = inspektør.message(0)
-
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "@event_name",
-            "kvpAvsluttet",
-            "aktørId",
-            "system_read_count",
-            "@id",
-            "@opprettet",
-            "system_participating_services"
-        )
-
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp-avsluttet")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
-
-        val kvpOpprettet = meldingJson.get("kvpAvsluttet")
-        assertThat(kvpOpprettet.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "aktorId",
-            "avsluttetAv",
-            "avsluttetDato",
-            "avsluttetBegrunnelse",
-        )
-
-        meldingJson.get("kvpAvsluttet").apply {
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("avsluttetAv").asText()).isEqualTo("A100001")
-            assertThat(get("avsluttetDato").asText()).isEqualTo("2020-10-31")
-            assertThat(get("avsluttetBegrunnelse").asText()).isEqualTo("Tabbe")
+            assertThat(get("avsluttetDato").asText()).isEqualTo("2022-10-30")
         }
     }
 
@@ -102,35 +56,23 @@ class KvpTest {
         val testRapid = TestRapid()
         val aktørId = "123"
 
-        StartetLytter(testRapid)
-        AvsluttetLytter(testRapid)
+        KvpLytter(testRapid)
 
-        testRapid.sendTestMessage(kvpOpprettetFraEksterntTopic(aktørId, true))
-        testRapid.sendTestMessage(kvpAvsluttetFraEksterntTopic(aktørId, true))
+        testRapid.sendTestMessage(kvpFraEksterntTopic(aktørId, true))
 
         val inspektør = testRapid.inspektør
 
         assertThat(inspektør.size).isEqualTo(0)
     }
 
-    private fun kvpOpprettetFraEksterntTopic(aktørId: String, eventName: Boolean = false) = """
+    private fun kvpFraEksterntTopic(aktørId: String, eventName: Boolean = false) = """
         {
-            ${if(eventName) """"@event_name":"kvp-opprettet",""" else ""}
+            ${if(eventName) """"@event_name":"kvp",""" else ""}
             "aktorId": "$aktørId",
             "enhetId": "0123",
-            "opprettetAv": "A100000",
+            "endretAv": "A100000",
             "opprettetDato": "2020-10-30",
-            "opprettetBegrunnelse": "Derfor"
-        }
-    """.trimIndent()
-
-    private fun kvpAvsluttetFraEksterntTopic(aktørId: String, eventName: Boolean = false) = """
-        {
-            ${if(eventName) """"@event_name":"kvp-avsluttet",""" else ""}
-            "aktorId": "$aktørId",
-            "avsluttetAv": "A100001",
-            "avsluttetDato": "2020-10-31",
-            "avsluttetBegrunnelse": "Tabbe"
+            "avsluttetDato": "2022-10-30"
         }
     """.trimIndent()
 }

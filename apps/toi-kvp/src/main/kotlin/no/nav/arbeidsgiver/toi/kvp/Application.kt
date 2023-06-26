@@ -9,8 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
-    StartetLytter(rapidsConnection)
-    AvsluttetLytter(rapidsConnection)
+    KvpLytter(rapidsConnection)
 }.start()
 
 val Any.log: Logger
