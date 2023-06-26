@@ -9,8 +9,7 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelse
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
-import no.nav.arbeidsgiver.toi.Testdata.Companion.kvpAvsluttet
-import no.nav.arbeidsgiver.toi.Testdata.Companion.kvpOpprettet
+import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeCV
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeHjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
@@ -214,8 +213,7 @@ class SynlighetsmotorTest {
     fun `Om person har opprettet kvp og avsluttet kvp skal synlighet være true`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = kvpOpprettet(),
-                kvpAvsluttet = kvpAvsluttet()
+                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00")
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
@@ -225,8 +223,7 @@ class SynlighetsmotorTest {
     fun `Om person har opprettet kvp og avsluttet kvp men avsluttetDato er før opprettetDato skal synlighet være false`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = kvpOpprettet(),
-                kvpAvsluttet = kvpAvsluttet(avsluttetDatoErFørOpprettetDato = true)
+                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", "2023-06-22T12:21:17.895143217+02:00"),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
         )
@@ -236,8 +233,7 @@ class SynlighetsmotorTest {
     fun `Om person har opprettet kvp og ingen avsluttet kvp skal synlighet være false`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = kvpOpprettet(),
-                kvpAvsluttet = null
+                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", null),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
         )
@@ -247,8 +243,7 @@ class SynlighetsmotorTest {
     fun `Om person ikke har opprettet kvp eller avsluttet kvp skal synlighet være true`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = null,
-                kvpAvsluttet = null
+                kvp = kvp(null, null),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
@@ -258,8 +253,7 @@ class SynlighetsmotorTest {
     fun `Om person ikke har opprettet kvp men har avsluttet kvp skal synlighet være true`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = null,
-                kvpAvsluttet = kvpAvsluttet()
+                kvp = kvp(null, "2023-06-22T12:21:17.895143217+02:00"),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
@@ -268,16 +262,14 @@ class SynlighetsmotorTest {
     fun `kvp skal ikke påvirke synlighet enda`() {
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = kvpOpprettet(),
-                kvpAvsluttet = kvpAvsluttet(avsluttetDatoErFørOpprettetDato = true)
+                kvp = kvp("2023-06-22T12:21:17.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00"),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
 
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvpOpprettet = kvpOpprettet(),
-                kvpAvsluttet = null
+                kvp= kvp( "2023-06-22T12:21:17.895143217+02:00", null),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )

@@ -49,8 +49,7 @@ class Testdata {
             aktørId: String = """
             "aktørId": "123456789"
         """.trimIndent(),
-            kvpOpprettet: String? = null,
-            kvpAvsluttet: String? = null
+            kvp: String? = null,
         ) =
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
@@ -61,8 +60,7 @@ class Testdata {
                 participatingService = participatingService,
                 måBehandleTidligereCv = måBehandleTidligereCv,
                 aktørId = aktørId,
-                kvpOpprettet = kvpOpprettet,
-                kvpAvsluttet = kvpAvsluttet
+                kvp = kvp,
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -84,8 +82,7 @@ class Testdata {
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
             aktørId: String? = null,
-            kvpOpprettet: String? = null,
-            kvpAvsluttet: String? = null
+            kvp: String? = null,
         ) = """
             {
                 ${
@@ -101,8 +98,7 @@ class Testdata {
                 participatingService,
                 måBehandleTidligereCv,
                 aktørId,
-                kvpOpprettet,
-                kvpAvsluttet
+                kvp,
             ).joinToString()
         }
             }
@@ -245,19 +241,13 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun kvpOpprettet() =
+        fun kvp(startdato: String? = null, sluttdato: String? = null) : String =
             """
-                "kvpOpprettet": {
-                    "opprettetDato": "2023-06-22T12:21:18.895143217+02:00"
-                  }
-            """.trimIndent()
-
-        fun kvpAvsluttet(avsluttetDatoErFørOpprettetDato: Boolean = false) =
-            """
-                "kvpAvsluttet": {
-                    "avsluttetDato": "${if(avsluttetDatoErFørOpprettetDato) "2023-06-22T12:21:17.895143217+02:00" else "2023-06-22T12:21:19.895143217+02:00"}"
-                  }
-            """.trimIndent()
+                "kvp": {
+                    "opprettetDato": ${if(startdato != null) """"$startdato"""" else "null"},
+                    "avsluttetDato": ${if(sluttdato != null) """"$sluttdato"""" else "null"}
+                }
+    """.trimIndent()
 
         fun manglendeHjemmel() =
             """

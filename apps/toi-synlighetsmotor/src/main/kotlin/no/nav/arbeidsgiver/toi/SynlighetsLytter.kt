@@ -49,18 +49,26 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
     }
 
     private fun validerKvp(kandidat: Kandidat) {
-        if(kandidat.kvpOpprettet?.opprettetDato?.isAfter(now()) == true) {
+        if(kandidat.kvp?.opprettetDato?.isAfter(now()) == true) {
             log("SynlighetsLytter").error("opprettetDato er etter nåværende tidspunkt se secureLog")
-            secureLog.error("opprettetDato er etter nåværende tidspunkt: aktørId: ${kandidat.aktørId}, opprettetDato: ${kandidat.kvpOpprettet.opprettetDato}, now: ${now()}")
+            secureLog.error("opprettetDato er etter nåværende tidspunkt: aktørId: ${kandidat.aktørId}, opprettetDato: ${kandidat.kvp.opprettetDato}, now: ${now()}")
             throw Exception("opprettetDato er etter nåværende tidspunkt")
         }
-        if(kandidat.kvpAvsluttet?.avsluttetDato?.isAfter(now()) == true) {
+        if(kandidat.kvp?.avsluttetDato?.isAfter(now()) == true) {
             log("SynlighetsLytter").error("avsluttetDato er etter nåværende tidspunkt se secureLog")
-            secureLog.error("avsluttetDato er etter nåværende tidspunkt: aktørId: ${kandidat.aktørId}, opprettetDato: ${kandidat.kvpAvsluttet.avsluttetDato}, now: ${now()}")
+            secureLog.error("avsluttetDato er etter nåværende tidspunkt: aktørId: ${kandidat.aktørId}, opprettetDato: ${kandidat.kvp.avsluttetDato}, now: ${now()}")
             throw Exception("avsluttetDato er etter nåværende tidspunkt")
         }
-        if(kandidat.kvpOpprettet != null) {
-            secureLog.info("Fant opprettet kvp for person (${kandidat.aktørId}, opprettet: ${kandidat.kvpOpprettet}, avsluttet: ${kandidat.kvpAvsluttet}")
+        if(kandidat.kvp?.opprettetDato!= null) {
+            secureLog.info("Fant opprettet kvp for person (${kandidat.aktørId}, opprettet: ${kandidat.kvp.opprettetDato}, avsluttet: ${kandidat.kvp.avsluttetDato}")
         }
+    }
+
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        super.onError(problems, context)
+    }
+
+    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
+        super.onSevere(error, context)
     }
 }
