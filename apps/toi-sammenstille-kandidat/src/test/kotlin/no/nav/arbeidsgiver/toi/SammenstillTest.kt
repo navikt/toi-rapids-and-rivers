@@ -439,7 +439,7 @@ class SammenstillTest {
         assertThat(kvp.get("enhetId").asText()).isEqualTo("0219")
         assertThat(kvp.get("endretAv").asText()).isEqualTo("Z100000")
         assertThat(kvp.get("opprettetDato").asText()).isEqualTo("2023-06-22T12:21:18.895143217+02:00")
-        assertThat(kvp.get("avsluttetDato").asText()).isEqualTo("2023-06-22T12:21:18.895143217+02:00")
+        assertThat(kvp.get("avsluttetDato").asText()).isEqualTo("2023-06-23T12:21:18.895143217+02:00")
 
     }
 

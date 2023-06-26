@@ -151,7 +151,7 @@ fun kvp(aktørId: String) = """
             "enhetId": "0219",
             "endretAv": "Z100000",
             "opprettetDato": "2023-06-22T12:21:18.895143217+02:00",
-            "avsluttetDato": "2023-06-23T12:21:18.895143217+02:00",
+            "avsluttetDato": "2023-06-23T12:21:18.895143217+02:00"
           },
           "@event_name": "kvp"
         }
