@@ -436,10 +436,10 @@ class SammenstillTest {
 
         val kvp = melding.get("kvp")
         assertThat(kvp.get("aktorId").asText()).isEqualTo(aktørId)
-        assertThat(kvp.get("enhetId").asText()).isEqualTo("0219")
-        assertThat(kvp.get("endretAv").asText()).isEqualTo("Z100000")
-        assertThat(kvp.get("opprettetDato").asText()).isEqualTo("2023-06-22T12:21:18.895143217+02:00")
-        assertThat(kvp.get("avsluttetDato").asText()).isEqualTo("2023-06-23T12:21:18.895143217+02:00")
+        assertThat(kvp.get("event").asText()).isEqualTo("AVSLUTTET")
+        assertThat(kvp.get("enhetId").asText()).isEqualTo("1860")
+        assertThat(kvp.get("startet").get("opprettetDato").asText()).isEqualTo("2023-01-03T09:44:23.394628+01:00")
+        assertThat(kvp.get("avsluttet").get("avsluttetDato").asText()).isEqualTo("2023-01-03T09:44:48.891877+01:00")
 
     }
 

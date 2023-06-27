@@ -131,7 +131,6 @@ fun oppfølgingsperiodeMelding(aktørId: String) = """
     """.trimIndent()
 
 
-
 fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boolean) = """
         {
             "aktørId": "$aktørId",
@@ -147,11 +146,19 @@ fun kvp(aktørId: String) = """
         {
           "aktørId": "$aktørId",
           "kvp": {
-            "aktorId": "$aktørId",
-            "enhetId": "0219",
-            "endretAv": "Z100000",
-            "opprettetDato": "2023-06-22T12:21:18.895143217+02:00",
-            "avsluttetDato": "2023-06-23T12:21:18.895143217+02:00"
+              "event": "AVSLUTTET",
+              "aktorId": "$aktørId",
+              "enhetId": "1860",
+              "startet": {
+                "opprettetAv": "Z100000",
+                "opprettetDato": "2023-01-03T09:44:23.394628+01:00",
+                "opprettetBegrunnelse": "vzcfv"
+              },
+              "avsluttet": {
+                "avsluttetAv": "Z100000",
+                "avsluttetDato": "2023-01-03T09:44:48.891877+01:00",
+                "avsluttetBegrunnelse": "dczxd"
+              }
           },
           "@event_name": "kvp"
         }
