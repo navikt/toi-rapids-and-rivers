@@ -13,7 +13,9 @@ class KvpTest {
 
         KvpLytter(testRapid)
 
-        testRapid.sendTestMessage(kvpFraEksterntTopic(aktørId))
+        val melding = kvpFraEksterntTopic(aktørId)
+
+        testRapid.sendTestMessage(melding)
 
         val inspektør = testRapid.inspektør
 
@@ -35,19 +37,19 @@ class KvpTest {
 
         val kvp = meldingJson.get("kvp")
         assertThat(kvp.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+            "event",
             "aktorId",
             "enhetId",
-            "endretAv",
-            "opprettetDato",
-            "avsluttetDato",
+            "startet",
+            "avsluttet"
         )
 
         meldingJson.get("kvp").apply {
+            assertThat(get("event").asText()).isEqualTo("AVSLUTTET")
             assertThat(get("aktorId").asText()).isEqualTo(aktørId)
             assertThat(get("enhetId").asText()).isEqualTo("0123")
-            assertThat(get("endretAv").asText()).isEqualTo("A100000")
-            assertThat(get("opprettetDato").asText()).isEqualTo("2020-10-30")
-            assertThat(get("avsluttetDato").asText()).isEqualTo("2022-10-30")
+            assertThat(get("startet").get("opprettetDato").asText()).isEqualTo("2023-01-03T09:44:23.394628+01:00")
+            assertThat(get("avsluttet").get("avsluttetDato").asText()).isEqualTo("2023-01-03T09:44:48.891877+01:00")
         }
     }
 
@@ -67,12 +69,21 @@ class KvpTest {
 
     private fun kvpFraEksterntTopic(aktørId: String, eventName: Boolean = false) = """
         {
-            ${if(eventName) """"@event_name":"kvp",""" else ""}
+            ${if (eventName) """"@event_name":"kvp",""" else ""}
+            "event": "AVSLUTTET",
             "aktorId": "$aktørId",
             "enhetId": "0123",
-            "endretAv": "A100000",
-            "opprettetDato": "2020-10-30",
-            "avsluttetDato": "2022-10-30"
+             "startet": {
+                "opprettetAv": "Z100000",
+                "opprettetDato": "2023-01-03T09:44:23.394628+01:00",
+                "opprettetBegrunnelse": "vzcfv"
+              },
+              "avsluttet": {
+                "avsluttetAv": "Z100000",
+                "avsluttetDato": "2023-01-03T09:44:48.891877+01:00",
+                "avsluttetBegrunnelse": "dczxd"
+              }  
         }
     """.trimIndent()
 }
+
