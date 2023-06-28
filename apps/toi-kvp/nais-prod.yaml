@@ -1,2 +1,2 @@
 kafka_pool: nav-prod
-kafka_consumer_group_id: toi-kvp-rapidconsumer-2
+kafka_consumer_group_id: toi-kvp-rapidconsumer-3

@@ -9,8 +9,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
                 it.demandKey("event")
                 it.demandKey("aktorId")
                 it.demandKey("startet")
-                it.demandKey("avsluttet")
-                it.demandKey("enhetId")
+                it.interestedIn("avsluttet")
+                it.requireKey("enhetId")
                 it.rejectKey("@event_name")
             }
         }.register(this)
@@ -35,7 +35,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         )
 
         //secureLog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
-        secureLog.info("Skal publisere kvp-opprettet-melding med event ${packet["event"].asText()} (securelog verifikasjon)")
+        secureLog.info("Skal publisere kvp-melding med event ${packet["event"].asText()} (securelog verifikasjon)")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
