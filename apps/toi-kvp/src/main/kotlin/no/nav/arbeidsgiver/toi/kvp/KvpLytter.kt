@@ -17,6 +17,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        log.info("Mottok kvp event")
+
         if (packet["event"].isNull || (packet["event"].asText() != "STARTET" && packet["event"].asText() != "AVSLUTTET")) {
             log.error("event er ikke startet eller avluttet, se secure-log")
             secureLog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
