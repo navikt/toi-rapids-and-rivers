@@ -208,7 +208,6 @@ class SynlighetsmotorTest {
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
         )
 
-    @Disabled
     @Test
     fun `Om person har avsluttet kvp skal synlighet være true`() =
         testProgramMedHendelse(
@@ -218,7 +217,6 @@ class SynlighetsmotorTest {
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
 
-    @Disabled
     @Test
     fun `Om person har startet kvp og ingen avsluttet kvp skal synlighet være false`() =
         testProgramMedHendelse(
@@ -227,23 +225,6 @@ class SynlighetsmotorTest {
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
         )
-
-    @Test
-    fun `kvp skal ikke påvirke synlighet enda`() {
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp("2023-06-22T12:21:17.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00", "AVSLUTTET"),
-            ),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
-        )
-
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(
-                kvp= kvp( "2023-06-22T12:21:17.895143217+02:00", null, "STARTET"),
-            ),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
-        )
-    }
 
     @Test
     fun `ignorer uinteressante hendelser`() {

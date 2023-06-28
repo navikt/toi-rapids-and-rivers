@@ -24,7 +24,8 @@ data class Evaluering(
             erIkkeKode6eller7 &&
             erIkkeSperretAnsatt &&
             erIkkeDoed &&
-            erFerdigBeregnet
+            erFerdigBeregnet &&
+            erIkkeKvp
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv,
@@ -40,7 +41,7 @@ data class Evaluering(
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this != null && erIkkeKode6eller7) { //TODO Pass på kvp her når det tas i bruk
+            if (this != null && erIkkeKode6eller7 && erIkkeKvp) { //TODO Pass på kvp her når det tas i bruk
                 tilEvalueringUtenDiskresjonskode()
             } else {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
