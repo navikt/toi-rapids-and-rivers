@@ -210,66 +210,36 @@ class SynlighetsmotorTest {
 
     @Disabled
     @Test
-    fun `Om person har opprettet kvp og avsluttet kvp skal synlighet være true`() =
+    fun `Om person har avsluttet kvp skal synlighet være true`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00")
+                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00", "AVSLUTTET")
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
 
     @Disabled
     @Test
-    fun `Om person har opprettet kvp og avsluttet kvp men avsluttetDato er før opprettetDato skal synlighet være false`() =
+    fun `Om person har startet kvp og ingen avsluttet kvp skal synlighet være false`() =
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", "2023-06-22T12:21:17.895143217+02:00"),
+                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", null, "STARTET"),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
-        )
-
-    @Disabled
-    @Test
-    fun `Om person har opprettet kvp og ingen avsluttet kvp skal synlighet være false`() =
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp("2023-06-22T12:21:18.895143217+02:00", null),
-            ),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
-        )
-
-    @Disabled
-    @Test
-    fun `Om person ikke har opprettet kvp eller avsluttet kvp skal synlighet være true`() =
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp(null, null),
-            ),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
-        )
-
-    @Disabled
-    @Test
-    fun `Om person ikke har opprettet kvp men har avsluttet kvp skal synlighet være true`() =
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp(null, "2023-06-22T12:21:17.895143217+02:00"),
-            ),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
 
     @Test
     fun `kvp skal ikke påvirke synlighet enda`() {
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvp = kvp("2023-06-22T12:21:17.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00"),
+                kvp = kvp("2023-06-22T12:21:17.895143217+02:00", "2023-06-22T12:21:19.895143217+02:00", "AVSLUTTET"),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )
 
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(
-                kvp= kvp( "2023-06-22T12:21:17.895143217+02:00", null),
+                kvp= kvp( "2023-06-22T12:21:17.895143217+02:00", null, "STARTET"),
             ),
             enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
         )

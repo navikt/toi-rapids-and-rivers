@@ -22,9 +22,9 @@ data class Kandidat(
 
     val erKvp: Boolean
         get() = when {
-            kvp?.opprettetDato == null -> false
-            kvp?.avsluttetDato == null -> true
-            kvp.avsluttetDato.isBefore(kvp.opprettetDato) -> true
+            kvp?.event == null -> false
+            kvp.event == "STARTET" -> true
+            kvp.event == "AVSLUTTET" -> false
             else -> false
         }
 
@@ -116,6 +116,5 @@ data class MåBehandleTidligereCv(
 )
 
 data class Kvp(
-    val opprettetDato: OffsetDateTime?,
-    val avsluttetDato: OffsetDateTime?
+    val event: String
 )

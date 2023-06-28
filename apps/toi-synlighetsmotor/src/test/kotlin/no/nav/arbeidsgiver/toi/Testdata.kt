@@ -81,14 +81,13 @@ class Testdata {
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
-            aktørId: String? = null,
+            aktørId: String? = """"aktørId": "123456789"""",
             kvp: String? = null,
         ) = """
             {
                 ${
             listOfNotNull(
                 """"@event_name": "hendelse"""",
-                """"aktørId": "123456789"""",
                 arbeidsmarkedCv,
                 oppfølgingsinformasjon,
                 oppfølgingsperiode,
@@ -241,12 +240,23 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun kvp(startdato: String? = null, sluttdato: String? = null) : String =
+        fun kvp(startdato: String? = null, sluttdato: String? = null, event: String) : String =
             """
                 "kvp": {
-                    "opprettetDato": ${if(startdato != null) """"$startdato"""" else "null"},
-                    "avsluttetDato": ${if(sluttdato != null) """"$sluttdato"""" else "null"}
-                }
+                "event": "$event",
+                "aktorId": "2000000000000",
+                "enhetId": "1860",
+                "startet": ${if(startdato == null) "null" else  """{
+                    "opprettetAv": "Z100000",
+                    "opprettetDato": "$startdato",
+                    "opprettetBegrunnelse": "vzcfv"
+                  }"""},
+                  "avsluttet": ${if(sluttdato == null) "null" else  """{
+                    "avsluttetAv": "Z100000",
+                    "avsluttetDato": "2023-01-03T09:44:48.891877+01:00",
+                    "avsluttetBegrunnelse": "dczxd"
+                  }"""
+                }}
     """.trimIndent()
 
         fun manglendeHjemmel() =
