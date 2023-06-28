@@ -19,8 +19,7 @@ class SammenstillTest {
         "arenaFritattKandidatsøk",
         "hjemmel",
         "måBehandleTidligereCv",
-        "kvpOpprettet",
-        "kvpAvsluttet"
+        "kvp",
     )
 
     private lateinit var javalin: Javalin
@@ -420,82 +419,42 @@ class SammenstillTest {
     }
 
     @Test
-    fun `Når kvp-opprettet event har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
+    fun `Når kvp event har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
         val aktørId = "123"
         val testRapid = TestRapid()
 
         startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(kvpOpprettet(aktørId))
+        testRapid.sendTestMessage(kvp(aktørId))
 
         val rapidInspektør = testRapid.inspektør
         assertThat(rapidInspektør.size).isEqualTo(1)
 
         val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("kvp-opprettet")
+        assertThat(melding.get("@event_name").asText()).isEqualTo("kvp")
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("kvpOpprettet")
+        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("kvp")
 
-        val kvpOpprettet = melding.get("kvpOpprettet")
-        assertThat(kvpOpprettet.get("aktorId").asText()).isEqualTo(aktørId)
-        assertThat(kvpOpprettet.get("enhetId").asText()).isEqualTo("0219")
-        assertThat(kvpOpprettet.get("opprettetAv").asText()).isEqualTo("Z100000")
-        assertThat(kvpOpprettet.get("opprettetDato").asText()).isEqualTo("2023-06-22T12:21:18.895143217+02:00")
-        assertThat(kvpOpprettet.get("opprettetBegrunnelse").asText()).isEqualTo("Test 2 kvp start")
+        val kvp = melding.get("kvp")
+        assertThat(kvp.get("aktorId").asText()).isEqualTo(aktørId)
+        assertThat(kvp.get("event").asText()).isEqualTo("AVSLUTTET")
+        assertThat(kvp.get("enhetId").asText()).isEqualTo("1860")
+        assertThat(kvp.get("startet").get("opprettetDato").asText()).isEqualTo("2023-01-03T09:44:23.394628+01:00")
+        assertThat(kvp.get("avsluttet").get("avsluttetDato").asText()).isEqualTo("2023-01-03T09:44:48.891877+01:00")
 
     }
 
     @Test
-    fun `Når kvp-avsluttet event har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
-        val aktørId = "123"
-        val testRapid = TestRapid()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(kvpAvsluttet(aktørId))
-
-        val rapidInspektør = testRapid.inspektør
-        assertThat(rapidInspektør.size).isEqualTo(1)
-
-        val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("kvp-avsluttet")
-        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("kvpAvsluttet")
-
-        val kvpAvsluttet = melding.get("kvpAvsluttet")
-        assertThat(kvpAvsluttet.get("aktorId").asText()).isEqualTo(aktørId)
-        assertThat(kvpAvsluttet.get("avsluttetAv").asText()).isEqualTo("Z100000")
-        assertThat(kvpAvsluttet.get("avsluttetDato").asText()).isEqualTo("2023-06-22T12:21:58.748120974+02:00")
-        assertThat(kvpAvsluttet.get("avsluttetBegrunnelse").asText()).isEqualTo("Test 2 avslutt kvp")
-    }
-
-    @Test
-    fun `Når kvp-opprettet-melding har blitt mottatt skal meldingen lagres i databasen`() {
+    fun `Når kvp-melding har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
         val testRapid = TestRapid()
         val testDatabase = TestDatabase()
 
         startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
 
-        testRapid.sendTestMessage(kvpOpprettet(aktørId))
+        testRapid.sendTestMessage(kvp(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
         assertThat(lagredeKandidater.size).isEqualTo(1)
-        assertThat(lagredeKandidater.first().kvpOpprettet).isNotNull
+        assertThat(lagredeKandidater.first().kvp).isNotNull
     }
-
-    @Test
-    fun `Når kvp-avsluttet-melding har blitt mottatt skal meldingen lagres i databasen`() {
-        val aktørId = "123"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-
-        testRapid.sendTestMessage(kvpAvsluttet(aktørId))
-
-        val lagredeKandidater = testDatabase.hentAlleKandidater()
-        assertThat(lagredeKandidater.size).isEqualTo(1)
-        assertThat(lagredeKandidater.first().kvpAvsluttet).isNotNull
-    }
-
-
 }

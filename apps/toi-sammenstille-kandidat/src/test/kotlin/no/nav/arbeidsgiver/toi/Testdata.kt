@@ -131,7 +131,6 @@ fun oppfølgingsperiodeMelding(aktørId: String) = """
     """.trimIndent()
 
 
-
 fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boolean) = """
         {
             "aktørId": "$aktørId",
@@ -143,30 +142,25 @@ fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boo
         }
     """.trimIndent()
 
-fun kvpOpprettet(aktørId: String) = """
+fun kvp(aktørId: String) = """
         {
           "aktørId": "$aktørId",
-          "kvpOpprettet": {
-            "aktorId": "$aktørId",
-            "enhetId": "0219",
-            "opprettetAv": "Z100000",
-            "opprettetDato": "2023-06-22T12:21:18.895143217+02:00",
-            "opprettetBegrunnelse": "Test 2 kvp start"
+          "kvp": {
+              "event": "AVSLUTTET",
+              "aktorId": "$aktørId",
+              "enhetId": "1860",
+              "startet": {
+                "opprettetAv": "Z100000",
+                "opprettetDato": "2023-01-03T09:44:23.394628+01:00",
+                "opprettetBegrunnelse": "vzcfv"
+              },
+              "avsluttet": {
+                "avsluttetAv": "Z100000",
+                "avsluttetDato": "2023-01-03T09:44:48.891877+01:00",
+                "avsluttetBegrunnelse": "dczxd"
+              }
           },
-          "@event_name": "kvp-opprettet"
-        }
-    """.trimIndent()
-
-fun kvpAvsluttet(aktørId: String) = """
-        {
-          "aktørId": "$aktørId",
-          "kvpAvsluttet": {
-            "aktorId": "$aktørId",
-            "avsluttetAv": "Z100000",
-            "avsluttetDato": "2023-06-22T12:21:58.748120974+02:00",
-            "avsluttetBegrunnelse": "Test 2 avslutt kvp"
-          },
-          "@event_name": "kvp-avsluttet"
+          "@event_name": "kvp"
         }
     """.trimIndent()
 

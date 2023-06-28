@@ -49,8 +49,7 @@ class Lytter(
             "arena-fritatt-kandidatsøk" -> kandidat.copy(arenaFritattKandidatsøk = verdi)
             "hjemmel" -> kandidat.copy(hjemmel = verdi)
             "må-behandle-tidligere-cv" -> kandidat.copy(måBehandleTidligereCv = verdi)
-            "kvp-opprettet" -> kandidat.copy(kvpOpprettet = verdi)
-            "kvp-avsluttet" -> kandidat.copy(kvpAvsluttet = verdi)
+            "kvp" -> kandidat.copy(kvp = verdi)
             else -> throw NotImplementedError("Mangler implementasjon for lytter for event $eventNavn")
         }
     }

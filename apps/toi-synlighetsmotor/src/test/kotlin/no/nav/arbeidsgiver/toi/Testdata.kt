@@ -49,8 +49,7 @@ class Testdata {
             aktørId: String = """
             "aktørId": "123456789"
         """.trimIndent(),
-            kvpOpprettet: String? = null,
-            kvpAvsluttet: String? = null
+            kvp: String? = null,
         ) =
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
@@ -61,8 +60,7 @@ class Testdata {
                 participatingService = participatingService,
                 måBehandleTidligereCv = måBehandleTidligereCv,
                 aktørId = aktørId,
-                kvpOpprettet = kvpOpprettet,
-                kvpAvsluttet = kvpAvsluttet
+                kvp = kvp,
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -83,15 +81,13 @@ class Testdata {
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
-            aktørId: String? = null,
-            kvpOpprettet: String? = null,
-            kvpAvsluttet: String? = null
+            aktørId: String? = """"aktørId": "123456789"""",
+            kvp: String? = null,
         ) = """
             {
                 ${
             listOfNotNull(
                 """"@event_name": "hendelse"""",
-                """"aktørId": "123456789"""",
                 arbeidsmarkedCv,
                 oppfølgingsinformasjon,
                 oppfølgingsperiode,
@@ -101,8 +97,7 @@ class Testdata {
                 participatingService,
                 måBehandleTidligereCv,
                 aktørId,
-                kvpOpprettet,
-                kvpAvsluttet
+                kvp,
             ).joinToString()
         }
             }
@@ -245,19 +240,24 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun kvpOpprettet() =
+        fun kvp(startdato: String? = null, sluttdato: String? = null, event: String) : String =
             """
-                "kvpOpprettet": {
-                    "opprettetDato": "2023-06-22T12:21:18.895143217+02:00"
-                  }
-            """.trimIndent()
-
-        fun kvpAvsluttet(avsluttetDatoErFørOpprettetDato: Boolean = false) =
-            """
-                "kvpAvsluttet": {
-                    "avsluttetDato": "${if(avsluttetDatoErFørOpprettetDato) "2023-06-22T12:21:17.895143217+02:00" else "2023-06-22T12:21:19.895143217+02:00"}"
-                  }
-            """.trimIndent()
+                "kvp": {
+                "event": "$event",
+                "aktorId": "2000000000000",
+                "enhetId": "1860",
+                "startet": ${if(startdato == null) "null" else  """{
+                    "opprettetAv": "Z100000",
+                    "opprettetDato": "$startdato",
+                    "opprettetBegrunnelse": "vzcfv"
+                  }"""},
+                  "avsluttet": ${if(sluttdato == null) "null" else  """{
+                    "avsluttetAv": "Z100000",
+                    "avsluttetDato": "2023-01-03T09:44:48.891877+01:00",
+                    "avsluttetBegrunnelse": "dczxd"
+                  }"""
+                }}
+    """.trimIndent()
 
         fun manglendeHjemmel() =
             """

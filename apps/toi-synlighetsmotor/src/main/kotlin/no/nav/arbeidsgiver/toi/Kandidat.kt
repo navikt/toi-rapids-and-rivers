@@ -15,17 +15,16 @@ data class Kandidat(
     val arenaFritattKandidatsøk: ArenaFritattKandidatsøk?,
     val hjemmel: Hjemmel?,
     val måBehandleTidligereCv: MåBehandleTidligereCv?,
-    val kvpOpprettet: KvpOpprettet?,
-    val kvpAvsluttet: KvpAvsluttet?
+    val kvp: Kvp?,
 ) {
     val erAAP: Boolean
         get() = oppfølgingsinformasjon?.erAAP == true
 
     val erKvp: Boolean
         get() = when {
-            kvpOpprettet == null -> false
-            kvpAvsluttet == null -> true
-            kvpAvsluttet.avsluttetDato.isBefore(kvpOpprettet.opprettetDato) -> true
+            kvp?.event == null -> false
+            kvp.event == "STARTET" -> true
+            kvp.event == "AVSLUTTET" -> false
             else -> false
         }
 
@@ -116,10 +115,6 @@ data class MåBehandleTidligereCv(
     val maaBehandleTidligereCv: Boolean
 )
 
-data class KvpOpprettet(
-    val opprettetDato: OffsetDateTime
-)
-
-data class KvpAvsluttet(
-    val avsluttetDato: OffsetDateTime
+data class Kvp(
+    val event: String
 )
