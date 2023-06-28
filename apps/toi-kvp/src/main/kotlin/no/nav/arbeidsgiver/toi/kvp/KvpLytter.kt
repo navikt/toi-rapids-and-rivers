@@ -17,13 +17,15 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        log.info("Mottok kvp event")
+        log.info("Mottok kvp event ${packet["event"].asText()}")
 
         if (packet["event"].isNull || (packet["event"].asText() != "STARTET" && packet["event"].asText() != "AVSLUTTET")) {
             log.error("event er ikke startet eller avluttet, se secure-log")
-            secureLog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+            //secureLog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
             return
         }
+
+
 
         val aktørId = packet["aktorId"].asText()
         val melding = mapOf(
@@ -32,7 +34,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
             "@event_name" to "kvp",
         )
 
-        secureLog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+        //secureLog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+        secureLog.info("Skal publisere kvp-opprettet-melding med event ${packet["event"].asText()} (securelog verifikasjon)")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
@@ -40,7 +43,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
         log.error("noe mangler i kvp.melding, se secure-log")
-        secureLog.error("noe mangler i kvp.melding: ${problems.toExtendedReport()}")
+        //secureLog.error("noe mangler i kvp.melding: ${problems.toExtendedReport()}")
     }
 
     override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
