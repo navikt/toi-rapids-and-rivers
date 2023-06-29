@@ -41,11 +41,12 @@ data class Evaluering(
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this != null && (erIkkeKode6eller7 || erIkkeKvp)) {
-                tilEvalueringUtenDiskresjonskode()
-            } else {
+            if (this == null || !erIkkeKode6eller7 || !erIkkeKvp) {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
+            } else {
+                tilEvalueringUtenDiskresjonskode()
             }
+
 
         operator fun Evaluering?.invoke() =
             lagEvalueringSomObfuskererKandidaterMedDiskresjonskode().let { obfuskertEvaluering ->
