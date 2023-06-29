@@ -14,10 +14,10 @@ val evaluerKandidatFraContext: ((String) ->  Evaluering?) -> (Context) -> Unit =
     }
 }
 private fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-    if (this != null && erIkkeKode6eller7) {
-        tilEvalueringUtenDiskresjonskodeDTO()
-    } else {
+    if (this == null || !erIkkeKode6eller7 || !erIkkeKvp) {
         EvalueringUtenDiskresjonskodeDTO.medAlleVerdierFalse()
+    } else {
+        tilEvalueringUtenDiskresjonskodeDTO()
     }
 
 private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDiskresjonskodeDTO(
