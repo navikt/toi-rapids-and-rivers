@@ -41,7 +41,7 @@ data class Evaluering(
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this != null && erIkkeKode6eller7 && erIkkeKvp) { //TODO Pass på kvp her når det tas i bruk
+            if (this != null && (erIkkeKode6eller7 || erIkkeKvp)) {
                 tilEvalueringUtenDiskresjonskode()
             } else {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
