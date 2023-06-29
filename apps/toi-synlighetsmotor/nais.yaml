@@ -57,7 +57,8 @@ spec:
       rules:
         - application: rekrutteringsbistand-container
           cluster: {{ cluster }}
-          namespace: toi
+        - application: rekrutteringsbistand
+          cluster: {{ cluster }}
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
