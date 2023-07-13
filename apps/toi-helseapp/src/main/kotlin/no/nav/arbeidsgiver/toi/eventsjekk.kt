@@ -20,7 +20,7 @@ private val uinteressanteHendelser = listOf(
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
-val grenseverdiForAlarm = Duration.ofHours(1)
+val grenseverdiForAlarm = Duration.ofHours(3)
 
 private val objectMapper = jacksonObjectMapper()
 
