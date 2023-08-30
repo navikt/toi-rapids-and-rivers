@@ -5,6 +5,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 fun main() = RapidApplication.create(System.getenv()).also { rapidsConnection ->
+    val urlNomApi = System.getenv("NOM_API_URL")
+    val accessTokenClient = AccessTokenClient(System.getenv())
+    val notifikasjonKlient = NomKlient(url = urlNomApi, hentAccessToken = accessTokenClient::hentAccessToken)
+
     VeilederLytter(rapidsConnection)
 }.start()
 

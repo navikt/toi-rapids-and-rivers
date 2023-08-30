@@ -1,2 +1,5 @@
 kafka_pool: nav-prod
 kafka_consumer_group_id: toi-veileder-rapidconsumer-10
+nom_api_url: https://nom-api.intern.nav.no/graphql
+nom_api_host: nom-api.intern.nav.no
+nom_api_scope: api://prod-gcp.nom.nom-api/.default
