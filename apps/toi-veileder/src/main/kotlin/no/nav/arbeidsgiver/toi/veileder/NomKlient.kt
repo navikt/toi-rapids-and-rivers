@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.veileder
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import org.slf4j.LoggerFactory
@@ -121,5 +122,8 @@ class NomKlient(
         val fornavn: String,
         val etternavn: String,
         val epost: String
-    )
+    ) {
+        fun toJsonNode(): JsonNode = jacksonObjectMapper().valueToTree(this)
+
+    }
 }

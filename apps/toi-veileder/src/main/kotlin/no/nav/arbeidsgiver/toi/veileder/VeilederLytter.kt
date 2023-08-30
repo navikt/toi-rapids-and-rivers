@@ -9,7 +9,8 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import org.slf4j.LoggerFactory
 
-class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class VeilederLytter(private val rapidsConnection: RapidsConnection, private val nomKlient: NomKlient) :
+    River.PacketListener {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
@@ -24,14 +25,20 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val ident = packet["veilederId"].asText()
+        val veilederinformasjon = nomKlient.hentVeilederinformasjon(ident)
+        packet["veilederinformasjon"] = veilederinformasjon.toJsonNode()
+
+
         val melding = mapOf(
             "aktørId" to packet["aktorId"],
-            "veileder" to packet.fjernMetadataOgKonverter(),
+            "veileder" to  packet.fjernMetadataOgKonverter(),
             "@event_name" to "veileder",
         )
 
         val nyPacket = JsonMessage.newMessage(melding)
         val aktørId = packet["aktorId"].asText()
+
 
         log.info("Skal publisere veiledermelding for aktørId (se securelog)")
         secureLog.info("Skal publisere veiledermelding for aktørId $aktørId")
@@ -40,7 +47,8 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection) : River.Pac
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
+        val metadataFelter =
+            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
         jsonNode.remove(metadataFelter)
         return jsonNode
     }

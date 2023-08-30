@@ -12,7 +12,7 @@ class VeilederTest {
         val veilederId = "2000020000"
         val tilordnet = "2020-12-21T10:58:19.023+01:00"
         val testRapid = TestRapid()
-        VeilederLytter(testRapid)
+        VeilederLytter(testRapid, nomKlient)
 
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
 
