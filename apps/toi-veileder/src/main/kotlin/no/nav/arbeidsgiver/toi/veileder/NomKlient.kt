@@ -42,6 +42,7 @@ class NomKlient(
         if (response.statusCode != 200) {
             log.error("Uventet statuskode fra veilederoppslag for ident: (se secureLog)")
             secureLog.error("Uventet statuskode fra veilederoppslag for ident: $ident")
+            throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se secureLog)")
         }
         return result.get()
     }

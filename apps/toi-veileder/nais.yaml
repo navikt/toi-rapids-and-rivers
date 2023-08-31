@@ -31,6 +31,10 @@ spec:
         - host: {{nom_api_host}}
   secureLogs:
     enabled: true
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
   kafka:
     pool: {{ kafka_pool }}
   env:
