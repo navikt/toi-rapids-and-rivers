@@ -28,7 +28,7 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: {{notifikasjon_api_host}}
+        - host: {{nom_api_host}}
   secureLogs:
     enabled: true
   kafka:
