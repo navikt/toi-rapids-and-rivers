@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 
 class VeilederTest {
 
-    val wiremock = WireMockServer(8089).also { it.start() }
+    val wiremock = WireMockServer(8089).also(WireMockServer::start)
     private val url = "http://localhost:8089/graphql"
     private val accessToken = "TestAccessToken"
 
@@ -24,21 +24,10 @@ class VeilederTest {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo("/graphql"))
                 .withRequestBody(
-                    WireMock.equalTo(
+                    WireMock.equalToJson(
                         """
                         {
-                          "query": "query(${'$'}identer: [String!]!) {
-                            ressurser(where: { navidenter: ${'$'}identer }) {
-                              id
-                              ressurs {
-                                navIdent
-                                visningsNavn
-                                fornavn
-                                etternavn
-                                epost
-                              }
-                            }
-                          }",
+                          "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
                           "variables": {
                             "identer": ["$veilederId"]
                           }

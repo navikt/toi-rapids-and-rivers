@@ -3,6 +3,8 @@ package no.nav.arbeidsgiver.toi.veileder
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
+import net.minidev.json.JSONObject
+import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.slf4j.LoggerFactory
 
 class NomKlient(
@@ -46,7 +48,7 @@ class NomKlient(
 
     private fun parseResponse(response: String): Veilederinformasjon {
         val jsonNode = objectMapper.readTree(response)
-        if (!jsonNode["error"].isNull) {
+        if (jsonNode["error"]?.isMissingOrNull() == false) {
             val errorMessage = jsonNode["error"].asText()
             log.error("Feilmelding ved henting av ident: (se secureLog)")
             secureLog.error("Feilmelding ved henting av ident: $errorMessage")
@@ -75,7 +77,6 @@ class NomKlient(
     }
 
     private fun spørringForCvDeltMedArbeidsgiver(identer: List<String>): String {
-        val identString = objectMapper.writeValueAsString(identer)
         val spørring = """
             query(${'$'}identer: [String!]!) {
                 ressurser(where: { navidenter: ${'$'}identer }) {
@@ -90,17 +91,10 @@ class NomKlient(
                 }
             }
         """.trimIndent()
-        val variabler = """
-            {
-                "identer": $identString
-            }
-        """.trimIndent()
-        return """
-            {
-                "query": $spørring,
-                "variables": $variabler
-            }
-        """.trimIndent()
+        val json = JSONObject()
+        json.put("query", spørring)
+        json.put("variables", mapOf("identer" to identer))
+        return json.toJSONString()
     }
 
     data class NomSvar(
