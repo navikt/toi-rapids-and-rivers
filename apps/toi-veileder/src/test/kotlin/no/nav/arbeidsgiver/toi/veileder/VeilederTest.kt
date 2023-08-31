@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.veileder
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -74,7 +75,6 @@ class VeilederTest {
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "veileder",
-            "veilederinformasjon",
             "aktørId",
             "system_read_count",
             "@id",
@@ -89,19 +89,28 @@ class VeilederTest {
             "aktorId",
             "veilederId",
             "tilordnet",
+            "veilederinformasjon"
         )
         meldingJson.get("veileder").apply {
             assertThat(get("aktorId").asText()).isEqualTo(aktørId)
             assertThat(get("veilederId").asText()).isEqualTo(veilederId)
             assertThat(get("tilordnet").asText()).isEqualTo(tilordnet)
+            assertThat(
+                jacksonObjectMapper().treeToValue(
+                    get("veilederinformasjon"),
+                    NomKlient.Veilederinformasjon::class.java
+                )
+            ).isEqualTo(
+                NomKlient.Veilederinformasjon(
+                    navIdent = veilederId,
+                    visningsNavn = "Jon Blund",
+                    fornavn = "Jon",
+                    etternavn = "Blund",
+                    epost = "Jonblund@jonb.no"
+                )
+            )
         }
 
-        val info = meldingJson["veileder"]["veilederinformasjon"]
-        assertThat(info["navIdent"].asText()).isEqualTo(veilederId)
-        assertThat(info["visningsNavn"].asText()).isEqualTo("Jon Blund")
-        assertThat(info["fornavn"].asText()).isEqualTo("Jon")
-        assertThat(info["etternavn"].asText()).isEqualTo("Blund")
-        assertThat(info["epost"].asText()).isEqualTo("Jonblund@jonb.no")
     }
 
     private fun veilederMeldingFraEksterntTopic(aktørId: String, veilederId: String, tilordnet: String) = """
