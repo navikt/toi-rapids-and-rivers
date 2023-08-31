@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.veileder
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.github.kittinunf.fuel.Fuel
 import net.minidev.json.JSONObject
 import no.nav.helse.rapids_rivers.isMissingOrNull
@@ -50,7 +51,7 @@ class NomKlient(
     private fun parseResponse(response: String): Veilederinformasjon? {
         val jsonNode = objectMapper.readTree(response)
         if (jsonNode["errors"]?.isMissingOrNull() == false) {
-            val errorMessage = jsonNode["errors"].asText()
+            val errorMessage = objectMapper.writeValueAsString(jsonNode["errors"])
             log.error("Feilmelding ved henting av ident: (se secureLog)")
             secureLog.error("Feilmelding ved henting av ident: $errorMessage")
             throw RuntimeException("Feilmelding ved henting av ident: (se secureLog)")
