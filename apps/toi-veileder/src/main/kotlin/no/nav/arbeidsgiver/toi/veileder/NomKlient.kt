@@ -49,8 +49,8 @@ class NomKlient(
 
     private fun parseResponse(response: String): Veilederinformasjon? {
         val jsonNode = objectMapper.readTree(response)
-        if (jsonNode["error"]?.isMissingOrNull() == false) {
-            val errorMessage = jsonNode["error"].asText()
+        if (jsonNode["errors"]?.isMissingOrNull() == false) {
+            val errorMessage = jsonNode["errors"].asText()
             log.error("Feilmelding ved henting av ident: (se secureLog)")
             secureLog.error("Feilmelding ved henting av ident: $errorMessage")
             throw RuntimeException("Feilmelding ved henting av ident: (se secureLog)")
