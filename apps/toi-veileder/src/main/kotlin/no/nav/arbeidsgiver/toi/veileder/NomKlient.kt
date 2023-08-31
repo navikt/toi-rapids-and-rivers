@@ -16,7 +16,7 @@ class NomKlient(
     private val log = LoggerFactory.getLogger(NomKlient::class.java)
     private val objectMapper = jacksonObjectMapper()
 
-    fun hentVeilederinformasjon(ident: String): Veilederinformasjon {
+    fun hentVeilederinformasjon(ident: String): Veilederinformasjon? {
         val spørring = spørringForCvDeltMedArbeidsgiver(listOf(ident))
         logRequestIfAppropriate(spørring)
 
@@ -47,7 +47,7 @@ class NomKlient(
         return result.get()
     }
 
-    private fun parseResponse(response: String): Veilederinformasjon {
+    private fun parseResponse(response: String): Veilederinformasjon? {
         val jsonNode = objectMapper.readTree(response)
         if (jsonNode["error"]?.isMissingOrNull() == false) {
             val errorMessage = jsonNode["error"].asText()
@@ -108,7 +108,7 @@ class NomKlient(
 
     data class RessursWrapper(
         val id: String,
-        val ressurs: Veilederinformasjon
+        val ressurs: Veilederinformasjon?
     )
 
     data class Veilederinformasjon(

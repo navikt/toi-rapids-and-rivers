@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.veileder
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -27,12 +28,13 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection, private val
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val ident = packet["veilederId"].asText()
         val veilederinformasjon = nomKlient.hentVeilederinformasjon(ident)
-        packet["veilederinformasjon"] = veilederinformasjon.toJsonNode()
+        packet["veilederinformasjon"] =
+            if (veilederinformasjon == null) JsonNodeFactory.instance.nullNode() else veilederinformasjon.toJsonNode()
 
 
         val melding = mapOf(
             "aktørId" to packet["aktorId"],
-            "veileder" to  packet.fjernMetadataOgKonverter(),
+            "veileder" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "veileder",
         )
 
