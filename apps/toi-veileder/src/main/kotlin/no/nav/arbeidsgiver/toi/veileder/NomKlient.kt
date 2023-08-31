@@ -112,11 +112,11 @@ class NomKlient(
     )
 
     data class Veilederinformasjon(
-        val navIdent: String,
-        val visningsNavn: String,
-        val fornavn: String,
-        val etternavn: String,
-        val epost: String
+        val navIdent: String?,
+        val visningsNavn: String?,
+        val fornavn: String?,
+        val etternavn: String?,
+        val epost: String?
     ) {
         fun toJsonNode(): JsonNode = jacksonObjectMapper().valueToTree(this)
 
