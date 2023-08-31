@@ -25,8 +25,16 @@ spec:
     requests:
       cpu: 400m
       memory: 512Mi
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{nom_api_host}}
   secureLogs:
     enabled: true
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
   kafka:
     pool: {{ kafka_pool }}
   env:
@@ -38,3 +46,9 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: NOM_API_URL
+      value: {{nom_api_url}}
+    - name: NOM_API_SCOPE
+      value: {{nom_api_scope}}
+    - name: NOM_API_HOST
+      value: {{nom_api_host}}
