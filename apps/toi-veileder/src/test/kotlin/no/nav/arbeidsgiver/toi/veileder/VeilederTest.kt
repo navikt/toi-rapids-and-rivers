@@ -47,23 +47,17 @@ class VeilederTest {
         return testRapid
     }
 
-    @Test
-    fun `Lesing av veilederMelding fra eksternt topic skal produsere ny melding på rapid`() {
-        val aktørId = "10000100000"
-        val veilederId = "A313111"
-        val tilordnet = "2020-12-21T10:58:19.023+01:00"
-
-        val query = """
-        {
+    private fun createQuery(veilederId: String): String {
+        return """{
           "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
           "variables": {
             "identer": ["$veilederId"]
           }
-        }
-        """
+        }"""
+    }
 
-        val responseBody = """
-        {
+    private fun createResponseBodyWithData(veilederId: String): String {
+        return """{
           "data": {
             "ressurser": [
               {
@@ -78,24 +72,49 @@ class VeilederTest {
               }
             ]
           }
+        }"""
+    }
+
+    private fun veilederMeldingFraEksterntTopic(aktørId: String, veilederId: String, tilordnet: String) = """
+        {
+            "aktorId": "$aktørId",
+            "veilederId": "$veilederId",
+            "tilordnet": "$tilordnet"
         }
-        """
+    """.trimIndent()
+
+    private fun performCommonAssertions(inspektør: TestRapid.RapidInspector, aktørId: String, veilederId: String, tilordnet: String) {
+        assertThat(inspektør.size).isEqualTo(1)
+        val meldingJson = inspektør.message(0)
+        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+
+        val veilederJson = meldingJson["veileder"]
+        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+    }
+
+    @Test
+    fun `Lesing av veilederMelding fra eksternt topic skal produsere ny melding på rapid`() {
+        // arrange
+        val aktørId = "10000100000"
+        val veilederId = "A313111"
+        val tilordnet = "2020-12-21T10:58:19.023+01:00"
+
+        val query = createQuery(veilederId)
+        val responseBody = createResponseBodyWithData(veilederId)
 
         stubWireMock(query, responseBody)
 
         val testRapid = createTestRapidAndLytter()
+
+        // act
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
 
+        // assert
         val inspektør = testRapid.inspektør
-
-        assertThat(inspektør.size).isEqualTo(1)
-        val meldingJson = inspektør.message(0)
-
-        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
-        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
-        assertThat(meldingJson["veileder"]["aktorId"].asText()).isEqualTo(aktørId)
-        assertThat(meldingJson["veileder"]["veilederId"].asText()).isEqualTo(veilederId)
-        assertThat(meldingJson["veileder"]["tilordnet"].asText()).isEqualTo(tilordnet)
+        performCommonAssertions(inspektør, aktørId, veilederId, tilordnet)
     }
 
     @Test
@@ -148,21 +167,14 @@ class VeilederTest {
 
     @Test
     fun `Lesing av veilederMelding der nom har ressurs som har nullverdier`() {
+        // Initialize test variables
         val aktørId = "10000100000"
         val veilederId = "A313111"
         val tilordnet = "2020-12-21T10:58:19.023+01:00"
 
-        val spørring = """
-    {
-      "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
-      "variables": {
-        "identer": ["$veilederId"]
-      }
-    }
-    """
+        val spørring = createQuery(veilederId)
 
-        val responsKropp = """
-    {
+        val responseBody = """{
       "data": {
         "ressurser": [
           {
@@ -177,19 +189,16 @@ class VeilederTest {
           }
         ]
       }
-    }
-    """
+    }"""
 
-        stubWireMock(spørring, responsKropp)
+        stubWireMock(spørring, responseBody)
 
         val testRapid = createTestRapidAndLytter()
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
 
         val inspektør = testRapid.inspektør
-
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
-
         assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
         assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
 
@@ -220,42 +229,42 @@ class VeilederTest {
         val tilordnet = "2020-12-21T10:58:19.023+01:00"
 
         val spørring = """
-    {
-      "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
-      "variables": {
-        "identer": ["$veilederId"]
-      }
-    }
-    """
+            {
+              "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
+              "variables": {
+                "identer": ["$veilederId"]
+              }
+            }
+            """
 
         val responsBody = """
-    {
-      "errors": [
-        {
-          "message": "AD har ingen data på nav-ident: N159553",
-          "locations": [],
-          "extensions": {
-            "code": "not_found",
-            "classification": "ExecutionAborted"
-          }
-        }
-      ],
-      "data": {
-        "ressurser": [
-          {
-            "id": "$veilederId",
-            "ressurs": {
-              "navIdent": "$veilederId",
-              "visningsNavn": "Jon Blund",
-              "fornavn": "Jon",
-              "etternavn": "Blund",
-              "epost": "Jonblund@jonb.no"
+            {
+              "errors": [
+                {
+                  "message": "AD har ingen data på nav-ident: $veilederId",
+                  "locations": [],
+                  "extensions": {
+                    "code": "not_found",
+                    "classification": "ExecutionAborted"
+                  }
+                }
+              ],
+              "data": {
+                "ressurser": [
+                  {
+                    "id": "$veilederId",
+                    "ressurs": {
+                      "navIdent": "$veilederId",
+                      "visningsNavn": "Jon Blund",
+                      "fornavn": "Jon",
+                      "etternavn": "Blund",
+                      "epost": "Jonblund@jonb.no"
+                    }
+                  }
+                ]
+              }
             }
-          }
-        ]
-      }
-    }
-    """
+            """
 
         stubWireMock(spørring, responsBody)
 
@@ -290,13 +299,4 @@ class VeilederTest {
         )
     }
 
-
-
-    private fun veilederMeldingFraEksterntTopic(aktørId: String, veilederId: String, tilordnet: String) = """
-        {
-            "aktorId": "$aktørId",
-            "veilederId": "$veilederId",
-            "tilordnet": "$tilordnet"
-        }
-    """.trimIndent()
 }
