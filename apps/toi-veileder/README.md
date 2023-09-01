@@ -1,1 +1,1 @@
-# Henter ut veilederinformasjon og legger den på rapid
+# Henter ut veilederinformasjon og legger den på rapid 
