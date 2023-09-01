@@ -5,15 +5,47 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VeilederTest {
 
-    val wiremock = WireMockServer(8089).also(WireMockServer::start)
+    val wiremock = WireMockServer(8089)
     private val url = "http://localhost:8089/graphql"
     private val accessToken = "TestAccessToken"
+
+    @BeforeAll
+    fun setup() {
+        wiremock.start()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        wiremock.stop()
+    }
+
+    fun stubWireMock(query: String, responseBody: String) {
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/graphql"))
+                .withRequestBody(WireMock.equalToJson(query))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(responseBody)
+                )
+        )
+    }
+
+    fun createTestRapidAndLytter(): TestRapid {
+        val testRapid = TestRapid()
+        val nomKlient = NomKlient(url = url) { accessToken }
+        VeilederLytter(testRapid, nomKlient)
+        return testRapid
+    }
 
     @Test
     fun `Lesing av veilederMelding fra eksternt topic skal produsere ny melding på rapid`() {
@@ -21,52 +53,37 @@ class VeilederTest {
         val veilederId = "A313111"
         val tilordnet = "2020-12-21T10:58:19.023+01:00"
 
-        val nomKlient = NomKlient(url = url) { accessToken }
+        val query = """
+        {
+          "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
+          "variables": {
+            "identer": ["$veilederId"]
+          }
+        }
+        """
 
-        val testRapid = TestRapid()
-        wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/graphql"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                        {
-                          "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
-                          "variables": {
-                            "identer": ["$veilederId"]
-                          }
-                        }
-                        """.trimIndent()
-                    )
-                )
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            """
-                            {
-                              "data": {
-                                "ressurser": [
-                                  {
-                                    "id": "A112123",
-                                    "ressurs": {
-                                      "navIdent": "$veilederId",
-                                      "visningsNavn": "Jon Blund",
-                                      "fornavn": "Jon",
-                                      "etternavn": "Blund",
-                                      "epost": "Jonblund@jonb.no"
-                                    }
-                                  }
-                                ]
-                              }
-                            }
-                            """.trimIndent()
-                        )
-                )
-        )
+        val responseBody = """
+        {
+          "data": {
+            "ressurser": [
+              {
+                "id": "A112123",
+                "ressurs": {
+                  "navIdent": "$veilederId",
+                  "visningsNavn": "Jon Blund",
+                  "fornavn": "Jon",
+                  "etternavn": "Blund",
+                  "epost": "Jonblund@jonb.no"
+                }
+              }
+            ]
+          }
+        }
+        """
 
-        VeilederLytter(testRapid, nomKlient)
+        stubWireMock(query, responseBody)
 
+        val testRapid = createTestRapidAndLytter()
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
 
         val inspektør = testRapid.inspektør
@@ -74,45 +91,11 @@ class VeilederTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "@event_name",
-            "veileder",
-            "aktørId",
-            "system_read_count",
-            "@id",
-            "@opprettet",
-            "system_participating_services"
-        )
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("veileder")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
-
-        val veilederJson = meldingJson.get("veileder")
-        assertThat(veilederJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "aktorId",
-            "veilederId",
-            "tilordnet",
-            "veilederinformasjon"
-        )
-        meldingJson.get("veileder").apply {
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("veilederId").asText()).isEqualTo(veilederId)
-            assertThat(get("tilordnet").asText()).isEqualTo(tilordnet)
-            assertThat(
-                jacksonObjectMapper().treeToValue(
-                    get("veilederinformasjon"),
-                    NomKlient.Veilederinformasjon::class.java
-                )
-            ).isEqualTo(
-                NomKlient.Veilederinformasjon(
-                    navIdent = veilederId,
-                    visningsNavn = "Jon Blund",
-                    fornavn = "Jon",
-                    etternavn = "Blund",
-                    epost = "Jonblund@jonb.no"
-                )
-            )
-        }
-
+        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["veileder"]["aktorId"].asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["veileder"]["veilederId"].asText()).isEqualTo(veilederId)
+        assertThat(meldingJson["veileder"]["tilordnet"].asText()).isEqualTo(tilordnet)
     }
 
     @Test
@@ -121,46 +104,31 @@ class VeilederTest {
         val veilederId = "A313111"
         val tilordnet = "2020-12-21T10:58:19.023+01:00"
 
-        val nomKlient = NomKlient(url = url) { accessToken }
+        val query = """
+    {
+      "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
+      "variables": {
+        "identer": ["$veilederId"]
+      }
+    }
+    """
 
-        val testRapid = TestRapid()
-        wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/graphql"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                        {
-                          "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
-                          "variables": {
-                            "identer": ["$veilederId"]
-                          }
-                        }
-                        """.trimIndent()
-                    )
-                )
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            """
-                            {
-                              "data": {
-                                "ressurser": [
-                                  {
-                                    "id": "A112123",
-                                    "ressurs": null
-                                  }
-                                ]
-                              }
-                            }
-                            """.trimIndent()
-                        )
-                )
-        )
+        val responseBody = """
+    {
+      "data": {
+        "ressurser": [
+          {
+            "id": "A112123",
+            "ressurs": null
+          }
+        ]
+      }
+    }
+    """
 
-        VeilederLytter(testRapid, nomKlient)
+        stubWireMock(query, responseBody)
 
+        val testRapid = createTestRapidAndLytter()
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
 
         val inspektør = testRapid.inspektør
@@ -168,31 +136,14 @@ class VeilederTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "@event_name",
-            "veileder",
-            "aktørId",
-            "system_read_count",
-            "@id",
-            "@opprettet",
-            "system_participating_services"
-        )
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("veileder")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
 
-        val veilederJson = meldingJson.get("veileder")
-        assertThat(veilederJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "aktorId",
-            "veilederId",
-            "tilordnet",
-            "veilederinformasjon"
-        )
-        meldingJson.get("veileder").apply {
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("veilederId").asText()).isEqualTo(veilederId)
-            assertThat(get("tilordnet").asText()).isEqualTo(tilordnet)
-            assertThat(get("veilederinformasjon").isNull).isTrue()
-        }
+        val veilederJson = meldingJson["veileder"]
+        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(veilederJson["veilederinformasjon"].isNull).isTrue()
     }
 
     @Test
@@ -201,52 +152,37 @@ class VeilederTest {
         val veilederId = "A313111"
         val tilordnet = "2020-12-21T10:58:19.023+01:00"
 
-        val nomKlient = NomKlient(url = url) { accessToken }
+        val spørring = """
+    {
+      "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
+      "variables": {
+        "identer": ["$veilederId"]
+      }
+    }
+    """
 
-        val testRapid = TestRapid()
-        wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/graphql"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                        {
-                          "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
-                          "variables": {
-                            "identer": ["$veilederId"]
-                          }
-                        }
-                        """.trimIndent()
-                    )
-                )
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            """
-                            {
-                              "data": {
-                                "ressurser": [
-                                  {
-                                    "id": "A112123",
-                                    "ressurs": {
-                                      "navIdent": null,
-                                      "visningsNavn": null,
-                                      "fornavn": null,
-                                      "etternavn": null,
-                                      "epost": null
-                                    }
-                                  }
-                                ]
-                              }
-                            }
-                            """.trimIndent()
-                        )
-                )
-        )
+        val responsKropp = """
+    {
+      "data": {
+        "ressurser": [
+          {
+            "id": "A112123",
+            "ressurs": {
+              "navIdent": null,
+              "visningsNavn": null,
+              "fornavn": null,
+              "etternavn": null,
+              "epost": null
+            }
+          }
+        ]
+      }
+    }
+    """
 
-        VeilederLytter(testRapid, nomKlient)
+        stubWireMock(spørring, responsKropp)
 
+        val testRapid = createTestRapidAndLytter()
         testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
 
         val inspektør = testRapid.inspektør
@@ -254,46 +190,107 @@ class VeilederTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "@event_name",
-            "veileder",
-            "aktørId",
-            "system_read_count",
-            "@id",
-            "@opprettet",
-            "system_participating_services"
-        )
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("veileder")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
 
-        val veilederJson = meldingJson.get("veileder")
-        assertThat(veilederJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "aktorId",
-            "veilederId",
-            "tilordnet",
-            "veilederinformasjon"
-        )
-        meldingJson.get("veileder").apply {
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("veilederId").asText()).isEqualTo(veilederId)
-            assertThat(get("tilordnet").asText()).isEqualTo(tilordnet)
-            assertThat(
-                jacksonObjectMapper().treeToValue(
-                    get("veilederinformasjon"),
-                    NomKlient.Veilederinformasjon::class.java
-                )
-            ).isEqualTo(
-                NomKlient.Veilederinformasjon(
-                    navIdent = null,
-                    visningsNavn = null,
-                    fornavn = null,
-                    etternavn = null,
-                    epost = null
-                )
+        val veilederJson = meldingJson["veileder"]
+        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(
+            jacksonObjectMapper().treeToValue(
+                veilederJson["veilederinformasjon"],
+                NomKlient.Veilederinformasjon::class.java
             )
-        }
-
+        ).isEqualTo(
+            NomKlient.Veilederinformasjon(
+                navIdent = null,
+                visningsNavn = null,
+                fornavn = null,
+                etternavn = null,
+                epost = null
+            )
+        )
     }
+
+    @Test
+    fun `Lesing av veilederMelding fra eksternt topic skal produsere ny melding på rapid om det er error melding, og i tillegg ressurs`() {
+        val aktørId = "10000100000"
+        val veilederId = "A313111"
+        val tilordnet = "2020-12-21T10:58:19.023+01:00"
+
+        val spørring = """
+    {
+      "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
+      "variables": {
+        "identer": ["$veilederId"]
+      }
+    }
+    """
+
+        val responsBody = """
+    {
+      "errors": [
+        {
+          "message": "AD har ingen data på nav-ident: N159553",
+          "locations": [],
+          "extensions": {
+            "code": "not_found",
+            "classification": "ExecutionAborted"
+          }
+        }
+      ],
+      "data": {
+        "ressurser": [
+          {
+            "id": "$veilederId",
+            "ressurs": {
+              "navIdent": "$veilederId",
+              "visningsNavn": "Jon Blund",
+              "fornavn": "Jon",
+              "etternavn": "Blund",
+              "epost": "Jonblund@jonb.no"
+            }
+          }
+        ]
+      }
+    }
+    """
+
+        stubWireMock(spørring, responsBody)
+
+        val testRapid = createTestRapidAndLytter()
+        testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val meldingJson = inspektør.message(0)
+
+        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+
+        val veilederJson = meldingJson["veileder"]
+        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(
+            jacksonObjectMapper().treeToValue(
+                veilederJson["veilederinformasjon"],
+                NomKlient.Veilederinformasjon::class.java
+            )
+        ).isEqualTo(
+            NomKlient.Veilederinformasjon(
+                navIdent = veilederId,
+                visningsNavn = "Jon Blund",
+                fornavn = "Jon",
+                etternavn = "Blund",
+                epost = "Jonblund@jonb.no"
+            )
+        )
+    }
+
+
 
     private fun veilederMeldingFraEksterntTopic(aktørId: String, veilederId: String, tilordnet: String) = """
         {

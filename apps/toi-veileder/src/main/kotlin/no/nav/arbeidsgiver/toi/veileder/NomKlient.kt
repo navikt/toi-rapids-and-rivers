@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.veileder
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.treeToValue
@@ -52,9 +53,8 @@ class NomKlient(
         val jsonNode = objectMapper.readTree(response)
         if (jsonNode["errors"]?.isMissingOrNull() == false) {
             val errorMessage = objectMapper.writeValueAsString(jsonNode["errors"])
-            log.error("Feilmelding ved henting av ident: (se secureLog)")
-            secureLog.error("Feilmelding ved henting av ident: $errorMessage")
-            throw RuntimeException("Feilmelding ved henting av ident: (se secureLog)")
+            log.error("Error ved henting av ident, om det er utgått ident kan personeninfo likevel prosesseres: (se secureLog)")
+            secureLog.error("Error ved henting av ident, om det er utgått ident kan personinfo likevel prosesseres: $errorMessage")
         }
 
         val nomSvar = objectMapper.treeToValue(jsonNode, NomSvar::class.java)
@@ -99,6 +99,7 @@ class NomKlient(
         return json.toJSONString()
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class NomSvar(
         val data: DataContainer
     )
