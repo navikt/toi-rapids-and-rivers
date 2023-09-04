@@ -42,9 +42,9 @@ class NomKlient(
             .responseString()
 
         if (response.statusCode != 200) {
-            log.error("Uventet statuskode fra veilederoppslag for ident: (se secureLog)")
-            secureLog.error("Uventet statuskode fra veilederoppslag for ident: $ident")
-            throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se secureLog)")
+            log.error("Uventet statuskode fra veilederoppslag for ident: (se secureLog) ${response.statusCode}")
+            secureLog.error("Uventet statuskode fra veilederoppslag for ident: $ident ${response.statusCode} ${response.responseMessage}")
+            throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se secureLog) ${response.statusCode}")
         }
         return result.get()
     }
@@ -60,9 +60,9 @@ class NomKlient(
         val nomSvar = objectMapper.treeToValue(jsonNode, NomSvar::class.java)
         val identsvar = nomSvar?.data?.ressurser ?: emptyList()
         if (identsvar.size != 1) {
-            log.error("Uventet antall svar ved henting av ident: (se secureLog)")
-            secureLog.error("Uventet antall svar ved henting av ident: $identsvar")
-            throw RuntimeException("Uventet antall svar ved henting av ident: (se secureLog)")
+            log.error("Uventet antall svar ved henting av ident: (se secureLog) antall ${identsvar.size}")
+            secureLog.error("Uventet antall svar ved henting av ident: $identsvar antall ${identsvar.size}")
+            throw RuntimeException("Uventet antall svar ved henting av ident: (se secureLog) antall ${identsvar.size}")
         }
         return identsvar[0].ressurs
     }

@@ -43,7 +43,7 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection, private val
 
 
         log.info("Skal publisere veiledermelding for aktørId (se securelog)")
-        secureLog.info("Skal publisere veiledermelding for aktørId $aktørId")
+        secureLog.info("Skal publisere veiledermelding for aktørId $aktørId ident $ident")
         rapidsConnection.publish(aktørId, nyPacket.toJson())
     }
 
