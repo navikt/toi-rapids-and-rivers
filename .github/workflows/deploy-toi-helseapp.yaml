@@ -13,6 +13,9 @@ on:
     - .github/workflows/deploy-toi-helseapp.yaml
     - buildSrc/**
 
+permissions:
+  packages: write
+
 jobs:
   build-and-publish:
     name: Build, test, and publish
