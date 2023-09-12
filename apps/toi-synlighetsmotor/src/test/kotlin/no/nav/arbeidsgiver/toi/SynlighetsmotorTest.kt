@@ -163,6 +163,15 @@ class SynlighetsmotorTest {
     )
 
     @Test
+    fun `person skal være synlig selv om hjemmelen er opprettet frem i tid`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(hjemmel = hjemmel(
+            opprettetDato = ZonedDateTime.now().plusHours(2),
+            slettetDato = null
+        )),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
+    )
+
+    @Test
     fun `om Person har hjemmel for feil ressurs skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(hjemmel = hjemmel(ressurs = "CV_GENERELL")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
