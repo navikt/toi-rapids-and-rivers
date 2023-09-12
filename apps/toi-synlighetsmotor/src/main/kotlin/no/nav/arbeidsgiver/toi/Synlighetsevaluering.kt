@@ -29,11 +29,10 @@ fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
 
 private fun harSettHjemmel(kandidat: Kandidat): Boolean {
     return if (kandidat.hjemmel != null && kandidat.hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL) {
-        val now = Instant.now()
-        val opprettetDato = kandidat.hjemmel.opprettetDato?.toInstant() ?: Instant.MAX
+        val opprettetDato = kandidat.hjemmel.opprettetDato
         val slettetDato = kandidat.hjemmel.slettetDato
 
-        opprettetDato.isBefore(now) && slettetDato == null
+        opprettetDato != null && slettetDato == null
     } else {
         false
     }
