@@ -10,7 +10,7 @@ const val TITTEL = "{{TITTEL}}"
 const val TEKST = "{{TEKST}}"
 const val AVSENDER = "{{AVSENDER}}"
 
-private val epostTemplate = """
+val epostTemplate = """
     <html>
         <head>
             <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
