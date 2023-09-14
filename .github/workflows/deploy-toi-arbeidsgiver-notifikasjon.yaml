@@ -11,6 +11,9 @@ on:
     - .github/workflows/deploy-toi-arbeidsgiver-notifikasjon.yaml
     - buildSrc/**
 
+permissions:
+  packages: write
+
 jobs:
   build-and-publish:
     name: Build, test, and publish
