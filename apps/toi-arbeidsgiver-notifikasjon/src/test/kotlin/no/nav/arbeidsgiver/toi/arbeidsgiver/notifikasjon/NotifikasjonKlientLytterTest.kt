@@ -15,11 +15,10 @@ class NotifikasjonKlientLytterTest {
     private val pesostegn = "$"
     private val accessToken = "TestAccessToken"
 
-    private val notifikasjonKlient =
-        NotifikasjonKlient(urlNotifikasjonApi) { accessToken }
-    private val notifikasjonsLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
+    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi) { accessToken }
+    private val notifikasjonLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
 
-    val wiremock = WireMockServer(8082).also { it.start() }
+    private val wiremock = WireMockServer(8082).also { it.start() }
 
     @BeforeEach
     fun beforeEach() {
