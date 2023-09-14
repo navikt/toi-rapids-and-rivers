@@ -6,21 +6,21 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-const val TITTEL = "{{TITTEL}}"
-const val TEKST = "{{TEKST}}"
-const val AVSENDER = "{{AVSENDER}}"
+const val TITTEL = "{tittel}"
+const val TEKST = "{tekst}"
+const val AVSENDER = "{avsender}"
 
 val epostTemplate = """
     <html>
         <head>
             <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
-            <title>$TITTEL</title>
+            <title id='tittel'>$TITTEL</title>
         </head>
         <body style='font-family: sans-serif; padding:40px 20px; color: #262626'>
             <div>
                 <h1 style='font-size: 1.75rem; font-weight:bold;'>Hei.</h1>
-                <h2 style='font-weight: 500; font-size: 1rem;'>Vi har funnet nye kandidater for deg til stillingen: <b>$TITTEL</b>.</h2>
-                <pre style='font-family: unset;'>$TEKST</pre>
+                <h2 style='font-weight: 500; font-size: 1rem;'>Vi har funnet nye kandidater for deg til stillingen: <b id='stillingstittel'>$TITTEL</b>.</h2>
+                <pre style='font-family: unset;' id='tekst'>$TEKST</pre>
             </div>
     
     
@@ -37,7 +37,7 @@ val epostTemplate = """
                 </div>
             </div>
     
-            <p style='padding-block:40px 32px'>Vennlig hilsen $AVSENDER</p>
+            <p style='padding-block:40px 32px'>Vennlig hilsen <span id='avsender'>$AVSENDER</span></p>
     
             <div style='border:1px solid rgba(0, 0, 0, 0.1)'></div>
     
