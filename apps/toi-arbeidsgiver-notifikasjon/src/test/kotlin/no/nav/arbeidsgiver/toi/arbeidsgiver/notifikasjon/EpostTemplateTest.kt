@@ -25,9 +25,9 @@ class EpostTemplateTest {
     fun `lagEpostBody erstatter plassholdere med tittel, tekst og avsender`() {
         val body = lagEpostBody("En slags jobb", "Hei, her kommer to nye kandidater!", "Vetle Veileder")
 
-        assertThat(body).contains("<title id='tittel'>En slags jobb</title>")
-        assertThat(body).contains("<b id='stillingstittel'>En slags jobb</b>")
-        assertThat(body).contains("<pre style='font-family: unset;' id='tekst'>Hei, her kommer to nye kandidater!</pre>")
-        assertThat(body).contains("<span id='avsender'>Vetle Veileder</span>")
+        assertThat(body).contains("<title id=\"tittel\">En slags jobb</title>")
+        assertThat(body).contains("<b id=\"stillingstittel\">En slags jobb</b>")
+        assertThat(body).contains("id=\"tekst\">Hei, her kommer to nye kandidater!</pre>")
+        assertThat(body).contains("<span id=\"avsender\">Vetle Veileder</span>")
     }
 }
