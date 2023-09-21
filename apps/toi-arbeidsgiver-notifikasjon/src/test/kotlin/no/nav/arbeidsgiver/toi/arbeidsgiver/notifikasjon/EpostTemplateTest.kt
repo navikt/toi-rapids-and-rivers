@@ -27,7 +27,7 @@ class EpostTemplateTest {
 
         assertThat(body).contains("<title id='tittel'>En slags jobb</title>")
         assertThat(body).contains("<b id='stillingstittel'>En slags jobb</b>")
-        assertThat(body).contains("id='tekst'>Hei, her kommer to nye kandidater!</pre>")
+        assertThat(body).contains("id='tekst'>Hei, her kommer to nye kandidater!</p>")
         assertThat(body).contains("<span id='avsender'>Vetle Veileder</span>")
     }
 }
