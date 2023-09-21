@@ -38,7 +38,7 @@ val epostTemplate = """
                 <p style='margin-top: 0'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
                 <p>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
                 <p>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
-                <p style="margin-bottom: 0; border-bottom: 16px solid #f2f3f5;">Kopier den gjerne og send den til vedkommende:</p>
+                <p style='margin-bottom: 0; border-bottom: 16px solid #f2f3f5;'>Kopier den gjerne og send den til vedkommende:</p>
 
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
                     <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
