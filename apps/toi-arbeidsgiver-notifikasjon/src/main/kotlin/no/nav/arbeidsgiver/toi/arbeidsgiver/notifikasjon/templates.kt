@@ -23,23 +23,23 @@ val epostTemplate = """
             <p style='white-space: pre-wrap; margin-top: 32px; margin-bottom: 32px' id='tekst'>$TEKST</pre>
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
-                <ol style='margin: 0px; padding-left: 24px; line-height: 24px'>
+                <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
                     <li>Åpne <a href='#' style='text-decoration: none; color: #000000; cursor: default; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</a></li>
                     <li><b>Logg inn</b></li>
                     <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
                 </ol>
             </div>
             <p style='margin-top: 24px; margin-bottom: 40px;'>Vennlig hilsen <span id='avsender'>$AVSENDER</span></p>
-    
+
             <div style='border: 1px solid #cbcfd5;'></div>
-    
+
             <h2 style='font-size: 16px; margin-top: 40px; margin-bottom: 16px'>Mangler du tilgang til Min Side for Arbeidsgiver hos NAV?</h2>
             <div style='border: 24px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5'>
                 <p style='margin-top: 0'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
                 <p>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
                 <p>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
-                <p>Kopier den gjerne og send den til vedkommende:</p>
-    
+                <p style="margin-bottom: 0; border-bottom: 16px solid #f2f3f5;">Kopier den gjerne og send den til vedkommende:</p>
+
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
                     <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
                         <p style='margin-top: 0;'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra NAV på vegne av virksomheten din.</p>
