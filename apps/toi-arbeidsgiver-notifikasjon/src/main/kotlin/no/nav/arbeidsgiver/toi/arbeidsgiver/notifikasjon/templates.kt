@@ -20,7 +20,7 @@ val epostTemplate = """
         <body style='font-family: sans-serif; padding: 40px 20px; color: #23262a; mso-line-height-rule: exactly;'>
             <h1 style='font-size: 32px; font-weight: bold'>Hei.</h1>
             <p>Vi har funnet nye kandidater for deg til stillingen: <b id='stillingstittel'>$TITTEL</b>.</p>
-            <pre style='font-family: sans-serif; font-size: 16px; margin-top: 32px; margin-bottom: 32px' id='tekst'>$TEKST</pre>
+            <p style='white-space: pre-wrap; margin-top: 32px; margin-bottom: 32px' id='tekst'>$TEKST</pre>
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
                 <ol style='margin: 0px; padding-left: 24px; line-height: 24px'>
@@ -41,7 +41,7 @@ val epostTemplate = """
                 <p>Kopier den gjerne og send den til vedkommende:</p>
     
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
-                    <div style='border: 24px solid #ffffff; background-color: #ffffff;'>
+                    <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
                         <p style='margin-top: 0;'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra NAV på vegne av virksomheten din.</p>
                         <p><b>Gi tilganger til CV-er fra NAV:</b></p>
                         <ol style='line-height: 24px'>
