@@ -15,10 +15,45 @@ class NotifikasjonKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
-
     private val secureLog = LoggerFactory.getLogger("secureLog")
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
+
+    fun opprettSak(
+        stillingsId: UUID,
+        stillingstittel: String,
+        organisasjonsnummer: String
+    ) {
+        val spørring = graphQlSpørringForSakHosArbeidsgiver(
+            stillingsId,
+            stillingstittel,
+            organisasjonsnummer
+        )
+
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(spørring)
+                .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
+
+            when (notifikasjonsSvar) {
+
+
+                else -> {
+                    håndterFeil(json, response, spørring)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            throw e
+        }
+    }
 
     fun sendNotifikasjon(
         notifikasjonsId: String,
@@ -106,6 +141,7 @@ class NotifikasjonKlient(
         }
         throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
     }
+
 
     enum class NotifikasjonsSvar {
         NyBeskjedVellykket,
