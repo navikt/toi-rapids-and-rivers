@@ -6,8 +6,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-val SAK_MERKELAPP = "Kandidater"
-val PESOSTEGN = "$"
+const val SAK_MERKELAPP = "Kandidater"
+const val PESOSTEGN = "$"
 
 fun opprettLenkeTilStilling(stillingsId: String, virksomhetsnummer: String): String {
     val erProd = System.getenv()["NAIS_CLUSTER_NAME"] == "prod-gcp"
@@ -152,6 +152,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
 
 fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: String, organisasjonsnummer: String): String {
     val lenkeTilStilling = opprettLenkeTilStilling(stillingsId.toString(), organisasjonsnummer)
+    val utløperOm = Period.of(0, 3, 0)
 
     val query = """
         mutation OpprettNySak(
@@ -159,6 +160,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
             ${PESOSTEGN}virksomhetsnummer: String!
             ${PESOSTEGN}tittel: String!
             ${PESOSTEGN}lenke: String!
+            ${PESOSTEGN}hardDeleteDuration: ISO8601Duration!
         ) {
             nySak(
                 grupperingsid: ${PESOSTEGN}grupperingsid
@@ -170,6 +172,9 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                         serviceCode: "5078"
                     } 
                 ]
+                hardDelete: {
+                    om: ${PESOSTEGN}hardDeleteDuration
+                }
                 tittel: ${PESOSTEGN}tittel
                 lenke: ${PESOSTEGN}lenke
                 initiellStatus: AKTIV_REKRUTTERINGSPROSESS
@@ -192,6 +197,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
             "virksomhetsnummer": "$organisasjonsnummer"
             "tittel": "$stillingstittel"
             "lenke": "$lenkeTilStilling"
+            "hardDeleteDuration": "$utløperOm"
         }
     """
 
