@@ -168,8 +168,8 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                 virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer
                 mottakere: [
                     altinn: {
-                        serviceEdition: "1"
-                        serviceCode: "5078"
+                        serviceEdition: \"1\"
+                        serviceCode: \"5078\"
                     } 
                 ]
                 hardDelete: {
@@ -177,8 +177,8 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                 }
                 tittel: ${PESOSTEGN}tittel
                 lenke: ${PESOSTEGN}lenke
-                initiellStatus: MOTTATT
-                overstyrStatustekstMed: "Aktiv rekrutteringsprosess"
+                initiellStatus: ${PESOSTEGN}initiellStatus
+                overstyrStatustekstMed: ${PESOSTEGN}overstyrStatustekstMed
             ) {
                 __typename
                 ... on NySakVellykket {
@@ -197,6 +197,8 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
             "virksomhetsnummer": "$organisasjonsnummer",
             "tittel": "$stillingstittel",
             "lenke": "$lenkeTilStilling",
+            "initiellStatus": "MOTTATT",
+            "overstyrStatustekstMed": "Aktiv rekrutteringsprosess",
             "hardDeleteDuration": "$utløperOm"
         }
     """
