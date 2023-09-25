@@ -123,7 +123,7 @@ class KandidatlisteOpprettetLytterTest {
         )
     }
 
-    fun stubUforventetStatusIResponsFraNotifikasjonApi() {
+    private fun stubUforventetStatusIResponsFraNotifikasjonApi() {
         wiremock.stubFor(
             WireMock.post("/api/graphql")
                 .withHeader("Authorization", WireMock.containing("Bearer $accessToken"))
@@ -144,7 +144,7 @@ class KandidatlisteOpprettetLytterTest {
         )
     }
 
-    fun stubErrorsIResponsFraNotifikasjonApi() {
+    private fun stubErrorsIResponsFraNotifikasjonApi() {
         wiremock.stubFor(
             WireMock.post("/api/graphql")
                 .withHeader("Authorization", WireMock.containing("Bearer $accessToken"))
