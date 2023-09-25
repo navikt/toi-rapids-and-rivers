@@ -152,7 +152,7 @@ private fun spørringForCvDeltMedArbeidsgiver(
 
 fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: String, organisasjonsnummer: String): String {
     val lenkeTilStilling = opprettLenkeTilStilling(stillingsId.toString(), organisasjonsnummer)
-    val utløperOm = Period.of(0, 3, 0)
+    val utløperOm = Period.of(0, 6, 0)
 
     val query = """
         mutation OpprettNySak(
