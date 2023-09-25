@@ -26,6 +26,11 @@ class NotifikasjonKlientLytterTest {
         testRapid.reset()
     }
 
+    @AfterAll
+    fun afterAll() {
+        wiremock.stop()
+    }
+
     @Test
     fun `Når vi mottar notifikasjonsmelding på rapid skal vi gjøre kall til notifikasjonssystemet`() {
         val melding = """
