@@ -155,7 +155,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
     val utløperOm = Period.of(0, 6, 0)
 
     val query = """
-        mutation OpprettNySak(
+        "mutation OpprettNySak(
             ${PESOSTEGN}grupperingsid: String!
             ${PESOSTEGN}virksomhetsnummer: String!
             ${PESOSTEGN}tittel: String!
@@ -167,7 +167,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                 merkelapp: "Kandidater"
                 virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer
                 mottakere: [
-                    altinn: { 
+                    altinn: {
                         serviceEdition: "1"
                         serviceCode: "5078"
                     } 
@@ -188,15 +188,15 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                     feilmelding
                 }
             }
-        }
+        }"
     """
 
     val variables = """
         {
-            "grupperingsid": "$stillingsId"
-            "virksomhetsnummer": "$organisasjonsnummer"
-            "tittel": "$stillingstittel"
-            "lenke": "$lenkeTilStilling"
+            "grupperingsid": "$stillingsId",
+            "virksomhetsnummer": "$organisasjonsnummer",
+            "tittel": "$stillingstittel",
+            "lenke": "$lenkeTilStilling",
             "hardDeleteDuration": "$utløperOm"
         }
     """
@@ -206,7 +206,10 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
             "query": $query,
             "variables": $variables
         }
-    """.trimIndent().utenLangeMellomrom()
+    """
+        .trimIndent()
+        .replace("\n", "")
+        .utenLangeMellomrom()
 }
 
 tailrec fun String.utenLangeMellomrom(): String =

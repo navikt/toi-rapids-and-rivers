@@ -9,6 +9,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 
+val opprettetKandidatlisteMelding = """
+    {
+        "@event_name": "kandidat_v2.OpprettetKandidatliste",
+        "notifikasjonsId": "enEllerAnnenId",
+        "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+        "stilling": {
+            "stillingstittel": "En fantastisk stilling!",
+            "organisasjonsnummer": "123456789"
+        },
+        "stillingsinfo": {
+            "stillingskategori": "STILLING"
+        }
+    }
+""".trimIndent()
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KandidatlisteOpprettetLytterTest {
 
@@ -30,23 +45,9 @@ class KandidatlisteOpprettetLytterTest {
 
     @Test
     fun `Når vi mottar kandidatliste opprettet-melding på rapid skal vi lage en sak i notifikasjonssystemet`() {
-        val melding = """
-            {
-              "@event_name": "kandidat_v2.OpprettetKandidatliste",
-              "notifikasjonsId": "enEllerAnnenId",
-              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "stilling": {
-                  "stillingstittel": "En fantastisk stilling!",
-                  "organisasjonsnummer": "123456789"
-              },
-              "stillingsinfo": {
-                  "stillingskategori": "STILLING"
-              }
-        """.trimIndent()
-
         stubNySak()
 
-        testRapid.sendTestMessage(melding)
+        testRapid.sendTestMessage(opprettetKandidatlisteMelding)
 
         wiremock.verify(
             1, WireMock.postRequestedFor(
@@ -55,7 +56,7 @@ class KandidatlisteOpprettetLytterTest {
                 WireMock.equalTo(
                     " " +
                             """
-                      { "query": "mutation OpprettNySak( ${pesostegn}grupperingsid: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}tittel: String! ${pesostegn}lenke: String! ${pesostegn}hardDeleteDuration: ISO8601Duration! ) { nySak( grupperingsid: ${pesostegn}grupperingsid merkelapp: "Kandidater" virksomhetsnummer: ${pesostegn}virksomhetsnummer mottakere: [ altinn: {  serviceEdition: "1" serviceCode: "5078" }  ] hardDelete: { om: ${pesostegn}hardDeleteDuration } tittel: ${pesostegn}tittel lenke: ${pesostegn}lenke initiellStatus: AKTIV_REKRUTTERINGSPROSESS overstyrStatustekstMed: "Aktiv rekrutteringsprosess" ) { __typename ... on NySakVellykket { id } ... on Error { feilmelding } } }", "variables": "{ "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385" "virksomhetsnummer": "123456789" "tittel": "En fantastisk stilling!" "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789" "hardDeleteDuration": "P3M" }"
+                      { "query": "mutation OpprettNySak( ${pesostegn}grupperingsid: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}tittel: String! ${pesostegn}lenke: String! ${pesostegn}hardDeleteDuration: ISO8601Duration! ) { nySak( grupperingsid: ${pesostegn}grupperingsid merkelapp: "Kandidater" virksomhetsnummer: ${pesostegn}virksomhetsnummer mottakere: [ altinn: { serviceEdition: "1" serviceCode: "5078" } ] hardDelete: { om: ${pesostegn}hardDeleteDuration } tittel: ${pesostegn}tittel lenke: ${pesostegn}lenke initiellStatus: MOTTATT overstyrStatustekstMed: "Aktiv rekrutteringsprosess" ) { __typename ... on NySakVellykket { id } ... on Error { feilmelding } } }", "variables": { "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385", "virksomhetsnummer": "123456789", "tittel": "En fantastisk stilling!", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "hardDeleteDuration": "P6M" } }
                     """.trimIndent()
                 )
             )
@@ -65,85 +66,20 @@ class KandidatlisteOpprettetLytterTest {
 
     @Test
     fun `Når vi får errors i svaret fra notifikasjonssystemet skal vi throwe error`() {
-        val melding = """
-            {
-              "@event_name": "notifikasjon.cv-delt",
-              "arbeidsgiversEpostadresser": ["test@testepost.no"],
-              "notifikasjonsId": "enEllerAnnenId",
-              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "virksomhetsnummer": "123456789",
-              "utførtAvVeilederFornavn": "Veileder",
-              "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
-              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
-            }
-        """.trimIndent()
         stubErrorsIResponsFraNotifikasjonApi()
 
         assertThrows<RuntimeException> {
-            testRapid.sendTestMessage(melding)
+            testRapid.sendTestMessage(opprettetKandidatlisteMelding)
         }
     }
 
     @Test
     fun `Når vi får ukjent verdi for notifikasjonssvar skal vi throwe error`() {
-        val melding = """
-            {
-              "@event_name": "notifikasjon.cv-delt",
-              "arbeidsgiversEpostadresser": ["test@testepost.no"],
-              "notifikasjonsId": "enEllerAnnenId",
-              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "virksomhetsnummer": "123456789",
-              "utførtAvVeilederFornavn": "Veileder",
-              "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
-              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
-            }
-        """.trimIndent()
         stubUforventetStatusIResponsFraNotifikasjonApi()
 
         assertThrows<RuntimeException> {
-            testRapid.sendTestMessage(melding)
+            testRapid.sendTestMessage(opprettetKandidatlisteMelding)
         }
-    }
-
-    @Test
-    fun `Skal fjerne tabs og spaces fra epostadresser`() {
-        val melding = """
-            {
-              "@event_name": "notifikasjon.cv-delt",
-              "notifikasjonsId": "enEllerAnnenId",
-              "arbeidsgiversEpostadresser": [" test@testepost.no    "], 
-              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-              "virksomhetsnummer": "123456789",
-              "utførtAvVeilederFornavn": "Veileder",
-              "utførtAvVeilederEtternavn": "Veiledersen",
-              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
-              "meldingTilArbeidsgiver": "Her\nhar du noen \n fine kandidater med \"hermetegn\".",
-              "stillingstittel": "En fantastisk stilling!"
-            }
-        """.trimIndent()
-        stubNySak()
-
-        testRapid.sendTestMessage(melding)
-
-        val epostBody = lagEpostBody("En fantastisk stilling!", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "").utenLangeMellomrom()
-
-        wiremock.verify(
-            1, WireMock.postRequestedFor(
-                WireMock.urlEqualTo("/api/graphql")
-            ).withRequestBody(
-                WireMock.equalTo(
-                    " " +
-                            """
-                        { "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "eksternId": "enEllerAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }
-                    """.trimIndent()
-                )
-            )
-        )
-        Assertions.assertThat(testRapid.inspektør.size).isZero
     }
 
     private fun stubNySak() {
@@ -156,7 +92,7 @@ class KandidatlisteOpprettetLytterTest {
                         {
                           "data": {
                             "nySak": {
-                              "__typename": "NySakVellykket",
+                              "__typename": "${NotifikasjonKlient.NySakSvar.NySakVellykket.name}",
                               "id": "79c444d8-c658-43f8-8bfe-fabe668c6dcb"
                             }
                           }
@@ -177,7 +113,7 @@ class KandidatlisteOpprettetLytterTest {
                         {
                           "data": {
                             "nyBeskjed": {
-                              "__typename": "DuplikatEksternIdOgMerkelapp",
+                              "__typename": "${NotifikasjonKlient.NySakSvar.DuplikatGrupperingsid.name}",
                               "feilmelding": "notifikasjon med angitt eksternId og merkelapp finnes fra før"
                             }
                           }
