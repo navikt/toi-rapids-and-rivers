@@ -39,10 +39,16 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
+            val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
 
             when (notifikasjonsSvar) {
+                NySakSvar.NySakVellykket.name -> {
+                    log.info("Sak opprettet hos notifikasjon-api for stilling: $stillingsId")
+                }
 
+                NySakSvar.DuplikatGrupperingsid.name -> {
+                    log.info("Sak ikke opprettet hos notifikasjon-api fordi det allerede finnes en sak med stillingsId: $stillingsId")
+                }
 
                 else -> {
                     håndterFeil(json, response, spørring)
@@ -109,11 +115,11 @@ class NotifikasjonKlient(
             val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
 
             when (notifikasjonsSvar) {
-                NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
+                NyBeskjedSvar.DuplikatEksternIdOgMerkelapp.name -> {
                     log.info("Duplikatmelding sendt mot notifikasjon api")
                 }
 
-                NotifikasjonsSvar.NyBeskjedVellykket.name -> {
+                NyBeskjedSvar.NyBeskjedVellykket.name -> {
                     log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
                 }
 
@@ -143,8 +149,13 @@ class NotifikasjonKlient(
     }
 
 
-    enum class NotifikasjonsSvar {
+    enum class NyBeskjedSvar {
         NyBeskjedVellykket,
         DuplikatEksternIdOgMerkelapp,
+    }
+
+    enum class NySakSvar {
+        NySakVellykket,
+        DuplikatGrupperingsid
     }
 }

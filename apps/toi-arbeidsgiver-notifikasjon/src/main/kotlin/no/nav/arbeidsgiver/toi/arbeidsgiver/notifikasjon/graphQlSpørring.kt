@@ -177,7 +177,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                 }
                 tittel: ${PESOSTEGN}tittel
                 lenke: ${PESOSTEGN}lenke
-                initiellStatus: AKTIV_REKRUTTERINGSPROSESS
+                initiellStatus: MOTTATT
                 overstyrStatustekstMed: "Aktiv rekrutteringsprosess"
             ) {
                 __typename
