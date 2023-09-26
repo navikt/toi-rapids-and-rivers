@@ -51,15 +51,16 @@ class KandidatlisteOpprettetLytterTest {
 
         testRapid.sendTestMessage(opprettetKandidatlisteMelding)
 
+        val spørring = """ { "query": "mutation OpprettNySak( ${pesostegn}grupperingsid: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}tittel: String! ${pesostegn}lenke: String! ${pesostegn}merkelapp: String! ${pesostegn}initiellStatus: String! ${pesostegn}overstyrStatustekstMed: String! ${pesostegn}hardDeleteDuration: ISO8601Duration! ) { nySak( grupperingsid: ${pesostegn}grupperingsid merkelapp: ${pesostegn}merkelapp virksomhetsnummer: ${pesostegn}virksomhetsnummer mottakere: [ altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } ] hardDelete: { om: ${pesostegn}hardDeleteDuration } tittel: ${pesostegn}tittel lenke: ${pesostegn}lenke initiellStatus: ${pesostegn}initiellStatus overstyrStatustekstMed: ${pesostegn}overstyrStatustekstMed ) { __typename ... on NySakVellykket { id } ... on Error { feilmelding } } }", "variables": { "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385", "virksomhetsnummer": "123456789", "tittel": "En fantastisk stilling!", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "merkelapp": "Kandidater", "initiellStatus": "MOTTATT", "overstyrStatustekstMed": "Aktiv rekrutteringsprosess", "hardDeleteDuration": "P6M" } }"""
+
         wiremock.verify(
             1, WireMock.postRequestedFor(
                 WireMock.urlEqualTo("/api/graphql")
             ).withRequestBody(
-                WireMock.equalTo(
-                    """ { "query": "mutation OpprettNySak( ${pesostegn}grupperingsid: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}tittel: String! ${pesostegn}lenke: String! ${pesostegn}hardDeleteDuration: ISO8601Duration! ) { nySak( grupperingsid: ${pesostegn}grupperingsid merkelapp: "Kandidater" virksomhetsnummer: ${pesostegn}virksomhetsnummer mottakere: [ altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } ] hardDelete: { om: ${pesostegn}hardDeleteDuration } tittel: ${pesostegn}tittel lenke: ${pesostegn}lenke initiellStatus: ${pesostegn}initiellStatus overstyrStatustekstMed: ${pesostegn}overstyrStatustekstMed ) { __typename ... on NySakVellykket { id } ... on Error { feilmelding } } }", "variables": { "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385", "virksomhetsnummer": "123456789", "tittel": "En fantastisk stilling!", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "initiellStatus": "MOTTATT", "overstyrStatustekstMed": "Aktiv rekrutteringsprosess", "hardDeleteDuration": "P6M" } }"""
-                )
+                WireMock.equalTo(spørring)
             )
         )
+
         Assertions.assertThat(testRapid.inspektør.size).isZero
     }
 

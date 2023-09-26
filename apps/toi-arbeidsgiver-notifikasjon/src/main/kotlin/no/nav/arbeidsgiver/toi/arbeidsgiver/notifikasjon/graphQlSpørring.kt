@@ -160,11 +160,14 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
             ${PESOSTEGN}virksomhetsnummer: String!
             ${PESOSTEGN}tittel: String!
             ${PESOSTEGN}lenke: String!
+            ${PESOSTEGN}merkelapp: String!
+            ${PESOSTEGN}initiellStatus: String!
+            ${PESOSTEGN}overstyrStatustekstMed: String!
             ${PESOSTEGN}hardDeleteDuration: ISO8601Duration!
         ) {
             nySak(
                 grupperingsid: ${PESOSTEGN}grupperingsid
-                merkelapp: "Kandidater"
+                merkelapp: ${PESOSTEGN}merkelapp
                 virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer
                 mottakere: [
                     altinn: {
@@ -197,6 +200,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
             "virksomhetsnummer": "$organisasjonsnummer",
             "tittel": "$stillingstittel",
             "lenke": "$lenkeTilStilling",
+            "merkelapp": "Kandidater",
             "initiellStatus": "MOTTATT",
             "overstyrStatustekstMed": "Aktiv rekrutteringsprosess",
             "hardDeleteDuration": "$utløperOm"
