@@ -170,10 +170,12 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
                 merkelapp: ${PESOSTEGN}merkelapp,
                 virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer,
                 mottakere: [
-                    altinn: {
-                        serviceEdition: \"1\",
-                        serviceCode: \"5078\"
-                    } 
+                    {
+                        altinn: {
+                            serviceEdition: \"1\",
+                            serviceCode: \"5078\"
+                        }
+                    }
                 ],
                 hardDelete: {
                     om: ${PESOSTEGN}hardDeleteDuration
