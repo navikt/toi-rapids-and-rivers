@@ -156,36 +156,39 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
 
     val query = """
         "mutation OpprettNySak(
-            ${PESOSTEGN}grupperingsid: String!
-            ${PESOSTEGN}virksomhetsnummer: String!
-            ${PESOSTEGN}tittel: String!
-            ${PESOSTEGN}lenke: String!
-            ${PESOSTEGN}merkelapp: String!
-            ${PESOSTEGN}initiellStatus: String!
-            ${PESOSTEGN}overstyrStatustekstMed: String!
+            ${PESOSTEGN}grupperingsid: String!,
+            ${PESOSTEGN}virksomhetsnummer: String!,
+            ${PESOSTEGN}tittel: String!,
+            ${PESOSTEGN}lenke: String!,
+            ${PESOSTEGN}merkelapp: String!,
+            ${PESOSTEGN}initiellStatus: SaksStatus!,
+            ${PESOSTEGN}overstyrStatustekstMed: String,
             ${PESOSTEGN}hardDeleteDuration: ISO8601Duration!
         ) {
             nySak(
-                grupperingsid: ${PESOSTEGN}grupperingsid
-                merkelapp: ${PESOSTEGN}merkelapp
-                virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer
+                grupperingsid: ${PESOSTEGN}grupperingsid,
+                merkelapp: ${PESOSTEGN}merkelapp,
+                virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer,
                 mottakere: [
                     altinn: {
-                        serviceEdition: \"1\"
+                        serviceEdition: \"1\",
                         serviceCode: \"5078\"
                     } 
-                ]
+                ],
                 hardDelete: {
                     om: ${PESOSTEGN}hardDeleteDuration
-                }
-                tittel: ${PESOSTEGN}tittel
-                lenke: ${PESOSTEGN}lenke
-                initiellStatus: ${PESOSTEGN}initiellStatus
+                },
+                tittel: ${PESOSTEGN}tittel,
+                lenke: ${PESOSTEGN}lenke,
+                initiellStatus: ${PESOSTEGN}initiellStatus,
                 overstyrStatustekstMed: ${PESOSTEGN}overstyrStatustekstMed
             ) {
                 __typename
                 ... on NySakVellykket {
                     id
+                }
+                ... on DuplikatGrupperingsid {
+                    feilmelding
                 }
                 ... on Error {
                     feilmelding
