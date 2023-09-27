@@ -148,11 +148,19 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val svar = json["data"]?.get("nyStatusSak")?.get("__typename")?.asText()
+            val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asText()
 
             when (svar) {
                 NyStatusSakSvar.NyStatusSakVellykket.name -> {
                     log.info("Sak fullført hos notifikasjon-api for stilling: $stillingsId")
+                }
+
+                NyStatusSakSvar.SakFinnesIkke.name -> {
+                    log.warn("Forsøkte å lukke sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
+                }
+
+                NyStatusSakSvar.Konflikt.name -> {
+                    log.error("Forsøkte å lukke sak, men fikk konflikt på stillingsId $stillingsId")
                 }
 
                 else -> {

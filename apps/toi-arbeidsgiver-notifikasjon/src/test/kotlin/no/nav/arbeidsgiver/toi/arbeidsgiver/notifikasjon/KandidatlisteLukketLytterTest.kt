@@ -84,7 +84,7 @@ class KandidatlisteLukketLytterTest {
                         """
                         {
                           "data": {
-                            "nyStatusSak": {
+                            "nyStatusSakByGrupperingsid": {
                               "__typename": "${NotifikasjonKlient.NyStatusSakSvar.NyStatusSakVellykket.name}",
                               "id": "79c444d8-c658-43f8-8bfe-fabe668c6dcb"
                             }
@@ -105,7 +105,7 @@ class KandidatlisteLukketLytterTest {
                         """
                         {
                           "data": {
-                            "nyStatusSak": {
+                            "nyStatusSakByGrupperingsid": {
                               "__typename": "UforventetStatus",
                               "feilmelding": "Dette er en artig feil"
                             }
