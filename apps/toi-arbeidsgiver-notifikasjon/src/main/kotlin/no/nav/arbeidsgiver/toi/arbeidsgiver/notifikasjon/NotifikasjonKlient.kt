@@ -134,22 +134,8 @@ class NotifikasjonKlient(
         }
     }
 
-    private fun håndterFeil(
-        json: JsonNode,
-        response: Response,
-        body: String,
-    ) {
-        log.error("Feilet kall til notifikasjon-api med følgende body: (se securelog)")
-        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
-        val errors = json["errors"]
-        if (errors != null && errors.size() > 0) {
-            log.error("Feil fra notifikasjon api, errors: $errors}")
-        }
-        throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
-    }
-
-    fun fullførSak(stillingsId: UUID) {
-        val spørring = graphQlSpørringForFullførtSakHosArbeidsgiver(
+    fun ferdigstillSak(stillingsId: UUID) {
+        val spørring = graphQlSpørringForFerdigstillingAvSakHosArbeidsgiver(
             stillingsId
         )
 
@@ -194,5 +180,19 @@ class NotifikasjonKlient(
         NyStatusSakVellykket,
         SakFinnesIkke,
         Konflikt
+    }
+
+    private fun håndterFeil(
+        json: JsonNode,
+        response: Response,
+        body: String,
+    ) {
+        log.error("Feilet kall til notifikasjon-api med følgende body: (se securelog)")
+        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
+        val errors = json["errors"]
+        if (errors != null && errors.size() > 0) {
+            log.error("Feil fra notifikasjon api, errors: $errors}")
+        }
+        throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
     }
 }

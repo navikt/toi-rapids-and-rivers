@@ -20,7 +20,7 @@ class KandidatlisteLukketLytter(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val stillingsId = UUID.fromString(packet["stillingsId"].asText())
 
-        notifikasjonKlient.fullførSak(stillingsId)
+        notifikasjonKlient.ferdigstillSak(stillingsId)
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {

@@ -223,9 +223,9 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
         .utenLangeMellomrom()
 }
 
-fun graphQlSpørringForFullførtSakHosArbeidsgiver(stillingsId: UUID): String {
+fun graphQlSpørringForFerdigstillingAvSakHosArbeidsgiver(stillingsId: UUID): String {
     val query = """
-        "mutation FullforSak(
+        "mutation FerdigstillSak(
             ${PESOSTEGN}grupperingsid: String!,
             ${PESOSTEGN}merkelapp: String!,
             ${PESOSTEGN}nyStatus: SaksStatus!,
@@ -240,12 +240,6 @@ fun graphQlSpørringForFullførtSakHosArbeidsgiver(stillingsId: UUID): String {
                 __typename
                 ... on NyStatusSakVellykket {
                     id
-                }
-                ... on SakFinnesIkke {
-                    feilmelding
-                }
-                ... on Konflikt {
-                    feilmelding
                 }
                 ... on Error {
                     feilmelding
