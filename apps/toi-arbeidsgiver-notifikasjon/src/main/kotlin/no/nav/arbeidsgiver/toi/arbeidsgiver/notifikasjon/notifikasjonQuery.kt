@@ -215,6 +215,33 @@ fun queryFerdigstillSak(stillingsId: UUID): String {
     ))
 }
 
+fun querySlettSak(stillingsId: UUID): String {
+    val query = """
+        mutation SlettSak(
+            ${PESOSTEGN}grupperingsid: String!,
+            ${PESOSTEGN}merkelapp: String!
+        ) {
+            hardDeleteSakByGrupperingsid(
+                grupperingsid: ${PESOSTEGN}grupperingsid,
+                merkelapp: ${PESOSTEGN}merkelapp
+            ) {
+                __typename
+                ... on HardDeleteSakVellykket {
+                    id
+                }
+                ... on Error {
+                    feilmelding
+                }
+            }
+        }
+    """
+
+    return opprettQuery(query, mapOf(
+        "grupperingsid" to stillingsId.toString(),
+        "merkelapp" to SAK_MERKELAPP,
+    ))
+}
+
 fun opprettQuery(query: String, variables: Map<String, String>): String {
     val queryJson = """
         {

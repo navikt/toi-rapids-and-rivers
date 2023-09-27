@@ -174,6 +174,56 @@ class NotifikasjonKlient(
         }
     }
 
+    fun slettSak(stillingsId: UUID) {
+        val query = querySlettSak(
+            stillingsId
+        )
+
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(query)
+                .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asText()
+
+            when (svar) {
+                SlettSakSvar.HardDeleteSakVellykket.name -> {
+                    log.info("Sak slettet hos notifikasjon-api for stilling: $stillingsId")
+                }
+
+                SlettSakSvar.SakFinnesIkke.name -> {
+                    log.warn("Forsøkte å slette sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
+                }
+
+                else -> {
+                    håndterFeil(json, response, query)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            throw e
+        }
+    }
+
+    private fun håndterFeil(
+        json: JsonNode,
+        response: Response,
+        body: String,
+    ) {
+        log.error("Feilet kall til notifikasjon-api med følgende body: (se securelog)")
+        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
+        val errors = json["errors"]
+        if (errors != null && errors.size() > 0) {
+            log.error("Feil fra notifikasjon api, errors: $errors}")
+        }
+        throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
+    }
+
     enum class NyBeskjedSvar {
         NyBeskjedVellykket,
         DuplikatEksternIdOgMerkelapp,
@@ -190,17 +240,8 @@ class NotifikasjonKlient(
         Konflikt
     }
 
-    private fun håndterFeil(
-        json: JsonNode,
-        response: Response,
-        body: String,
-    ) {
-        log.error("Feilet kall til notifikasjon-api med følgende body: (se securelog)")
-        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
-        val errors = json["errors"]
-        if (errors != null && errors.size() > 0) {
-            log.error("Feil fra notifikasjon api, errors: $errors}")
-        }
-        throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
+    enum class SlettSakSvar {
+        HardDeleteSakVellykket,
+        SakFinnesIkke
     }
 }
