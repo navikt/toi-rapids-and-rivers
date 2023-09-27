@@ -16,7 +16,7 @@ fun startApp(
     opprettJavalin(rapidIsAlive)
     NotifikasjonLytter(rapidsConnection, notifikasjonKlient)
     KandidatlisteOpprettetLytter(rapidsConnection, notifikasjonKlient)
-    KandidatlisteLukketLytter(rapidsConnection, notifikasjonKlient)
+    // KandidatlisteLukketLytter(rapidsConnection, notifikasjonKlient)
 
     rapidsConnection.start()
 }
