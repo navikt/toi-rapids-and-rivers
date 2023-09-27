@@ -24,7 +24,7 @@ class NotifikasjonKlient(
         stillingstittel: String,
         organisasjonsnummer: String
     ) {
-        val spørring = graphQlSpørringForSakHosArbeidsgiver(
+        val spørring = queryOpprettNySak(
             stillingsId,
             stillingstittel,
             organisasjonsnummer
@@ -83,7 +83,7 @@ class NotifikasjonKlient(
         )
 
         val spørring =
-            graphQlSpørringForCvDeltMedArbeidsgiver(
+            queryOpprettNyBeskjed(
                 notifikasjonsId = notifikasjonsId,
                 stillingsId = stillingsId.toString(),
                 virksomhetsnummer = virksomhetsnummer,
@@ -135,7 +135,7 @@ class NotifikasjonKlient(
     }
 
     fun ferdigstillSak(stillingsId: UUID) {
-        val spørring = graphQlSpørringForFerdigstillingAvSakHosArbeidsgiver(
+        val spørring = queryFerdigstillSak(
             stillingsId
         )
 

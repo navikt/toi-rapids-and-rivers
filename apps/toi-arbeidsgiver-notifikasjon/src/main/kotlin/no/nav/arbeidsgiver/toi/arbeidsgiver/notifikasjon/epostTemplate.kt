@@ -71,6 +71,7 @@ fun lagEpostBody(tittel: String, tekst: String, avsender: String): String {
         .replace(TITTEL, tittel.htmlEscape())
         .replace(TEKST, tekst.htmlEscape())
         .replace(AVSENDER, avsender)
+        .oneLiner()
 }
 
 private fun String.htmlEscape(): String =
