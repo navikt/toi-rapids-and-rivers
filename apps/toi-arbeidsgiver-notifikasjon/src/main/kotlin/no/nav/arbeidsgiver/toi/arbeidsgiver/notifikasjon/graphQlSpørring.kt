@@ -54,14 +54,14 @@ private fun spørringForCvDeltMedArbeidsgiver(
     return """
     {
         "query": "mutation OpprettNyBeskjed(
-            ${PESOSTEGN}eksternId: String! 
-            ${PESOSTEGN}grupperingsId: String! 
-            ${PESOSTEGN}merkelapp: String! 
-            ${PESOSTEGN}virksomhetsnummer: String! 
-            ${PESOSTEGN}epostTittel: String! 
-            ${PESOSTEGN}epostBody: String! 
-            ${PESOSTEGN}lenke: String! 
-            ${PESOSTEGN}tidspunkt: ISO8601DateTime! 
+            ${PESOSTEGN}eksternId: String!
+            ${PESOSTEGN}grupperingsId: String!
+            ${PESOSTEGN}merkelapp: String!
+            ${PESOSTEGN}virksomhetsnummer: String!
+            ${PESOSTEGN}epostTittel: String!
+            ${PESOSTEGN}epostBody: String!
+            ${PESOSTEGN}lenke: String!
+            ${PESOSTEGN}tidspunkt: ISO8601DateTime!
             ${PESOSTEGN}hardDeleteDuration: ISO8601Duration!
             ${PESOSTEGN}notifikasjonTekst: String!
             ${
@@ -150,7 +150,11 @@ private fun spørringForCvDeltMedArbeidsgiver(
 """.trimIndent()
 }
 
-fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: String, organisasjonsnummer: String): String {
+fun graphQlSpørringForSakHosArbeidsgiver(
+    stillingsId: UUID?,
+    stillingstittel: String,
+    organisasjonsnummer: String
+): String {
     val lenkeTilStilling = opprettLenkeTilStilling(stillingsId.toString(), organisasjonsnummer)
     val utløperOm = Period.of(0, 6, 0)
 
@@ -225,7 +229,7 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
 
 fun graphQlSpørringForFerdigstillingAvSakHosArbeidsgiver(stillingsId: UUID): String {
     val query = """
-        "mutation FerdigstillSak(
+        mutation FerdigstillSak(
             ${PESOSTEGN}grupperingsid: String!,
             ${PESOSTEGN}merkelapp: String!,
             ${PESOSTEGN}nyStatus: SaksStatus!,
@@ -245,27 +249,35 @@ fun graphQlSpørringForFerdigstillingAvSakHosArbeidsgiver(stillingsId: UUID): St
                     feilmelding
                 }
             }
-        }"
-    """
-
-    val variables = """
-        {
-            "grupperingsid": "$stillingsId",
-            "merkelapp": "Kandidater",
-            "nyStatus": "FERDIG",
-            "overstyrStatustekstMed": "Avsluttet rekrutteringsprosess"
         }
     """
 
-    return """
+    return opprettQuery(query, mapOf(
+        "grupperingsid" to "$stillingsId",
+        "merkelapp" to "Kandidater",
+        "nyStatus" to "FERDIG",
+        "overstyrStatustekstMed" to "Avsluttet rekrutteringsprosess"
+    ))
+}
+
+fun opprettQuery(query: String, variables: Map<String, String>): String {
+    val variablesJson = variables.entries.joinToString(", ") {
+        (key, value) -> "\"$key\": \"$value\""
+    }
+
+
+    val queryJson = """
         {
-            "query": $query,
-            "variables": $variables
+            "query": "${query.trim()}",
+            "variables": { $variablesJson }
         }
     """
-        .trimIndent()
-        .replace("\n", "")
-        .utenLangeMellomrom()
+
+    return queryJson.oneLiner()
+}
+
+fun String.oneLiner(): String {
+    return this.trim().replace(Regex("\\s+"), " ")
 }
 
 tailrec fun String.utenLangeMellomrom(): String =

@@ -44,7 +44,7 @@ class KandidatlisteLukketLytterTest {
 
         testRapid.sendTestMessage(lukketKandidatlisteMelding)
 
-        val spørring = """ { "query": "mutation FerdigstillSak( ${pesostegn}grupperingsid: String!, ${pesostegn}merkelapp: String!, ${pesostegn}nyStatus: SaksStatus!, ${pesostegn}overstyrStatustekstMed: String ) { nyStatusSakByGrupperingsid( grupperingsid: ${pesostegn}grupperingsid, merkelapp: ${pesostegn}merkelapp, nyStatus: ${pesostegn}nyStatus, overstyrStatustekstMed: ${pesostegn}overstyrStatustekstMed ) { __typename ... on NyStatusSakVellykket { id } ... on Error { feilmelding } } }", "variables": { "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "nyStatus": "FERDIG", "overstyrStatustekstMed": "Avsluttet rekrutteringsprosess" } }"""
+        val spørring = """{ "query": "mutation FerdigstillSak( ${pesostegn}grupperingsid: String!, ${pesostegn}merkelapp: String!, ${pesostegn}nyStatus: SaksStatus!, ${pesostegn}overstyrStatustekstMed: String ) { nyStatusSakByGrupperingsid( grupperingsid: ${pesostegn}grupperingsid, merkelapp: ${pesostegn}merkelapp, nyStatus: ${pesostegn}nyStatus, overstyrStatustekstMed: ${pesostegn}overstyrStatustekstMed ) { __typename ... on NyStatusSakVellykket { id } ... on Error { feilmelding } } }", "variables": { "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "nyStatus": "FERDIG", "overstyrStatustekstMed": "Avsluttet rekrutteringsprosess" } }"""
 
         wiremock.verify(
             1, WireMock.postRequestedFor(
