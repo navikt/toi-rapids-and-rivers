@@ -148,6 +148,37 @@ class NotifikasjonKlient(
         throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
     }
 
+    fun fullførSak(stillingsId: UUID) {
+        val spørring = graphQlSpørringForFullførtSakHosArbeidsgiver(
+            stillingsId
+        )
+
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(spørring)
+                .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val svar = json["data"]?.get("nyStatusSak")?.get("__typename")?.asText()
+
+            when (svar) {
+                NyStatusSakSvar.NyStatusSakVellykket.name -> {
+                    log.info("Sak fullført hos notifikasjon-api for stilling: $stillingsId")
+                }
+
+                else -> {
+                    håndterFeil(json, response, spørring)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            throw e
+        }
+    }
 
     enum class NyBeskjedSvar {
         NyBeskjedVellykket,
@@ -157,5 +188,11 @@ class NotifikasjonKlient(
     enum class NySakSvar {
         NySakVellykket,
         DuplikatGrupperingsid
+    }
+
+    enum class NyStatusSakSvar {
+        NyStatusSakVellykket,
+        SakFinnesIkke,
+        Konflikt
     }
 }

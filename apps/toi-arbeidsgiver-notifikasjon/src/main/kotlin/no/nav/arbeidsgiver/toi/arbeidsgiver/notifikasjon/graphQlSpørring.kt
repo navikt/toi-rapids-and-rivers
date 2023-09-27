@@ -223,6 +223,57 @@ fun graphQlSpørringForSakHosArbeidsgiver(stillingsId: UUID?, stillingstittel: S
         .utenLangeMellomrom()
 }
 
+fun graphQlSpørringForFullførtSakHosArbeidsgiver(stillingsId: UUID): String {
+    val query = """
+        "mutation FullforSak(
+            ${PESOSTEGN}grupperingsid: String!,
+            ${PESOSTEGN}merkelapp: String!,
+            ${PESOSTEGN}nyStatus: SaksStatus!,
+            ${PESOSTEGN}overstyrStatustekstMed: String
+        ) {
+            nyStatusSakByGrupperingsid(
+                grupperingsid: ${PESOSTEGN}grupperingsid,
+                merkelapp: ${PESOSTEGN}merkelapp,
+                nyStatus: ${PESOSTEGN}nyStatus,
+                overstyrStatustekstMed: ${PESOSTEGN}overstyrStatustekstMed
+            ) {
+                __typename
+                ... on NyStatusSakVellykket {
+                    id
+                }
+                ... on SakFinnesIkke {
+                    feilmelding
+                }
+                ... on Konflikt {
+                    feilmelding
+                }
+                ... on Error {
+                    feilmelding
+                }
+            }
+        }"
+    """
+
+    val variables = """
+        {
+            "grupperingsid": "$stillingsId",
+            "merkelapp": "Kandidater",
+            "nyStatus": "FERDIG",
+            "overstyrStatustekstMed": "Avsluttet rekrutteringsprosess"
+        }
+    """
+
+    return """
+        {
+            "query": $query,
+            "variables": $variables
+        }
+    """
+        .trimIndent()
+        .replace("\n", "")
+        .utenLangeMellomrom()
+}
+
 tailrec fun String.utenLangeMellomrom(): String =
     if (contains("  "))
         replace("  ", " ").utenLangeMellomrom()

@@ -7,7 +7,10 @@ import no.nav.helse.rapids_rivers.River
 import java.time.ZonedDateTime
 import java.util.*
 
-class KandidatlisteOpprettetLytter(rapidsConnection: RapidsConnection, private val notifikasjonKlient: NotifikasjonKlient) : River.PacketListener {
+class KandidatlisteOpprettetLytter(
+    rapidsConnection: RapidsConnection,
+    private val notifikasjonKlient: NotifikasjonKlient
+) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate {
