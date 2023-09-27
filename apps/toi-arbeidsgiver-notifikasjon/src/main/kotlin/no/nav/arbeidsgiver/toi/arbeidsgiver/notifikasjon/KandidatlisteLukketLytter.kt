@@ -10,7 +10,7 @@ class KandidatlisteLukketLytter(
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("@event_name", "kandidat_v2.SlettetStillingOgKandidatliste")
+                it.demandValue("@event_name", "kandidat_v2.LukketKandidatliste")
                 it.requireKey("stillingsId")
                 it.rejectValue("@slutt_av_hendelseskjede", true)
             }
