@@ -24,7 +24,7 @@ class NotifikasjonKlient(
         stillingstittel: String,
         organisasjonsnummer: String
     ) {
-        val spørring = queryOpprettNySak(
+        val query = queryOpprettNySak(
             stillingsId,
             stillingstittel,
             organisasjonsnummer
@@ -35,7 +35,7 @@ class NotifikasjonKlient(
                 .post(path = url)
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(spørring)
+                .body(query)
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
@@ -51,12 +51,12 @@ class NotifikasjonKlient(
                 }
 
                 else -> {
-                    håndterFeil(json, response, spørring)
+                    håndterFeil(json, response, query)
                 }
             }
         } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
@@ -82,7 +82,7 @@ class NotifikasjonKlient(
             avsender = avsender
         )
 
-        val spørring =
+        val query =
             queryOpprettNyBeskjed(
                 notifikasjonsId = notifikasjonsId,
                 stillingsId = stillingsId.toString(),
@@ -98,9 +98,9 @@ class NotifikasjonKlient(
 
         if (erDev) {
             log.info("graphqlmelding (bør ikke vises i prod), se securelog for detaljer")
-            secureLog.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
+            secureLog.info("graphqlmelding (bør ikke vises i prod) ${query}")
         } else if (erLokal) {
-            println("query: $spørring")
+            println("query: $query")
         }
 
         try {
@@ -108,7 +108,7 @@ class NotifikasjonKlient(
                 .post(path = url)
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(spørring)
+                .body(query)
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
@@ -124,18 +124,18 @@ class NotifikasjonKlient(
                 }
 
                 else -> {
-                    håndterFeil(json, response, spørring)
+                    håndterFeil(json, response, query)
                 }
             }
         } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
 
     fun ferdigstillSak(stillingsId: UUID) {
-        val spørring = queryFerdigstillSak(
+        val query = queryFerdigstillSak(
             stillingsId
         )
 
@@ -144,7 +144,7 @@ class NotifikasjonKlient(
                 .post(path = url)
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(spørring)
+                .body(query)
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
@@ -164,12 +164,12 @@ class NotifikasjonKlient(
                 }
 
                 else -> {
-                    håndterFeil(json, response, spørring)
+                    håndterFeil(json, response, query)
                 }
             }
         } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
