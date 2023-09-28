@@ -20,8 +20,6 @@ fun queryOpprettNyBeskjed(
     val epostTittel = "Kandidater fra NAV";
     val lenke = opprettLenkeTilStilling(stillingsId, virksomhetsnummer)
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
-
-    val utløperOm = Period.of(0, 3, 0).toString()
     val tidspunktForVarselISO8601DateTime =
         tidspunktForVarsel.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
@@ -48,7 +46,6 @@ fun queryOpprettNyBeskjed(
         """.trimIndent()
     }.joinToString(", ")
 
-
     val query = """
         mutation OpprettNyBeskjed(
             ${PESOSTEGN}eksternId: String!
@@ -59,7 +56,6 @@ fun queryOpprettNyBeskjed(
             ${PESOSTEGN}epostBody: String!
             ${PESOSTEGN}lenke: String!
             ${PESOSTEGN}tidspunkt: ISO8601DateTime!
-            ${PESOSTEGN}hardDeleteDuration: ISO8601Duration!
             ${PESOSTEGN}notifikasjonTekst: String!
             $eposttyper
         ) {
@@ -70,9 +66,6 @@ fun queryOpprettNyBeskjed(
                         eksternId: ${PESOSTEGN}eksternId
                         opprettetTidspunkt: ${PESOSTEGN}tidspunkt
                         grupperingsid: ${PESOSTEGN}grupperingsId
-                        hardDelete: {
-                            om: ${PESOSTEGN}hardDeleteDuration
-                        }
                     }
                     mottaker: {
                         altinn: {
@@ -112,7 +105,6 @@ fun queryOpprettNyBeskjed(
         "epostBody" to epostBody,
         "lenke" to lenke,
         "tidspunkt" to tidspunktForVarselISO8601DateTime,
-        "hardDeleteDuration" to utløperOm,
         "notifikasjonTekst" to notifikasjonTekst,
     ))
 }
@@ -123,7 +115,6 @@ fun queryOpprettNySak(
     organisasjonsnummer: String
 ): String {
     val lenkeTilStilling = opprettLenkeTilStilling(stillingsId.toString(), organisasjonsnummer)
-    val utløperOm = Period.of(0, 6, 0)
 
     val query = """
         mutation OpprettNySak(
@@ -133,8 +124,7 @@ fun queryOpprettNySak(
             ${PESOSTEGN}lenke: String!,
             ${PESOSTEGN}merkelapp: String!,
             ${PESOSTEGN}initiellStatus: SaksStatus!,
-            ${PESOSTEGN}overstyrStatustekstMed: String,
-            ${PESOSTEGN}hardDeleteDuration: ISO8601Duration!
+            ${PESOSTEGN}overstyrStatustekstMed: String
         ) {
             nySak(
                 grupperingsid: ${PESOSTEGN}grupperingsid,
@@ -148,9 +138,6 @@ fun queryOpprettNySak(
                         }
                     }
                 ],
-                hardDelete: {
-                    om: ${PESOSTEGN}hardDeleteDuration
-                },
                 tittel: ${PESOSTEGN}tittel,
                 lenke: ${PESOSTEGN}lenke,
                 initiellStatus: ${PESOSTEGN}initiellStatus,
@@ -177,8 +164,7 @@ fun queryOpprettNySak(
         "lenke" to lenkeTilStilling,
         "merkelapp" to SAK_MERKELAPP,
         "initiellStatus" to "MOTTATT",
-        "overstyrStatustekstMed" to "Aktiv rekrutteringsprosess",
-        "hardDeleteDuration" to utløperOm.toString()
+        "overstyrStatustekstMed" to "Aktiv rekrutteringsprosess"
     ))
 }
 
