@@ -17,7 +17,7 @@ fun startApp(
     NotifikasjonLytter(rapidsConnection, notifikasjonKlient)
     KandidatlisteOpprettetLytter(rapidsConnection, notifikasjonKlient)
     KandidatlisteLukketLytter(rapidsConnection, notifikasjonKlient)
-    
+
     // SlettetStillingLytter(rapidsConnection, notifikasjonKlient)
 
     rapidsConnection.start()

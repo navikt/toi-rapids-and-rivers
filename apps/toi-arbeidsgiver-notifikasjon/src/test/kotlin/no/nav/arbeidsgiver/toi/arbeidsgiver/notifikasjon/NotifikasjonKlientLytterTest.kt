@@ -1,21 +1,24 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
+import TEST_ACCESS_TOKEN
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
+import stubDuplisertBeskjed
+import stubErrorsIRespons
+import stubNyBeskjed
+import stubUventetStatusIRespons
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NotifikasjonKlientLytterTest {
-
     private val testRapid = TestRapid()
     private val urlNotifikasjonApi = "http://localhost:8082/api/graphql"
     private val pesostegn = "$"
-    private val accessToken = "TestAccessToken"
 
-    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi) { accessToken }
+    private val notifikasjonKlient = NotifikasjonKlient(urlNotifikasjonApi) { TEST_ACCESS_TOKEN }
     private val notifikasjonLytter = NotifikasjonLytter(testRapid, notifikasjonKlient)
 
     private val wiremock = WireMockServer(8082).also { it.start() }
@@ -47,8 +50,8 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        stubKallTilNotifikasjonssystemet()
 
+        wiremock.stubNyBeskjed()
         testRapid.sendTestMessage(melding)
 
         val epostBody = lagEpostBody("En fantastisk stilling!", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "")
@@ -81,21 +84,19 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        stubKallTilNotifikasjonssystemet()
+        wiremock.stubNyBeskjed()
 
         testRapid.sendTestMessage(melding)
 
         val epostBody = lagEpostBody("En fantastisk stilling!", "Her har du noen fine kandidater!", "Veileder Veiledersen").replace("\n", "")
+        val query = """{ "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ${pesostegn}epostadresse2: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } }, { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse2 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "epostadresse2": "test2@testepost.no", "eksternId": "enHeltAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }"""
 
         wiremock.verify(
-            1, postRequestedFor(
-                urlEqualTo("/api/graphql")
-            ).withRequestBody(
-                equalTo(
-                    """{ "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ${pesostegn}epostadresse2: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } }, { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse2 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "epostadresse2": "test2@testepost.no", "eksternId": "enHeltAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }"""
-                )
-            )
+            1,
+            postRequestedFor(urlEqualTo("/api/graphql"))
+                .withRequestBody(equalTo(query))
         )
+
         assertThat(testRapid.inspektør.size).isZero
     }
 
@@ -115,7 +116,8 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        stubDuplisertKallTilNotifikasjonssystemet()
+
+        wiremock.stubDuplisertBeskjed()
 
         testRapid.sendTestMessage(melding)
     }
@@ -136,7 +138,8 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        stubErrorsIResponsFraNotifikasjonApi()
+
+        wiremock.stubErrorsIRespons()
 
         assertThrows<RuntimeException> {
             testRapid.sendTestMessage(melding)
@@ -159,7 +162,8 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        stubUforventetStatusIResponsFraNotifikasjonApi()
+
+        wiremock.stubUventetStatusIRespons("nyBeskjed")
 
         assertThrows<RuntimeException> {
             testRapid.sendTestMessage(melding)
@@ -182,123 +186,20 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        stubKallTilNotifikasjonssystemet()
+        
+        wiremock.stubNyBeskjed()
 
         testRapid.sendTestMessage(melding)
 
         val epostBody = lagEpostBody("En fantastisk stilling!", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "")
+        val query = """{ "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "eksternId": "enEllerAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }"""
 
         wiremock.verify(
-            1, postRequestedFor(
-                urlEqualTo("/api/graphql")
-            ).withRequestBody(
-                equalTo(
-                    """{ "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}hardDeleteDuration: ISO8601Duration! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId hardDelete: { om: ${pesostegn}hardDeleteDuration } } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "eksternId": "enEllerAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "hardDeleteDuration": "P3M", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }"""
-                )
-            )
+            1,
+            postRequestedFor(urlEqualTo("/api/graphql"))
+                .withRequestBody(equalTo(query))
         )
+
         assertThat(testRapid.inspektør.size).isZero
-    }
-
-    fun stubKallTilNotifikasjonssystemet() {
-        wiremock.stubFor(
-            post("/api/graphql")
-                .withHeader("Authorization", containing("Bearer $accessToken"))
-                .willReturn(
-                    ok(
-                        """
-                        {
-                          "data": {
-                            "nyBeskjed": {
-                              "__typename": "NyBeskjedVellykket",
-                              "id": "79c444d8-c658-43f8-8bfe-fabe668c6dcb"
-                            }
-                          }
-                        }
-                    """.trimIndent()
-                    ).withHeader("Content-Type", "application/json")
-                )
-        )
-    }
-
-    fun stubDuplisertKallTilNotifikasjonssystemet() {
-        wiremock.stubFor(
-            post("/api/graphql")
-                .withHeader("Authorization", containing("Bearer $accessToken"))
-                .willReturn(
-                    ok(
-                        """
-                        {
-                          "data": {
-                            "nyBeskjed": {
-                              "__typename": "DuplikatEksternIdOgMerkelapp",
-                              "feilmelding": "notifikasjon med angitt eksternId og merkelapp finnes fra før"
-                            }
-                          }
-                        }
-                    """.trimIndent()
-                    ).withHeader("Content-Type", "application/json")
-                )
-        )
-    }
-
-    fun stubUforventetStatusIResponsFraNotifikasjonApi() {
-        wiremock.stubFor(
-            post("/api/graphql")
-                .withHeader("Authorization", containing("Bearer $accessToken"))
-                .willReturn(
-                    ok(
-                        """
-                        {
-                          "data": {
-                            "nyBeskjed": {
-                              "__typename": "UforventetStatus",
-                              "feilmelding": "Dette er en artig feil"
-                            }
-                          }
-                        }
-                    """.trimIndent()
-                    ).withHeader("Content-Type", "application/json")
-                )
-        )
-    }
-
-    fun stubErrorsIResponsFraNotifikasjonApi() {
-        wiremock.stubFor(
-            post("/api/graphql")
-                .withHeader("Authorization", containing("Bearer $accessToken"))
-                .willReturn(
-                    ok(
-                        """
-                        {
-                          "error": {
-                            "errors": [
-                              {
-                                "message": "Field \"NyBeskjedInput.metadata\" of required type \"MetadataInput!\" was not provided.",
-                                "extensions": {
-                                  "code": "GRAPHQL_VALIDATION_FAILED",
-                                  "exception": {
-                                    "stacktrace": [
-                                      "GraphQLError: Field \"NyBeskjedInput.metadata\" of required type \"MetadataInput!\" was not provided.",
-                                      "    at ObjectValue (/usr/src/app/server/node_modules/graphql/validation/rules/ValuesOfCorrectTypeRule.js:64:13)",
-                                      "    at Object.enter (/usr/src/app/server/node_modules/graphql/language/visitor.js:301:32)",
-                                      "    at Object.enter (/usr/src/app/server/node_modules/graphql/utilities/TypeInfo.js:391:27)",
-                                      "    at visit (/usr/src/app/server/node_modules/graphql/language/visitor.js:197:21)",
-                                      "    at validate (/usr/src/app/server/node_modules/graphql/validation/validate.js:91:24)",
-                                      "    at validate (/usr/src/app/server/node_modules/apollo-server-core/dist/requestPipeline.js:186:39)",
-                                      "    at processGraphQLRequest (/usr/src/app/server/node_modules/apollo-server-core/dist/requestPipeline.js:98:34)",
-                                      "    at processTicksAndRejections (node:internal/process/task_queues:96:5)",
-                                      "    at async processHTTPRequest (/usr/src/app/server/node_modules/apollo-server-core/dist/runHttpQuery.js:221:30)"
-                                    ]
-                                  }
-                                }
-                              }
-                            ]
-                          }
-                        }
-                    """.trimIndent()
-                    ).withHeader("Content-Type", "application/json")
-                )
-        )
     }
 }
