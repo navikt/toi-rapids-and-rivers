@@ -156,7 +156,7 @@ class NotifikasjonKlient(
                 }
 
                 NyStatusSakSvar.SakFinnesIkke.name -> {
-                    log.warn("Forsøkte å lukke sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
+                    log.info("Forsøkte å lukke sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
                 }
 
                 NyStatusSakSvar.Konflikt.name -> {
@@ -196,7 +196,7 @@ class NotifikasjonKlient(
                 }
 
                 SlettSakSvar.SakFinnesIkke.name -> {
-                    log.warn("Forsøkte å slette sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
+                    log.info("Forsøkte å slette sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
                 }
 
                 else -> {
