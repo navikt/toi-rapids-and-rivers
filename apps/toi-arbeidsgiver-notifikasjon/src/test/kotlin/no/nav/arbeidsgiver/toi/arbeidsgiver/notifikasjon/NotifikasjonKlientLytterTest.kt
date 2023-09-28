@@ -186,7 +186,7 @@ class NotifikasjonKlientLytterTest {
               "stillingstittel": "En fantastisk stilling!"
             }
         """.trimIndent()
-        
+
         wiremock.stubNyBeskjed()
 
         testRapid.sendTestMessage(melding)
