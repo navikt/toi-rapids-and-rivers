@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: toi-livshendelse
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  groups:
+    - name: toi-livshendelse
+      rules:
+        - alert: toi-livshendelse
+          expr: kube_deployment_status_replicas_available{deployment="toi-livshendelse"} == 0
+          for: 1s
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-livshendelse
+          expr: sum(increase(log_messages_errors{app="toi-livshendelse", level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-livshendelse
+          expr: sum(increase(log_messages_errors{app="toi-livshendelse", level="Warning"}[10m])) > 3
+          for: 1s
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
+          labels:
+            namespace: toi
+            severity: warning
