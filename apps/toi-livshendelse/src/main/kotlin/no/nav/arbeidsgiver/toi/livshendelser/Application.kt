@@ -20,11 +20,10 @@ fun startApp(
     rapidsConnection.also {
         val consumer = KafkaConsumer<String, Personhendelse>(consumerConfig)
 
-        Lytter(rapidsConnection, consumer, ::håndterDiskresjonskodeEndringPåIdent)
+        Lytter(rapidsConnection, consumer)
     }.start()
 }
 
-fun håndterDiskresjonskodeEndringPåIdent(ident: String): Unit  = TODO("Kall mot pdl, publiser på rapid")
 fun rapidsConnection() = RapidApplication.create(System.getenv())
 
 val Any.log: Logger

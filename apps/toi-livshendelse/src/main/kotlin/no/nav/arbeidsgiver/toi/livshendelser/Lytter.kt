@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<String, Personhendelse>, private val håndterDiskresjonskodeEndringPåIdent: (String) -> Unit) : CoroutineScope, RapidsConnection.StatusListener {
+class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<String, Personhendelse>) :
+    CoroutineScope, RapidsConnection.StatusListener {
 
     init {
         rapidsConnection.register(this)
@@ -45,11 +46,8 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
                     try {
                         val records: ConsumerRecords<String, Personhendelse> =
                             consumer.poll(Duration.ofSeconds(5))
-                        records.map(ConsumerRecord<String, Personhendelse>::value)
-                            .filter{it.opplysningstype == "ADRESSEBESKYTTELSE"}
-                            .map { it.personidenter.firstOrNull() }
-                            .forEach { it?.let { håndterDiskresjonskodeEndringPåIdent(it) } ?: log.error("Ingen personidenter funnet på hendelse") }
 
+                        records.map(ConsumerRecord<String, Personhendelse>::value).håndter()
                         consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)
