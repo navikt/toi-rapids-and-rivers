@@ -11,16 +11,18 @@ import javax.sql.DataSource
 private val env = System.getenv()
 
 fun main() = startApp(
-    rapidsConnection()
+    rapidsConnection(),
+    PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env))
 )
 
 fun startApp(
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
+    pdlKlient: PdlKlient
 ) {
     rapidsConnection.also {
         val consumer = KafkaConsumer<String, Personhendelse>(consumerConfig)
 
-        Lytter(rapidsConnection, consumer)
+        Lytter(rapidsConnection, consumer, pdlKlient)
     }.start()
 }
 

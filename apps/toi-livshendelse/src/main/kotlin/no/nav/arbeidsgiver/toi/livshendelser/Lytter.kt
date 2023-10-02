@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<String, Personhendelse>) :
+class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
     CoroutineScope, RapidsConnection.StatusListener {
 
     init {
@@ -47,7 +47,7 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
                         val records: ConsumerRecords<String, Personhendelse> =
                             consumer.poll(Duration.ofSeconds(5))
 
-                        records.map(ConsumerRecord<String, Personhendelse>::value).håndter()
+                        PersonhendelseService(rapidsConnection, pdlKlient).håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
                         consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)
