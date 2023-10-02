@@ -28,13 +28,13 @@ class HåndterPersonhendelserTest {
             personidenter = listOf("12312312312"),
             master = "testMaster",
             opprettet = LocalDateTime.of(2023,1,1,0,0).toInstant(ZoneOffset.UTC),
-            opplysningstype = "type1",
+            opplysningstype = "ADRESSEBESKYTTELSE",
             endringstype = Endringstype.OPPRETTET,
             tidligereHendelseId = "123",
             adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG),
         )
         val testRapid = TestRapid()
-        val envs = mapOf("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/.well-known/openid-configuration")
+        val envs = mapOf("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token")
         PersonhendelseService(testRapid, PdlKlient("http://localhost:8083/", AccessTokenClient(envs))).håndter(listOf(personHendelse))
 
         val inspektør = testRapid.inspektør
