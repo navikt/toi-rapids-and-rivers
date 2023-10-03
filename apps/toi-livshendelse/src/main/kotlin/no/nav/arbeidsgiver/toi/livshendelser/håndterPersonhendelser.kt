@@ -12,7 +12,10 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             .forEach(::publiserHendelse)
     }
 
-    fun kallPdl(ident: String) = DiskresjonsHendelse(ident = ident, gradering = pdlKlient.hentGradering(ident))
+    fun kallPdl(ident: String): DiskresjonsHendelse {
+        val gradering = pdlKlient.hentGradering(ident)
+        return DiskresjonsHendelse(ident = ident, gradering = gradering)
+    }
 
     fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) =
         rapidsConnection.publish(diskresjonsHendelse.ident(), diskresjonsHendelse.toJson())
