@@ -1,4 +1,5 @@
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.arbeidsgiver.toi.livshendelser.PersonhendelseService
@@ -8,6 +9,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.http.post
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
@@ -18,10 +20,25 @@ import java.time.ZoneOffset
 class HåndterPersonhendelserTest {
 
     private val wiremock = WireMockServer(8083).also(WireMockServer::start)
-    private val mockOAuth2Server = MockOAuth2Server().also { it.start(InetAddress.getByName("localhost"), 18301) }
+    private val mockOAuth2Server = WireMockServer(18301).also(WireMockServer::start)
 
     @Test
     fun `sjekk at gradering er sendt for en hendelse med en ident`() {
+
+        val mockedAccessToken = """
+            {
+                "access_token": "mockedAccessToken",
+                "expires_in": 36000
+            }
+        """.trimIndent()
+
+        mockOAuth2Server.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/isso-idtoken/token")).willReturn(
+                WireMock.aResponse()
+                .withStatus(200)
+                .withBody(mockedAccessToken)))
+
+
 
         val personHendelse = personhendelse(
             hendelseId = "id1",
