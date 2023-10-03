@@ -9,7 +9,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 
 val consumerConfig = mapOf(
     CommonClientConfigs.CLIENT_ID_CONFIG to "toi-livshendelse",
-    CommonClientConfigs.GROUP_ID_CONFIG to System.getenv("LIVSHENDELSE_KAFKA_GROUP_ID"),
+    CommonClientConfigs.GROUP_ID_CONFIG to System.getenv("PDL_KAFKA_GROUP_ID"),
     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to System.getenv("KAFKA_BROKERS"),
 
     ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",

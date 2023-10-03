@@ -27,6 +27,10 @@ spec:
       memory: 512Mi
   secureLogs:
     enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ pdl_host }}
   kafka:
     pool: {{ kafka_pool }}
   env:
@@ -36,13 +40,13 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
-    - name: KAFKA_MAX_POLL_INTERVAL_MS
-      value: "1320000" # 6 sekunder per melding * 200 meldinger + 2 minutter ekstra
-    - name: KAFKA_MAX_RECORDS
-      value: "200"
     - name: KAFKA_BOOTSTRAP_SERVERS_ONPREM_URL
       value: {{ kafka_bootstrap_on_prem_url }}
     - name: KAFKA_SCHEMA_REGISTRY_ONPREM_URL
       value: {{ kafka_schema_on_prem_url }}
     - name: PDL_KAFKA_GROUP_ID
       value: {{ pdl_kafka_group_id }}
+    - name: PDL_SCOPE
+      value: {{ pdl_scope }}
+    - name: PDL_URL
+      value: {{ pdl_url }}
