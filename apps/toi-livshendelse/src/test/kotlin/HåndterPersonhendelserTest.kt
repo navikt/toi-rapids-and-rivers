@@ -98,7 +98,10 @@ class HåndterPersonhendelserTest {
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(2)
-        val meldinger = listOf(1,2).map(inspektør::message)
+        val meldinger = listOf(0,1).map(inspektør::message)
+
+        val keys =listOf(0,1).map(inspektør::key)
+        assertThat(keys).containsExactlyInAnyOrder("987654321", "987654322")
 
         meldinger.map { assertThat(it["@event_name"].asText()).isEqualTo("adressebeskyttelse") }
         meldinger.map { assertThat(it["gradering"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString()) }
