@@ -53,7 +53,7 @@ class HåndterPersonhendelserTest {
                     WireMock.equalToJson(
                         """
                     {
-                        "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident, historikk: false) { adressebeskyttelse { gradering }}}",
+                        "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident, historikk: false) { adressebeskyttelse { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
                         "variables":{"ident":"12312312312"}
                     }
                 """.trimIndent()
@@ -68,8 +68,15 @@ class HåndterPersonhendelserTest {
                             "data": {
                                 "hentPerson": {
                                     "adressebeskyttelse": {
-                                        "gradering" : "FORTROLIG"
+                                        "gradering" : "STRENGT_FORTROLIG"
                                     }
+                                },
+                                "hentIdenter": {
+                                    "identer": [
+                                        {
+                                            "ident" : "987654321"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -99,7 +106,7 @@ class HåndterPersonhendelserTest {
         val melding = inspektør.message(0)
 
         assertThat(melding["@event_name"].asText()).isEqualTo("adressebeskyttelse")
-        assertThat(melding["aktørId"].asText()).isEqualTo("123123123")
+        assertThat(melding["aktørId"].asText()).isEqualTo("987654321")
         assertThat(melding["gradering"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString())
     }
 }

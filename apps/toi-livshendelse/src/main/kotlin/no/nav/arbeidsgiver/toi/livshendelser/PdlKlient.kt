@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
-    fun hentGradering(ident: String): Gradering {
+    fun hentGraderingPerAktørId(ident: String): Map<String, Gradering> {
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(ident)
 
@@ -22,15 +22,19 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         when (result) {
             is com.github.kittinunf.result.Result.Success -> {
-                return result.get().data.hentPerson?.adressebeskyttelse?.gradering
-                        ?: behandleErrorFraPDL(result.get().errors)
+                val gradering = result.get().data.hentPerson?.adressebeskyttelse?.gradering
+                    ?: behandleErrorFraPDL(result.get().errors)
+
+                return result.get().data.hentIdenter?.identer?.map(Identer::ident)?.associateWith { gradering }
+                    ?: behandleErrorFraPDL(result.get().errors)
+
             }
 
             is com.github.kittinunf.result.Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
         }
     }
 
-    private fun behandleErrorFraPDL(errors: List<Error>?): Gradering {
+    private fun behandleErrorFraPDL(errors: List<Error>?): Nothing {
         log.error("Klarte ikke å hente gradering fra PDL-respons: se securelog")
         secureLog.error("Klarte ikke å hente gradering fra PDL-respons: $errors")
         throw Exception("Klarte ikke å hente gradering fra PDL-respons")
@@ -41,7 +45,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         return """
             {
-                "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident, historikk: false) { adressebeskyttelse { gradering }}}",
+                "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident, historikk: false) { adressebeskyttelse { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
                 "variables":{"ident":"$ident"}
             }
         """.trimIndent()
@@ -55,6 +59,15 @@ private data class Respons(
 
 private data class Data(
     val hentPerson: HentPerson?,
+    val hentIdenter: HentIdenter?
+)
+
+private data class HentIdenter(
+    val identer: List<Identer>,
+)
+
+private data class Identer(
+    val ident: String
 )
 
 private data class HentPerson(
@@ -70,9 +83,15 @@ private data class Error(
 )
 
 
-class DiskresjonsHendelse(private val ident: String, gradering: Gradering) {
+class DiskresjonsHendelse(private val ident: String, private val gradering: Gradering) {
     fun toJson(): String {
-        TODO("Not yet implemented")
+        return """
+            {
+                "@event_name": "adressebeskyttelse",
+                "gradering": "$gradering",
+                "aktørId": "$ident"
+            }
+        """.trimIndent()
     }
 
     fun ident() = ident

@@ -8,14 +8,15 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
         personHendelser.filter { it.opplysningstype == "ADRESSEBESKYTTELSE" }
             .map { it.personidenter }
             .mapNotNull { it.firstOrNull()?.also { log.error("Ingen personidenter funnet på hendelse") } }
-            .map(::kallPdl)
+            .flatMap(::kallPdl)
             .forEach(::publiserHendelse)
     }
 
-    fun kallPdl(ident: String): DiskresjonsHendelse {
-        val gradering = pdlKlient.hentGradering(ident)
-        return DiskresjonsHendelse(ident = ident, gradering = gradering)
-    }
+    fun kallPdl(ident: String) =
+        pdlKlient.hentGraderingPerAktørId(ident)
+            .map { (aktørId, gradering) ->
+                DiskresjonsHendelse(ident = aktørId, gradering = gradering)
+            }
 
     fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) =
         rapidsConnection.publish(diskresjonsHendelse.ident(), diskresjonsHendelse.toJson())
