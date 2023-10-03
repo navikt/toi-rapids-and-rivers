@@ -9,9 +9,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -36,6 +34,11 @@ class HåndterPersonhendelserTest {
     @BeforeEach
     fun setUp() {
         testRapid.reset()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        wiremock.resetAll()
     }
 
     @Test
@@ -72,14 +75,16 @@ class HåndterPersonhendelserTest {
     fun `sjekk at gradering sendes per ident for en person med flere aktørider`() {
 
         stubOAtuh()
-        stubPdl(identSvar = """
+        stubPdl(
+            identSvar = """
             {
                 "ident" : "987654321"
             },
             {
                 "ident" : "987654322"
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         val personHendelse = personhendelse(
             hendelseId = "id1",
@@ -98,14 +103,42 @@ class HåndterPersonhendelserTest {
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(2)
-        val meldinger = listOf(0,1).map(inspektør::message)
+        val meldinger = listOf(0, 1).map(inspektør::message)
 
-        val keys =listOf(0,1).map(inspektør::key)
+        val keys = listOf(0, 1).map(inspektør::key)
         assertThat(keys).containsExactlyInAnyOrder("987654321", "987654322")
 
         meldinger.map { assertThat(it["@event_name"].asText()).isEqualTo("adressebeskyttelse") }
         meldinger.map { assertThat(it["gradering"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString()) }
-        assertThat(meldinger.map { it["aktørId"].asText()}).containsExactlyInAnyOrder("987654321","987654322")
+        assertThat(meldinger.map { it["aktørId"].asText() }).containsExactlyInAnyOrder("987654321", "987654322")
+    }
+
+    @Test
+    fun `sjekk at gradering håndterer feil`() {
+
+        stubOAtuh()
+        stubPdlFeil()
+
+        val personHendelse = personhendelse(
+            hendelseId = "id1",
+            personidenter = listOf("12312312312"),
+            master = "testMaster",
+            opprettet = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
+            opplysningstype = "ADRESSEBESKYTTELSE",
+            endringstype = Endringstype.OPPRETTET,
+            tidligereHendelseId = "123",
+            adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG),
+        )
+
+
+        assertThat(assertThrows<RuntimeException> {
+            personhendelseService.håndter(
+                listOf(personHendelse)
+            )
+        }).hasMessage("Noe feil skjedde ved henting av diskresjonskode: ")
+
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     private fun stubPdl(
@@ -147,6 +180,25 @@ class HåndterPersonhendelserTest {
                                         ]
                                     }
                                 }
+                            }
+                        """.trimIndent()
+                        )
+                )
+        )
+    }
+
+    private fun stubPdlFeil() {
+        val pesostegn = "$"
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/graphql"))
+                .withHeader("Authorization", WireMock.equalTo("Bearer mockedAccessToken"))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withBody(
+                            """
+                            {
+                              "errors": [ "feil1", "feil2" ]
                             }
                         """.trimIndent()
                         )
