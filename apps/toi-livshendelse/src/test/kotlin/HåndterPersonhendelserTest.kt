@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-
+@Disabled("Vi logger bare foreløpig, publisering til rapid er disablet til vi har verifisert i dev")
 class HåndterPersonhendelserTest {
 
     companion object {

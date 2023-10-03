@@ -84,6 +84,8 @@ private data class Error(
 
 
 class DiskresjonsHendelse(private val ident: String, private val gradering: Gradering) {
+    private val secureLog = LoggerFactory.getLogger("secureLog")
+
     fun toJson(): String {
         return """
             {
@@ -92,6 +94,12 @@ class DiskresjonsHendelse(private val ident: String, private val gradering: Grad
                 "aktørId": "$ident"
             }
         """.trimIndent()
+    }
+
+    fun toSecurelog() {
+        if(!gradering.equals(Gradering.UGRADERT)) {
+            secureLog.info("$gradering")
+        }
     }
 
     fun ident() = ident
