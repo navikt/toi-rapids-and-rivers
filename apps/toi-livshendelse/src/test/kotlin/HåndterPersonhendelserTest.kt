@@ -8,19 +8,24 @@ import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.mock.oauth2.http.post
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
-import java.net.InetAddress
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class HåndterPersonhendelserTest {
 
-    private val wiremock = WireMockServer(8083).also(WireMockServer::start)
-    private val mockOAuth2Server = WireMockServer(18301).also(WireMockServer::start)
+    companion object {
+        private val wiremock = WireMockServer(8083).also(WireMockServer::start)
+        private val mockOAuth2Server = WireMockServer(18301).also(WireMockServer::start)
+        @AfterAll
+        fun shutdown() {
+            mockOAuth2Server.stop()
+            wiremock.stop()
+        }
+    }
 
     @Test
     fun `sjekk at gradering er sendt for en hendelse med en ident`() {
@@ -35,16 +40,49 @@ class HåndterPersonhendelserTest {
         mockOAuth2Server.stubFor(
             WireMock.post(WireMock.urlEqualTo("/isso-idtoken/token")).willReturn(
                 WireMock.aResponse()
-                .withStatus(200)
-                .withBody(mockedAccessToken)))
+                    .withStatus(200)
+                    .withBody(mockedAccessToken)
+            )
+        )
 
-
+        val pesostegn = "$"
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/graphql"))
+                .withHeader("Authorization", WireMock.equalTo("Bearer mockedAccessToken"))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                    {
+                        "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident, historikk: false) { adressebeskyttelse { gradering }}}",
+                        "variables":{"ident":"12312312312"}
+                    }
+                """.trimIndent()
+                    )
+                )
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withBody(
+                            """
+                        {
+                            "data": {
+                                "hentPerson": {
+                                    "adressebeskyttelse": {
+                                        "gradering" : "FORTROLIG"
+                                    }
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                        )
+                )
+        )
 
         val personHendelse = personhendelse(
             hendelseId = "id1",
             personidenter = listOf("12312312312"),
             master = "testMaster",
-            opprettet = LocalDateTime.of(2023,1,1,0,0).toInstant(ZoneOffset.UTC),
+            opprettet = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
             opplysningstype = "ADRESSEBESKYTTELSE",
             endringstype = Endringstype.OPPRETTET,
             tidligereHendelseId = "123",
@@ -52,7 +90,9 @@ class HåndterPersonhendelserTest {
         )
         val testRapid = TestRapid()
         val envs = mapOf("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token")
-        PersonhendelseService(testRapid, PdlKlient("http://localhost:8083/", AccessTokenClient(envs))).håndter(listOf(personHendelse))
+        PersonhendelseService(testRapid, PdlKlient("http://localhost:8083/graphql", AccessTokenClient(envs))).håndter(
+            listOf(personHendelse)
+        )
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)

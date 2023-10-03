@@ -26,7 +26,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
                         ?: behandleErrorFraPDL(result.get().errors)
             }
 
-            is com.github.kittinunf.result.Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av aktørId: ", result.getException())
+            is com.github.kittinunf.result.Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
         }
     }
 
