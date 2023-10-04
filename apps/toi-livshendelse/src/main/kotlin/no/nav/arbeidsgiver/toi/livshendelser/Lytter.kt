@@ -31,6 +31,8 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
         get() = Dispatchers.IO + job
 
     override fun onReady(rapidsConnection: RapidsConnection) {
+        secureLog.info("Pdl lytter klar")
+        log.info("Pdl lytter klar")
 
         job.invokeOnCompletion {
             log.error("Shutting down Rapid", it)
