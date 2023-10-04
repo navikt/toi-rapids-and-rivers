@@ -24,7 +24,7 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
-    private val leesahTopic = TopicPartition("pdl.leesah-v1", 0)
+    private val leesahTopic = "pdl.leesah-v1"
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -39,8 +39,8 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
 
         launch {
             consumer.use {
-                consumer.subscribe(listOf(leesahTopic.topic()))
-                log.info("Starter å konsumere topic: ${leesahTopic.topic()}")
+                consumer.subscribe(listOf(leesahTopic))
+                log.info("Starter å konsumere topic: $leesahTopic")
 
                 while (job.isActive) {
                     try {

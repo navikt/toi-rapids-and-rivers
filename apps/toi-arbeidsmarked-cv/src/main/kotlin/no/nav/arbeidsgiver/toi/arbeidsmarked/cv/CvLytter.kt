@@ -19,7 +19,7 @@ class CvLytter(private val consumer: Consumer<String, Melding>, private val beha
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
-    val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
+    val cvTopic = "teampam.cv-endret-ekstern-v2"
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -34,8 +34,8 @@ class CvLytter(private val consumer: Consumer<String, Melding>, private val beha
 
         launch {
             consumer.use {
-                consumer.subscribe(listOf(cvTopic.topic()))
-                log.info("Starter å konsumere topic: ${cvTopic.topic()}")
+                consumer.subscribe(listOf(cvTopic))
+                log.info("Starter å konsumere topic: $cvTopic")
 
                 while (job.isActive) {
                     try {
