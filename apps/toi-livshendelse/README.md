@@ -1,0 +1,1 @@
+# Henter diskresjonskoder fra pdl og legger de på rapid
