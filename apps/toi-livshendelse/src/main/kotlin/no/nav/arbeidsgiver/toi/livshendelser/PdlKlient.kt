@@ -98,7 +98,7 @@ class DiskresjonsHendelse(private val ident: String, private val gradering: Grad
 
     fun toSecurelog() {
         if(!gradering.equals(Gradering.UGRADERT)) {
-            secureLog.info("$gradering")
+            secureLog.info("gradering: $gradering")
         }
     }
 
