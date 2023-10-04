@@ -13,7 +13,14 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
         personHendelser.filter { it.opplysningstype.startsWith("ADRESSEBESKYTTELSE_") }
             .map { it.personidenter }
-            .mapNotNull { it.firstOrNull()?.also { log.error("Ingen personidenter funnet på hendelse") } }
+            .mapNotNull {
+                if (it.isEmpty()) {
+                    log.error("Ingen personidenter funnet på hendelse")
+                    null
+                } else {
+                    it.first()
+                }
+            }
             .flatMap(::kallPdl)
             //.forEach(::publiserHendelse)
             .forEach{
