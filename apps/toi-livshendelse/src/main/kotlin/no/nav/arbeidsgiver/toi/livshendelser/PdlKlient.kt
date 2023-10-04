@@ -30,7 +30,10 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
             }
 
-            is com.github.kittinunf.result.Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
+            is com.github.kittinunf.result.Result.Failure -> {
+                secureLog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message}")
+                throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
+            }
         }
     }
 
@@ -97,7 +100,7 @@ class DiskresjonsHendelse(private val ident: String, private val gradering: Grad
     }
 
     fun toSecurelog() {
-            secureLog.info("Gradering fra pdl: $gradering")
+        secureLog.info("Gradering fra pdl: $gradering")
     }
 
     fun ident() = ident

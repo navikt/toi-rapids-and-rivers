@@ -24,6 +24,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             }
             .mapNotNull { it }
             .flatMap(::kallPdl)
+
             //.forEach(::publiserHendelse)
             .forEach(DiskresjonsHendelse::toSecurelog)
     }
