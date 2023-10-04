@@ -14,7 +14,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
         personHendelser.filter { it.opplysningstype.startsWith("ADRESSEBESKYTTELSE_") }
             .map { it.personidenter }
             .mapNotNull {
-                if (it.isEmpty()) {
+                if (it.isNullOrEmpty()) {
                     log.error("Ingen personidenter funnet på hendelse")
                     null
                 } else {
