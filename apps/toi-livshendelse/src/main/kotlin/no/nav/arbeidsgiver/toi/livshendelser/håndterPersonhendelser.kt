@@ -25,9 +25,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             .mapNotNull { it }
             .flatMap(::kallPdl)
             //.forEach(::publiserHendelse)
-            .forEach {
-                secureLog.info("Gradering fra pdl: $")
-            }
+            .forEach(DiskresjonsHendelse::toSecurelog)
     }
 
     fun kallPdl(ident: String) =
