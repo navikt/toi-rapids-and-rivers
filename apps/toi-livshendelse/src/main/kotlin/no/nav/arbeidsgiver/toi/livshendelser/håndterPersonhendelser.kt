@@ -10,7 +10,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
     fun håndter(personHendelser: List<Personhendelse>) {
         val opplysningstyper = personHendelser.map{it.opplysningstype}.distinct()
         secureLog.info("Håndterer ${personHendelser.size} hendelser med typer: ${opplysningstyper}")
-        
+
         personHendelser.filter { it.opplysningstype == "ADRESSEBESKYTTELSE" }
             .map { it.personidenter }
             .mapNotNull { it.firstOrNull()?.also { log.error("Ingen personidenter funnet på hendelse") } }
