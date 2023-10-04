@@ -12,18 +12,17 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
         secureLog.info("Håndterer ${personHendelser.size} hendelser med typer: ${opplysningstyper}")
 
         personHendelser.filter { it.opplysningstype.startsWith("ADRESSEBESKYTTELSE_") }
-            .map { it.personidenter }
             .mapNotNull {
-                if (it.isNullOrEmpty()) {
+                if (it.personidenter.isNullOrEmpty()) {
                     log.error("Ingen personidenter funnet på hendelse")
                     null
                 } else {
-                    it.first()
+                    it.personidenter.first()
                 }
             }
             .flatMap(::kallPdl)
             //.forEach(::publiserHendelse)
-            .forEach{
+            .forEach {
                 it.toSecurelog()
             }
     }
