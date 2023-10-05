@@ -26,7 +26,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
     }
 
     private fun fetchAccessToken(): AccessTokenResponse {
-        secureLog.info("Prøver å hente nytt access token for url: ${env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"]}")
+        secureLog.info("Prøver å hente nytt access token")
 
         if (env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] == null ||
             env["AZURE_APP_CLIENT_SECRET"] == null ||
