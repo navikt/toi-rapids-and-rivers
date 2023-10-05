@@ -29,11 +29,15 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             .forEach(DiskresjonsHendelse::toSecurelog)
     }
 
-    fun kallPdl(ident: String) =
-        pdlKlient.hentGraderingPerAktørId(ident)
+    fun kallPdl(ident: String): List<DiskresjonsHendelse> {
+        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
             .map { (aktørId, gradering) ->
                 DiskresjonsHendelse(ident = aktørId, gradering = gradering)
             }
+
+        secureLog.info("Resulat fra pdl: " + resultat)
+        return resultat
+    }
 
     fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) {
         rapidsConnection.publish(diskresjonsHendelse.ident(), diskresjonsHendelse.toJson())
