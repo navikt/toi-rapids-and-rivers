@@ -13,6 +13,8 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(ident)
 
+        secureLog.info("kaller pdl med spørring: " + graphql)
+
         val (_, _, result) = com.github.kittinunf.fuel.Fuel.post(pdlUrl)
             .header(com.github.kittinunf.fuel.core.Headers.Companion.CONTENT_TYPE, "application/json")
             .header("Tema", "GEN")
