@@ -6,14 +6,25 @@ import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import javax.sql.DataSource
+import kotlin.system.exitProcess
 
 private val env = System.getenv()
 
-fun main() = startApp(
-    rapidsConnection(),
-    PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env))
-)
+private val secureLog = LoggerFactory.getLogger("secureLog")
+
+
+fun main() {
+    try {
+        startApp(
+            rapidsConnection(),
+            PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env))
+        )
+    }
+    catch (e: Exception) {
+        secureLog.error("Uhåndtert exception, stanser applikasjonen", e)
+        exitProcess(1)
+    }
+}
 
 fun startApp(
     rapidsConnection: RapidsConnection,

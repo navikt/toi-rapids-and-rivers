@@ -18,8 +18,9 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
                     secureLog.error("Ingen personidenter funnet på hendelse")
                     null
                 } else {
-                    secureLog.info("personidenter funnet på hendelse med opplysningstype ${it.opplysningstype} ")
-                    it.personidenter.first()
+                    val first = it.personidenter.first()
+                    secureLog.info("personidenter funnet på hendelse med opplysningstype ${it.opplysningstype} bruker: $first")
+                    first
                 }
             }
             .mapNotNull { it }
@@ -30,6 +31,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
     }
 
     fun kallPdl(ident: String): List<DiskresjonsHendelse> {
+        secureLog.info("kaller pdl: $ident")
         val resultat = pdlKlient.hentGraderingPerAktørId(ident)
             .map { (aktørId, gradering) ->
                 DiskresjonsHendelse(ident = aktørId, gradering = gradering)
