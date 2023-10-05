@@ -3,10 +3,9 @@ package no.nav.arbeidsgiver.toi.livshendelser
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.jackson.responseObject
-import java.time.Instant
-import kotlin.RuntimeException
 import com.github.kittinunf.result.Result
 import org.slf4j.LoggerFactory
+import java.time.Instant
 
 class AccessTokenClient(private val env: Map<String, String>) {
     private val secureLog = LoggerFactory.getLogger("secureLog")
@@ -19,7 +18,6 @@ class AccessTokenClient(private val env: Map<String, String>) {
         }
 
 
-
     fun hentAccessToken(): String {
         if (Instant.now().isAfter(tokenUtgår))
             cachedToken = fetchAccessToken()
@@ -28,16 +26,18 @@ class AccessTokenClient(private val env: Map<String, String>) {
     }
 
     private fun fetchAccessToken(): AccessTokenResponse {
-        secureLog.info("Prøver å hente nytt access token")
+        secureLog.info("Prøver å hente nytt access token for url: ${env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"]}")
 
-        if(env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] == null ||
+        if (env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] == null ||
             env["AZURE_APP_CLIENT_SECRET"] == null ||
             env["AZURE_APP_CLIENT_ID"] == null ||
-            env["PDL_SCOPE"] == null) {
+            env["PDL_SCOPE"] == null
+        ) {
             secureLog.info("Access token kall mangler data")
         }
 
-        val url = env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] ?: throw RuntimeException("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT ikke satt")
+        val url = env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"]
+            ?: throw RuntimeException("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT ikke satt")
 
         val formData = listOf(
             "grant_type" to "client_credentials",
@@ -56,7 +56,10 @@ class AccessTokenClient(private val env: Map<String, String>) {
                 return result.get()
             }
 
-            is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.getException())
+            is Result.Failure -> throw RuntimeException(
+                "Noe feil skjedde ved henting av access_token: ",
+                result.getException()
+            )
         }
     }
 }
