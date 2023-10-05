@@ -10,10 +10,11 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
     fun hentGraderingPerAktørId(ident: String): Map<String, Gradering> {
+        secureLog.info("kaller accessTokenClient for $ident")
         val accessToken = accessTokenClient.hentAccessToken()
+        secureLog.info("lager graphql for $ident")
         val graphql = lagGraphQLSpørring(ident)
-
-        secureLog.info("kaller pdl med spørring: " + graphql)
+        secureLog.info("kaller pdl med spørring for $ident: " + graphql)
 
         val (_, _, result) = com.github.kittinunf.fuel.Fuel.post(pdlUrl)
             .header(com.github.kittinunf.fuel.core.Headers.Companion.CONTENT_TYPE, "application/json")
