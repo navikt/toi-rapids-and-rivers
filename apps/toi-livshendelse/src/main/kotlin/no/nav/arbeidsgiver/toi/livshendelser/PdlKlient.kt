@@ -79,7 +79,8 @@ private data class Identer(
 private data class HentPerson(
     val adressebeskyttelse: List<Adressebeskyttelse>
 ) {
-    fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.first().apply { require(adressebeskyttelse.size==1) }
+    fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.firstOrNull().apply { require(adressebeskyttelse.size<=1) }
+        ?: Adressebeskyttelse(Gradering.UGRADERT)
 }
 
 private data class Adressebeskyttelse(
