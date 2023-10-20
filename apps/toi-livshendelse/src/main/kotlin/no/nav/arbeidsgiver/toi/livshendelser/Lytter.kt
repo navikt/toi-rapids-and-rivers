@@ -44,12 +44,13 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
                 consumer.subscribe(listOf(leesahTopic))
                 log.info("Starter å konsumere topic: $leesahTopic")
 
+                val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
                 while (job.isActive) {
                     try {
                         val records: ConsumerRecords<String, Personhendelse> =
                             consumer.poll(Duration.ofSeconds(5))
 
-                        PersonhendelseService(rapidsConnection, pdlKlient).håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
+                        personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
                         consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)
