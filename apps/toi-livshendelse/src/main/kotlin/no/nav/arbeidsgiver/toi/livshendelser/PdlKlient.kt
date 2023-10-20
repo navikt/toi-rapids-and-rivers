@@ -25,7 +25,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         when (result) {
             is com.github.kittinunf.result.Result.Success -> {
-                val gradering = result.get().data?.hentPerson?.adressebeskyttelse?.gradering
+                val gradering = result.get().data?.hentPerson?.hentEnesteAdressebeskyttelsenSomFinnes()?.gradering
                     ?: behandleErrorFraPDL(result.get().errors)
 
                 return result.get().data?.hentIdenter?.identer?.map(Identer::ident)?.associateWith { gradering }
@@ -77,8 +77,10 @@ private data class Identer(
 )
 
 private data class HentPerson(
-    val adressebeskyttelse: Adressebeskyttelse
-)
+    val adressebeskyttelse: List<Adressebeskyttelse>
+) {
+    fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.first().apply { require(adressebeskyttelse.size==1) }
+}
 
 private data class Adressebeskyttelse(
     val gradering: Gradering
