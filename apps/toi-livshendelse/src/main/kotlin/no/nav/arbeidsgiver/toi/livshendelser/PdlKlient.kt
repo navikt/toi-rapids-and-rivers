@@ -25,10 +25,10 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         when (result) {
             is com.github.kittinunf.result.Result.Success -> {
-                val gradering = result.get().data.hentPerson?.adressebeskyttelse?.gradering
+                val gradering = result.get().data?.hentPerson?.adressebeskyttelse?.gradering
                     ?: behandleErrorFraPDL(result.get().errors)
 
-                return result.get().data.hentIdenter?.identer?.map(Identer::ident)?.associateWith { gradering }
+                return result.get().data?.hentIdenter?.identer?.map(Identer::ident)?.associateWith { gradering }
                     ?: behandleErrorFraPDL(result.get().errors)
 
             }
@@ -59,7 +59,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 }
 
 private data class Respons(
-    var data: Data,
+    var data: Data?,
     val errors: List<Error>?,
 )
 
