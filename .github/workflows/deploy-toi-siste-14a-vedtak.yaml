@@ -11,6 +11,9 @@ on:
     - .github/workflows/deploy-toi-siste-14a-vedtak.yaml
     - buildSrc/**
 
+permissions:
+  packages: write
+
 jobs:
   build-and-publish:
     name: Build, test, and publish
