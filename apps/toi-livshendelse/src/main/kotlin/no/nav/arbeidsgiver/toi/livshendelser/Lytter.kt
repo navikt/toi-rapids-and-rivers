@@ -1,12 +1,13 @@
-package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
+package no.nav.arbeidsgiver.toi.livshendelser
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.RetriableException
@@ -14,18 +15,24 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class CvLytter(private val consumer: Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
-) : CoroutineScope, RapidsConnection.StatusListener {
+class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
+    CoroutineScope, RapidsConnection.StatusListener {
+
+    init {
+        rapidsConnection.register(this)
+    }
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
-    val cvTopic = "teampam.cv-endret-ekstern-v2"
+    private val leesahTopic = "pdl.leesah-v1"
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
     override fun onReady(rapidsConnection: RapidsConnection) {
+        secureLog.info("Pdl lytter klar")
+        log.info("Pdl lytter klar")
 
         job.invokeOnCompletion {
             log.error("Shutting down Rapid", it)
@@ -34,20 +41,16 @@ class CvLytter(private val consumer: Consumer<String, Melding>, private val beha
 
         launch {
             consumer.use {
-                consumer.subscribe(listOf(cvTopic))
-                log.info("Starter å konsumere topic: $cvTopic")
+                consumer.subscribe(listOf(leesahTopic))
+                log.info("Starter å konsumere topic: $leesahTopic")
 
+                val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
                 while (job.isActive) {
                     try {
-                        val records: ConsumerRecords<String, Melding> =
+                        val records: ConsumerRecords<String, Personhendelse> =
                             consumer.poll(Duration.ofSeconds(5))
-                        val cvMeldinger = records.map { behandleCv(it.value()) }
 
-                        cvMeldinger.forEach {
-                            log.info("Publiserer arbeidsmarkedCv for aktør på rapid, se securelog for aktørid")
-                            secureLog.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
-                            rapidsConnection.publish(it.aktørId, it.somJson())
-                        }
+                        personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
                         consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)

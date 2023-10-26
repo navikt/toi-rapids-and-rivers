@@ -15,10 +15,51 @@ class NotifikasjonKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
-
     private val secureLog = LoggerFactory.getLogger("secureLog")
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
+
+    fun opprettSak(
+        stillingsId: UUID,
+        stillingstittel: String,
+        organisasjonsnummer: String
+    ) {
+        val query = queryOpprettNySak(
+            stillingsId,
+            stillingstittel,
+            organisasjonsnummer
+        )
+
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(query)
+                .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
+
+            when (notifikasjonsSvar) {
+                NySakSvar.NySakVellykket.name -> {
+                    log.info("Sak opprettet hos notifikasjon-api for stilling: $stillingsId")
+                }
+
+                NySakSvar.DuplikatGrupperingsid.name -> {
+                    log.info("Sak ikke opprettet hos notifikasjon-api fordi det allerede finnes en sak med stillingsId: $stillingsId")
+                }
+
+                else -> {
+                    håndterFeil(json, response, query)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            throw e
+        }
+    }
 
     fun sendNotifikasjon(
         notifikasjonsId: String,
@@ -41,8 +82,8 @@ class NotifikasjonKlient(
             avsender = avsender
         )
 
-        val spørring =
-            graphQlSpørringForCvDeltMedArbeidsgiver(
+        val query =
+            queryOpprettNyBeskjed(
                 notifikasjonsId = notifikasjonsId,
                 stillingsId = stillingsId.toString(),
                 virksomhetsnummer = virksomhetsnummer,
@@ -57,9 +98,9 @@ class NotifikasjonKlient(
 
         if (erDev) {
             log.info("graphqlmelding (bør ikke vises i prod), se securelog for detaljer")
-            secureLog.info("graphqlmelding (bør ikke vises i prod) ${spørring}")
+            secureLog.info("graphqlmelding (bør ikke vises i prod) ${query}")
         } else if (erLokal) {
-            println("query: $spørring")
+            println("query: $query")
         }
 
         try {
@@ -67,28 +108,104 @@ class NotifikasjonKlient(
                 .post(path = url)
                 .header("Content-type", "application/json")
                 .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(spørring)
+                .body(query)
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
             val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
 
             when (notifikasjonsSvar) {
-                NotifikasjonsSvar.DuplikatEksternIdOgMerkelapp.name -> {
+                NyBeskjedSvar.DuplikatEksternIdOgMerkelapp.name -> {
                     log.info("Duplikatmelding sendt mot notifikasjon api")
                 }
 
-                NotifikasjonsSvar.NyBeskjedVellykket.name -> {
+                NyBeskjedSvar.NyBeskjedVellykket.name -> {
                     log.info("Melding sendt til notifikasjon-api med notifikasjonsId: $notifikasjonsId")
                 }
 
                 else -> {
-                    håndterFeil(json, response, spørring)
+                    håndterFeil(json, response, query)
                 }
             }
         } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $spørring", e)
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            throw e
+        }
+    }
+
+    fun ferdigstillSak(stillingsId: UUID) {
+        val query = queryFerdigstillSak(
+            stillingsId
+        )
+
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(query)
+                .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asText()
+
+            when (svar) {
+                NyStatusSakSvar.NyStatusSakVellykket.name -> {
+                    log.info("Sak fullført hos notifikasjon-api for stilling: $stillingsId")
+                }
+
+                NyStatusSakSvar.SakFinnesIkke.name -> {
+                    log.info("Forsøkte å lukke sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
+                }
+
+                NyStatusSakSvar.Konflikt.name -> {
+                    log.error("Forsøkte å lukke sak, men fikk konflikt på stillingsId $stillingsId")
+                }
+
+                else -> {
+                    håndterFeil(json, response, query)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            throw e
+        }
+    }
+
+    fun slettSak(stillingsId: UUID) {
+        val query = querySlettSak(
+            stillingsId
+        )
+
+        try {
+            val (_, response, result) = Fuel
+                .post(path = url)
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .body(query)
+                .responseString()
+
+            val json = jacksonObjectMapper().readTree(result.get())
+            val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asText()
+
+            when (svar) {
+                SlettSakSvar.HardDeleteSakVellykket.name -> {
+                    log.info("Sak slettet hos notifikasjon-api for stilling: $stillingsId")
+                }
+
+                SlettSakSvar.SakFinnesIkke.name -> {
+                    log.info("Forsøkte å slette sak, men sak med stillingsId $stillingsId finnes ikke i notifikasjon-api")
+                }
+
+                else -> {
+                    håndterFeil(json, response, query)
+                }
+            }
+        } catch (e: Throwable) {
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
@@ -107,8 +224,24 @@ class NotifikasjonKlient(
         throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
     }
 
-    enum class NotifikasjonsSvar {
+    enum class NyBeskjedSvar {
         NyBeskjedVellykket,
         DuplikatEksternIdOgMerkelapp,
+    }
+
+    enum class NySakSvar {
+        NySakVellykket,
+        DuplikatGrupperingsid
+    }
+
+    enum class NyStatusSakSvar {
+        NyStatusSakVellykket,
+        SakFinnesIkke,
+        Konflikt
+    }
+
+    enum class SlettSakSvar {
+        HardDeleteSakVellykket,
+        SakFinnesIkke
     }
 }

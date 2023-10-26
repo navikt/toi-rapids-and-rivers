@@ -1,4 +1,4 @@
-name: toi-arbeidsgiver-notifikasjon
+name: toi-livshendelse
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
@@ -7,8 +7,8 @@ env:
 on:
   push:
     paths:
-    - apps/toi-arbeidsgiver-notifikasjon/**
-    - .github/workflows/deploy-toi-arbeidsgiver-notifikasjon.yaml
+    - apps/toi-livshendelse/**
+    - .github/workflows/deploy-toi-livshendelse.yaml
     - buildSrc/**
 
 permissions:
@@ -46,7 +46,7 @@ jobs:
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp
     needs: build-and-publish
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sak-tilknyttet-notifikasjoner'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/todo'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -57,16 +57,3 @@ jobs:
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml
           VARS: apps/${{ env.APP_NAME }}/nais-dev.yaml
 
-  deploy-to-prod-gcp:
-    name: Deploy to prod-gcp
-    needs: build-and-publish
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
-          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
-          VARS: apps/${{ env.APP_NAME }}/nais-prod.yaml
