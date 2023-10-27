@@ -11,6 +11,9 @@ on:
     - .github/workflows/deploy-toi-hull-i-cv.yaml
     - buildSrc/**
 
+permissions:
+  packages: write
+
 jobs:
   build-and-publish:
     name: Build, test, and publish
