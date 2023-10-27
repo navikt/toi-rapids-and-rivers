@@ -41,20 +41,28 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
 
         launch {
             consumer.use {
-                consumer.subscribe(listOf(leesahTopic))
-                log.info("Starter å konsumere topic: $leesahTopic")
+                try {
+                    consumer.subscribe(listOf(leesahTopic))
+                    log.info("Starter å konsumere topic: $leesahTopic")
 
-                val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
-                while (job.isActive) {
-                    try {
-                        val records: ConsumerRecords<String, Personhendelse> =
-                            consumer.poll(Duration.ofSeconds(5))
+                    val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
+                    while (job.isActive) {
+                        try {
+                            val records: ConsumerRecords<String, Personhendelse> =
+                                consumer.poll(Duration.ofSeconds(5))
 
-                        personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
-                        consumer.commitSync()
-                    } catch (e: RetriableException) {
-                        log.warn("Fikk en retriable exception, prøver på nytt", e)
+                            personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
+                            consumer.commitSync()
+                        } catch (e: RetriableException) {
+                            log.warn("Fikk en retriable exception, prøver på nytt", e)
+                        }
                     }
+                } catch (e: Exception) {
+                    log.error("Jobb mottok en exception", e)
+                    throw e
+                }
+                finally {
+                    log.error("Jobb stenges ned")
                 }
             }
         }

@@ -30,11 +30,20 @@ fun startApp(
     rapidsConnection: RapidsConnection,
     pdlKlient: PdlKlient
 ) {
-    rapidsConnection.also {
-        val consumer = KafkaConsumer<String, Personhendelse>(consumerConfig)
+    val log = LoggerFactory.getLogger("Application.kt")
+    try {
+        rapidsConnection.also {
+            val consumer = KafkaConsumer<String, Personhendelse>(consumerConfig)
 
-        Lytter(rapidsConnection, consumer, pdlKlient)
-    }.start()
+            Lytter(rapidsConnection, consumer, pdlKlient)
+        }.start()
+    } catch (e: Exception) {
+        log.error("Applikasjonen mottok exception", e)
+        throw e
+    }
+    finally {
+        log.error("Applikasjonen stenges ned")
+    }
 }
 
 fun rapidsConnection() = RapidApplication.create(System.getenv())
