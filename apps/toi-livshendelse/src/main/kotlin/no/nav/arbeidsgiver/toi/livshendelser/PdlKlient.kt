@@ -81,7 +81,7 @@ private data class HentPerson(
 ) {
     fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.firstOrNull()
         .apply {
-            if(adressebeskyttelse.size<=1) {
+            if(adressebeskyttelse.size > 1) {
                 if (erDev) {
                     log.warn("For mange adressebeskyttelser (${adressebeskyttelse.size}) på person")
                 } else {

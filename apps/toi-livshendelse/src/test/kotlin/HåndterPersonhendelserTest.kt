@@ -13,14 +13,20 @@ import org.junit.jupiter.api.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-@Disabled("Vi logger bare foreløpig, publisering til rapid er disablet til vi har verifisert i dev")
+
 class HåndterPersonhendelserTest {
 
     companion object {
         private val wiremock = WireMockServer(8083).also(WireMockServer::start)
         private val mockOAuth2Server = WireMockServer(18301).also(WireMockServer::start)
         val testRapid = TestRapid()
-        val envs = mapOf("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token")
+        val envs = mapOf(
+            "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token",
+            "AZURE_APP_CLIENT_SECRET" to "test1",
+            "AZURE_APP_CLIENT_ID" to "test2",
+            "PDL_SCOPE" to "test3",
+        )
+
         val personhendelseService =
             PersonhendelseService(testRapid, PdlKlient("http://localhost:8083/graphql", AccessTokenClient(envs)))
 
@@ -52,7 +58,7 @@ class HåndterPersonhendelserTest {
             personidenter = listOf("12312312312"),
             master = "testMaster",
             opprettet = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
-            opplysningstype = "ADRESSEBESKYTTELSE",
+            opplysningstype = "ADRESSEBESKYTTELSE_V1",
             endringstype = Endringstype.OPPRETTET,
             tidligereHendelseId = "123",
             adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG),
@@ -156,7 +162,7 @@ class HåndterPersonhendelserTest {
                     WireMock.equalToJson(
                         """
                         {
-                            "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident, historikk: false) { adressebeskyttelse { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
+                            "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident) { adressebeskyttelse(historikk: false) { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
                             "variables":{"ident":"12312312312"}
                         }
                     """.trimIndent()
@@ -170,11 +176,11 @@ class HåndterPersonhendelserTest {
                             {
                                 "data": {
                                     "hentPerson": {
-                                        [
-                                            "adressebeskyttelse": {
-                                                "gradering" : "STRENGT_FORTROLIG"
-                                            }
-                                        ]
+                                            "adressebeskyttelse": [
+                                                {
+                                                    "gradering" : "STRENGT_FORTROLIG"
+                                                }
+                                            ]
                                     },
                                     "hentIdenter": {
                                         "identer": [
