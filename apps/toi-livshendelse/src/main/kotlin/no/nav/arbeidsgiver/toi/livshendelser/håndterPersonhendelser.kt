@@ -32,12 +32,16 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
     fun kallPdl(ident: String): List<DiskresjonsHendelse> {
         secureLog.info("kaller pdl: $ident")
-        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
-            .map { (aktørId, gradering) ->
-                DiskresjonsHendelse(ident = aktørId, gradering = gradering)
-            }
+        var resultat: List<DiskresjonsHendelse> = emptyList()
+        try {
+            resultat = pdlKlient.hentGraderingPerAktørId(ident)
+                .map { (aktørId, gradering) ->
+                    DiskresjonsHendelse(ident = aktørId, gradering = gradering)
+                }
+        } finally {
+            secureLog.info("Resultat fra pdl: " + resultat)
+        }
 
-        secureLog.info("Resulat fra pdl: " + resultat)
         return resultat
     }
 

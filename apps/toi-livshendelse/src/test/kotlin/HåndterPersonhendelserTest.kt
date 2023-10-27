@@ -170,9 +170,11 @@ class HåndterPersonhendelserTest {
                             {
                                 "data": {
                                     "hentPerson": {
-                                        "adressebeskyttelse": {
-                                            "gradering" : "STRENGT_FORTROLIG"
-                                        }
+                                        [
+                                            "adressebeskyttelse": {
+                                                "gradering" : "STRENGT_FORTROLIG"
+                                            }
+                                        ]
                                     },
                                     "hentIdenter": {
                                         "identer": [

@@ -111,4 +111,5 @@ class DiskresjonsHendelse(private val ident: String, private val gradering: Grad
 
     fun ident() = ident
 
+    override fun toString() = """ident: $ident, gradering: $gradering"""
 }
