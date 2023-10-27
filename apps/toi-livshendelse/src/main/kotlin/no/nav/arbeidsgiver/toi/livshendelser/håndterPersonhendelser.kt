@@ -31,20 +31,10 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
     fun kallPdl(ident: String): List<DiskresjonsHendelse> {
         secureLog.info("kaller pdl: $ident")
-        var resultat: List<DiskresjonsHendelse> = emptyList()
-        try {
-            resultat = pdlKlient.hentGraderingPerAktørId(ident)
-                .map { (aktørId, gradering) ->
-                    DiskresjonsHendelse(ident = aktørId, gradering = gradering)
-                }
-        } catch (e:Exception) {
-            secureLog.error("Fikk feil ved henting av gradering",e)
-            throw e
-        } finally {
-            secureLog.info("Resultat fra pdl: " + resultat)
-        }
-
-        return resultat
+        return pdlKlient.hentGraderingPerAktørId(ident)
+            .map { (aktørId, gradering) ->
+                DiskresjonsHendelse(ident = aktørId, gradering = gradering)
+            }
     }
 
     fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) {
