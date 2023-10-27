@@ -38,6 +38,8 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
                 .map { (aktørId, gradering) ->
                     DiskresjonsHendelse(ident = aktørId, gradering = gradering)
                 }
+        } catch (e:Exception) {
+            secureLog.error("Fikk feil ved henting av gradering",e)
         } finally {
             secureLog.info("Resultat fra pdl: " + resultat)
         }
