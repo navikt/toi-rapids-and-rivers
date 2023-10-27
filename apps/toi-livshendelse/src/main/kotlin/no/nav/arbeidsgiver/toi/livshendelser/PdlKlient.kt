@@ -80,8 +80,15 @@ private data class HentPerson(
     val adressebeskyttelse: List<Adressebeskyttelse>
 ) {
     fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.firstOrNull()
-        .apply { require(adressebeskyttelse.size<=1) {"For mange adressebeskyttelser (${adressebeskyttelse.size}) på person"} }
-        ?: Adressebeskyttelse(Gradering.UGRADERT)
+        .apply {
+            if(adressebeskyttelse.size<=1) {
+                if (erDev) {
+                    log.warn("For mange adressebeskyttelser (${adressebeskyttelse.size}) på person")
+                } else {
+                    throw IndexOutOfBoundsException("For mange adressebeskyttelser (${adressebeskyttelse.size}) på person")
+                }
+            }
+        } ?: Adressebeskyttelse(Gradering.UGRADERT)
 }
 
 private data class Adressebeskyttelse(

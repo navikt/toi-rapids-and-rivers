@@ -50,3 +50,5 @@ fun rapidsConnection() = RapidApplication.create(System.getenv())
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
+
+val erDev: Boolean = System.getenv()["NAIS_CLUSTER_NAME"]?.equals("dev-gcp") ?: false
