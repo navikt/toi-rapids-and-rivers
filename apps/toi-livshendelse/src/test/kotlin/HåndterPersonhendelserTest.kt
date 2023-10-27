@@ -53,16 +53,7 @@ class HåndterPersonhendelserTest {
         stubOAtuh()
         stubPdl()
 
-        val personHendelse = personhendelse(
-            hendelseId = "id1",
-            personidenter = listOf("12312312312"),
-            master = "testMaster",
-            opprettet = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
-            opplysningstype = "ADRESSEBESKYTTELSE_V1",
-            endringstype = Endringstype.OPPRETTET,
-            tidligereHendelseId = "123",
-            adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG),
-        )
+        val personHendelse = personhendelse()
 
         personhendelseService.håndter(
             listOf(personHendelse)
@@ -92,16 +83,7 @@ class HåndterPersonhendelserTest {
         """.trimIndent()
         )
 
-        val personHendelse = personhendelse(
-            hendelseId = "id1",
-            personidenter = listOf("12312312312"),
-            master = "testMaster",
-            opprettet = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
-            opplysningstype = "ADRESSEBESKYTTELSE",
-            endringstype = Endringstype.OPPRETTET,
-            tidligereHendelseId = "123",
-            adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG),
-        )
+        val personHendelse = personhendelse()
 
         personhendelseService.håndter(
             listOf(personHendelse)
@@ -125,16 +107,7 @@ class HåndterPersonhendelserTest {
         stubOAtuh()
         stubPdlFeil()
 
-        val personHendelse = personhendelse(
-            hendelseId = "id1",
-            personidenter = listOf("12312312312"),
-            master = "testMaster",
-            opprettet = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
-            opplysningstype = "ADRESSEBESKYTTELSE",
-            endringstype = Endringstype.OPPRETTET,
-            tidligereHendelseId = "123",
-            adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG),
-        )
+        val personHendelse = personhendelse()
 
 
         assertThat(assertThrows<RuntimeException> {
@@ -232,14 +205,14 @@ class HåndterPersonhendelserTest {
 }
 
 fun personhendelse(
-    hendelseId: String,
-    personidenter: List<String>,
-    master: String,
-    opprettet: Instant,
-    opplysningstype: String,
-    endringstype: Endringstype, // Husk å importere denne klassen
-    tidligereHendelseId: String,
-    adressebeskyttelse: Adressebeskyttelse // Husk å importere denne klassen
+    hendelseId: String = "id1",
+    personidenter: List<String> = listOf("12312312312"),
+    master: String = "testMaster",
+    opprettet: Instant = LocalDateTime.of(2023, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
+    opplysningstype: String = "ADRESSEBESKYTTELSE_V1",
+    endringstype: Endringstype = Endringstype.OPPRETTET,
+    tidligereHendelseId: String = "123",
+    adressebeskyttelse: Adressebeskyttelse = Adressebeskyttelse(Gradering.STRENGT_FORTROLIG)
 ) = Personhendelse(
     hendelseId,
     personidenter,
