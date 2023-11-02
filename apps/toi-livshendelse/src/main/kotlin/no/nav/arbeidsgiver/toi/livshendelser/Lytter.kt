@@ -54,7 +54,8 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
                             personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
                             consumer.commitSync()
                         } catch (e: RetriableException) {
-                            log.warn("Fikk en retriable exception, prøver på nytt", e)
+                            secureLog.warn("Fikk en retriable exception, prøver på nytt", e)
+                            log.warn("Fikk en retriable exception, prøver på nytt(se securelog)")
                         }
                     }
                 } catch (e: Exception) {

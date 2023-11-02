@@ -3,5 +3,5 @@ kafka_consumer_group_id: toi-livshendelse-rapidconsumer-5
 pdl_scope: api://dev-fss.pdl.pdl-api/.default
 pdl_host: pdl-api.dev-fss-pub.nais.io
 pdl_url: https://pdl-api.dev-fss-pub.nais.io/graphql
-pdl_kafka_group_id: toi-livshendelse-21
+pdl_kafka_group_id: toi-livshendelse-22
 max_replicas: 1
