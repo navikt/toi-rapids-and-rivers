@@ -26,8 +26,6 @@ class AccessTokenClient(private val env: Map<String, String>) {
     }
 
     private fun fetchAccessToken(): AccessTokenResponse {
-        secureLog.info("Prøver å hente nytt access token")
-
         if (env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] == null ||
             env["AZURE_APP_CLIENT_SECRET"] == null ||
             env["AZURE_APP_CLIENT_ID"] == null ||
@@ -50,7 +48,6 @@ class AccessTokenClient(private val env: Map<String, String>) {
 
         when (result) {
             is Result.Success -> {
-                log.info("Fikk tak i access token med lengde ${result.get().access_token.length}")
                 return result.get()
             }
 

@@ -31,11 +31,11 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
         get() = Dispatchers.IO + job
 
     override fun onReady(rapidsConnection: RapidsConnection) {
-        secureLog.info("Pdl lytter klar")
         log.info("Pdl lytter klar")
 
         job.invokeOnCompletion {
-            log.error("Shutting down Rapid", it)
+            log.error("Shutting down Rapid(se securelog")
+            secureLog.error("Shutting down Rapid", it)
             rapidsConnection.stop()
         }
 
@@ -58,7 +58,8 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
                         }
                     }
                 } catch (e: Exception) {
-                    log.error("Jobb mottok en exception", e)
+                    log.error("Jobb mottok en exception(se securelog)")
+                    secureLog.error("Jobb mottok en exception", e)
                     throw e
                 }
                 finally {

@@ -8,29 +8,23 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
     fun håndter(personHendelser: List<Personhendelse>) {
-        val opplysningstyper = personHendelser.map{it.opplysningstype}.distinct()
-        secureLog.info("Håndterer ${personHendelser.size} hendelser med typer: ${opplysningstyper}")
 
         personHendelser
             .filter { it.opplysningstype.contains("ADRESSEBESKYTTELSE_") }
             .map {
                 if (it.personidenter.isNullOrEmpty()) {
-                    secureLog.error("Ingen personidenter funnet på hendelse")
                     null
                 } else {
                     val first = it.personidenter.first()
-                    secureLog.info("personidenter funnet på hendelse med opplysningstype ${it.opplysningstype} bruker: $first")
                     first
                 }
             }
             .mapNotNull { it }
             .flatMap(::kallPdl)
-            .onEach(DiskresjonsHendelse::toSecurelog)
             .forEach(::publiserHendelse)
     }
 
     fun kallPdl(ident: String): List<DiskresjonsHendelse> {
-        secureLog.info("kaller pdl: $ident")
         return pdlKlient.hentGraderingPerAktørId(ident)
             .map { (aktørId, gradering) ->
                 DiskresjonsHendelse(ident = aktørId, gradering = gradering)
