@@ -9,7 +9,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
     fun håndter(personHendelser: List<Personhendelse>) {
 
-        secureLog.info("Håndterer ${personHendelser.size} hendelser")
+        log.info("Håndterer ${personHendelser.size} hendelser")
 
         personHendelser
             .filter { it.opplysningstype.contains("ADRESSEBESKYTTELSE_") }
