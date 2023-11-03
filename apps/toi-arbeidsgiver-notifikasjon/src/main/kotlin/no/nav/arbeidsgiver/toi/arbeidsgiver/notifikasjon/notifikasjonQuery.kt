@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
+import io.micrometer.core.instrument.util.StringEscapeUtils
 import java.time.Period
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -160,7 +161,7 @@ fun queryOpprettNySak(
     return opprettQuery(query, mapOf(
         "grupperingsid" to stillingsId.toString(),
         "virksomhetsnummer" to organisasjonsnummer,
-        "tittel" to stillingstittel,
+        "tittel" to stillingstittel.escapeJson(),
         "lenke" to lenkeTilStilling,
         "merkelapp" to SAK_MERKELAPP,
         "initiellStatus" to "MOTTATT",
@@ -252,6 +253,10 @@ fun opprettLenkeTilStilling(stillingsId: String, virksomhetsnummer: String): Str
 
 fun String.oneLiner(): String {
     return this.trim().replace(Regex("\\s+"), " ")
+}
+
+private fun String.escapeJson(): String {
+    return StringEscapeUtils.escapeJson(this)
 }
 
 private fun String.fjernTabsOgSpaces(): String =
