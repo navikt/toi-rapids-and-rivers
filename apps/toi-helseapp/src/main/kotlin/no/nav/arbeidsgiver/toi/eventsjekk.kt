@@ -16,6 +16,7 @@ private val uinteressanteHendelser = listOf(
     "application_stop",
     "application_down",
     "republisert",
+    "adressebeskyttelse"
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
