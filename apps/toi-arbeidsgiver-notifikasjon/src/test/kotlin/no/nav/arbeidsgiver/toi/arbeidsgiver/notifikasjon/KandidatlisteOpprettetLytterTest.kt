@@ -51,6 +51,23 @@ class KandidatlisteOpprettetLytterTest {
     }
 
     @Test
+    fun `Opprettelse av JSON-melding fungerer også når stillingstittelen inneholder hermetegn`() {
+        wiremock.stubNySak()
+        testRapid.sendTestMessage(opprettetKandidatlisteMeldingMedHermetegnITittelen)
+
+        val query = """{ "query": "mutation OpprettNySak( ${pesostegn}grupperingsid: String!, ${pesostegn}virksomhetsnummer: String!, ${pesostegn}tittel: String!, ${pesostegn}lenke: String!, ${pesostegn}merkelapp: String!, ${pesostegn}initiellStatus: SaksStatus!, ${pesostegn}overstyrStatustekstMed: String ) { nySak( grupperingsid: ${pesostegn}grupperingsid, merkelapp: ${pesostegn}merkelapp, virksomhetsnummer: ${pesostegn}virksomhetsnummer, mottakere: [ { altinn: { serviceEdition: \"1\", serviceCode: \"5078\" } } ], tittel: ${pesostegn}tittel, lenke: ${pesostegn}lenke, initiellStatus: ${pesostegn}initiellStatus, overstyrStatustekstMed: ${pesostegn}overstyrStatustekstMed ) { __typename ... on NySakVellykket { id } ... on DuplikatGrupperingsid { feilmelding } ... on Error { feilmelding } } }", "variables": { "grupperingsid": "666028e2-d031-4d53-8a44-156efc1a3385", "virksomhetsnummer": "123456789", "tittel": "En \"fantastisk\" stilling!", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "merkelapp": "Kandidater", "initiellStatus": "MOTTATT", "overstyrStatustekstMed": "Aktiv rekrutteringsprosess" } }"""
+
+        wiremock.verify(
+            1,
+            WireMock.postRequestedFor(
+                WireMock.urlEqualTo("/api/graphql")
+            ).withRequestBody(WireMock.equalTo(query))
+        )
+
+        Assertions.assertThat(testRapid.inspektør.size).isZero
+    }
+
+    @Test
     fun `Når vi forsøker å lage en sak som finnes i notifikasjonssystemet fra før, skal vi ikke kaste feilmelding`() {
         wiremock.stubDuplisertSak()
         testRapid.sendTestMessage(opprettetKandidatlisteMelding)
@@ -81,6 +98,21 @@ class KandidatlisteOpprettetLytterTest {
             "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
             "stilling": {
                 "stillingstittel": "En fantastisk stilling!",
+                "organisasjonsnummer": "123456789"
+            },
+            "stillingsinfo": {
+                "stillingskategori": "STILLING"
+            }
+        }
+    """.trimIndent()
+
+    private val opprettetKandidatlisteMeldingMedHermetegnITittelen = """
+        {
+            "@event_name": "kandidat_v2.OpprettetKandidatliste",
+            "notifikasjonsId": "enEllerAnnenId",
+            "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+            "stilling": {
+                "stillingstittel": "En \"fantastisk\" stilling!",
                 "organisasjonsnummer": "123456789"
             },
             "stillingsinfo": {

@@ -22,6 +22,7 @@ fun main() {
     }
     catch (e: Exception) {
         secureLog.error("Uhåndtert exception, stanser applikasjonen", e)
+        LoggerFactory.getLogger("main").error("Uhåndtert exception, stanser applikasjonen(se securelog)")
         exitProcess(1)
     }
 }
@@ -38,7 +39,8 @@ fun startApp(
             Lytter(rapidsConnection, consumer, pdlKlient)
         }.start()
     } catch (e: Exception) {
-        log.error("Applikasjonen mottok exception", e)
+        log.error("Applikasjonen mottok exception(se secure log)")
+        secureLog.error("Applikasjonen mottok exception", e)
         throw e
     }
     finally {

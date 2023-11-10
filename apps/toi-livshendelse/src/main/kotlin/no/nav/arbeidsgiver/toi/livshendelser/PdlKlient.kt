@@ -10,11 +10,8 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
     fun hentGraderingPerAktørId(ident: String): Map<String, Gradering> {
-        secureLog.info("kaller accessTokenClient for $ident")
         val accessToken = accessTokenClient.hentAccessToken()
-        secureLog.info("lager graphql for $ident")
         val graphql = lagGraphQLSpørring(ident)
-        secureLog.info("kaller pdl med spørring for $ident: " + graphql)
 
         val (_, _, result) = com.github.kittinunf.fuel.Fuel.post(pdlUrl)
             .header(com.github.kittinunf.fuel.core.Headers.Companion.CONTENT_TYPE, "application/json")
@@ -34,6 +31,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             }
 
             is com.github.kittinunf.result.Result.Failure -> {
+                log.error("Noe feil skjedde ved henting av diskresjonskode for ident(se securelog)")
                 secureLog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message}")
                 throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
             }
@@ -81,7 +79,7 @@ private data class HentPerson(
 ) {
     fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.firstOrNull()
         .apply {
-            if(adressebeskyttelse.size > 1) {
+            if (adressebeskyttelse.size > 1) {
                 if (erDev) {
                     log.warn("For mange adressebeskyttelser (${adressebeskyttelse.size}) på person")
                 } else {
@@ -111,10 +109,6 @@ class DiskresjonsHendelse(private val ident: String, private val gradering: Grad
                 "aktørId": "$ident"
             }
         """.trimIndent()
-    }
-
-    fun toSecurelog() {
-        secureLog.info("Gradering fra pdl: $gradering")
     }
 
     fun ident() = ident
