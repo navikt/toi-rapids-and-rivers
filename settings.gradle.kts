@@ -19,5 +19,6 @@ include(
     "apps:toi-arbeidsgiver-notifikasjon",
     "apps:toi-arena-fritatt-kandidatsok",
     "apps:toi-kvp",
-    "apps:toi-livshendelse"
+    "apps:toi-livshendelse",
+    "apps:toi-evaluertdatalogger"
 )
