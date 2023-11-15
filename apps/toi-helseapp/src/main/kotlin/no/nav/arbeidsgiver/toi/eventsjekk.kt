@@ -15,13 +15,15 @@ private val uinteressanteHendelser = listOf(
     "application_not_ready",
     "application_stop",
     "application_down",
-    "republisert",
-    "adressebeskyttelse"
+    "republisert"
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
-val grenseverdiForAlarm = Duration.ofHours(3)
+private fun grenseverdiForAlarm(eventName: String) = when(eventName) {
+    "adressebeskyttelse" -> Duration.ofDays(4)
+    else -> Duration.ofHours(1)
+}
 
 private val objectMapper = jacksonObjectMapper()
 
@@ -63,27 +65,20 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             val sorterteEventer = sisteEvent.toList()
                 .filterNot { (eventName, _) -> eventName in hendelserSomIkkeSendesLenger }
                 .map { (eventName, instant) -> eventName to Duration.between(instant, nå) }
-                .sortedByDescending(Pair<String, Duration>::second)
-            val mestUtdaterteHendelse = sorterteEventer.map(Pair<String, Duration>::second).maxOrNull()
-            if (mestUtdaterteHendelse != null && mestUtdaterteHendelse > grenseverdiForAlarm && forventerIkkeUtdaterteHendelserNå()) {
+                .map { (eventName, duration) -> SisteEvent(eventName, duration) }
+                .sortedDescending()
+            if (sorterteEventer.any(SisteEvent::utdatert)) {
                 log.warn("Tid siden hendelser (grenseverdi er nådd):\n" +
                         sorterteEventer
-                            .filter { (_, duration) -> duration > grenseverdiForAlarm }
-                            .joinToString("\n") { (eventName, duration) ->
-                                "$eventName: ${duration.prettify()}"
-                            } + "\n\n" +
+                            .filter(SisteEvent::utdatert)
+                            .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n" +
                         sorterteEventer
-                            .filter { (_, duration) -> duration <= grenseverdiForAlarm }
-                            .joinToString("\n") { (eventName, duration) ->
-                                "$eventName: ${duration.prettify()}"
-                            }
+                            .filterNot(SisteEvent::utdatert)
+                            .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
                 )
             } else {
-                log.info("Tid siden hendelser:\n" +
-                        sorterteEventer
-                            .joinToString("\n") { (eventName, duration) ->
-                                "$eventName: ${duration.prettify()}"
-                            })
+                log.info("Tid siden hendelser:\n" + sorterteEventer
+                    .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n")
             }
             hendelserSomIkkeSendesLenger.filterNot(sisteEvent::containsKey).forEach {
                 log.warn("Finner ingen hendelser ved navn $it i rapiden lenger. Burde fjernes fra hendelserSomIkkeSendesLenger-listen")
@@ -95,12 +90,17 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     }
 }
 
-private fun String.erGyldigJson(): Boolean {
-    return try {
-        objectMapper.readTree(this) != null
-    } catch (e: Exception) {
-        false
-    }
+class SisteEvent(private val eventName: String, private val duration: Duration): Comparable<SisteEvent> {
+    override fun compareTo(other: SisteEvent) = duration.compareTo(other.duration)
+    fun utdatert() = duration > grenseverdiForAlarm(eventName)
+
+    fun beskrivelse() = "$eventName: ${duration.prettify()}"
+}
+
+private fun String.erGyldigJson() = try {
+    objectMapper.readTree(this) != null
+} catch (e: Exception) {
+    false
 }
 
 private fun forventerIkkeUtdaterteHendelserNå() = !forventerUtdaterteHendelserNå()
