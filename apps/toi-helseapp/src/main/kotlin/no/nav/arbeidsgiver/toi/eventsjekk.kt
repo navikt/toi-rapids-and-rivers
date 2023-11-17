@@ -67,7 +67,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                 .map { (eventName, instant) -> eventName to Duration.between(instant, nå) }
                 .map { (eventName, duration) -> SisteEvent(eventName, duration) }
                 .sortedDescending()
-            if (sorterteEventer.any(SisteEvent::utdatert)) {
+            if (sorterteEventer.any(SisteEvent::utdatert) && forventerIkkeUtdaterteHendelserNå()) {
                 log.warn("Tid siden hendelser (grenseverdi er nådd):\n" +
                         sorterteEventer
                             .filter(SisteEvent::utdatert)
