@@ -22,6 +22,7 @@ private val hendelserSomIkkeSendesLenger = listOf<String>()
 
 private fun grenseverdiForAlarm(eventName: String) = when(eventName) {
     "adressebeskyttelse" -> Duration.ofDays(4)
+    "kvp" -> Duration.ofHours(2)
     else -> Duration.ofHours(1)
 }
 
