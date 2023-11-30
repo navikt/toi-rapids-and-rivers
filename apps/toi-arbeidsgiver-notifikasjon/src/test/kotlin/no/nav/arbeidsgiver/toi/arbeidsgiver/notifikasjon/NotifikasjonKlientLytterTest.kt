@@ -47,14 +47,16 @@ class NotifikasjonKlientLytterTest {
               "utførtAvVeilederEtternavn": "Veiledersen",
               "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her\nhar du noen \n fine kandidater med \"hermetegn\".",
-              "stillingstittel": "En fantastisk stilling!"
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
             }
         """.trimIndent()
 
         wiremock.stubNyBeskjed()
         testRapid.sendTestMessage(melding)
 
-        val epostBody = lagEpostBody("En fantastisk stilling!", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "")
+        val epostBody = lagEpostBody("En tittel beriket av stillingapi", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "")
 
         wiremock.verify(
             1, postRequestedFor(
@@ -81,14 +83,16 @@ class NotifikasjonKlientLytterTest {
               "utførtAvVeilederEtternavn": "Veiledersen",
               "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
             }
         """.trimIndent()
         wiremock.stubNyBeskjed()
 
         testRapid.sendTestMessage(melding)
 
-        val epostBody = lagEpostBody("En fantastisk stilling!", "Her har du noen fine kandidater!", "Veileder Veiledersen").replace("\n", "")
+        val epostBody = lagEpostBody("En tittel beriket av stillingapi", "Her har du noen fine kandidater!", "Veileder Veiledersen").replace("\n", "")
         val query = """{ "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ${pesostegn}epostadresse2: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } }, { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse2 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "epostadresse2": "test2@testepost.no", "eksternId": "enHeltAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }"""
 
         wiremock.verify(
@@ -113,7 +117,9 @@ class NotifikasjonKlientLytterTest {
               "utførtAvVeilederEtternavn": "Veiledersen",
               "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
             }
         """.trimIndent()
 
@@ -135,7 +141,9 @@ class NotifikasjonKlientLytterTest {
               "utførtAvVeilederEtternavn": "Veiledersen",
               "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
             }
         """.trimIndent()
 
@@ -159,7 +167,9 @@ class NotifikasjonKlientLytterTest {
               "utførtAvVeilederEtternavn": "Veiledersen",
               "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-              "stillingstittel": "En fantastisk stilling!"
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
             }
         """.trimIndent()
 
@@ -183,7 +193,9 @@ class NotifikasjonKlientLytterTest {
               "utførtAvVeilederEtternavn": "Veiledersen",
               "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
               "meldingTilArbeidsgiver": "Her\nhar du noen \n fine kandidater med \"hermetegn\".",
-              "stillingstittel": "En fantastisk stilling!"
+              "stilling": {
+                  "stillingstittel": "En tittel beriket av stillingapi"
+              }
             }
         """.trimIndent()
 
@@ -191,7 +203,7 @@ class NotifikasjonKlientLytterTest {
 
         testRapid.sendTestMessage(melding)
 
-        val epostBody = lagEpostBody("En fantastisk stilling!", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "")
+        val epostBody = lagEpostBody("En tittel beriket av stillingapi", "Her\nhar du noen \n fine kandidater med \"hermetegn\".", "Veileder Veiledersen").replace("\n", "")
         val query = """{ "query": "mutation OpprettNyBeskjed( ${pesostegn}eksternId: String! ${pesostegn}grupperingsId: String! ${pesostegn}merkelapp: String! ${pesostegn}virksomhetsnummer: String! ${pesostegn}epostTittel: String! ${pesostegn}epostBody: String! ${pesostegn}lenke: String! ${pesostegn}tidspunkt: ISO8601DateTime! ${pesostegn}notifikasjonTekst: String! ${pesostegn}epostadresse1: String! ) { nyBeskjed ( nyBeskjed: { metadata: { virksomhetsnummer: ${pesostegn}virksomhetsnummer eksternId: ${pesostegn}eksternId opprettetTidspunkt: ${pesostegn}tidspunkt grupperingsid: ${pesostegn}grupperingsId } mottaker: { altinn: { serviceEdition: \"1\" serviceCode: \"5078\" } } notifikasjon: { merkelapp: ${pesostegn}merkelapp tekst: ${pesostegn}notifikasjonTekst lenke: ${pesostegn}lenke } eksterneVarsler: [ { epost: { epostTittel: ${pesostegn}epostTittel epostHtmlBody: ${pesostegn}epostBody mottaker: { kontaktinfo: { epostadresse: ${pesostegn}epostadresse1 } } sendetidspunkt: { sendevindu: LOEPENDE } } } ] } ) { __typename ... on NyBeskjedVellykket { id } ... on Error { feilmelding } } }", "variables": { "epostadresse1": "test@testepost.no", "eksternId": "enEllerAnnenId", "grupperingsId": "666028e2-d031-4d53-8a44-156efc1a3385", "merkelapp": "Kandidater", "virksomhetsnummer": "123456789", "epostTittel": "Kandidater fra NAV", "epostBody": "$epostBody", "lenke": "https://presenterte-kandidater.intern.dev.nav.no/kandidatliste/666028e2-d031-4d53-8a44-156efc1a3385?virksomhet=123456789", "tidspunkt": "2023-02-09T10:37:45+01:00", "notifikasjonTekst": "Din virksomhet har mottatt nye kandidater" } }"""
 
         wiremock.verify(

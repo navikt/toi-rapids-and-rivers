@@ -13,6 +13,7 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "notifikasjon.cv-delt")
+                it.demandKey("stilling.stillingstittel")
                 it.requireKey(
                     "notifikasjonsId",
                     "virksomhetsnummer",
@@ -22,7 +23,6 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
                     "arbeidsgiversEpostadresser",
                     "tidspunktForHendelse",
                     "meldingTilArbeidsgiver",
-                    "stillingstittel",
                 )
             }
         }.register(this)
@@ -37,7 +37,7 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         val arbeidsgiversEpostadresser = packet["arbeidsgiversEpostadresser"].toList().map { it.asText() }
         val tidspunktForHendelse = ZonedDateTime.parse(packet["tidspunktForHendelse"].asText())
         val meldingTilArbeidsgiver = packet["meldingTilArbeidsgiver"].asText()
-        val stillingstittel = packet["stillingstittel"].asText()
+        val stillingstittel = packet["stilling.stillingstittel"].asText()
 
         notifikasjonKlient.sendNotifikasjon(
             notifikasjonsId = notifikasjonsId,
