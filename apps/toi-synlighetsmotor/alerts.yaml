@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-synlighetsmotor
           expr: kube_deployment_status_replicas_available{deployment="toi-synlighetsmotor"} == 0
-          for: 1s
+          for: 10s
           annotations:
             summary: Applikasjonen er nede
             action: "https://logs.adeo.no/goto/cf3fc1b0-43bf-11ed-8607-d590fd125f80"
