@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-arbeidsgiver-notifikasjon
           expr: kube_deployment_status_replicas_available{deployment="toi-arbeidsgiver-notifikasjon"} == 0
-          for: 1s
+          for: 10s
           annotations:
             summary: Appen er nede
             action: "https://logs.adeo.no/app/r/s/Cr1VK"
