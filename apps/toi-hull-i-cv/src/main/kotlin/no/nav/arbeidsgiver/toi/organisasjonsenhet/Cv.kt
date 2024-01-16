@@ -3,14 +3,10 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer
-import java.time.Instant
-import java.time.LocalDate
-import java.time.Period
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter.ofPattern
+import java.time.*
 
 
-class Cv (
+class Cv(
     private val utdannelse: List<CVPeriode>,
     private val arbeidserfaring: List<CVPeriode>,
     private val foedselsdato: LocalDate
@@ -47,12 +43,12 @@ class CVPeriode(
 ) {
     fun tilAktivPeriode() = AktivPeriode(
         fraTidspunkt ?: LocalDate.MIN,
-        tilTidspunkt?: LocalDate.MAX
+        tilTidspunkt ?: LocalDate.MAX
     )
 
     fun tilArbeidsmarkedJson() = """{
-            "fraTidspunkt": ${fraTidspunkt?.format(ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"},
-            "tilTidspunkt": ${tilTidspunkt?.format(ofPattern("YYYY-MM"))?.let { """"${it}"""" } ?: "null"}
+            "fraTidspunkt": ${fraTidspunkt?.let { """"${YearMonth.from(it)}"""" } ?: "null"},
+            "tilTidspunkt": ${tilTidspunkt?.let { """"${YearMonth.from(it)}"""" } ?: "null"}
           }
     """.trimIndent()
 }
@@ -82,16 +78,15 @@ data class AktivPeriode(val førsteDag: LocalDate, val sisteDag: LocalDate) {
         dato.isAfterOrEqual(førsteDag) && dato.isBeforeOrEqual(sisteDag)
 
     fun overlapperMed(other: AktivPeriode): Boolean =
-        inneholder(other.sisteDag) || inneholder(other.førsteDag) || other.inneholder(sisteDag) || other.inneholder(førsteDag)
+        inneholder(other.sisteDag) || inneholder(other.førsteDag) || other.inneholder(sisteDag) || other.inneholder(
+            førsteDag
+        )
 }
 
 
 private data class InaktivPeriode(val førsteDag: LocalDate, val sisteDag: LocalDate) {
     fun varighet(): Period = Period.between(førsteDag, sisteDag.plusOneDayOrMax())
 }
-
-
-
 
 
 /**
@@ -136,6 +131,7 @@ private fun perioderMedInaktivitet(aktivePerioder: List<AktivPeriode>): Pair<Loc
             aktivePerioder.isEmpty() -> {
                 Pair(LocalDate.MIN, listOf())
             }
+
             accInaktivePerioder.isEmpty() -> {
                 val førsteInaktivePeriode = InaktivPeriode(
                     førsteDag = LocalDate.MIN,
@@ -143,9 +139,11 @@ private fun perioderMedInaktivitet(aktivePerioder: List<AktivPeriode>): Pair<Loc
                 )
                 perioderMedInaktivitet(listOf(førsteInaktivePeriode), aktivePerioder)
             }
+
             aktivePerioder.size == 1 -> {
                 Pair(aktivePerioder.first().sisteDag.plusOneDayOrMax(), accInaktivePerioder)
             }
+
             else -> {
                 val (head, tail) = aktivePerioder.headTail()
                 val neck = tail.first()
@@ -193,8 +191,3 @@ private fun LocalDate.minusOneDayOrMin(): LocalDate =
 private fun <T> List<T>.headTail() =
     Pair(first(), subList(1, size))
 
-fun safeToLocalDate(longValue: Long?): LocalDate? {
-    return if (longValue == null) {
-        null
-    } else LocalDate.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault())
-}
