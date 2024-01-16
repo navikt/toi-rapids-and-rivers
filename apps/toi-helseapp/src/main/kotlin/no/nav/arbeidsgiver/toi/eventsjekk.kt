@@ -7,7 +7,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
-import java.util.*
 
 private val uinteressanteHendelser = listOf(
     "application_up",
@@ -20,9 +19,10 @@ private val uinteressanteHendelser = listOf(
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
-private fun grenseverdiForAlarm(eventName: String) = when(eventName) {
+private fun grenseverdiForAlarm(eventName: String) = when (eventName) {
     "adressebeskyttelse" -> Duration.ofDays(4)
     "kvp" -> Duration.ofHours(2)
+    "siste14avedtak" -> Duration.ofHours(3)
     else -> Duration.ofHours(1)
 }
 
@@ -35,7 +35,8 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
         StringDeserializer()
     )
     val sisteEvent = mutableMapOf<String, Instant>()
-    val topicPartitions = consument.partitionsFor(envs["KAFKA_RAPID_TOPIC"]).map { TopicPartition(it.topic(), it.partition()) }
+    val topicPartitions =
+        consument.partitionsFor(envs["KAFKA_RAPID_TOPIC"]).map { TopicPartition(it.topic(), it.partition()) }
     consument.assign(topicPartitions)
     consument.seekToBeginning(topicPartitions)
     while (true) {
@@ -69,17 +70,20 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                 .map { (eventName, duration) -> SisteEvent(eventName, duration) }
                 .sortedDescending()
             if (sorterteEventer.any(SisteEvent::utdatert) && forventerIkkeUtdaterteHendelserNå()) {
-                log.warn("Tid siden hendelser (grenseverdi er nådd):\n" +
-                        sorterteEventer
-                            .filter(SisteEvent::utdatert)
-                            .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n" +
-                        sorterteEventer
-                            .filterNot(SisteEvent::utdatert)
-                            .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
+                log.warn(
+                    "Tid siden hendelser (grenseverdi er nådd):\n" +
+                            sorterteEventer
+                                .filter(SisteEvent::utdatert)
+                                .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n" +
+                            sorterteEventer
+                                .filterNot(SisteEvent::utdatert)
+                                .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
                 )
             } else {
-                log.info("Tid siden hendelser:\n" + sorterteEventer
-                    .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n")
+                log.info(
+                    "Tid siden hendelser:\n" + sorterteEventer
+                        .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
+                )
             }
             hendelserSomIkkeSendesLenger.filterNot(sisteEvent::containsKey).forEach {
                 log.warn("Finner ingen hendelser ved navn $it i rapiden lenger. Burde fjernes fra hendelserSomIkkeSendesLenger-listen")
@@ -91,7 +95,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     }
 }
 
-class SisteEvent(private val eventName: String, private val duration: Duration): Comparable<SisteEvent> {
+class SisteEvent(private val eventName: String, private val duration: Duration) : Comparable<SisteEvent> {
     override fun compareTo(other: SisteEvent) = duration.compareTo(other.duration)
     fun utdatert() = duration > grenseverdiForAlarm(eventName)
 
