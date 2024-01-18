@@ -44,7 +44,7 @@ fun startApp(
         throw e
     }
     finally {
-        log.error("Applikasjonen stenges ned")
+        log.info("Applikasjonen stenges ned")
     }
 }
 

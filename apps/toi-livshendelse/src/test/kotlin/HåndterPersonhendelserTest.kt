@@ -69,6 +69,36 @@ class HåndterPersonhendelserTest {
     }
 
     @Test
+    fun `sjekk at hendelser ikke sendes for andre opplysningstype`() {
+
+        stubOAtuh()
+        stubPdl()
+
+        val personHendelse = personhendelse(opplysningstype = "NOE_ANNET")
+
+        personhendelseService.håndter(
+            listOf(personHendelse)
+        )
+
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `sjekk at en tom liste av hendelser håndteres korrekt`() {
+
+        stubOAtuh()
+        stubPdl()
+
+        personhendelseService.håndter(
+            listOf()
+        )
+
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
     fun `sjekk at gradering sendes per ident for en person med flere aktørider`() {
 
         stubOAtuh()

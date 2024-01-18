@@ -11,6 +11,11 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
         log.info("Håndterer ${personHendelser.size} hendelser")
 
+        if(personHendelser.isNotEmpty()) {
+            val opplysningstyper = personHendelser.map{it.opplysningstype}.distinct()
+            secureLog.info("Håndterer hendelser med typer: $opplysningstyper")
+        }
+
         personHendelser
             .filter { it.opplysningstype.contains("ADRESSEBESKYTTELSE_") }
             .map {
@@ -24,6 +29,10 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             .mapNotNull { it }
             .flatMap(::kallPdl)
             .forEach(::publiserHendelse)
+
+        if(personHendelser.isEmpty()) {
+            Thread.sleep(1000)
+        }
     }
 
     fun kallPdl(ident: String): List<DiskresjonsHendelse> {
