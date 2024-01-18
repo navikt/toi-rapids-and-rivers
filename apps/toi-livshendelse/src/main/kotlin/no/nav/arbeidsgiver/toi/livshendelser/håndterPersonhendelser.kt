@@ -18,15 +18,9 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
         personHendelser
             .filter { it.opplysningstype.contains("ADRESSEBESKYTTELSE_") }
-            .map {
-                if (it.personidenter.isNullOrEmpty()) {
-                    null
-                } else {
-                    val first = it.personidenter.first()
-                    first
-                }
+            .mapNotNull {
+                it.personidenter?.firstOrNull()
             }
-            .mapNotNull { it }
             .flatMap(::kallPdl)
             .forEach(::publiserHendelse)
 
