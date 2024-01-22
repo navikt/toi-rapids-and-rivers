@@ -5,10 +5,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VeilederTest {
@@ -25,6 +22,11 @@ class VeilederTest {
     @AfterAll
     fun tearDown() {
         wiremock.stop()
+    }
+
+    @BeforeEach
+    fun clear() {
+        wiremock.resetAll()
     }
 
     fun stubWireMock(query: String, responseBody: String) {
@@ -220,6 +222,49 @@ class VeilederTest {
                 epost = null
             )
         )
+    }
+
+    @Test
+    fun `Lesing av veilederMelding fra eksternt topic skal feile om det er en error melding uten ressurs`() {
+        val aktørId = "10000100000"
+        val veilederId = "A313111"
+        val tilordnet = "2020-12-21T10:58:19.023+01:00"
+
+        val spørring = """
+            {
+              "query": "query(${'$'}identer: [String!]!) {\n    ressurser(where: { navidenter: ${'$'}identer }) {\n        id\n        ressurs {\n            navIdent\n            visningsNavn\n            fornavn\n            etternavn\n            epost\n        }\n    }\n}",
+              "variables": {
+                "identer": ["$veilederId"]
+              }
+            }
+            """
+
+        val responsBody = """
+            {
+              "errors": [
+                {
+                  "message": "Oppslag mot AD feilet",
+                  "locations": [],
+                  "extensions": {
+                    "code": "server_error",
+                    "classification": "DataFetchingException"
+                  }
+                }
+              ],
+              "data": {
+                "ressurser": []
+              }
+            }
+            """
+
+        stubWireMock(spørring, responsBody)
+
+        val testRapid = createTestRapidAndLytter()
+        assertThrows<Exception> { testRapid.sendTestMessage(veilederMeldingFraEksterntTopic(aktørId, veilederId, tilordnet)) }
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test

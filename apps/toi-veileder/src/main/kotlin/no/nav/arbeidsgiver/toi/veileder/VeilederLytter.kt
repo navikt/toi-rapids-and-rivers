@@ -26,25 +26,31 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection, private val
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val ident = packet["veilederId"].asText()
-        val veilederinformasjon = nomKlient.hentVeilederinformasjon(ident)
-        packet["veilederinformasjon"] =
-            if (veilederinformasjon == null) JsonNodeFactory.instance.nullNode() else veilederinformasjon.toJsonNode()
 
-
-        val melding = mapOf(
-            "aktørId" to packet["aktorId"],
-            "veileder" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "veileder",
-        )
-
-        val nyPacket = JsonMessage.newMessage(melding)
         val aktørId = packet["aktorId"].asText()
+        try {
+            val ident = packet["veilederId"].asText()
+            val veilederinformasjon = nomKlient.hentVeilederinformasjon(ident)
+            packet["veilederinformasjon"] = veilederinformasjon?.toJsonNode() ?: JsonNodeFactory.instance.nullNode()
 
 
-        log.info("Skal publisere veiledermelding for aktørId (se securelog)")
-        secureLog.info("Skal publisere veiledermelding for aktørId $aktørId ident $ident")
-        rapidsConnection.publish(aktørId, nyPacket.toJson())
+            val melding = mapOf(
+                "aktørId" to aktørId,
+                "veileder" to packet.fjernMetadataOgKonverter(),
+                "@event_name" to "veileder",
+            )
+
+            val nyPacket = JsonMessage.newMessage(melding)
+
+
+            log.info("Skal publisere veiledermelding for aktørId (se securelog)")
+            secureLog.info("Skal publisere veiledermelding for aktørId $aktørId ident $ident")
+            rapidsConnection.publish(aktørId, nyPacket.toJson())
+        } catch (t:Throwable) {
+            log.error("Feil i lesing av hendelse (se securelog)")
+            secureLog.error("Feil i lesing av hendelse for aktørId $aktørId", t)
+            throw t
+        }
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

@@ -52,16 +52,15 @@ class NomKlient(
     private fun parseResponse(response: String): Veilederinformasjon? {
         val jsonNode = objectMapper.readTree(response)
         if (jsonNode["errors"]?.isMissingOrNull() == false) {
-            val errorMessage = objectMapper.writeValueAsString(jsonNode["errors"])
             log.error("Error ved henting av ident, om det er utgått ident kan personeninfo likevel prosesseres: (se secureLog)")
-            secureLog.error("Error ved henting av ident, om det er utgått ident kan personinfo likevel prosesseres: $errorMessage")
+            secureLog.error("Error ved henting av ident, om det er utgått ident kan personinfo likevel prosesseres: $response")
         }
 
         val nomSvar = objectMapper.treeToValue(jsonNode, NomSvar::class.java)
         val identsvar = nomSvar?.data?.ressurser ?: emptyList()
         if (identsvar.size != 1) {
             log.error("Uventet antall svar ved henting av ident: (se secureLog) antall ${identsvar.size}")
-            secureLog.error("Uventet antall svar ved henting av ident: $identsvar antall ${identsvar.size}")
+            secureLog.error("Uventet antall svar ved henting av ident: $identsvar antall ${identsvar.size}, respons $response")
             throw RuntimeException("Uventet antall svar ved henting av ident: (se secureLog) antall ${identsvar.size}")
         }
         return identsvar[0].ressurs
