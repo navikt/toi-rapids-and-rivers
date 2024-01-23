@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-deploy:
-    uses: ./.github/workflows/deploy-toi-template.yaml@main
+    uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app-name: ${{ github.workflow }}
       deploy_dev_branch: refs/heads/foobar
