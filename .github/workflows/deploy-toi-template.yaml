@@ -37,6 +37,7 @@ jobs:
         id: docker-build-push
         with:
           team: toi
+          dockerfile: apps/${{ inputs.app_name }}/Dockerfile
           docker_context: apps/${{ inputs.app_name }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
