@@ -3,8 +3,8 @@ name: toi-arbeidsgiver-notifikasjon
 on:
   push:
     paths:
-    - apps/${{ github.workflow }}/**
-    - .github/workflows/deploy-${{ github.workflow }}.yaml
+    - apps/toi-arbeidsgiver-notifikasjon/**
+    - .github/workflows/deploy-toi-arbeidsgiver-notifikasjon.yaml
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
 
