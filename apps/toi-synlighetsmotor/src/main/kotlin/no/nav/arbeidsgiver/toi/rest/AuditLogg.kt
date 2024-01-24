@@ -18,15 +18,15 @@ object AuditLogg {
         secureLog.info("auditlogger: {}", cefMessage)
     }
 
-    fun loggSynlighetsoppslag(aktørId: String, navIdent: String) {
+    fun loggSynlighetsoppslag(personident: String, authenticatedUser: AuthenticatedUser) {
         val cefMessage = CefMessage.builder()
             .applicationName("Rekrutteringsbistand")
             .loggerName("toi-synlighetsmotor")
             .event(CefMessageEvent.ACCESS)
             .name("Sporingslogg")
             .authorizationDecision(AuthorizationDecision.PERMIT)
-            .sourceUserId(navIdent)
-            .destinationUserId(aktørId)
+            .sourceUserId(authenticatedUser.navIdent)
+            .destinationUserId(personident)
             .timeEnded(System.currentTimeMillis())
             .extension("msg", "NAV-ansatt har sett synlighetsinformasjon for bruker")
             .build()

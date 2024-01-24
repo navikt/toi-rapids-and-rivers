@@ -7,8 +7,7 @@ val evaluerKandidatFraContext: ((String) ->  Evaluering?) -> (Context) -> Unit =
     { context ->
         val fnr = context.pathParam("fnr")
 
-        //val navIdent =
-        //loggSynlighetsoppslag
+        AuditLogg.loggSynlighetsoppslag(fnr, context.attribute<AuthenticatedUser>("authenticatedUser") ?: throw Exception("Prøver sjekke synlighet uten å ha autensiert bruker"))
 
         val evaluering = hentMedFødselsnummer(fnr)
             .lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()
