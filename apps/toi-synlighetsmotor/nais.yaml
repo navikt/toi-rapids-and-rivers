@@ -23,6 +23,7 @@ spec:
     min: 1
     max: {{ max_replicas }}
   strategy:
+    #Skaper problemer/nedetid for rest grensesnitt ved redeploy, men løser problemer ved flyway endring, anbefalt for r&r med db, vi bør vurdere to applikasjoner med tilgang til db her
     type: Recreate
   resources:
     limits:
