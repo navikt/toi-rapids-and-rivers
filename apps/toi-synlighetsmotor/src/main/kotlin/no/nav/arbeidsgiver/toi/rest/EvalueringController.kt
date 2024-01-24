@@ -7,6 +7,9 @@ val evaluerKandidatFraContext: ((String) ->  Evaluering?) -> (Context) -> Unit =
     { context ->
         val fnr = context.pathParam("fnr")
 
+        //val navIdent =
+        //loggSynlighetsoppslag
+
         val evaluering = hentMedFødselsnummer(fnr)
             .lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()
 
