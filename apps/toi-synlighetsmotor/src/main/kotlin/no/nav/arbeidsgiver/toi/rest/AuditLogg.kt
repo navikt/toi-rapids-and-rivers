@@ -28,7 +28,7 @@ object AuditLogg {
             .sourceUserId(authenticatedUser.navIdent)
             .destinationUserId(personident)
             .timeEnded(System.currentTimeMillis())
-            .extension("msg", "NAV-ansatt har sett synlighetsinformasjon for bruker")
+            .extension("msg", "NAV-ansatt har sett synlighetsinformasjon for kandidat")
             .build()
         log(cefMessage)
     }
