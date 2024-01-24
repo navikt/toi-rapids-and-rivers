@@ -138,7 +138,7 @@ private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.iss
         issuerId = "isso-idtoken",
         claims = mapOf(
             Pair("name", "navn"),
-            Pair("NAVident", "NAVident"),
+            Pair("NAVident", "A123456"),
             Pair("unique_name", "unique_name"),
         ),
         audience = listOf("audience")

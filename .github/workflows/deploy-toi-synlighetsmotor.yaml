@@ -17,5 +17,5 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/vekk-fra-fork
+      deploy_dev_branch: refs/heads/auditlogging-synlighet
     secrets: inherit

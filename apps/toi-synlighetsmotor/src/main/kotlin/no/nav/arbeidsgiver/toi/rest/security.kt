@@ -36,11 +36,9 @@ fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
 
 class AuthenticatedUser(val navIdent: String)
 
-fun interface Autentiseringsmetode {
-    operator fun invoke(claims: JwtTokenClaims?, ctx: Context): Boolean
-}
+typealias Autentiseringsmetode  = (JwtTokenClaims?, Context) -> Boolean
 
-private val autentiserVeileder = Autentiseringsmetode { claims, ctx ->
+private val autentiserVeileder: Autentiseringsmetode = { claims, ctx ->
     val navIdent = claims?.hentNAVIdent()
     (navIdent?.isNotEmpty() ?: false).also {erAutensiert ->
         if(erAutensiert)
