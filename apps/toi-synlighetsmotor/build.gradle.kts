@@ -9,6 +9,7 @@ dependencies {
     implementation("io.javalin:javalin:5.1.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
     implementation("no.nav.security:token-validation-core:3.0.10")
+    implementation("no.nav.common:audit-log:3.2023.12.12_13.53-510909d4aa1a")
 
     testImplementation("no.nav.security:mock-oauth2-server:0.5.6")
     testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")

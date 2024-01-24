@@ -5,6 +5,7 @@ import io.javalin.security.RouteRole
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
 import io.javalin.http.Handler
+import no.nav.common.audit_log.cef.CefMessageBuilder
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration
 import no.nav.security.token.support.core.http.HttpRequest
@@ -22,7 +23,7 @@ fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
         val erAutentisert =
             when {
                 roller.contains(Rolle.UNPROTECTED) -> true
-                roller.contains(Rolle.VEILEDER) -> autentiserVeileder(hentTokenClaims(ctx, issuerProperties, Rolle.VEILEDER))
+                roller.contains(Rolle.VEILEDER) -> autentiserVeileder(hentTokenClaims(ctx, issuerProperties, Rolle.VEILEDER), ctx)
                 else -> false
             }
 
@@ -33,12 +34,19 @@ fun styrTilgang(issuerProperties: Map<Rolle, IssuerProperties>) =
         }
     }
 
+class AuthenticatedUser(val navIdent: String)
 
-fun interface Autentiseringsmetode {
-    operator fun invoke(claims: JwtTokenClaims?): Boolean
+typealias Autentiseringsmetode  = (JwtTokenClaims?, Context) -> Boolean
+
+private val autentiserVeileder: Autentiseringsmetode = { claims, ctx ->
+    val navIdent = claims?.hentNAVIdent()
+    (navIdent?.isNotEmpty() ?: false).also {erAutensiert ->
+        if(erAutensiert)
+            ctx.attribute("authenticatedUser", AuthenticatedUser(navIdent!!))
+    }
 }
 
-val autentiserVeileder = Autentiseringsmetode { it?.get("NAVident")?.toString()?.isNotEmpty() ?: false }
+private fun JwtTokenClaims.hentNAVIdent() = get("NAVident")?.toString()
 
 private fun hentTokenClaims(ctx: Context, issuerProperties: Map<Rolle, IssuerProperties>, rolle: Rolle) =
     hentTokenValidationHandler(issuerProperties, rolle)
