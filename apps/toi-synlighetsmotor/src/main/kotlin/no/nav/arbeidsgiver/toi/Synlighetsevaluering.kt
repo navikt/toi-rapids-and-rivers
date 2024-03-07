@@ -5,6 +5,9 @@ import java.time.Instant
 
 val secureLog = LoggerFactory.getLogger("secureLog")
 
+/**
+ * Reglene for synligheten spesifiseres i denne klassen. Ved endringer i denne klassen, pass på at dokumentasjonen i microsoft loop er oppdatert med endringene.
+ */
 fun lagEvalueringsGrunnlag(kandidat: Kandidat): Evaluering =
     Evaluering(
         harAktivCv = kandidat.arbeidsmarkedCv?.meldingstype.let {
