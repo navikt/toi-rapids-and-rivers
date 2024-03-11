@@ -20,7 +20,7 @@ private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
 private fun grenseverdiForAlarm(eventName: String) = when (eventName) {
-    "adressebeskyttelse" -> Duration.ofDays(4)
+    "adressebeskyttelse" -> Duration.ofDays(9)
     "kvp" -> Duration.ofHours(2)
     "siste14avedtak" -> Duration.ofHours(3)
     else -> Duration.ofHours(1)
