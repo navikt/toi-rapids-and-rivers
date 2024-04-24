@@ -25,6 +25,7 @@ class ArenaFritattKandidatsokLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        secureLog.info("Melding som leses: ${packet.toJson()}")
         val operasjonstype = operasjonstype(packet) ?: feilMedManglendeOperasjonstype(packet)
         val data = getData(operasjonstype, packet)
         validerData(data, operasjonstype, packet.toJson())
