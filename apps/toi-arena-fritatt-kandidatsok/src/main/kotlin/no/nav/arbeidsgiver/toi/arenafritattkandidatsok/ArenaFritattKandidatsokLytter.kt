@@ -20,12 +20,19 @@ class ArenaFritattKandidatsokLytter(
                 it.demandValue("table", "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK")
                 it.interestedIn("before", "after")
                 it.interestedIn("op_type")
+                it.interestedIn("pos")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         secureLog.info("Melding som leses: ${packet.toJson()}")
+        val pos = packet["pos"].asTextNullable()
+        if(pos != null && pos == "00000002990079967980") {
+            secureLog.info("Melding med pos $pos, ignoreres")
+            return
+        }
+
         val operasjonstype = operasjonstype(packet) ?: feilMedManglendeOperasjonstype(packet)
         val data = getData(operasjonstype, packet)
         validerData(data, operasjonstype, packet.toJson())
