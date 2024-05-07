@@ -16,6 +16,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         val (_, _, result) = com.github.kittinunf.fuel.Fuel.post(pdlUrl)
             .header(com.github.kittinunf.fuel.core.Headers.Companion.CONTENT_TYPE, "application/json")
             .header("Tema", "GEN")
+            .header("Behandlingsnummer", "B346")
             .authentication().bearer(accessToken)
             .jsonBody(graphql)
             .responseObject<Respons>()
