@@ -26,7 +26,6 @@ class ArenaFritattKandidatsokLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        secureLog.info("Melding som leses: ${packet.toJson()}")
         val pos = packet["pos"].asTextNullable()
         if(pos != null && pos == "00000002990079967980") {
             secureLog.info("Melding med pos $pos, ignoreres")
