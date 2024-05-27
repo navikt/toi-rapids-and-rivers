@@ -79,7 +79,8 @@ suspend fun sjekkOffsets(envs: Map<String, String>) {
         "rekrutteringsbistand-stilling-api" to "rekrutteringsbistand-stilling-rapidconsumer-2",
         "presenterte-kandidagter-api" to "presenterte-kandidagter-api-rapidconsumer-1",
         "foresporsel-om-deling-av-cv-api" to "foresporsel-om-deling-av-cv-api-rapidconsumer-1",
-        "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-2"
+        "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-2",
+        "toi-evaluertdatalogger" to "toi-evaluertdatalogger-rapidconsumer-2"
     )
     while (true) {
         val sisteOffset = sisteOffset(envs)
