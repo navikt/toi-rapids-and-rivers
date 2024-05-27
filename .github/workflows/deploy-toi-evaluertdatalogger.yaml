@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - apps/toi-kvp/**
-      - .github/workflows/deploy-toi-evaluertdaatalogger.yaml
+      - .github/workflows/deploy-toi-evaluertdatalogger.yaml
       - .github/workflows/deploy-toi-template.yaml
       - buildSrc/**
 
