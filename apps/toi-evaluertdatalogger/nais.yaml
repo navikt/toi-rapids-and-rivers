@@ -31,4 +31,4 @@ spec:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: toi-evaluertdatalogger-rapidconsumer-1
+      value: toi-evaluertdatalogger-rapidconsumer-2
