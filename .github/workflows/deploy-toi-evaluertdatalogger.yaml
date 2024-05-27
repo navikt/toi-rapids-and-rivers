@@ -45,15 +45,15 @@ jobs:
           docker build --tag ${IMAGE} apps/${APP_NAME}
           docker push ${IMAGE}
 
-#  deploy-to-prod-gcp:
-#    name: Deploy to prod-gcp
-#    needs: build-and-publish
-#    if: github.ref == 'refs/heads/main'
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: nais/deploy/actions/deploy@v1
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: prod-gcp
-#          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
+  deploy-to-prod-gcp:
+    name: Deploy to prod-gcp
+    needs: build-and-publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
