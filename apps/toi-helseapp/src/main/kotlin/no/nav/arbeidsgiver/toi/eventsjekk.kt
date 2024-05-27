@@ -23,6 +23,7 @@ private fun grenseverdiForAlarm(eventName: String) = when (eventName) {
     "adressebeskyttelse" -> Duration.ofDays(9)
     "kvp" -> Duration.ofHours(2)
     "siste14avedtak" -> Duration.ofHours(3)
+    "arbeidsgiversKandidatliste.VisningKontaktinfo" -> Duration. ofHours(2)
     else -> Duration.ofHours(1)
 }
 
