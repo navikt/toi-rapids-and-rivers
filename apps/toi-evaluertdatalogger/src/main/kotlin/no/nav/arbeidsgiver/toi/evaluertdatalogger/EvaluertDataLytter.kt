@@ -11,8 +11,10 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("synlighet.erSynlig", true)
+                it.demandValue("synlighet.ferdigBeregnet", true)
                 it.demandKey("aktørId")
                 it.demandKey("oppfølgingsinformasjon.rettighetsgruppe")
+                it.demandValue("@slutt_av_hendelseskjede", true)
             }
         }.register(this)
     }
