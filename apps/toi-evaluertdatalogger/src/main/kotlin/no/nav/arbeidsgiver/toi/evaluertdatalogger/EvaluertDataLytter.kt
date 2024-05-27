@@ -10,7 +10,7 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("synlighet",true)
+                it.demandValue("synlighet.erSynlig", true)
                 it.demandKey("aktørId")
                 it.demandKey("oppfølgingsinformasjon.rettighetsgruppe")
             }
