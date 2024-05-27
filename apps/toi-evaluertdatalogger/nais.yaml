@@ -26,9 +26,9 @@ spec:
       cpu: 100m
       memory: 512Mi
   kafka:
-     pool: nav-prod
+     pool: {{ kafka_pool }}
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: toi-evaluertdatalogger-rapidconsumer-2
+      value: {{ kafka_consumer_group_id }}
