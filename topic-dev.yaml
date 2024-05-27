@@ -95,3 +95,6 @@ spec:
     - team: toi
       application: toi-livshendelse
       access: readwrite
+    - team: toi
+      application: toi-evaluertdatalogger
+      access: readwrite
