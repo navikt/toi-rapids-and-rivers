@@ -3,7 +3,7 @@ name: toi-evaluertdatalogger
 on:
   push:
     paths:
-      - apps/toi-kvp/**
+      - apps/toi-evaluertdatalogger/**
       - .github/workflows/deploy-toi-evaluertdatalogger.yaml
       - .github/workflows/deploy-toi-template.yaml
       - buildSrc/**
