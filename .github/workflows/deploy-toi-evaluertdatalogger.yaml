@@ -1,4 +1,4 @@
-name: toi-kvp
+name: toi-evaluertdatalogger
 
 on:
   push:
