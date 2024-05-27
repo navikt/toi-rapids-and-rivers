@@ -24,6 +24,7 @@ private fun grenseverdiForAlarm(eventName: String) = when (eventName) {
     "kvp" -> Duration.ofHours(2)
     "siste14avedtak" -> Duration.ofHours(3)
     "arbeidsgiversKandidatliste.VisningKontaktinfo" -> Duration. ofHours(2)
+    "notifikasjon.cv-delt" -> Duration. ofHours(2)
     else -> Duration.ofHours(1)
 }
 
