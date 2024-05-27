@@ -11,14 +11,17 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
             validate {
                 it.demandValue("synlighet",true)
                 it.demandKey("aktørId")
-                it.demandValue("oppfølgingsinformasjon.rettighetsgruppe","AAP")
+                it.demandKey("oppfølgingsinformasjon.rettighetsgruppe")
             }
         }.register(this)
     }
-    private val synligeMedAap = mutableSetOf<String>()
+    private val synligeMedRettighetsGruppe = mutableMapOf<String, String>()
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        synligeMedAap += packet["aktørId"].asText()
-        log.info("Antall synlige brukere med AAP er ${synligeMedAap.size}")
+        val aktørId = packet["aktørId"].asText()
+        val rettighetsgruppe = packet["oppfølgingsinformasjon.rettighetsgruppe"].asText()
+        synligeMedRettighetsGruppe[aktørId] = rettighetsgruppe
+        synligeMedRettighetsGruppe.values.groupBy { it }.map { it.key to it.value.size }
+        log.info("Antall synlige brukere: $synligeMedRettighetsGruppe")
     }
 }
