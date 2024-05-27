@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import org.slf4j.LoggerFactory
 
 class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListener {
     init {
@@ -20,8 +21,9 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
         val rettighetsgruppe = packet["oppfølgingsinformasjon.rettighetsgruppe"].asText()
-        synligeMedRettighetsGruppe[aktørId] = rettighetsgruppe
-        synligeMedRettighetsGruppe.values.groupBy { it }.map { it.key to it.value.size }
-        log.info("Antall synlige brukere: $synligeMedRettighetsGruppe")
+        log.info("Synlig bruker med rettighetsgruppe $rettighetsgruppe")
+        secureLog.info("(secure) Synlig bruker med rettighetsgruppe $rettighetsgruppe")
     }
 }
+
+private val secureLog = LoggerFactory.getLogger("secureLog")
