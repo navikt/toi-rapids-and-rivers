@@ -9,7 +9,7 @@ import java.util.*
 class CacheHjelper {
     private val cacheKonfigurasjon = CacheConfigurationBuilder.newCacheConfigurationBuilder(
         String::class.java, OntologiRelasjoner::class.java,
-        ResourcePoolsBuilder.heap(200)
+        ResourcePoolsBuilder.heap(666)
     )
 
     private val cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
