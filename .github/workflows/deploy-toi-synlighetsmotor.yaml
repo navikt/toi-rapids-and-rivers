@@ -17,5 +17,5 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/auditlogging-synlighet
+      deploy_dev_branch: refs/heads/endret_tilgang_synlighet
     secrets: inherit
