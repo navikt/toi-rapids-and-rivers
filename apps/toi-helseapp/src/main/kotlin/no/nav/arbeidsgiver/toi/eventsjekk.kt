@@ -19,12 +19,15 @@ private val uinteressanteHendelser = listOf(
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 
+private fun manuellEventTid(duration: Duration) = if(LocalDate.now().month != Month.JULY) duration else
+    duration.plus(duration)
+
 private fun grenseverdiForAlarm(eventName: String) = when (eventName) {
-    "adressebeskyttelse" -> Duration.ofDays(9)
-    "kvp" -> Duration.ofHours(4)
-    "siste14avedtak" -> Duration.ofHours(3)
-    "arbeidsgiversKandidatliste.VisningKontaktinfo" -> Duration. ofHours(2)
-    "notifikasjon.cv-delt" -> Duration. ofHours(2)
+    "adressebeskyttelse" -> manuellEventTid(Duration.ofDays(9))
+    "kvp" -> manuellEventTid(Duration.ofHours(4))
+    "siste14avedtak" -> manuellEventTid(Duration.ofHours(3))
+    "arbeidsgiversKandidatliste.VisningKontaktinfo" -> manuellEventTid(Duration.ofHours(2))
+    "notifikasjon.cv-delt" -> manuellEventTid(Duration.ofHours(2))
     else -> Duration.ofHours(1)
 }
 
