@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-veileder
           expr: kube_deployment_status_replicas_available{deployment="toi-veileder"} == 0
-          for: 1s
+          for: 10m
           annotations:
             summary: Applikasjonen er nede
             action: "https://logs.adeo.no/goto/0897adc0-3992-11ed-8607-d590fd125f80"
