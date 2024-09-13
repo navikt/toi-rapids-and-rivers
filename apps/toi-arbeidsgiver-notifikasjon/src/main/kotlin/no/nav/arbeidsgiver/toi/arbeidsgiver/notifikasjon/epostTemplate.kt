@@ -20,7 +20,7 @@ val epostTemplate = """
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
                 <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
-                    <li>Åpne <a href='#' style='text-decoration: none; color: #000000; cursor: default; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</a></li>
+                    <li>Åpne <span role='link' aria-label='lenke til min side arbeidsgiver' style='text-decoration: none; color: #000000; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</span></li>
                     <li><b>Logg inn</b></li>
                     <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
                 </ol>
@@ -51,7 +51,7 @@ val epostTemplate = """
                             <li>Skriv «Rekruttering», så vil alternativet komme opp som et valg. Velg «Rekruttering».</li>
                             <li>Bekreft</li>
                         </ol>
-                        <p>Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på <a href='#' style='text-decoration: none; color: #000; cursor: default; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</a>.</p>
+                        <p>Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på <span role='link' aria-label='lenke til min side arbeidsgiver' style='text-decoration: none; color: #000000; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</span>.</p>
                         <p><b>Ga ikke Altinn deg muligheten til å gi tilgang?</b></p>
                         <p>Du kan gi tilgang hvis du har en av disse rollene:</p>
                         <ul style='line-height: 24px'>
