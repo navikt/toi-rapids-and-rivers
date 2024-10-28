@@ -9,8 +9,8 @@ on:
     - buildSrc/**
 
 permissions:
-  contents: read
-  id-token: write
+  contents: read # TODO Are: Kan slettes herfra hvis det oppgis nedenfor?
+  id-token: write  # TODO Are: Kan slettes herfra hvis det oppgis nedenfor?
 
 jobs:
   build-deploy:
