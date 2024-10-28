@@ -19,3 +19,5 @@ jobs:
       app_name: ${{ github.workflow }}
       deploy_dev_branch: refs/heads/foobar
     secrets: inherit
+    permissions:
+      security-events: write
