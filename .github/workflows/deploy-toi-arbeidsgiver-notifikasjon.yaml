@@ -20,4 +20,5 @@ jobs:
       deploy_dev_branch: refs/heads/foobar
     secrets: inherit
     permissions:
+      id-token: write
       security-events: write
