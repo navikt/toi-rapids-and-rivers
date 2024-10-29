@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Java v17.x
         uses: actions/setup-java@v3
         with:
@@ -51,9 +51,19 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: nais/deploy/actions/deploy@v1
+      - uses: actions/checkout@v4
+      - uses: nais/deploy/actions/deploy@v2
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
+
+  call-trivy-security-scan:
+    needs: build-and-publish
+    uses: navikt/toi-github-actions-workflows/.github/workflows/trivy-security-scan.yaml@main
+    with:
+      image: ${{ env.IMAGE }}
+    permissions:
+      id-token: write
+      security-events: write
+    secrets: inherit
