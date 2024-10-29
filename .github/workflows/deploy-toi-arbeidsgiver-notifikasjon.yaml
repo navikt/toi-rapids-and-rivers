@@ -8,16 +8,12 @@ on:
       - .github/workflows/deploy-toi-template.yaml
       - buildSrc/**
 
-permissions:
-  contents: read # TODO Are: Kan slettes herfra hvis det oppgis nedenfor?
-  id-token: write  # TODO Are: Kan slettes herfra hvis det oppgis nedenfor?
-
 jobs:
   build-deploy:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/foobar
+      deploy_dev_branch: refs/heads/trivy
     secrets: inherit
     permissions:
       contents: read
