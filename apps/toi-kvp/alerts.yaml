@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-kvp
           expr: kube_deployment_status_replicas_available{deployment="toi-kvp"} == 0
-          for: 10s
+          for: 5m
           annotations:
             summary: Appen er nede
             action: "https://logs.adeo.no/app/r/s/f0p7r"
