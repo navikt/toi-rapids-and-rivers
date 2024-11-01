@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-identmapper
           expr: kube_deployment_status_replicas_available{deployment="toi-identmapper"} == 0
-          for: 1s
+          for: 5m
           annotations:
             summary: Appen er nede
             action: "https://logs.adeo.no/goto/6be3d400-64d8-11ed-9d6c-8305350409f6"
