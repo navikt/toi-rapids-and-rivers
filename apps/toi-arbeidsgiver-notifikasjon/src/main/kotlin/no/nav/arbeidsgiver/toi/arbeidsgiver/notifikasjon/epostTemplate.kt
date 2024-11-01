@@ -20,7 +20,7 @@ val epostTemplate = """
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
                 <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
-                    <li>Åpne <span role='link' aria-label='lenke til min side arbeidsgiver' style='text-decoration: none; color: #000000; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</span></li>
+                    <li>På Nav sitt nettsted, under arkfanen "Arbeidsgiver", velg "Min side - arbeidsgiver".</li>
                     <li><b>Logg inn</b></li>
                     <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
                 </ol>
@@ -32,7 +32,13 @@ val epostTemplate = """
             <h2 style='font-size: 16px; margin-top: 40px; margin-bottom: 16px'>Mangler du tilgang til Min Side for Arbeidsgiver hos NAV?</h2>
             <div style='border: 24px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5'>
                 <p style='margin-top: 0'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
-                <p>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
+                <p>For å få tilgang må du kontakte den som styrer tilgangene til vi            <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
+                <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
+                    <li>Åpne <span role='link' aria-label='lenke til min side arbeidsgiver' style='text-decoration: none; color: #000000; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</span></li>
+                    <li><b>Logg inn</b></li>
+                    <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
+                </ol>
+            </div>rksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
                 <p>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
                 <p style='margin-bottom: 0; border-bottom: 16px solid #f2f3f5;'>Kopier den gjerne og send den til vedkommende:</p>
 
