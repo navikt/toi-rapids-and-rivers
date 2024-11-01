@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-helseapp
           expr: kube_deployment_status_replicas_available{deployment="toi-helseapp"} == 0
-          for: 10s
+          for: 5m
           annotations:
             summary: Applikasjonen er nede
             action: "https://logs.adeo.no/goto/2d965f50-0db3-11ed-9b1a-4723a5e7a9db"
