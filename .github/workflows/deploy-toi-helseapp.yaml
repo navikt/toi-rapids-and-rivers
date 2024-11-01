@@ -48,7 +48,7 @@ jobs:
           IMAGE=ghcr.io/${{ github.repository }}/${{ github.workflow }}:${TAG}
           docker build --tag ${IMAGE} apps/${APP_NAME}
           docker push ${IMAGE}
-          echo "::set-output name=image::${IMAGE}"
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
 
   deploy-to-prod-gcp:
     name: Deploy to prod-gcp
