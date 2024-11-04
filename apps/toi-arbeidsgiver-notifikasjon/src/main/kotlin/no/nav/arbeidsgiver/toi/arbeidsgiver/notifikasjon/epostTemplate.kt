@@ -20,7 +20,7 @@ val epostTemplate = """
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
                 <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
-                    <li>På Nav sitt nettsted, under arkfanen "Arbeidsgiver", velg "Min side - arbeidsgiver".</li>
+                    <li>På Nav sitt nettsted, under arkfanen 'Arbeidsgiver', velg 'Min side - arbeidsgiver'.</li>
                     <li><b>Logg inn</b></li>
                     <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
                 </ol>
