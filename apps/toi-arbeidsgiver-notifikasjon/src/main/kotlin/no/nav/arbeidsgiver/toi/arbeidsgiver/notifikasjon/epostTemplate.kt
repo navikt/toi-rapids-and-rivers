@@ -20,7 +20,7 @@ val epostTemplate = """
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
                 <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
-                    <li>På Nav sitt nettsted, under arkfanen 'Arbeidsgiver', velg 'Min side - arbeidsgiver'.</li>
+                    <li>På Nav sitt nettsted, under arkfanen &quot;Arbeidsgiver&quot;, velg &quot;Min side - arbeidsgiver&quot;.</li>
                     <li><b>Logg inn</b></li>
                     <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
                 </ol>
@@ -29,12 +29,12 @@ val epostTemplate = """
 
             <div style='border: 1px solid #cbcfd5;'></div>
 
-            <h2 style='font-size: 16px; margin-top: 40px; margin-bottom: 16px'>Mangler du tilgang til Min Side for Arbeidsgiver hos NAV?</h2>
+            <h2 style='font-size: 16px; margin-top: 40px; margin-bottom: 16px'>Mangler du tilgang til Min Side for Arbeidsgiver hos Nav?</h2>
             <div style='border: 24px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5'>
                 <p style='margin-top: 0'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
                 <p>For å få tilgang må du kontakte den som styrer tilgangene til vi            <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
                 <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
-                    <li>Åpne <span role='link' aria-label='lenke til min side arbeidsgiver' style='text-decoration: none; color: #000000; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</span></li>
+                    <li>På Nav sitt nettsted, under arkfanen &quot;Arbeidsgiver&quot;, velg &quot;Min side - arbeidsgiver&quot;.</li>
                     <li><b>Logg inn</b></li>
                     <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
                 </ol>
@@ -44,8 +44,8 @@ val epostTemplate = """
 
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
                     <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
-                        <p style='margin-top: 0;'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra NAV på vegne av virksomheten din.</p>
-                        <p><b>Gi tilganger til CV-er fra NAV:</b></p>
+                        <p style='margin-top: 0;'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra Nav på vegne av virksomheten din.</p>
+                        <p><b>Gi tilganger til CV-er fra Nav:</b></p>
                         <ol style='line-height: 24px'>
                             <li>Logg inn i Altinn</li>
                             <li>Velg virksomheten din under «Alle dine aktører»</li>
@@ -57,7 +57,7 @@ val epostTemplate = """
                             <li>Skriv «Rekruttering», så vil alternativet komme opp som et valg. Velg «Rekruttering».</li>
                             <li>Bekreft</li>
                         </ol>
-                        <p>Denne enkeltrettigheten gir kun tilgang til å bruke NAV sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra NAV på <span role='link' aria-label='lenke til min side arbeidsgiver' style='text-decoration: none; color: #000000; font-weight: bold;'>https://arbeidsgiver.nav.no/min-side-arbeidsgiver</span>.</p>
+                        <p>Denne enkeltrettigheten gir kun tilgang til å bruke Nav sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra Nav på &quot;Min side - arbeidsgiver&quot; på Nav sitt nettsted.</p>
                         <p><b>Ga ikke Altinn deg muligheten til å gi tilgang?</b></p>
                         <p>Du kan gi tilgang hvis du har en av disse rollene:</p>
                         <ul style='line-height: 24px'>
