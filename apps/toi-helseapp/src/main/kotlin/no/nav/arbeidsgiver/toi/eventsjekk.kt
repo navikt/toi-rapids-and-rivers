@@ -17,7 +17,7 @@ private val uinteressanteHendelser = listOf(
     "republisert"
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
-private val hendelserSomIkkeSendesLenger = listOf<String>()
+private val hendelserSomIkkeSendesLenger = listOf<String>("tiltakAvtaleInngått")
 
 private fun manuellEventTid(duration: Duration) = if(LocalDate.now().month != Month.JULY) duration else
     duration.plus(duration)
