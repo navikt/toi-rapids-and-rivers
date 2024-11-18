@@ -23,14 +23,14 @@ spec:
           expr: sum(increase(log_messages_errors{app="toi-helseapp", level="Error"}[10m])) > 0
           for: 1s
           annotations:
-            summary: Applikasjonen har logget en error
+            summary: Helseappen mener noe er galt
             action: "https://logs.adeo.no/goto/2d965f50-0db3-11ed-9b1a-4723a5e7a9db"
           labels:
             namespace: toi
             severity: critical
 
         - alert: toi-helseapp
-          expr: sum(increase(log_messages_errors{app="toi-helseapp", level="Warning"}[10m])) > 3
+          expr: sum(increase(log_messages_errors{app="toi-helseapp", level="Warning"}[10m])) > 10
           for: 1s
           annotations:
             summary: Økning i warnings
