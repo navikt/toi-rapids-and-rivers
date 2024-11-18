@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-siste-14a-vedtak
           expr: kube_deployment_status_replicas_available{deployment="toi-siste-14a-vedtak"} == 0
-          for: 30s
+          for: 2m
           annotations:
             summary: Applikasjonen er nede
             action: "https://logs.adeo.no/goto/2dfa6fc0-398e-11ed-8607-d590fd125f80"

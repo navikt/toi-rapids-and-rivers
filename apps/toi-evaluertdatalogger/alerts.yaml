@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-evaluertdatalogger
           expr: kube_deployment_status_replicas_available{deployment="toi-evaluertdatalogger"} == 0
-          for: 30s
+          for: 2m
           annotations:
             summary: Appen er nede
             action: "https://logs.adeo.no/app/r/s/Mp6AS"

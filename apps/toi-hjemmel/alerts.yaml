@@ -12,7 +12,7 @@ spec:
       rules:
         - alert: toi-hjemmel
           expr: kube_deployment_status_replicas_available{deployment="toi-hjemmel"} == 0
-          for: 30s
+          for: 2m
           annotations:
             summary: Applikasjonen er nede
             action: "https://logs.adeo.no/app/r/s/zrHA2"
