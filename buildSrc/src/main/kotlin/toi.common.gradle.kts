@@ -33,7 +33,7 @@ val stiTilApplicationClass =
 
 tasks {
     named<Jar>("jar") {
-        archiveBaseName.set("app")
+        archiveBaseName.set("Aretest")
 
         manifest {
             attributes["Main-Class"] = stiTilApplicationClass
