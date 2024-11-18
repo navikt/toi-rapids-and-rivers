@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-kandidatfeed
           expr: kube_deployment_status_replicas_available{deployment="toi-kandidatfeed"} == 0
-          for: 5m
+          for: 30s
           annotations:
             summary: Appen er nede
             action: "https://logs.adeo.no/app/r/s/cbEOJ"

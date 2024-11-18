@@ -19,7 +19,7 @@ spec:
     enabled: true
     path: /metrics
   replicas:
-    min: 1
+    min: 2
     max: {{ max_replicas }}
   secureLogs:
     enabled: true

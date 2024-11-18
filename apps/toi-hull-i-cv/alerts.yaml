@@ -12,7 +12,7 @@ spec:
       rules:
         - alert: toi-hull-i-cv
           expr: kube_deployment_status_replicas_available{deployment="toi-hull-i-cv"} == 0
-          for: 10s
+          for: 30s
           annotations:
             summary: Applikasjonen er nede
             action: "https://logs.adeo.no/app/r/s/wnqTp"
