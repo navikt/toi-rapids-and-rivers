@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.time.delay
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -52,6 +50,13 @@ fun main() {
 suspend fun logException(jobbNavn: String, envs: Map<String, String>, funksjon: KSuspendFunction1<Map<String, String>, Unit>) {
     try {
         funksjon(envs)
+    } catch (e: CancellationException) {
+        if(e.cause == null) {
+            log.info("Kansellerer jobben $jobbNavn")
+        } else {
+            log.error("Feil i $jobbNavn: ${e.message}", e)
+        }
+        throw e
     } catch (e: Exception) {
         log.error("Feil i $jobbNavn: ${e.message}", e)
         throw e
@@ -59,43 +64,53 @@ suspend fun logException(jobbNavn: String, envs: Map<String, String>, funksjon: 
 }
 
 suspend fun sjekkOffsets(envs: Map<String, String>) {
-    val listOfGroupIds = listOf(
-        "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
-        "toi-arena-fritatt-kandidatsøk" to "toi-arena-fritatt-kandidatsok-3",
-        "toi-hjemmel" to "toi-hjemmel-rapidconsumer-2",
-        "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
-        "toi-kandidatfeed" to "toi-kandidatfeed-rapidconsumer-6",
-        "toi-maa-behandle-tidligere-cv" to "toi-maa-behandle-tidligere-cv-rapidconsumer-5",
-        "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-4",
-        "toi-oppfolgingsperiode" to "toi-oppfølgingsperiode-rapidconsumer-2",
-        "toi-organisasjonsenhet" to "toi-organisasjonsenhet-rapidconsumer-1",
-        "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
-        "toi-siste-14a-vedtak" to "toi-siste-14a-vedtak-rapidconsumer-2",
-        "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
-        "toi-veileder" to "toi-veileder-rapidconsumer-12",
-        "toi-hull-i-cv" to "toi-hull-i-cv-rapidconsumer-1",
-        "toi-ontologitjeneste" to "toi-ontologitjeneste-rapidconsumer-1",
-        "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1",
-        "rekrutteringsbistand-stilling-api" to "rekrutteringsbistand-stilling-rapidconsumer-2",
-        "presenterte-kandidagter-api" to "presenterte-kandidagter-api-rapidconsumer-1",
-        "foresporsel-om-deling-av-cv-api" to "foresporsel-om-deling-av-cv-api-rapidconsumer-1",
-        "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-2",
-        "toi-evaluertdatalogger" to "toi-evaluertdatalogger-rapidconsumer-2"
-    )
-    while (true) {
-        val sisteOffset = sisteOffset(envs)
-        val resultsPerApplicationPerPartitions = listOfGroupIds.map { (application, groupId) ->
-            consumerOffset(groupId, envs).map { (partition, consumerOffset) ->
-                ResultsPerApplicationPerPartition(application, consumerOffset, sisteOffset[partition]!! - consumerOffset, partition)
+    try {
+        val listOfGroupIds = listOf(
+            "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
+            "toi-arena-fritatt-kandidatsøk" to "toi-arena-fritatt-kandidatsok-3",
+            "toi-hjemmel" to "toi-hjemmel-rapidconsumer-2",
+            "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
+            "toi-kandidatfeed" to "toi-kandidatfeed-rapidconsumer-6",
+            "toi-maa-behandle-tidligere-cv" to "toi-maa-behandle-tidligere-cv-rapidconsumer-5",
+            "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-4",
+            "toi-oppfolgingsperiode" to "toi-oppfølgingsperiode-rapidconsumer-2",
+            "toi-organisasjonsenhet" to "toi-organisasjonsenhet-rapidconsumer-1",
+            "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
+            "toi-siste-14a-vedtak" to "toi-siste-14a-vedtak-rapidconsumer-2",
+            "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
+            "toi-veileder" to "toi-veileder-rapidconsumer-12",
+            "toi-hull-i-cv" to "toi-hull-i-cv-rapidconsumer-1",
+            "toi-ontologitjeneste" to "toi-ontologitjeneste-rapidconsumer-1",
+            "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1",
+            "rekrutteringsbistand-stilling-api" to "rekrutteringsbistand-stilling-rapidconsumer-2",
+            "presenterte-kandidagter-api" to "presenterte-kandidagter-api-rapidconsumer-1",
+            "foresporsel-om-deling-av-cv-api" to "foresporsel-om-deling-av-cv-api-rapidconsumer-1",
+            "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-2",
+            "toi-evaluertdatalogger" to "toi-evaluertdatalogger-rapidconsumer-2"
+        )
+        while (true) {
+            val sisteOffset = sisteOffset(envs)
+            val resultsPerApplicationPerPartitions = listOfGroupIds.map { (application, groupId) ->
+                consumerOffset(groupId, envs).map { (partition, consumerOffset) ->
+                    ResultsPerApplicationPerPartition(
+                        application,
+                        consumerOffset,
+                        sisteOffset[partition]!! - consumerOffset,
+                        partition
+                    )
+                }
+            }.flatten().sortedByDescending(ResultsPerApplicationPerPartition::behind)
+            val result = formatResults(resultsPerApplicationPerPartitions, sisteOffset)
+            if (resultsPerApplicationPerPartitions.any(ResultsPerApplicationPerPartition::erFeilsituasjon)) {
+                log.error(result)
+            } else {
+                log.info(result)
             }
-        }.flatten().sortedByDescending(ResultsPerApplicationPerPartition::behind)
-        val result = formatResults(resultsPerApplicationPerPartitions, sisteOffset)
-        if(resultsPerApplicationPerPartitions.any(ResultsPerApplicationPerPartition::erFeilsituasjon)) {
-            log.error(result)
-        } else {
-            log.info(result)
+            delay(Duration.ofSeconds(10))
         }
-        delay(Duration.ofSeconds(10))
+    } catch (e: Exception) {
+        log.error("Feil i jobb", e)
+        throw e
     }
 }
 
