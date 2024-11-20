@@ -14,8 +14,9 @@ object AuditLogg {
     private val auditLogger: AuditLogger = AuditLoggerImpl()
 
     private fun log(cefMessage: CefMessage) {
-        auditLogger.log(cefMessage)
-        secureLog.info("auditlogger: {}", cefMessage)
+        val ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn = " "
+        auditLogger.log("$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn)
+        secureLog.info("auditlogger: {}", "$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn)
     }
 
     fun loggSynlighetsoppslag(personident: String, authenticatedUser: AuthenticatedUser) {
