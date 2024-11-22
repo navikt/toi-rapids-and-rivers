@@ -46,7 +46,7 @@ jobs:
         run: |
           TAG=$(if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then echo "latest"; else echo "${{ github.sha }}"; fi)
           IMAGE=ghcr.io/${{ github.repository }}/${{ github.workflow }}:${TAG}
-          docker build --tag ${IMAGE} apps/${APP_NAME}
+          docker build --build-arg APP_NAME=${APP_NAME} --tag ${IMAGE} apps/${APP_NAME}
           docker push ${IMAGE}
           echo "image=${IMAGE}" >> $GITHUB_OUTPUT
 
