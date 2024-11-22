@@ -43,6 +43,8 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           tag: ${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}
+          build_args: |
+            APP_NAME=${{ inputs.app_name }}
 
   deploy-to-dev-gcp:
     name: Deploy to dev-gcp

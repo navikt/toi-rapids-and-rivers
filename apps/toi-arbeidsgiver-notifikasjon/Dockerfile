@@ -1,4 +1,5 @@
 FROM ghcr.io/navikt/baseimages/temurin:17
-WORKDIR /toi-arbeidsgiver-notifikasjon
+ARG APP_NAME
+WORKDIR /$APP_NAME
 COPY build/libs/*.jar ./
 EXPOSE 8301
