@@ -13,8 +13,10 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
                 it.demandValue("synlighet.erSynlig", true)
                 it.demandValue("synlighet.ferdigBeregnet", true)
                 it.demandKey("aktørId")
-                it.demandKey("oppfølgingsinformasjon.rettighetsgruppe")
+                it.demandKey("oppfølgingsinformasjon.formidlingsgruppe")
                 it.demandValue("@slutt_av_hendelseskjede", true)
+                it.demandValue("@event_name", "republisert")
+                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.hovedmaal")
             }
         }.register(this)
     }
@@ -22,9 +24,10 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val aktørId = packet["aktørId"].asText()
-        val rettighetsgruppe = packet["oppfølgingsinformasjon.rettighetsgruppe"].asText()
-        log.info("Synlig bruker med rettighetsgruppe $rettighetsgruppe")
-        secureLog.info("(secure) Synlig bruker med rettighetsgruppe $rettighetsgruppe")
+        val formidlingsgruppe = packet["oppfølgingsinformasjon.formidlingsgruppe"].asText()
+        val kvalifiseringsgruppe = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asText()
+        val hovedmaal = packet["oppfølgingsinformasjon.hovedmaal"].asText()
+        secureLog.info("(secure) Synlig bruker med formidlingsgruppe $formidlingsgruppe kvalifiseringsgruppe $kvalifiseringsgruppe hovedmaal $hovedmaal ($aktørId)")
     }
 }
 
