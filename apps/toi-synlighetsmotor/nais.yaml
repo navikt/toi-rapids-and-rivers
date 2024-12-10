@@ -15,6 +15,7 @@ spec:
   readiness:
     port: 8080
     path: /isready
+    initialDelay: 60
   prometheus:
     enabled: true
     path: /metrics
