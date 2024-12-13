@@ -1,6 +1,6 @@
-FROM ghcr.io/navikt/baseimages/temurin:17
+FROM gcr.io/distroless/java17
 ARG APP_NAME
 WORKDIR /$APP_NAME
 COPY build/libs/*.jar ./
-
+CMD ["app.jar"]
 EXPOSE 8301

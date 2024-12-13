@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/vis-appnavn-i-trivyrapporten
+      deploy_dev_branch: refs/heads/baseimage-resten
     secrets: inherit
     permissions:
       contents: read
