@@ -39,14 +39,14 @@ jobs:
         id: docker-build-push
         with:
           team: toi
-          image_suffix: ${{ inputs.app_name }}
-          dockerfile: apps/${{ inputs.app_name }}/Dockerfile
-          docker_context: apps/${{ inputs.app_name }}
+          image_suffix: ${{ env.APP_NAME }}
+          dockerfile: apps/${{ env.APP_NAME }}/Dockerfile
+          docker_context: apps/${{ env.APP_NAME }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           tag: ${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}
           build_args: |
-            APP_NAME=${{ inputs.app_name }}
+            APP_NAME=${{ env.APP_NAME }}
 
   deploy-to-prod-gcp:
     name: Deploy to prod-gcp
