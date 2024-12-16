@@ -5,8 +5,6 @@ env:
 
 on:
   push:
-    branches:
-    - main
     paths:
     - apps/toi-helseapp/**
     - .github/workflows/deploy-toi-helseapp.yaml
