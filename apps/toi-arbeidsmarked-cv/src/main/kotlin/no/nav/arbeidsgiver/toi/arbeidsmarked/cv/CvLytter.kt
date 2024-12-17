@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class CvLytter(private val consumer: Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
+class CvLytter(private val consumer: () -> Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
@@ -33,14 +33,14 @@ class CvLytter(private val consumer: Consumer<String, Melding>, private val beha
         }
 
         launch {
-            consumer.use {
-                consumer.subscribe(listOf(cvTopic))
+            consumer().use {
+                it.subscribe(listOf(cvTopic))
                 log.info("Starter å konsumere topic: $cvTopic")
 
                 while (job.isActive) {
                     try {
                         val records: ConsumerRecords<String, Melding> =
-                            consumer.poll(Duration.ofSeconds(5))
+                            it.poll(Duration.ofSeconds(5))
                         val cvMeldinger = records.map { behandleCv(it.value()) }
 
                         cvMeldinger.forEach {
@@ -48,7 +48,7 @@ class CvLytter(private val consumer: Consumer<String, Melding>, private val beha
                             secureLog.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
                             rapidsConnection.publish(it.aktørId, it.somJson())
                         }
-                        consumer.commitSync()
+                        it.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)
                     }

@@ -34,7 +34,7 @@ fun startApp(
     val log = LoggerFactory.getLogger("Application.kt")
     try {
         rapidsConnection.also {
-            val consumer = KafkaConsumer<String, Personhendelse>(consumerConfig)
+            val consumer = { KafkaConsumer<String, Personhendelse>(consumerConfig) }
 
             Lytter(rapidsConnection, consumer, pdlKlient)
         }.start()
