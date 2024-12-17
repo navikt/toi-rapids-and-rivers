@@ -24,7 +24,7 @@ java {
 
 tasks {
     withType<Wrapper> {
-        gradleVersion = "7.5.1"
+        gradleVersion = "8.11.1"
     }
 
     withType<KotlinCompile> {
