@@ -23,11 +23,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Java v17.x
+      - name: Setup Java v21.x
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17.x'
+          java-version: '21.x'
       - name: Gradle test and build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

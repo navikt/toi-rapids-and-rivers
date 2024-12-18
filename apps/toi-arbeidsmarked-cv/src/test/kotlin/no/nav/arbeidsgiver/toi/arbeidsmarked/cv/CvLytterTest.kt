@@ -20,7 +20,7 @@ class CvLytterTest {
         val melding = melding()
         val consumer = mockConsumer()
         val rapid = TestRapid()
-        val cvLytter = CvLytter(consumer, behandleCv)
+        val cvLytter = CvLytter({ consumer }, behandleCv)
 
         produserCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
