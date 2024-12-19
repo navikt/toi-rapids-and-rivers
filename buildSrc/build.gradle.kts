@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import ca.cutterslade.gradle.analyze.AnalyzeDependenciesTask
 
 plugins {
@@ -25,10 +24,6 @@ java {
 tasks {
     withType<Wrapper> {
         gradleVersion = "8.11.1"
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_21.toString()
     }
 
     withType<AnalyzeDependenciesTask> {
