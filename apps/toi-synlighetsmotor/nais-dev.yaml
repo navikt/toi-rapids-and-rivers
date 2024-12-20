@@ -10,4 +10,4 @@ ad_gruppe_arbeidsgiverrettet: 52bc2af7-38d1-468b-b68d-0f3a4de45af2
 ad_gruppe_utvikler: a1749d9a-52e0-4116-bb9f-935c38f6c74a
 min_replicas: 0
 max_replicas: 0
-postgres_versjon: POSTGRES_13
+postgres_versjon: POSTGRES_14
