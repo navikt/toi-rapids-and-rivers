@@ -8,7 +8,9 @@ For republisering på Kafka av all kandidatinformasjon, se README i toi-sammenst
 ## Bygging
 
 ### Lokalt
-Vi har ingen måte å bygge bare én app på. Bygging gjøres ved å stå i hovedkatalogen og kjøre `./gradlew clean build`.
+Bygging kan gjøres f.eks. ved å stå i hovedkatalogen og kjøre
+* for å bygge alle appene: `./gradlew clean build`
+* for å bygge en app, f.eks. "toi-arbeidsmarked-cv": `./gradlew :apps:toi-arbeidsmarked-cv:clean :apps:toi-arbeidsmarked-cv:build`
 
 ### På Github
 Bygging på Github styres av en workflow-fil for hver app i katalogen `.github/workflows`. De gjenbruker filen `deploy-toi-template.yaml` **med unntak av deploy-toi-helseapp**.yaml som har sin egen byggkonfig.
