@@ -16,7 +16,7 @@ spec:
     enabled: true
     path: /metrics
   replicas:
-    min: 1
+    min: {{ min_replicas }}
     max: {{ max_replicas }}
   resources:
     limits:

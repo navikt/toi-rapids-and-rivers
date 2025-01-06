@@ -8,5 +8,6 @@ pdl_url: https://pdl-api.prod-fss-pub.nais.io/graphql
 pdl_kafka_group_id: toi-identmapper-1
 gcp_db_tier: db-custom-1-3840
 gcp_disk_autoresize: true
-max_replicas: 6
+min_replicas: 0
+max_replicas: 0
 postgres_versjon: POSTGRES_12
