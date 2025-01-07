@@ -2,11 +2,12 @@ package no.nav.arbeidsgiver.toi.rest
 
 import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.Evaluering
+import no.nav.security.token.support.core.configuration.IssuerProperties
 
-val evaluerKandidatFraContext: ((String) ->  Evaluering?) -> (Context) -> Unit = { hentMedFødselsnummer ->
+val evaluerKandidatFraContext: ((String) ->  Evaluering?, Map<Rolle,Pair<String, IssuerProperties>>) -> (Context) -> Unit = { hentMedFødselsnummer, issuerProperties ->
     { context ->
+        context.sjekkTilgang(Rolle.VEILEDER, issuerProperties)
         val fnr = context.pathParam("fnr")
-
 
         val evaluering = hentMedFødselsnummer(fnr)
             .lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()
