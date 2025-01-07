@@ -15,12 +15,11 @@ fun startApp(
     repository: Repository,
     javalin: Javalin,
     rapidsConnection: RapidsConnection,
+    issuerProperties:Map<Rolle, Pair<String, IssuerProperties>>,
     rapidIsAlive: () -> Boolean
 ) {
-    javalin.routes {
-        get("/isalive", isAlive(rapidIsAlive), Rolle.UNPROTECTED)
-        get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr), Rolle.VEILEDER)
-    }
+    javalin.get("/isalive", isAlive(rapidIsAlive))
+    javalin.get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
 
     rapidsConnection.also {
         SynlighetsLytter(it, repository)
@@ -33,20 +32,16 @@ private val isAlive: (() -> Boolean) -> (Context) -> Unit = { isAlive ->
     }
 }
 
-fun opprettJavalinMedTilgangskontroll(
-    issuerProperties: Map<Rolle, IssuerProperties>
-): Javalin =
+fun opprettJavalinMedTilgangskontroll(): Javalin =
     Javalin.create {
         it.http.defaultContentType = "application/json"
-        it.accessManager(styrTilgang(issuerProperties))
     }.start(8301)
 
 fun main() {
     val env = System.getenv()
     val datasource = DatabaseKonfigurasjon(env).lagDatasource()
     val repository = Repository(datasource)
-    val issuerProperties = hentIssuerProperties(System.getenv())
-    val javalin = opprettJavalinMedTilgangskontroll(issuerProperties)
+    val javalin = opprettJavalinMedTilgangskontroll()
 
     lateinit var rapidIsAlive: () -> Boolean
     val rapidsConnection = RapidApplication.create(env, configure = { _, kafkarapid ->
@@ -59,7 +54,7 @@ fun main() {
         })
     }
 
-    startApp(repository, javalin, rapidsConnection, rapidIsAlive)
+    startApp(repository, javalin, rapidsConnection, hentIssuerProperties(System.getenv()), rapidIsAlive)
 }
 
 fun log(navn: String): Logger = LoggerFactory.getLogger(navn)

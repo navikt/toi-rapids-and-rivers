@@ -15,6 +15,7 @@ import no.nav.security.token.support.core.configuration.IssuerProperties
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import java.net.InetAddress
+import java.net.URI
 import java.net.URL
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -29,17 +30,7 @@ class EvalueringTest {
 
     @BeforeEach
     fun beforeEach() {
-        val issuerProperties = IssuerProperties(
-            URL("http://localhost:18300/isso-idtoken/.well-known/openid-configuration"),
-            listOf("audience"),
-            "isso-idtoken"
-        )
-
-        javalin = opprettJavalinMedTilgangskontroll(
-            mapOf(
-                Rolle.VEILEDER to issuerProperties
-            )
-        )
+        javalin = opprettJavalinMedTilgangskontroll()
     }
 
     @AfterEach
@@ -59,7 +50,7 @@ class EvalueringTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid) { true }
+        startApp(repository, rapid)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -82,7 +73,7 @@ class EvalueringTest {
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid) { true }
+        startApp(repository, rapid)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -115,7 +106,7 @@ class EvalueringTest {
         val rapid = TestRapid()
         val token = hentToken(mockOAuth2Server)
 
-        startApp(repository, javalin, rapid) { true }
+        startApp(repository, rapid)
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
@@ -129,6 +120,16 @@ class EvalueringTest {
         val responeEvaluering =
             jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
+    }
+
+    private fun startApp(
+        repository: Repository,
+        rapid: TestRapid
+    ) {
+        no.nav.arbeidsgiver.toi.startApp(repository, javalin, rapid, mapOf(Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
+            URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
+            listOf("audience")
+        )))) { true }
     }
 }
 
