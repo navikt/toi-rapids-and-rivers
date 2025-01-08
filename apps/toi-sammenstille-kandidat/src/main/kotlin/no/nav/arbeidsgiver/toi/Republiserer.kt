@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder.path
-import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.http.Context
 import io.javalin.http.UnauthorizedResponse
 import kotlinx.coroutines.GlobalScope
@@ -25,14 +23,8 @@ class Republiserer(
     init {
         javalin
             .before(republiseringspath, ::autentiserPassord)
-            .routes {
-                path(republiseringspath) {
-                    post(::republiserAlleKandidater)
-                    path("{aktørId}") {
-                        post(::republiserEnKandidat)
-                    }
-                }
-            }
+            .post(path = republiseringspath, handler = ::republiserAlleKandidater)
+            .post(path = "$republiseringspath/{aktørId}", handler = ::republiserEnKandidat)
     }
 
     fun autentiserPassord(context: Context) {
