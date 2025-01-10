@@ -1,12 +1,10 @@
 package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder.get
-import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.rest.*
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
