@@ -1,9 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
-import no.nav.arbeidsgiver.toi.rest.hentIssuerProperties
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import org.assertj.core.api.Assertions
 import java.net.URI
