@@ -22,9 +22,6 @@ class HjemmelLytter(private val rapidsConnection: RapidsConnection) : River.Pack
                 it.forbid("@event_name")
                 it.requireValue("ressurs", "CV_HJEMMEL")
             }
-            validate {
-
-            }
         }.register(this)
     }
 
