@@ -3,10 +3,11 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
+import io.micrometer.core.instrument.MeterRegistry
 import org.flywaydb.core.Flyway
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -131,7 +132,7 @@ data class Kandidat(
         return objectMapper.writeValueAsString(this)
     }
 
-    fun somJsonMessage() = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""))
+    fun somJsonMessage(metrics: MeterRegistry) = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""), metrics)
 
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)
 }
