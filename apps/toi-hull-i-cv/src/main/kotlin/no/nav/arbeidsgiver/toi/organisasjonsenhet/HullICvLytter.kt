@@ -4,6 +4,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.rapids_rivers.*
 import org.slf4j.LoggerFactory
 
@@ -27,8 +35,12 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val aktørid: String = packet["aktørId"].asText()
         val cvPacket = packet["arbeidsmarkedCv"]["opprettCv"]["cv"] ?: packet["arbeidsmarkedCv"]["endreCv"]["cv"]
         packet[HullICv] =
@@ -52,10 +64,12 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         return PerioderMedInaktivitet(null, emptyList())
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
+        super.onError(problems, context, metadata)
     }
 }
+
 
 private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
     demand("@behov") { behovNode ->
