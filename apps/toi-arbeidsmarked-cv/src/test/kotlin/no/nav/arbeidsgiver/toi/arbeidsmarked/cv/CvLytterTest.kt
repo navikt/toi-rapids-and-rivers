@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeid.cv.avro.*
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
@@ -14,6 +16,10 @@ import java.time.LocalDate
 class CvLytterTest {
 
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
+
+    val behandleCv: (Melding) -> ArbeidsmarkedCv = { melding ->
+        ArbeidsmarkedCv(melding, PrometheusMeterRegistry(PrometheusConfig.DEFAULT))
+    }
 
     @Test
     fun `lesing av cv-meldinger fra topic skal publiseres på rapid`() {
@@ -32,6 +38,7 @@ class CvLytterTest {
         val meldingJson = inspektør.message(0)
 
         Assertions.assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+            "meterRegistry",
             "@event_name",
             "arbeidsmarkedCv",
             "aktørId",
