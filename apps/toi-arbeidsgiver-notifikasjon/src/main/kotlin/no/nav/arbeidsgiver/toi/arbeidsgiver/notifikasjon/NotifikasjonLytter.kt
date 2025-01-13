@@ -1,9 +1,11 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -11,9 +13,11 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
 
     init {
         River(rapidsConnection).apply {
+            precondition{
+                it.requireValue("@event_name", "notifikasjon.cv-delt")
+                it.requireKey("stilling.stillingstittel")
+            }
             validate {
-                it.demandValue("@event_name", "notifikasjon.cv-delt")
-                it.demandKey("stilling.stillingstittel")
                 it.requireKey(
                     "notifikasjonsId",
                     "virksomhetsnummer",
@@ -28,7 +32,7 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val notifikasjonsId = packet["notifikasjonsId"].asText()
         val stillingsId = UUID.fromString(packet["stillingsId"].asText())
         val virksomhetsnummer = packet["virksomhetsnummer"].asText()
