@@ -7,8 +7,8 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.result.Result
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import net.minidev.json.JSONObject
-import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.slf4j.LoggerFactory
 
 class NomKlient(
