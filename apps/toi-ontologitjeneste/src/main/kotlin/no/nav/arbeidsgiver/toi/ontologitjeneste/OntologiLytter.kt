@@ -4,6 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.jackson.responseObject
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.rapids_rivers.*
 import java.util.*
 
@@ -18,14 +26,21 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         kompetanseCache = cacheHjelper.lagCache { ontologiRelasjoner("/kompetanse/?kompetansenavn=$it") }
         stillingstittelCache = cacheHjelper.lagCache { ontologiRelasjoner("/stilling/?stillingstittel=$it") }
         River(rapidsConnection).apply {
-            validate {
+            precondition{
                 it.demandAtFørstkommendeUløsteBehovEr("ontologi")
+            }
+            validate {
                 it.requireKey("kompetanse", "stillingstittel")
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         packet["ontologi"] = Ontologi(
             packet["kompetanse"].map(JsonNode::asText).associateWith(this::synonymerTilKompetanse),
             packet["stillingstittel"].map(JsonNode::asText).associateWith(this::synonymerTilStillingstittel)
@@ -33,8 +48,9 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         context.publish(packet.toJson())
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error("Fant ikke obligatoriske parametere")
+        super.onError(problems, context, metadata)
     }
 
     private fun synonymerTilKompetanse(kompetanse: String) = kompetanseCache(kompetanse)
@@ -68,7 +84,7 @@ data class Ontologi(
 data class OntologiRelasjoner(val synonymer: List<String>, val merGenerell: List<String>)
 
 private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
-    demand("@behov") { behovNode ->
+    require("@behov") { behovNode ->
         if (behovNode
                 .toList()
                 .map(JsonNode::asText)

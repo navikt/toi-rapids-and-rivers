@@ -73,7 +73,7 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
 
 
 private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
-    demand("@behov") { behovNode ->
+    require("@behov") { behovNode ->
         if (behovNode
                 .toList()
                 .map(JsonNode::asText)
