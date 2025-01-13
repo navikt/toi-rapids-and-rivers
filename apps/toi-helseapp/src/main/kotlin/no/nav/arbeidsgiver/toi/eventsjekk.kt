@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import kotlinx.coroutines.time.delay
-import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer

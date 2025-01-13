@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.*
 import kotlinx.coroutines.time.delay
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
