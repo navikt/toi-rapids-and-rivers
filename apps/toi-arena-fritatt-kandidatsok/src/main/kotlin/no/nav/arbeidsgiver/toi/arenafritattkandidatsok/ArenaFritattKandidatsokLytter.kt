@@ -1,6 +1,13 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.rapids_rivers.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -16,8 +23,8 @@ class ArenaFritattKandidatsokLytter(
 
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("table", "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK")
+            precondition{
+                it.requireValue("table", "ARENA_GOLDENGATE.ARBEIDSMARKEDBRUKER_FRITAK")
                 it.interestedIn("before", "after")
                 it.interestedIn("op_type")
                 it.interestedIn("pos")
@@ -25,7 +32,12 @@ class ArenaFritattKandidatsokLytter(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val pos = packet["pos"].asTextNullable()
         if(pos != null && pos == "00000002990079967980") {
             secureLog.info("Melding med pos $pos, ignoreres")

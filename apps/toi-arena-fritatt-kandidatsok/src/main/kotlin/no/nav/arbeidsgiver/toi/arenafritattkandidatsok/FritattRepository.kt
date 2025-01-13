@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.helse.rapids_rivers.JsonMessage
 import org.flywaydb.core.Flyway
 import java.sql.Date
 import java.sql.ResultSet

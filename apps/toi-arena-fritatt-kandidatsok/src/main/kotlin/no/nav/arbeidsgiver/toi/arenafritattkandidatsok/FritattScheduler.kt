@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.LoggerFactory
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
