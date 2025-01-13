@@ -41,7 +41,6 @@ fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, 
         javalin,
         passordForRepublisering,
         meterRegistry
-
     )
 
     startRapid(rapid, repository)

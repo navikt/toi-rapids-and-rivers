@@ -132,7 +132,7 @@ data class Kandidat(
         return objectMapper.writeValueAsString(this)
     }
 
-    fun somJsonMessage(metrics: MeterRegistry) = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""), metrics)
+    fun somJsonMessage(meterRegistry: MeterRegistry) = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""), meterRegistry)
 
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)
 }

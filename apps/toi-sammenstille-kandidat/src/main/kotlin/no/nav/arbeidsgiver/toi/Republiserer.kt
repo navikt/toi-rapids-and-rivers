@@ -25,11 +25,10 @@ class Republiserer(
         javalin
             .before(republiseringspath, ::autentiserPassord)
             .post(path = republiseringspath) { ctx ->
-                // Her sender vi "ctx" + "meterRegistry" til metoden
-                republiserAlleKandidater(ctx, meterRegistry)
+                republiserAlleKandidater(ctx)
             }
             .post(path = "$republiseringspath/{aktørId}") { ctx ->
-                republiserEnKandidat(ctx, meterRegistry)
+                republiserEnKandidat(ctx)
             }
     }
 
@@ -41,7 +40,7 @@ class Republiserer(
         }
     }
 
-    fun republiserEnKandidat(context: Context, metrics: MeterRegistry) {
+    fun republiserEnKandidat(context: Context) {
         val aktørId = context.pathParam("aktørId")
         val kandidat = repository.hentKandidat(aktørId)
         if (kandidat == null) {
@@ -49,13 +48,13 @@ class Republiserer(
         } else {
             log.info("Skal republisere aktør (se securelog)")
             secureLog.info("Skal republisere $aktørId")
-            val pakke = lagPakke(kandidat, metrics)
+            val pakke = lagPakke(kandidat)
             rapidsConnection.publish(aktørId, pakke.toJson())
             context.status(200)
         }
     }
 
-    fun republiserAlleKandidater(context: Context, metrics: MeterRegistry) {
+    fun republiserAlleKandidater(context: Context) {
         context.status(200)
 
         GlobalScope.launch {
@@ -66,7 +65,7 @@ class Republiserer(
                     log.info("Har republisert $index kandidater")
                 }
 
-                val pakke = lagPakke(kandidat, metrics)
+                val pakke = lagPakke(kandidat)
                 rapidsConnection.publish(kandidat.aktørId, pakke.toJson())
             }
 
@@ -74,8 +73,8 @@ class Republiserer(
         }
     }
 
-    private fun lagPakke(kandidat: Kandidat, metrics: MeterRegistry): JsonMessage {
-        val pakke = kandidat.somJsonMessage(metrics)
+    private fun lagPakke(kandidat: Kandidat): JsonMessage {
+        val pakke = kandidat.somJsonMessage(meterRegistry)
         pakke["@event_name"] = "republisert"
         return pakke
     }
