@@ -1,3 +1,3 @@
 plugins {
-    id("toi.rapids-and-rivers")
+    id("toi.rapids-and-rivers-new")
 }

@@ -1,28 +1,35 @@
 package no.nav.arbeidsgiver.toi.evaluertdatalogger
 
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
 
 class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("synlighet.erSynlig", true)
-                it.demandValue("synlighet.ferdigBeregnet", true)
-                it.demandKey("aktørId")
-                it.demandKey("oppfølgingsinformasjon.formidlingsgruppe")
-                it.demandValue("@slutt_av_hendelseskjede", true)
-                it.demandValue("@event_name", "republisert")
+            precondition{
+                it.requireValue("synlighet.erSynlig", true)
+                it.requireValue("synlighet.ferdigBeregnet", true)
+                it.requireKey("aktørId")
+                it.requireKey("oppfølgingsinformasjon.formidlingsgruppe")
+                it.requireValue("@slutt_av_hendelseskjede", true)
+                it.requireValue("@event_name", "republisert")
                 it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.hovedmaal","oppfølgingsinformasjon.rettighetsgruppe")
             }
         }.register(this)
     }
     private val synligeMedRettighetsGruppe = mutableMapOf<String, String>()
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val aktørId = packet["aktørId"].asText()
         val formidlingsgruppe = packet["oppfølgingsinformasjon.formidlingsgruppe"].asText()
         val kvalifiseringsgruppe = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asText()
