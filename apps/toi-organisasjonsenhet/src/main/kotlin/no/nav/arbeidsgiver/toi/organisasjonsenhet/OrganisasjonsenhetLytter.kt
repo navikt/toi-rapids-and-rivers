@@ -1,6 +1,14 @@
 package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.rapids_rivers.*
 import org.slf4j.LoggerFactory
 
@@ -11,15 +19,22 @@ class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConne
 
     init {
         River(rapidsConnection).apply {
-            validate {
+            precondition{
                 it.demandAtFørstkommendeUløsteBehovEr("organisasjonsenhetsnavn")
+            }
+            validate {
                 it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
                 it.requireKey("aktørId")
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
         val aktørid: String = packet["aktørId"].asText()
 
@@ -43,13 +58,14 @@ class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConne
         context.publish(aktørid, packet.toJson())
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext) {
+    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
+        super.onError(problems, context, metadata)
     }
 }
 
 private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
-    demand("@behov") { behovNode ->
+    require("@behov") { behovNode ->
         if (behovNode
                 .toList()
                 .map(JsonNode::asText)
