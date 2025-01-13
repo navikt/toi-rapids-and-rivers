@@ -11,8 +11,8 @@ import io.micrometer.core.instrument.MeterRegistry
 class SystemCountLytter(rapidsConnection: RapidsConnection): River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandKey("system_read_count")
+            precondition{
+                it.requireKey("system_read_count")
                 it.interestedIn("@event_name")
                 it.interestedIn("system_participating_services")
             }
