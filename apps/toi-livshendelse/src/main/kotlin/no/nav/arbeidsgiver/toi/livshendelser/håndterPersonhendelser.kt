@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.livshendelser
 
-import no.nav.helse.rapids_rivers.RapidsConnection
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.person.pdl.leesah.Personhendelse
 import org.slf4j.LoggerFactory
 

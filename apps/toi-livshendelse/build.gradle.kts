@@ -1,5 +1,5 @@
 plugins {
-    id("toi.rapids-and-rivers")
+    id("toi.rapids-and-rivers-new")
     id("com.github.davidmc24.gradle.plugin.avro") version "1.5.0"
 }
 
