@@ -1,5 +1,5 @@
 plugins {
-    id("toi.rapids-and-rivers-new")
+    id("toi.rapids-and-rivers")
 }
 
 dependencies {

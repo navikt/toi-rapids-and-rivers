@@ -8,7 +8,7 @@ val javalinVersion = "6.4.0"
 
 
 plugins {
-    id("toi.rapids-and-rivers-new")
+    id("toi.rapids-and-rivers")
 }
 
 dependencies {
