@@ -1,35 +1,39 @@
 package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.UnauthorizedResponse
+import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.LoggerFactory
 
 class Republiserer(
     private val repository: Repository,
     private val rapidsConnection: RapidsConnection,
     javalin: Javalin,
-    private val passord: String
+    private val passord: String,
+    private val meterRegistry: MeterRegistry
 ) {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
-
     private val republiseringspath = "republiser"
 
     init {
         javalin
             .before(republiseringspath, ::autentiserPassord)
-            .post(path = republiseringspath, handler = ::republiserAlleKandidater)
-            .post(path = "$republiseringspath/{aktørId}", handler = ::republiserEnKandidat)
+            .post(path = republiseringspath) { ctx ->
+                republiserAlleKandidater(ctx)
+            }
+            .post(path = "$republiseringspath/{aktørId}") { ctx ->
+                republiserEnKandidat(ctx)
+            }
     }
 
     fun autentiserPassord(context: Context) {
         val body = context.bodyAsClass(RepubliseringBody::class.java)
-
         if (body.passord != passord) {
             log.warn("Mottok forsøk på å republisere kandidater uten riktig passord")
             throw UnauthorizedResponse()
@@ -39,7 +43,6 @@ class Republiserer(
     fun republiserEnKandidat(context: Context) {
         val aktørId = context.pathParam("aktørId")
         val kandidat = repository.hentKandidat(aktørId)
-
         if (kandidat == null) {
             context.status(404)
         } else {
@@ -71,12 +74,10 @@ class Republiserer(
     }
 
     private fun lagPakke(kandidat: Kandidat): JsonMessage {
-        val pakke = kandidat.somJsonMessage()
+        val pakke = kandidat.somJsonMessage(meterRegistry)
         pakke["@event_name"] = "republisert"
         return pakke
     }
 
-    data class RepubliseringBody(
-        val passord: String
-    )
+    data class RepubliseringBody(val passord: String)
 }
