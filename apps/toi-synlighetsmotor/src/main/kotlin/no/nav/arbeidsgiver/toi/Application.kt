@@ -17,7 +17,8 @@ fun startApp(
     rapidIsAlive: () -> Boolean
 ) {
     javalin.get("/isalive", isAlive(rapidIsAlive))
-    javalin.get("/evaluering/{fnr}", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
+    javalin.post("/evaluering", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
+    javalin.get("/evaluering/{fnr}", evaluerKandidatFraContextGet(repository::hentMedFnr, issuerProperties))
 
     rapidsConnection.also {
         SynlighetsLytter(it, repository)

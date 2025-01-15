@@ -43,7 +43,31 @@ class EvalueringTest {
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
+    fun `POST mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val repository = Repository(TestDatabase().dataSource)
+        val token = hentToken(mockOAuth2Server)
+        val rapid = TestRapid()
+
+        startApp(repository, rapid)
+
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
+
+        val response = Fuel.post("http://localhost:8301/evaluering")
+            .authentication().bearer(token.serialize())
+            .body("""{"fnr": "12345678912"}""")
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
+    }
+
+    @Test
+    fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
@@ -66,7 +90,42 @@ class EvalueringTest {
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
+    fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val repository = Repository(TestDatabase().dataSource)
+        val token = hentToken(mockOAuth2Server)
+        val rapid = TestRapid()
+
+        startApp(repository, rapid)
+
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
+        rapid.sendTestMessage(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
+                    fritattKandidatsøk = true,
+                    fnr = "12312312312"
+                )
+            )
+        )
+
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
+
+        val response = Fuel.post("http://localhost:8301/evaluering")
+            .authentication().bearer(token.serialize())
+            .body("""{"fnr": "12345678912"}""")
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        Assertions.assertThat(responeEvaluering)
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+    }
+
+    @Test
+    fun `Deprekert til fordel for post GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
@@ -100,7 +159,30 @@ class EvalueringTest {
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
+    fun `POST mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
+        val repository = Repository(TestDatabase().dataSource)
+        val rapid = TestRapid()
+        val token = hentToken(mockOAuth2Server)
+
+        startApp(repository, rapid)
+
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
+
+        val response = Fuel.post("http://localhost:8301/evaluering")
+            .authentication().bearer(token.serialize())
+            .body("""{"fnr": "12345678912"}""")
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responeEvaluering =
+            jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
+    }
+
+    @Test
+    fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
         val token = hentToken(mockOAuth2Server)
