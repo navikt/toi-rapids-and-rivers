@@ -57,10 +57,5 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error("noe mangler i kvp.melding, se secure-log")
-        super.onError(problems, context, metadata)
-    }
-
-    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        super.onSevere(error, context)
     }
 }

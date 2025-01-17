@@ -33,6 +33,5 @@ class KandidatlisteLukketLytter(
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error("Feil ved lesing av hendelse kandidat_v2.LukketKandidatliste: $problems")
-        super.onError(problems, context, metadata)
     }
 }

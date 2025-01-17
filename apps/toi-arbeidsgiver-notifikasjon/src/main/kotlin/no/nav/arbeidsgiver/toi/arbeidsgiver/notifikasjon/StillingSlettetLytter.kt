@@ -37,6 +37,5 @@ class StillingSlettetLytter(
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error("Feil ved lesing av hendelse kandidat_v2.SlettetStillingOgKandidatliste: $problems")
-        super.onError(problems, context, metadata)
     }
 }

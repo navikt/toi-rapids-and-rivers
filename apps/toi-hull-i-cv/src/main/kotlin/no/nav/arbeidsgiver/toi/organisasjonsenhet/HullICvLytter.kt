@@ -67,7 +67,6 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
-        super.onError(problems, context, metadata)
     }
 }
 

@@ -50,7 +50,6 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error("Fant ikke obligatoriske parametere")
-        super.onError(problems, context, metadata)
     }
 
     private fun synonymerTilKompetanse(kompetanse: String) = kompetanseCache(kompetanse)

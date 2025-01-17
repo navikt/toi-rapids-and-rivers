@@ -60,7 +60,6 @@ class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConne
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
-        super.onError(problems, context, metadata)
     }
 }
 
