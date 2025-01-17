@@ -24,7 +24,7 @@ fun startRapid(
             Lytter(rapid, repository, "hjemmel")
             Lytter(rapid, repository, "må-behandle-tidligere-cv", "måBehandleTidligereCv")
             Lytter(rapid, repository, "kvp", "kvp")
-
+            Lytter(rapid, repository, "adressebeskyttelse", "adressebeskyttelse")
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
