@@ -14,13 +14,13 @@ class KandidatlisteOpprettetLytter(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "kandidat_v2.OpprettetKandidatliste")
-                it.demandKey("stillingsId")
-                it.demandKey("stilling.stillingstittel")
-                it.demandKey("stilling.organisasjonsnummer")
-                it.demandValue("stillingsinfo.stillingskategori", "STILLING")
-                it.rejectValue("@slutt_av_hendelseskjede", true)
+            precondition() {
+                it.requireValue("@event_name", "kandidat_v2.OpprettetKandidatliste")
+                it.requireKey("stillingsId")
+                it.requireKey("stilling.stillingstittel")
+                it.requireKey("stilling.organisasjonsnummer")
+                it.requireValue("stillingsinfo.stillingskategori", "STILLING")
+                it.forbidValue("@slutt_av_hendelseskjede", true)
             }
         }.register(this)
     }

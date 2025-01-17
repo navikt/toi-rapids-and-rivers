@@ -16,10 +16,14 @@ class StillingSlettetLytter(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
+            precondition{
+                it.requireValue("@event_name", "kandidat_v2.SlettetStillingOgKandidatliste")
+                it.forbidValue("@slutt_av_hendelseskjede", true)
+            }
             validate {
-                it.demandValue("@event_name", "kandidat_v2.SlettetStillingOgKandidatliste")
+
                 it.requireKey("stillingsId")
-                it.rejectValue("@slutt_av_hendelseskjede", true)
+
             }
         }.register(this)
     }
