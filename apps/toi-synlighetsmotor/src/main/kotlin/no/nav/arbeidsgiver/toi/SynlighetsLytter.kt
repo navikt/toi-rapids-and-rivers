@@ -80,9 +80,9 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         val kandidatMenGraderingNull = synligUtenomGradering && kandidat.adressebeskyttelse == null
 
-        val stoppetAvFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse != "FORTROLIG"
-        val stoppetAvStrengtFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse != "STRENGT_FORTROLIG"
-        val stoppetAvStrengtFortroligUtland = synligUtenomGradering && kandidat.adressebeskyttelse != "STRENGT_FORTROLIG_UTLAND"
+        val stoppetAvFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse == "FORTROLIG"
+        val stoppetAvStrengtFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse == "STRENGT_FORTROLIG"
+        val stoppetAvStrengtFortroligUtland = synligUtenomGradering && kandidat.adressebeskyttelse == "STRENGT_FORTROLIG_UTLAND"
 
         val uenigOmKode7 = synligUtenomGradering && (
                 (kandidat.adressebeskyttelse != "FORTROLIG" && kandidat.oppfølgingsinformasjon?.diskresjonskode == "7") ||
