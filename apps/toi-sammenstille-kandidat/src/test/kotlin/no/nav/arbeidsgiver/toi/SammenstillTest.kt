@@ -492,6 +492,6 @@ class SammenstillTest {
         assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("adressebeskyttelse")
 
         assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.get("gradering").asText()).isEqualTo("UGRADERT")
+        assertThat(melding.get("adressebeskyttelse").asText()).isEqualTo("UGRADERT")
     }
 }
