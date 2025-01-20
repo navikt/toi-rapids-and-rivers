@@ -55,6 +55,7 @@ class Lytter(
             "hjemmel" -> kandidat.copy(hjemmel = verdi)
             "må-behandle-tidligere-cv" -> kandidat.copy(måBehandleTidligereCv = verdi)
             "kvp" -> kandidat.copy(kvp = verdi)
+            "adressebeskyttelse" -> kandidat.copy(adressebeskyttelse = verdi)
             else -> throw NotImplementedError("Mangler implementasjon for lytter for event $eventNavn")
         }
     }
