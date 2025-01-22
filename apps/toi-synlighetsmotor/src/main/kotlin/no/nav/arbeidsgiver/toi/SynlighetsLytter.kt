@@ -112,7 +112,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         if (betingelser.any { it }) {
             secureLog.info("Adressebeskyttelse vurdering for aktørId=${kandidat.aktørId}: " +
                     "ukjentAdressebeskyttelse=$ukjentAdressebeskyttelse, " +
-                    "kandidatMenGraderingNull=$kandidatOgGraderingNull, " +
+                    "kandidatOgGraderingNull=$kandidatOgGraderingNull, " +
                     "kandidatOgGraderingUGRADERT=$kandidatOgGraderingUGRADERT, " +
                     "stoppetAvFortrolig=$stoppetAvFortrolig, " +
                     "stoppetAvStrengtFortrolig=$stoppetAvStrengtFortrolig, " +
