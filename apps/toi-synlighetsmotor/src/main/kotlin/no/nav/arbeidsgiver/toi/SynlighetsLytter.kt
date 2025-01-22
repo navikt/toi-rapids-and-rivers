@@ -78,7 +78,8 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
             beskyttelse !in listOf("STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG", "FORTROLIG", "UGRADERT")
         } ?: false
 
-        val kandidatMenGraderingNull = synligUtenomGradering && kandidat.adressebeskyttelse == null
+        val kandidatOgGraderingNull = synligUtenomGradering && kandidat.adressebeskyttelse == null
+        val kandidatOgGraderingUGRADERT = synligUtenomGradering && kandidat.adressebeskyttelse == "UGRADERT"
 
         val stoppetAvFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse == "FORTROLIG"
         val stoppetAvStrengtFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse == "STRENGT_FORTROLIG"
@@ -98,7 +99,8 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         val betingelser = listOf(
             ukjentAdressebeskyttelse,
-            kandidatMenGraderingNull,
+            kandidatOgGraderingNull,
+            kandidatOgGraderingUGRADERT,
             stoppetAvFortrolig,
             stoppetAvStrengtFortrolig,
             stoppetAvStrengtFortroligUtland,
@@ -110,7 +112,8 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         if (betingelser.any { it }) {
             secureLog.info("Adressebeskyttelse vurdering for aktørId=${kandidat.aktørId}: " +
                     "ukjentAdressebeskyttelse=$ukjentAdressebeskyttelse, " +
-                    "kandidatMenGraderingNull=$kandidatMenGraderingNull, " +
+                    "kandidatMenGraderingNull=$kandidatOgGraderingNull, " +
+                    "kandidatOgGraderingUGRADERT=$kandidatOgGraderingUGRADERT, " +
                     "stoppetAvFortrolig=$stoppetAvFortrolig, " +
                     "stoppetAvStrengtFortrolig=$stoppetAvStrengtFortrolig, " +
                     "stoppetAvStrengtFortroligUtland=$stoppetAvStrengtFortroligUtland, " +
