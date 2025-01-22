@@ -80,7 +80,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
         val kandidatOgGraderingNull = synligUtenomGradering && kandidat.adressebeskyttelse == null
         val kandidatOgGraderingUGRADERT = synligUtenomGradering && kandidat.adressebeskyttelse == "UGRADERT"
-
+        val harGradering = kandidat.adressebeskyttelse != null;
         val stoppetAvFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse == "FORTROLIG"
         val stoppetAvStrengtFortrolig = synligUtenomGradering && kandidat.adressebeskyttelse == "STRENGT_FORTROLIG"
         val stoppetAvStrengtFortroligUtland = synligUtenomGradering && kandidat.adressebeskyttelse == "STRENGT_FORTROLIG_UTLAND"
@@ -101,6 +101,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
             ukjentAdressebeskyttelse,
             kandidatOgGraderingNull,
             kandidatOgGraderingUGRADERT,
+            harGradering,
             stoppetAvFortrolig,
             stoppetAvStrengtFortrolig,
             stoppetAvStrengtFortroligUtland,
@@ -114,6 +115,7 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
                     "ukjentAdressebeskyttelse=$ukjentAdressebeskyttelse, " +
                     "kandidatOgGraderingNull=$kandidatOgGraderingNull, " +
                     "kandidatOgGraderingUGRADERT=$kandidatOgGraderingUGRADERT, " +
+                    "harGradering=$harGradering, " +
                     "stoppetAvFortrolig=$stoppetAvFortrolig, " +
                     "stoppetAvStrengtFortrolig=$stoppetAvStrengtFortrolig, " +
                     "stoppetAvStrengtFortroligUtland=$stoppetAvStrengtFortroligUtland, " +
