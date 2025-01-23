@@ -65,7 +65,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(melding["@event_name"].asText()).isEqualTo("adressebeskyttelse")
         assertThat(melding["aktørId"].asText()).isEqualTo("987654321")
-        assertThat(melding["gradering"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString())
+        assertThat(melding["diskresjon"].asText()).isEqualTo("true")
     }
 
     @Test
@@ -127,7 +127,7 @@ class HåndterPersonhendelserTest {
         assertThat(keys).containsExactlyInAnyOrder("987654321", "987654322")
 
         meldinger.map { assertThat(it["@event_name"].asText()).isEqualTo("adressebeskyttelse") }
-        meldinger.map { assertThat(it["gradering"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString()) }
+        meldinger.map { assertThat(it["diskresjon"].asText()).isEqualTo("true") }
         assertThat(meldinger.map { it["aktørId"].asText() }).containsExactlyInAnyOrder("987654321", "987654322")
     }
 
