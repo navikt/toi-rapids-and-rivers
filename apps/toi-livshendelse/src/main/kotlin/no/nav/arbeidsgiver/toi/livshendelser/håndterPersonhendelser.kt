@@ -37,6 +37,6 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
     }
 
     fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) {
-        rapidsConnection.publish(diskresjonsHendelse.ident(), diskresjonsHendelse.toJson())
+        rapidsConnection.publish(diskresjonsHendelse.ident, diskresjonsHendelse.toJson())
     }
 }
