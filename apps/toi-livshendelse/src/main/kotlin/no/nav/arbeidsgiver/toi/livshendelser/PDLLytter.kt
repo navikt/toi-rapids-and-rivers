@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class Lytter(rapidsConnection: RapidsConnection, private val consumer: () -> Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
+class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
     CoroutineScope, RapidsConnection.StatusListener {
 
     init {

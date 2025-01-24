@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi.livshendelser
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.jackson.responseObject
-import harDiskresjon
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
 import org.slf4j.LoggerFactory
 
@@ -98,19 +97,3 @@ private data class Adressebeskyttelse(
 private data class Error(
     val message: String,
 )
-
-
-class DiskresjonsHendelse(val ident: String, val gradering: Gradering) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
-
-    fun toJson(): String {
-        return """
-            {
-                "@event_name": "adressebeskyttelse",
-                "diskresjon": "${harDiskresjon(this)}",
-                "aktørId": "$ident"
-            }
-        """.trimIndent()
-    }
-
-}

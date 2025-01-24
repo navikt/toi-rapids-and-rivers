@@ -8,6 +8,7 @@ import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import java.time.Instant
@@ -19,16 +20,17 @@ class HåndterPersonhendelserTest {
     companion object {
         private val wiremock = WireMockServer(8083).also(WireMockServer::start)
         private val mockOAuth2Server = WireMockServer(18301).also(WireMockServer::start)
-        val testRapid = TestRapid()
         val envs = mapOf(
             "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token",
             "AZURE_APP_CLIENT_SECRET" to "test1",
             "AZURE_APP_CLIENT_ID" to "test2",
             "PDL_SCOPE" to "test3",
         )
+        val pdlKlient = PdlKlient("http://localhost:8083/graphql", AccessTokenClient(envs))
+        val testRapid = TestRapid().also { AdressebeskyttelseLytter(pdlKlient, it) }
 
         val personhendelseService =
-            PersonhendelseService(testRapid, PdlKlient("http://localhost:8083/graphql", AccessTokenClient(envs)))
+            PersonhendelseService(testRapid, pdlKlient)
 
         @AfterAll
         fun shutdown() {
@@ -49,11 +51,11 @@ class HåndterPersonhendelserTest {
 
     @Test
     fun `sjekk at gradering er sendt for en hendelse med en ident`() {
-
+        val aktørId = "123123123"
         stubOAtuh()
-        stubPdl()
+        stubPdl(ident = aktørId)
 
-        val personHendelse = personhendelse()
+        val personHendelse = personhendelse(personidenter = listOf(aktørId))
 
         personhendelseService.håndter(
             listOf(personHendelse)
@@ -64,8 +66,8 @@ class HåndterPersonhendelserTest {
         val melding = inspektør.message(0)
 
         assertThat(melding["@event_name"].asText()).isEqualTo("adressebeskyttelse")
-        assertThat(melding["aktørId"].asText()).isEqualTo("987654321")
-        assertThat(melding["diskresjon"].asText()).isEqualTo("true")
+        assertThat(melding["aktørId"].asText()).isEqualTo(aktørId)
+        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
     }
 
     @Test
@@ -127,7 +129,7 @@ class HåndterPersonhendelserTest {
         assertThat(keys).containsExactlyInAnyOrder("987654321", "987654322")
 
         meldinger.map { assertThat(it["@event_name"].asText()).isEqualTo("adressebeskyttelse") }
-        meldinger.map { assertThat(it["diskresjon"].asText()).isEqualTo("true") }
+        meldinger.map { assertThat(it["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString()) }
         assertThat(meldinger.map { it["aktørId"].asText() }).containsExactlyInAnyOrder("987654321", "987654322")
     }
 
@@ -150,10 +152,84 @@ class HåndterPersonhendelserTest {
         assertThat(inspektør.size).isEqualTo(0)
     }
 
+    @Test
+    fun `legg på svar om første behov er adressebeskyttelse`() {
+        val aktørId = "123123123"
+        stubOAtuh()
+        stubPdl(ident = aktørId)
+
+        testRapid.sendTestMessage(behovsMelding(ident = aktørId, behovListe = """["adressebeskyttelse"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val message = inspektør.message(0)
+        assertThat(message["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString())
+    }
+
+    @Test
+    fun `ikke legg på svar om andre uløste behov enn adressebeskyttelse er først i listen`() {
+        val aktørId = "123123123"
+        stubOAtuh()
+        stubPdl(ident = aktørId)
+
+        testRapid.sendTestMessage(behovsMelding(ident = aktørId, behovListe = """["noeannet", "adressebeskyttelse"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `legg på svar om behov nummer 2 er adressebeskyttelse, dersom første behov har en løsning`() {
+        val aktørId = "123123123"
+        stubOAtuh()
+        stubPdl(ident = aktørId)
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                ident = aktørId,
+                behovListe = """["noeannet", "adressebeskyttelse"]""",
+                løsninger = listOf("noeannet" to """{"noeannetsvar": 123}""")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
+        assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
+    }
+
+    @Test
+    fun `ikke legg på svar om behov er en tom liste`() {
+        testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på`() {
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["adressebeskyttelse"]""",
+                løsninger = listOf("adressebeskyttelse" to """"svar"""")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
     private fun stubPdl(
+        ident: String = "12312312312",
         identSvar: String = """
         {
-            "ident" : "987654321"
+            "ident" : "$ident"
         }
     """.trimIndent()
     ) {
@@ -166,7 +242,7 @@ class HåndterPersonhendelserTest {
                         """
                         {
                             "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident) { adressebeskyttelse(historikk: false) { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
-                            "variables":{"ident":"12312312312"}
+                            "variables":{"ident":"$ident"}
                         }
                     """.trimIndent()
                     )
@@ -253,3 +329,15 @@ fun personhendelse(
     tidligereHendelseId,
     adressebeskyttelse
 )
+
+private fun behovsMelding(
+    ident: String = "12312312312",
+    behovListe: String,
+    løsninger: List<Pair<String, String>> = emptyList(),
+) = """
+        {
+            "aktørId":"$ident",
+            "@behov":$behovListe
+            ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
+        }
+    """.trimIndent()
