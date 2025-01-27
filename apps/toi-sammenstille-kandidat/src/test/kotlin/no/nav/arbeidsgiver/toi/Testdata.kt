@@ -164,14 +164,6 @@ fun kvp(aktørId: String) = """
         }
     """.trimIndent()
 
-fun adressebeskyttelse(aktørId: String, gradering: String) = """
-     {
-          "@event_name": "adressebeskyttelse",
-          "gradering": "$gradering",
-          "aktørId": "$aktørId"
-     }
-""".trimIndent()
-
 fun hjemmelMelding(aktørId: String) = """
         {
             "aktørId": "$aktørId",

@@ -19,8 +19,7 @@ class SammenstillTest {
         "arenaFritattKandidatsøk",
         "hjemmel",
         "måBehandleTidligereCv",
-        "kvp",
-        "adressebeskyttelse"
+        "kvp"
     )
 
     private lateinit var javalin: Javalin
@@ -457,41 +456,5 @@ class SammenstillTest {
         val lagredeKandidater = testDatabase.hentAlleKandidater()
         assertThat(lagredeKandidater.size).isEqualTo(1)
         assertThat(lagredeKandidater.first().kvp).isNotNull
-    }
-
-    @Test
-    fun `Når adressebeskyttelse-melding har blitt mottatt skal meldingen lagres i databasen`() {
-        val aktørId = "123"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-
-        testRapid.sendTestMessage(adressebeskyttelse(aktørId, "UGRADERT"))
-
-        val lagredeKandidater = testDatabase.hentAlleKandidater()
-        assertThat(lagredeKandidater.size).isEqualTo(1)
-        assertThat(lagredeKandidater.first().adressebeskyttelse).isNotNull
-    }
-
-
-    @Test
-    fun `Når adressebeskyttelse event har blitt mottatt for kandidat skal ny melding publiseres på rapid`() {
-        val aktørId = "123"
-        val testRapid = TestRapid()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(adressebeskyttelse(aktørId, "UGRADERT"))
-
-        val rapidInspektør = testRapid.inspektør
-        assertThat(rapidInspektør.size).isEqualTo(1)
-
-        val melding = rapidInspektør.message(0)
-        assertThat(melding.get("@event_name").asText()).isEqualTo("adressebeskyttelse")
-        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(kunKandidatfelter(melding)).containsExactlyInAnyOrder("adressebeskyttelse")
-
-        assertThat(melding.get("aktørId").asText()).isEqualTo(aktørId)
-        assertThat(melding.get("adressebeskyttelse").asText()).isEqualTo("UGRADERT")
     }
 }
