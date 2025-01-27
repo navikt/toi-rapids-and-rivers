@@ -97,20 +97,3 @@ private data class Adressebeskyttelse(
 private data class Error(
     val message: String,
 )
-
-
-class DiskresjonsHendelse(private val ident: String, private val gradering: Gradering) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
-
-    fun toJson(): String {
-        return """
-            {
-                "@event_name": "adressebeskyttelse",
-                "gradering": "$gradering",
-                "aktørId": "$ident"
-            }
-        """.trimIndent()
-    }
-
-    fun ident() = ident
-}
