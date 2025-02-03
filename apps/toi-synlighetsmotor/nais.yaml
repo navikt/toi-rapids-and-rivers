@@ -15,12 +15,13 @@ spec:
   readiness:
     port: 8080
     path: /isready
+    initialDelay: 60
   prometheus:
     enabled: true
     path: /metrics
     port: "8080"
   replicas:
-    min: 2
+    min: {{ min_replicas }}
     max: {{ max_replicas }}
   strategy:
     type: Recreate
@@ -48,7 +49,7 @@ spec:
           - id: {{ ad_gruppe_utvikler }}
   gcp:
     sqlInstances:
-      - type: POSTGRES_12
+      - type: {{ postgres_versjon }}
         tier: {{ gcp_db_tier }}
         diskAutoresize: {{ gcp_disk_autoresize }}
         databases:

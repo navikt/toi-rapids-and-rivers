@@ -20,12 +20,12 @@ jobs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup Java v17.x
-        uses: actions/setup-java@v3
+        uses: actions/checkout@v4
+      - name: Setup Java v21.x
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17.x'
+          java-version: '21.x'
       - name: Gradle test and build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,8 +40,6 @@ jobs:
           image_suffix: ${{ inputs.app_name }}
           dockerfile: apps/${{ inputs.app_name }}/Dockerfile
           docker_context: apps/${{ inputs.app_name }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           tag: ${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}
           build_args: |
             APP_NAME=${{ inputs.app_name }}
@@ -52,7 +50,7 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == inputs.deploy_dev_branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
@@ -66,7 +64,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-gcp
@@ -76,10 +74,9 @@ jobs:
 
   call-trivy-security-scan:
     needs: build-and-publish
-    uses: navikt/toi-github-actions-workflows/.github/workflows/trivy-security-scan.yaml@main
+    uses: navikt/toi-github-actions-workflows/.github/workflows/trivy-security-scan.yaml@v1
     with:
       image: ${{ needs.build-and-publish.outputs.image }}
-      category: ${{ inputs.app_name }}
     permissions:
       id-token: write
       security-events: write

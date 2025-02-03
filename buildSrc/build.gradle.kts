@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import ca.cutterslade.gradle.analyze.AnalyzeDependenciesTask
 
 plugins {
@@ -19,16 +18,12 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
     withType<Wrapper> {
-        gradleVersion = "7.5.1"
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+        gradleVersion = "8.11.1"
     }
 
     withType<AnalyzeDependenciesTask> {

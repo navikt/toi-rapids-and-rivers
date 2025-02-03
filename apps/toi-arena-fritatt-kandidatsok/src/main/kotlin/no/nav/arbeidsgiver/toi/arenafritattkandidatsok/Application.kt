@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.time.LocalDateTime

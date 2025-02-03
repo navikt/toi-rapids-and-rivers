@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.get
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets

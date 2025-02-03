@@ -3,7 +3,12 @@ package no.nav.arbeidsgiver.toi.kandidatfeed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.*
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
@@ -18,16 +23,21 @@ class UsynligKandidatfeedLytter(
 
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandKey("aktørId")
-                it.demandValue("synlighet.erSynlig", false)
-                it.demandValue("synlighet.ferdigBeregnet", true)
-                it.rejectValue("@slutt_av_hendelseskjede", true)
+            precondition{
+                it.requireKey("aktørId")
+                it.requireValue("synlighet.erSynlig", false)
+                it.requireValue("synlighet.ferdigBeregnet", true)
+                it.forbidValue("@slutt_av_hendelseskjede", true)
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val aktørId = packet["aktørId"].asText()
         val packetUtenMetadata = packet.fjernMetadataOgKonverter()
         val melding = ProducerRecord(topicName, aktørId, packetUtenMetadata.toString())

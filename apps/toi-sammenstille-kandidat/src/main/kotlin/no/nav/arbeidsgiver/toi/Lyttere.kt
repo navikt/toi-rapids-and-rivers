@@ -1,6 +1,11 @@
 package no.nav.arbeidsgiver.toi
 
-import no.nav.helse.rapids_rivers.*
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 
 class Lytter(
     private val rapidsConnection: RapidsConnection,
@@ -11,24 +16,24 @@ class Lytter(
     River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", eventNavn)
-                it.demandKey("aktørId")
-                it.demandKey(feltSomSkalBehandles)
-                it.rejectValue("sammenstilt", true)
+            precondition{
+                it.requireValue("@event_name", eventNavn)
+                it.requireKey("aktørId")
+                it.requireKey(feltSomSkalBehandles)
+                it.forbidValue("sammenstilt", true)
                 it.interestedIn("system_participating_services", "system_read_count")
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val aktørId = packet["aktørId"].asText()
 
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
         val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
         repository.lagreKandidat(oppdatertKandidat)
 
-        val nyPakke = oppdatertKandidat.somJsonMessage()
+        val nyPakke = oppdatertKandidat.somJsonMessage(meterRegistry)
         nyPakke["@event_name"] = packet["@event_name"].asText()
         nyPakke["system_participating_services"] = packet["system_participating_services"]
         nyPakke["system_read_count"] = packet["system_read_count"]

@@ -5,15 +5,14 @@ env:
 
 on:
   push:
-    branches:
-    - main
     paths:
     - apps/toi-helseapp/**
     - .github/workflows/deploy-toi-helseapp.yaml
     - buildSrc/**
 
 permissions:
-  packages: write
+  contents: read
+  id-token: write
 
 jobs:
   build-and-publish:
@@ -24,38 +23,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Java v17.x
-        uses: actions/setup-java@v3
+      - name: Setup Java v21.x
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17.x'
+          java-version: '21.x'
       - name: Gradle test and build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x ./gradlew
           ./gradlew :apps:${APP_NAME}:test :apps:${APP_NAME}:build
-      - name: Docker login
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and publish docker image
+      - name: Push docker image to GAR
+        uses: nais/docker-build-push@v0
         id: docker-build-push
-        run: |
-          TAG=$(if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then echo "latest"; else echo "${{ github.sha }}"; fi)
-          IMAGE=ghcr.io/${{ github.repository }}/${{ github.workflow }}:${TAG}
-          docker build --build-arg APP_NAME=${APP_NAME} --tag ${IMAGE} apps/${APP_NAME}
-          docker push ${IMAGE}
-          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+        with:
+          team: toi
+          image_suffix: ${{ env.APP_NAME }}
+          dockerfile: apps/${{ env.APP_NAME }}/Dockerfile
+          docker_context: apps/${{ env.APP_NAME }}
+          tag: ${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}
+          build_args: |
+            APP_NAME=${{ env.APP_NAME }}
 
   deploy-to-prod-gcp:
     name: Deploy to prod-gcp
     needs: build-and-publish
     if: github.ref == 'refs/heads/main'
-    permissions:
-      id-token: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +61,7 @@ jobs:
 
   call-trivy-security-scan:
     needs: build-and-publish
-    uses: navikt/toi-github-actions-workflows/.github/workflows/trivy-security-scan.yaml@main
+    uses: navikt/toi-github-actions-workflows/.github/workflows/trivy-security-scan.yaml@v1
     with:
       image: ${{ needs.build-and-publish.outputs.image }}
     permissions:

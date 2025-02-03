@@ -16,7 +16,7 @@ spec:
     enabled: true
     path: /metrics
   replicas:
-    min: 1
+    min: {{ min_replicas }}
     max: {{ max_replicas }}
   resources:
     limits:
@@ -35,7 +35,7 @@ spec:
     pool: {{ kafka_pool }}
   gcp:
     sqlInstances:
-      - type: POSTGRES_12
+      - type: {{ postgres_versjon }}
         tier: {{ gcp_db_tier }}
         diskAutoresize: {{ gcp_disk_autoresize }}
         databases:

@@ -1,8 +1,11 @@
 package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.arbeidsgiver.toi.rest.Rolle
+import no.nav.security.token.support.core.configuration.IssuerProperties
 import org.assertj.core.api.Assertions
+import java.net.URI
 import java.time.ZonedDateTime
 
 fun testProgramMedHendelse(
@@ -12,7 +15,11 @@ fun testProgramMedHendelse(
 ) {
     val rapid = TestRapid()
 
-    startApp(repository, Javalin.create(), rapid) { true }
+    startApp(repository, Javalin.create(), rapid, mapOf(
+        Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
+        URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
+        listOf("audience")
+    )))) { true }
 
     rapid.sendTestMessage(hendelse)
     rapid.inspektør.assertion()

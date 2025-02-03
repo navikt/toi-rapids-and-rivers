@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -19,7 +19,7 @@ class SammenstillTest {
         "arenaFritattKandidatsøk",
         "hjemmel",
         "måBehandleTidligereCv",
-        "kvp",
+        "kvp"
     )
 
     private lateinit var javalin: Javalin

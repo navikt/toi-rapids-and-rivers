@@ -4,7 +4,7 @@ on:
   push:
     paths:
     - apps/toi-sammenstille-kandidat/**
-    - .github/workflows/deploy-toi-sammenstille-kandidat.yaml
+    - .github/workflows/deploy-toi-sammenstille-kand  idat.yaml
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
 
@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/vis-appnavn-i-trivyrapporten
+      deploy_dev_branch: refs/heads/oppgradere-rapids-and-rivers
     secrets: inherit
     permissions:
       contents: read

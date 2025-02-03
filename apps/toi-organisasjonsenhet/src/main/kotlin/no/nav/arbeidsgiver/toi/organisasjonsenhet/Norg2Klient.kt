@@ -56,6 +56,7 @@ class Norg2Klient(private val norg2Url: String) {
         "1279", // NAV Marked Hordaland, opprettet kun i Arena
         "1476", // NAV Sjukefåvær Sunnfjord, virtuell enhet
         "4732", // Enhet har sluttet eksistere (ukjent navn)
+        "1103" // 1103 er GT (geografisk tilknytning) for Svanger, men Stavanger er kun mappet opp med enheter for bydelsnumre som 110301, 110302, 110303, osv., ikke mot kommunenummer.
     )
 }
 

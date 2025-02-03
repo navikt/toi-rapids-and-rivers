@@ -1,21 +1,20 @@
 package no.nav.arbeidsgiver.toi.livshendelser
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
-import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.RetriableException
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
+class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
     CoroutineScope, RapidsConnection.StatusListener {
 
     init {
@@ -40,19 +39,19 @@ class Lytter(rapidsConnection: RapidsConnection, private val consumer: Consumer<
         }
 
         launch {
-            consumer.use {
+            consumer().use {
                 try {
-                    consumer.subscribe(listOf(leesahTopic))
+                    it.subscribe(listOf(leesahTopic))
                     log.info("Starter å konsumere topic: $leesahTopic")
 
                     val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
                     while (job.isActive) {
                         try {
                             val records: ConsumerRecords<String, Personhendelse> =
-                                consumer.poll(Duration.ofSeconds(5))
+                                it.poll(Duration.ofSeconds(5))
 
                             personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
-                            consumer.commitSync()
+                            it.commitSync()
                         } catch (e: RetriableException) {
                             secureLog.warn("Fikk en retriable exception, prøver på nytt", e)
                             log.warn("Fikk en retriable exception, prøver på nytt(se securelog)")

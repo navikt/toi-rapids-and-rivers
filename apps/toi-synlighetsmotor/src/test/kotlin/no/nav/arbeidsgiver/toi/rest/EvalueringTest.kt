@@ -5,17 +5,17 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import java.net.InetAddress
-import java.net.URL
+import java.net.URI
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EvalueringTest {
@@ -29,17 +29,7 @@ class EvalueringTest {
 
     @BeforeEach
     fun beforeEach() {
-        val issuerProperties = IssuerProperties(
-            URL("http://localhost:18300/isso-idtoken/.well-known/openid-configuration"),
-            listOf("audience"),
-            "isso-idtoken"
-        )
-
-        javalin = opprettJavalinMedTilgangskontroll(
-            mapOf(
-                Rolle.VEILEDER to issuerProperties
-            )
-        )
+        javalin = opprettJavalinMedTilgangskontroll()
     }
 
     @AfterEach
@@ -53,13 +43,37 @@ class EvalueringTest {
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
+    fun `POST mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid) { true }
+        startApp(repository, rapid)
+
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
+
+        val response = Fuel.post("http://localhost:8301/evaluering")
+            .authentication().bearer(token.serialize())
+            .body("""{"fnr": "12345678912"}""")
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
+    }
+
+    @Test
+    fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val repository = Repository(TestDatabase().dataSource)
+        val token = hentToken(mockOAuth2Server)
+        val rapid = TestRapid()
+
+        startApp(repository, rapid)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -76,13 +90,48 @@ class EvalueringTest {
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
+    fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
         val rapid = TestRapid()
 
-        startApp(repository, javalin, rapid) { true }
+        startApp(repository, rapid)
+
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
+        rapid.sendTestMessage(
+            komplettHendelseSomFørerTilSynlighetTrue(
+                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
+                    fritattKandidatsøk = true,
+                    fnr = "12312312312"
+                )
+            )
+        )
+
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
+
+        val response = Fuel.post("http://localhost:8301/evaluering")
+            .authentication().bearer(token.serialize())
+            .body("""{"fnr": "12345678912"}""")
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        Assertions.assertThat(responeEvaluering)
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+    }
+
+    @Test
+    fun `Deprekert til fordel for post GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
+        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val repository = Repository(TestDatabase().dataSource)
+        val token = hentToken(mockOAuth2Server)
+        val rapid = TestRapid()
+
+        startApp(repository, rapid)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -110,12 +159,35 @@ class EvalueringTest {
     }
 
     @Test
-    fun `GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
+    fun `POST mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
         val rapid = TestRapid()
         val token = hentToken(mockOAuth2Server)
 
-        startApp(repository, javalin, rapid) { true }
+        startApp(repository, rapid)
+
+        Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
+
+        val response = Fuel.post("http://localhost:8301/evaluering")
+            .authentication().bearer(token.serialize())
+            .body("""{"fnr": "12345678912"}""")
+            .response().second
+
+        Assertions.assertThat(response.statusCode).isEqualTo(200)
+
+        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responeEvaluering =
+            jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
+        Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
+    }
+
+    @Test
+    fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
+        val repository = Repository(TestDatabase().dataSource)
+        val rapid = TestRapid()
+        val token = hentToken(mockOAuth2Server)
+
+        startApp(repository, rapid)
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
@@ -129,6 +201,16 @@ class EvalueringTest {
         val responeEvaluering =
             jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
+    }
+
+    private fun startApp(
+        repository: Repository,
+        rapid: TestRapid
+    ) {
+        no.nav.arbeidsgiver.toi.startApp(repository, javalin, rapid, mapOf(Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
+            URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
+            listOf("audience")
+        )))) { true }
     }
 }
 

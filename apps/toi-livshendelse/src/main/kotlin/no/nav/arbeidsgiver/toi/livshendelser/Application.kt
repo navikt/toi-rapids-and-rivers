@@ -1,7 +1,8 @@
 package no.nav.arbeidsgiver.toi.livshendelser
 
+import AdressebeskyttelseLytter
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
@@ -34,9 +35,10 @@ fun startApp(
     val log = LoggerFactory.getLogger("Application.kt")
     try {
         rapidsConnection.also {
-            val consumer = KafkaConsumer<String, Personhendelse>(consumerConfig)
+            val consumer = { KafkaConsumer<String, Personhendelse>(consumerConfig) }
 
-            Lytter(rapidsConnection, consumer, pdlKlient)
+            PDLLytter(rapidsConnection, consumer, pdlKlient)
+            AdressebeskyttelseLytter(pdlKlient, rapidsConnection)
         }.start()
     } catch (e: Exception) {
         log.error("Applikasjonen mottok exception(se secure log)")

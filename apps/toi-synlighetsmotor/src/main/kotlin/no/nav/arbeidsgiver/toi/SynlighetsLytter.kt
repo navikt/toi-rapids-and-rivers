@@ -1,9 +1,13 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
-import no.nav.helse.rapids_rivers.*
-import java.time.OffsetDateTime.now
 
 class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
     River.PacketListener {
@@ -18,16 +22,21 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
 
     init {
         River(rapidsConnection).apply {
-            validate {
+            precondition {
+                it.requireKey("system_participating_services")
+                it.forbid("synlighet")
                 it.interestedIn(*interessanteFelt.toTypedArray())
                 it.interestedIn("aktørId")
-                it.demandKey("system_participating_services")
-                it.rejectKey("synlighet")
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
         val erSammenstillt = packet["system_participating_services"]
             .map { it.get("service")?.asText() }
@@ -38,18 +47,14 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         val kandidat = Kandidat.fraJson(packet)
 
         val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
-        repository.lagre(evaluering = synlighetsevaluering, aktørId = kandidat.aktørId, fødselsnummer = kandidat.fødselsNummer())
+        repository.lagre(
+            evaluering = synlighetsevaluering,
+            aktørId = kandidat.aktørId,
+            fødselsnummer = kandidat.fødselsNummer()
+        )
 
         val synlighet = synlighetsevaluering()
         packet["synlighet"] = synlighet
         rapidsConnection.publish(kandidat.aktørId, packet.toJson())
-    }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        super.onError(problems, context)
-    }
-
-    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        super.onSevere(error, context)
     }
 }

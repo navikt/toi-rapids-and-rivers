@@ -3,10 +3,12 @@ package no.nav.arbeidsgiver.toi.veileder
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.result.Result
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import net.minidev.json.JSONObject
-import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.slf4j.LoggerFactory
 
 class NomKlient(
@@ -34,19 +36,25 @@ class NomKlient(
     }
 
     private fun executeRequest(spørring: String, ident: String): String {
-        val (_, response, result) = Fuel
+        val (_, response: Response, result: Result<String, FuelError>) = Fuel
             .post(path = url)
             .header("Content-type", "application/json")
             .header("Authorization", "Bearer ${hentAccessToken()}")
             .body(spørring)
             .responseString()
 
-        if (response.statusCode != 200) {
-            log.error("Uventet statuskode fra veilederoppslag for ident: (se secureLog) ${response.statusCode}")
-            secureLog.error("Uventet statuskode fra veilederoppslag for ident: $ident ${response.statusCode} ${response.responseMessage}")
-            throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se secureLog) ${response.statusCode}")
+        when (result) {
+            is Result.Success -> {
+                if (response.statusCode != 200) {
+                    secureLog.error("Uventet statuskode fra veilederoppslag for ident: $ident ${response.statusCode} ${response.responseMessage}")
+                    throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se secureLog) ${response.statusCode}")
+                } else {
+                    return result.get()
+                }
+            }
+
+            is Result.Failure -> throw result.error
         }
-        return result.get()
     }
 
     private fun parseResponse(response: String): Veilederinformasjon? {

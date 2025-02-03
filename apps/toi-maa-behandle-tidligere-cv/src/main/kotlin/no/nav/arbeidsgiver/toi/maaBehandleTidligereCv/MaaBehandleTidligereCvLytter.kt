@@ -3,10 +3,12 @@ package no.nav.arbeidsgiver.toi.maaBehandleTidligereCv
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
 
 class MaaBehandleTidligereCvLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
@@ -15,14 +17,20 @@ class MaaBehandleTidligereCvLytter(private val rapidsConnection: RapidsConnectio
 
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandKey("aktorId")
-                it.rejectKey("@event_name")
+            precondition {
+                it.requireKey("aktorId")
+                it.forbid("@event_name")
             }
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
+
         val aktørId = packet["aktorId"].asText()
 
         val melding = mapOf(
@@ -39,7 +47,8 @@ class MaaBehandleTidligereCvLytter(private val rapidsConnection: RapidsConnectio
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
+        val metadataFelter =
+            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
         jsonNode.remove(metadataFelter)
         return jsonNode
     }

@@ -1,9 +1,10 @@
-val postgresVersion = "42.5.1"
-val hikariVersion = "5.0.1"
-val flywayVersion = "9.8.2"
-val h2Version = "2.1.214"
-val logbackVersion = "1.4.4"
-val logstashEncoderVersion = "7.2"
+val postgresVersion = "42.7.4"
+val hikariVersion = "6.2.1"
+val flywayVersion = "11.1.0"
+val h2Version = "2.3.232"
+val fuelVersion = "2.3.1"
+val javalinVersion = "6.4.0"
+
 
 
 plugins {
@@ -13,10 +14,9 @@ plugins {
 dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("io.javalin:javalin:5.1.3")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-    testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
+    implementation("io.javalin:javalin:$javalinVersion")
+    testImplementation("com.github.kittinunf.fuel:fuel:$fuelVersion")
     testImplementation("com.h2database:h2:$h2Version")
 }

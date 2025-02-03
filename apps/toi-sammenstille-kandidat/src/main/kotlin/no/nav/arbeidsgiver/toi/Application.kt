@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -22,7 +24,6 @@ fun startRapid(
             Lytter(rapid, repository, "hjemmel")
             Lytter(rapid, repository, "må-behandle-tidligere-cv", "måBehandleTidligereCv")
             Lytter(rapid, repository, "kvp", "kvp")
-
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
@@ -31,12 +32,14 @@ fun startRapid(
 
 fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, passordForRepublisering: String) {
     val repository = Repository(datasource)
+    val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     Republiserer(
         repository,
         rapid,
         javalin,
         passordForRepublisering,
+        meterRegistry
     )
 
     startRapid(rapid, repository)
@@ -47,7 +50,6 @@ fun main() {
         ?: throw Exception("PASSORD_FOR_REPUBLISERING kunne ikke hentes fra kubernetes secrets")
 
     val javalin = Javalin.create().start(9000)
-
     startApp(rapidsConnection(), datasource(), javalin, passordForRepublisering)
 }
 

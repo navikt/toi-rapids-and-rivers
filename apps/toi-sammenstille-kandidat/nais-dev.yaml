@@ -3,4 +3,6 @@ kafka_consumer_group_id: toi-sammenstille-kandidat-rapidconsumer-1
 ingress: https://toi-sammenstille-kandidat.intern.dev.nav.no
 gcp_db_tier: db-f1-micro
 gcp_disk_autoresize: false
+min_replicas: 1
 max_replicas: 1
+postgres_versjon: POSTGRES_16

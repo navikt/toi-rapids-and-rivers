@@ -2,11 +2,27 @@ package no.nav.arbeidsgiver.toi.rest
 
 import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.Evaluering
+import no.nav.security.token.support.core.configuration.IssuerProperties
 
-val evaluerKandidatFraContext: ((String) ->  Evaluering?) -> (Context) -> Unit = { hentMedFødselsnummer ->
+private class EvalueringsRespons(val fnr: String)
+
+val evaluerKandidatFraContext: ((String) ->  Evaluering?, Map<Rolle,Pair<String, IssuerProperties>>) -> (Context) -> Unit = { hentMedFødselsnummer, issuerProperties ->
     { context ->
-        val fnr = context.pathParam("fnr")
+        context.sjekkTilgang(Rolle.VEILEDER, issuerProperties)
+        val fnr = context.bodyAsClass(EvalueringsRespons::class.java).fnr
 
+        val evaluering = hentMedFødselsnummer(fnr)
+            .lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()
+
+        AuditLogg.loggSynlighetsoppslag(fnr, context.attribute<AuthenticatedUser>("authenticatedUser") ?: throw Exception("Prøver sjekke synlighet uten å ha autensiert bruker"))
+
+        context.json(evaluering).status(200)
+    }
+}
+val evaluerKandidatFraContextGet: ((String) ->  Evaluering?, Map<Rolle,Pair<String, IssuerProperties>>) -> (Context) -> Unit = { hentMedFødselsnummer, issuerProperties ->
+    { context ->
+        context.sjekkTilgang(Rolle.VEILEDER, issuerProperties)
+        val fnr = context.pathParam("fnr")
 
         val evaluering = hentMedFødselsnummer(fnr)
             .lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()

@@ -3,8 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.JsonMessage
-import java.time.OffsetDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.ZonedDateTime
 
 data class Kandidat(
@@ -16,6 +15,7 @@ data class Kandidat(
     val hjemmel: Hjemmel?,
     val måBehandleTidligereCv: MåBehandleTidligereCv?,
     val kvp: Kvp?,
+    val adressebeskyttelse: String?,
 ) {
     val erAAP: Boolean
         get() = oppfølgingsinformasjon?.erAAP == true

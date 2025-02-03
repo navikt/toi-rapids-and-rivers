@@ -3,8 +3,8 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.jsonBody
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 

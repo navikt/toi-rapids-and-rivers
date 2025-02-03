@@ -3,9 +3,9 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helse.rapids_rivers.asLocalDate
-import no.nav.helse.rapids_rivers.isMissingOrNull
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
