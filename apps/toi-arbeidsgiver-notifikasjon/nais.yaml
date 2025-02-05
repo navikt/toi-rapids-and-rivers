@@ -38,6 +38,8 @@ spec:
       rules:
         - application: rekrutteringsbistand
           cluster: {{cluster}}
+        - application: rekrutteringsbistand-frontend
+          cluster: {{cluster}}          
   azure:
     application:
       enabled: true
