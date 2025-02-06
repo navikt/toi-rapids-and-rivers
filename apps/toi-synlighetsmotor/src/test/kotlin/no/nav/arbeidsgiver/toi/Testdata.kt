@@ -113,7 +113,7 @@ class Testdata {
         fun oppfølgingsinformasjon(
             erDoed: Boolean = false,
             sperretAnsatt: Boolean = false,
-            formidlingsgruppe: String = "IARBS",
+            formidlingsgruppe: String = "ARBS",
             harOppfolgingssak: Boolean = true,
             diskresjonskode: String? = null
         ) =
