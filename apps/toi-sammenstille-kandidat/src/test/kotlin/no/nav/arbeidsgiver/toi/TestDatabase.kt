@@ -36,6 +36,14 @@ class TestDatabase {
             }.map { it.somJsonNode() }
             .map { Kandidat.fraJson(it) }
 
+    fun lagreKandidat(kandidat: Kandidat) = dataSource.connection
+        .prepareStatement("insert into sammenstiltkandidat (aktor_id, kandidat) values (?, ?)")
+        .apply {
+            setString(1, kandidat.aktørId)
+            setString(2, kandidat.toJson())
+        }.executeUpdate()
+
+
     fun <T> ResultSet.map(mapper: (ResultSet) -> T): List<T> {
         return generateSequence {
             if (this.next()) {
