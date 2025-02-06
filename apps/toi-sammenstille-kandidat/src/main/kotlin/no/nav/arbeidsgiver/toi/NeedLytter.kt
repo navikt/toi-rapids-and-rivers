@@ -30,7 +30,7 @@ class NeedLytter(
         meterRegistry: MeterRegistry
     ) {
         repository.hentKandidat(packet["aktørId"].asText())
-            ?.somJsonMessage(meterRegistry)
+            ?.populerMelding(packet)
             ?.toJson()
             ?.also(rapidsConnection::publish)
     }
