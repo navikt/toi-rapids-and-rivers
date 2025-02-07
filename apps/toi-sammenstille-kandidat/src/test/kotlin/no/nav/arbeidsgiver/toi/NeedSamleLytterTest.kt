@@ -97,8 +97,39 @@ class NeedSamleLytterTest {
         assertThat(message[felt].asText()).isEqualTo(expectedVerdi)
     }
 
-    @Test
-    fun `ikke legg på svar om andre uløste behov enn veileder er først i listen`() {
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `legg på et gitt felt lik null om første behov er det feltet og felt-informasjon ikke finnes`(felt: String, ikkeibruk: String) {
+        val testRapid = TestRapid()
+        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
+
+        testRapid.sendTestMessage(behovsMelding(ident = aktørIdUtenFelter, behovListe = """["$felt"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val message = inspektør.message(0)
+        assertThat(message[felt].isNull).isTrue()
+    }
+
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `legg på et gitt felt lik null om person ikke finnes i sammenstiller`(felt: String, ikkeibruk: String) {
+        val testRapid = TestRapid()
+        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
+
+        testRapid.sendTestMessage(behovsMelding(ident = aktørIdIkkeEksisterende, behovListe = """["$felt"]"""))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val message = inspektør.message(0)
+        assertThat(message[felt].isNull).isTrue()
+    }
+
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `ikke legg på svar om andre uløste behov enn det gitte feltet er først i listen`(felt: String, ikkeibruk: String) {
         val testRapid = TestRapid()
         startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
 

@@ -29,10 +29,9 @@ class NeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        repository.hentKandidat(packet["aktørId"].asText())
-            ?.populerMelding(packet)
-            ?.toJson()
-            ?.also(rapidsConnection::publish)
+        val aktørId = packet["aktørId"].asText()
+        val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
+        kandidat.populerMelding(packet).toJson().also(rapidsConnection::publish)
     }
 }
 
