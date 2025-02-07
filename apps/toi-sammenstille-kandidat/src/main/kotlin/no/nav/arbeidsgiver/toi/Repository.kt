@@ -132,9 +132,17 @@ data class Kandidat(
         return objectMapper.writeValueAsString(this)
     }
 
+    @Deprecated(message = "Se på å bruk populerMelding for å istedetfor gjenbruke eksisterende melding")
     fun somJsonMessage(meterRegistry: MeterRegistry) = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""), meterRegistry)
 
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)
+    fun populerMelding(packet: JsonMessage): JsonMessage {
+        val jsonObjekt = jacksonObjectMapper().valueToTree<JsonNode>(this)
+        jsonObjekt.fieldNames().forEach { feltNavn ->
+            packet[feltNavn] = jsonObjekt.get(feltNavn)
+        }
+        return packet
+    }
 }
 
 typealias AktøridHendelse = Pair<String, JsonMessage>
