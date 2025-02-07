@@ -68,7 +68,7 @@ class OrganisasjonsenhetTest {
     }
 
     @Test
-    fun `ikke legg på svar om andre behov enn organisasjonsenhetsnavn som ikke er løst`() { //TODO: Annet navn om rekkefølge?
+    fun `ikke legg på svar om andre behov enn organisasjonsenhetsnavn som ikke er løst`() {
         val testRapid = TestRapid()
         startApp(Norg2Klient("http://localhost:8082"), testRapid)
 
