@@ -46,6 +46,8 @@ fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
         Assertions.assertThat(size).isEqualTo(0)
     }
 
+private const val s = """fodselsnummer"""
+
 class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
@@ -61,7 +63,7 @@ class Testdata {
             aktørId: String = """
             "aktørId": "123456789"
         """.trimIndent(),
-            kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "STARTET"),
+            kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "AVSLUTTET"),
         ) =
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
@@ -85,53 +87,52 @@ class Testdata {
                 oppfølgingsinformasjon = oppfølgingsinformasjon,
                 participatingService = participatingService
             )
-
         fun hendelse(
-            oppfølgingsperiode: String? = null,
-            oppfølgingsinformasjon: String? = null,
-            arbeidsmarkedCv: String? = null,
-            fritattKandidatsøk: String? = null,
-            arenaFritattKandidatsøk: String? = null,
-            hjemmel: String? = null,
+            oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
+            oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
+            arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
+            //fritattKandidatsøk: String? = null,
+            arenaFritattKandidatsøk: String? = nullVerdiForKey("arenaFritattKandidatsøk"),
+            hjemmel: String? = nullVerdiForKey("hjemmel"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-            måBehandleTidligereCv: String? = null,
+            måBehandleTidligereCv: String? = nullVerdiForKey("måBehandleTidligereCv"),
             aktørId: String? = """"aktørId": "123456789"""",
-            kvp: String? = null,
-            veileder: String? = null,
-            siste14avedtak: String? = null,
+            kvp: String? = nullVerdiForKey("kvp"),
+            veileder: String? = nullVerdiForKey("veileder"),
+            siste14avedtak: String? = nullVerdiForKey("siste14avedtak"),
         ) = """
             {
                 ${
             listOfNotNull(
                 """"@event_name": "hendelse"""",
-                arbeidsmarkedCv,
-                oppfølgingsinformasjon,
-                oppfølgingsperiode,
-                fritattKandidatsøk,
-                arenaFritattKandidatsøk,
-                hjemmel,
+                arbeidsmarkedCv ?: nullVerdiForKey("arbeidsmarkedCv"),
+                oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
+                oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
+                //fritattKandidatsøk,
+                arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
+                hjemmel ?: nullVerdiForKey("hjemmel"),
                 participatingService,
-                måBehandleTidligereCv,
+                måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
                 aktørId,
-                kvp,
-                veileder,
-                siste14avedtak,
+                kvp ?: nullVerdiForKey("kvp"),
+                veileder ?: nullVerdiForKey("veileder"),
+                siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
             ).joinToString()
         }
             }
         """.trimIndent()
 
+        private fun nullVerdiForKey(key: String) =  """
+                "$key":null
+        """.trimIndent()
+
         fun oppfølgingsinformasjon(
-            erSattTilNull: Boolean = false,
             erDoed: Boolean = false,
             sperretAnsatt: Boolean = false,
             formidlingsgruppe: String = "ARBS",
             harOppfolgingssak: Boolean = true,
             diskresjonskode: String? = null
-        ) = if(erSattTilNull) """
-                "oppfølgingsinformasjon":null
-        """.trimIndent() else
-            """
+        ) = """
             "oppfølgingsinformasjon": {
                 "fodselsnummer": "12345678912",
                 "formidlingsgruppe": "$formidlingsgruppe",
