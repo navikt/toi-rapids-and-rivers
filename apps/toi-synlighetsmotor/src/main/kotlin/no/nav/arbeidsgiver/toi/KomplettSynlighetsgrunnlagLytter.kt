@@ -20,7 +20,7 @@ class KomplettSynlighetsgrunnlagLytter(private val rapidsConnection: RapidsConne
             precondition {
                 it.requireKey("system_participating_services")
                 it.forbid("synlighet")
-                it.requireKey(*requiredFields.toTypedArray())
+                it.isNotMissing(requiredFields)
                 it.interestedIn("aktørId")
             }
         }.register(this)
@@ -51,10 +51,14 @@ class KomplettSynlighetsgrunnlagLytter(private val rapidsConnection: RapidsConne
         packet["synlighet"] = synlighet
         rapidsConnection.publish(kandidat.aktørId, packet.toJson())
     }
-
-
-    override fun onPreconditionError(error: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
-        super.onPreconditionError(error, context, metadata)
-    }
 }
 
+private fun JsonMessage.isNotMissing(keys: List<String>) = keys.forEach(::isNotMissing)
+
+private fun JsonMessage.isNotMissing(key: String) {
+    require(key) {
+        if (it.isMissingNode) {
+            throw MessageProblems.MessageException(MessageProblems(toJson()).apply { this.error("Feltet $key fantes ikke i meldingen") })
+        }
+    }
+}

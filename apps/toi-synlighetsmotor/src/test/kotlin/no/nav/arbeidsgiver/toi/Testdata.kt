@@ -122,12 +122,15 @@ class Testdata {
         """.trimIndent()
 
         fun oppfølgingsinformasjon(
+            erSattTilNull: Boolean = false,
             erDoed: Boolean = false,
             sperretAnsatt: Boolean = false,
             formidlingsgruppe: String = "ARBS",
             harOppfolgingssak: Boolean = true,
             diskresjonskode: String? = null
-        ) =
+        ) = if(erSattTilNull) """
+                "oppfølgingsinformasjon":null
+        """.trimIndent() else
             """
             "oppfølgingsinformasjon": {
                 "fodselsnummer": "12345678912",

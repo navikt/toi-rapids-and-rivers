@@ -19,7 +19,6 @@ class InkomplettSynlighetsgrunnlagLytter(
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("aktørId")
-                it.forbid("synlighet")
                 it.interestedIn("@behov")
                 it.forbidIfAllIn("@behov", requiredFields)
                 it.requireAtLeastOneKey(requiredFields)
@@ -46,14 +45,6 @@ class InkomplettSynlighetsgrunnlagLytter(
         val aktorId = packet["aktørId"].asText()
         rapidsConnection.publish(aktorId, packet.toJson())
     }
-
-    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
-        println("jjj")
-    }
-
-    override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-        super.onSevere(error, context)
-    }
 }
 
 private fun JsonMessage.forbidIfAllIn(key: String, values: List<String>) {
@@ -62,7 +53,7 @@ private fun JsonMessage.forbidIfAllIn(key: String, values: List<String>) {
                 .map(JsonNode::asText)
                 .containsAll(values)
         ) {
-            throw Exception("Ignorerer siden alle verdier finnes i liste gitt ved key $key")
+            throw MessageProblems.MessageException(MessageProblems(toJson()).apply { this.error("Ignorerer siden alle verdier finnes i liste gitt ved key $key") })
         }
     }
 }
@@ -72,6 +63,6 @@ private fun JsonMessage.requireAtLeastOneKey(keys: List<String>) {
         .map(::get)
         .none { it.isMissingNode }
     ) {
-        throw Exception("Ingen av feltene eksisterte på meldingen")
+        throw MessageProblems.MessageException(MessageProblems(toJson()).apply { this.error("Ingen av feltene eksisterte på meldingen") })
     }
 }
