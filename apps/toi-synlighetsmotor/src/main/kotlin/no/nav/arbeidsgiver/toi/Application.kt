@@ -22,6 +22,7 @@ fun startApp(
 
     rapidsConnection.also {
         SynlighetsLytter(it, repository)
+        InkomplettSynlighetsgrunnlagLytter(it)
     }.start()
 }
 

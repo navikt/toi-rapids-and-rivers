@@ -47,7 +47,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${feltNavn.joinToString(",","[","]"){""""$it""""}}
+                "@behov": ${feltNavn.joinToString(",","[","]"){""""$it""""}},
                 "$felt": {}
             }
         """.trimIndent(), {
