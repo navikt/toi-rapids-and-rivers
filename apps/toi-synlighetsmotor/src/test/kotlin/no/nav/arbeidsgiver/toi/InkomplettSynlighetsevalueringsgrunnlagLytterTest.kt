@@ -61,7 +61,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(feltNavn.subList(0, feltNavn.size-3)).joinToString(",","[","]"){""""$it""""}}
+                "@behov": ${(feltNavn.subList(0, feltNavn.size-3)).joinToString(",","[","]"){""""$it""""}},
                 "$felt": {}
             }
         """.trimIndent(), {
@@ -80,7 +80,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(feltNavn.subList(0, feltNavn.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}}
+                "@behov": ${(feltNavn.subList(0, feltNavn.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}},
                 "$felt": {}
             }
         """.trimIndent(), {

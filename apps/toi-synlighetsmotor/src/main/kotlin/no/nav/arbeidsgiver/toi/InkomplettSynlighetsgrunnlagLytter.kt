@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
@@ -30,7 +31,8 @@ class InkomplettSynlighetsgrunnlagLytter(
             precondition {
                 it.requireKey("aktørId")
                 it.interestedIn("@behov")
-                it.interestedIn(*requiredFields.toTypedArray())
+                it.forbidIfAllIn("@behov", requiredFields)
+                it.requireAtLeastOneKey(requiredFields)
             }
         }.register(this)
     }
@@ -41,17 +43,15 @@ class InkomplettSynlighetsgrunnlagLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        val behov = packet["@behov"]
         val existingBehov: Set<String> =
-            if (packet.get("@behov") != null && packet["@behov"].isArray) {
-                packet.get("@behov").mapNotNull { if (it.isTextual) it.asText() else null }.toSet()
+            if (behov.isArray) {
+                behov.mapNotNull { if (it.isTextual) it.asText() else null }.toSet()
             } else {
                 emptySet()
             }
 
-        if (existingBehov.containsAll(requiredFields)) return
-
-        val newBehov =  (existingBehov union requiredFields).toList()
-        packet["@behov"] = newBehov
+        packet["@behov"] = existingBehov+requiredFields
 
         val aktorId = packet["aktørId"].asText()
         rapidsConnection.publish(aktorId, packet.toJson())
@@ -63,5 +63,25 @@ class InkomplettSynlighetsgrunnlagLytter(
 
     override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
         super.onSevere(error, context)
+    }
+}
+
+private fun JsonMessage.forbidIfAllIn(key: String, values: List<String>) {
+    interestedIn(key) { behovNode ->
+        if (behovNode.toList()
+                .map(JsonNode::asText)
+                .containsAll(values)
+        ) {
+            throw Exception("Ignorerer siden alle verdier finnes i liste gitt ved key $key")
+        }
+    }
+}
+
+private fun JsonMessage.requireAtLeastOneKey(keys: List<String>) {
+    if (keys.onEach { interestedIn(it) }
+        .map(::get)
+        .none { it.isMissingNode }
+    ) {
+        throw Exception("Ingen av feltene eksisterte på meldingen")
     }
 }
