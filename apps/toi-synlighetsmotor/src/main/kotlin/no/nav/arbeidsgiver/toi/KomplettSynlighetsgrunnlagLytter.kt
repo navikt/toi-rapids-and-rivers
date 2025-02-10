@@ -5,27 +5,22 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
 
-class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
+class KomplettSynlighetsgrunnlagLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
     River.PacketListener {
-    private val interessanteFelt = listOf(
-        "arbeidsmarkedCv",
-        "oppfølgingsinformasjon",
-        "oppfølgingsperiode",
-        "fritattKandidatsøk",
-        "hjemmel",
-        "måBehandleTidligereCv"
-    )
+
+    private val requiredFields = requiredFieldsSynlilghetsbehov()
 
     init {
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("system_participating_services")
                 it.forbid("synlighet")
-                it.interestedIn(*interessanteFelt.toTypedArray())
+                it.requireKey(*requiredFields.toTypedArray())
                 it.interestedIn("aktørId")
             }
         }.register(this)
@@ -37,12 +32,11 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val harIngenInteressanteFelter = interessanteFelt.map(packet::get).all(JsonNode::isMissingNode)
         val erSammenstillt = packet["system_participating_services"]
             .map { it.get("service")?.asText() }
             .contains("toi-sammenstille-kandidat")
 
-        if (harIngenInteressanteFelter || !erSammenstillt) return
+        if (!erSammenstillt) return
 
         val kandidat = Kandidat.fraJson(packet)
 
@@ -57,4 +51,10 @@ class SynlighetsLytter(private val rapidsConnection: RapidsConnection, private v
         packet["synlighet"] = synlighet
         rapidsConnection.publish(kandidat.aktørId, packet.toJson())
     }
+
+
+    override fun onPreconditionError(error: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
+        super.onPreconditionError(error, context, metadata)
+    }
 }
+

@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
@@ -14,22 +13,13 @@ class InkomplettSynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
-    private val requiredFields = listOf(
-        "arbeidsmarkedCv",
-        "veileder",
-        "oppfølgingsinformasjon",
-        "siste14avedtak",
-        "oppfølgingsperiode",
-        "arenaFritattKandidatsøk",
-        "hjemmel",
-        "måBehandleTidligereCv",
-        "kvp"
-    )
+    private val requiredFields = requiredFieldsSynlilghetsbehov()
 
     init {
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("aktørId")
+                it.forbid("synlighet")
                 it.interestedIn("@behov")
                 it.forbidIfAllIn("@behov", requiredFields)
                 it.requireAtLeastOneKey(requiredFields)

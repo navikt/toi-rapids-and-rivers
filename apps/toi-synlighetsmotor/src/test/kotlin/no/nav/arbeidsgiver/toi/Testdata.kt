@@ -15,11 +15,14 @@ fun testProgramMedHendelse(
 ) {
     val rapid = TestRapid()
 
-    startApp(repository, Javalin.create(), rapid, mapOf(
-        Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
-        URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
-        listOf("audience")
-    )))) { true }
+    startApp(
+        repository, Javalin.create(), rapid, mapOf(
+            Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
+                URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
+                listOf("audience")
+            ))
+        )
+    ) { true }
 
     rapid.sendTestMessage(hendelse)
     rapid.inspektør.assertion()
@@ -49,14 +52,16 @@ class Testdata {
             oppfølgingsperiode: String = aktivOppfølgingsperiode(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
-            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(fnr="12312312312"),
+            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(fnr = "12312312312"),
             hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-            måBehandleTidligereCv: String? = null,
+            veileder: String? = veileder("123456789"),
+            siste14avedtak: String? = siste14avedtak("123456789"),
+            måBehandleTidligereCv: String? = måBehandleTidligereCv(false),
             aktørId: String = """
             "aktørId": "123456789"
         """.trimIndent(),
-            kvp: String? = null,
+            kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "STARTET"),
         ) =
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
@@ -68,6 +73,8 @@ class Testdata {
                 måBehandleTidligereCv = måBehandleTidligereCv,
                 aktørId = aktørId,
                 kvp = kvp,
+                veileder = veileder,
+                siste14avedtak = siste14avedtak,
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -90,6 +97,8 @@ class Testdata {
             måBehandleTidligereCv: String? = null,
             aktørId: String? = """"aktørId": "123456789"""",
             kvp: String? = null,
+            veileder: String? = null,
+            siste14avedtak: String? = null,
         ) = """
             {
                 ${
@@ -105,6 +114,8 @@ class Testdata {
                 måBehandleTidligereCv,
                 aktørId,
                 kvp,
+                veileder,
+                siste14avedtak,
             ).joinToString()
         }
             }
@@ -220,7 +231,7 @@ class Testdata {
             """
             "arenaFritattKandidatsøk" : {
                 "erFritattKandidatsøk" : $fritattKandidatsøk,
-                "fnr" : ${fnr?.let{ """"$it"""" }}
+                "fnr" : ${fnr?.let { """"$it"""" }}
             }
         """.trimIndent()
 
@@ -247,23 +258,26 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun kvp(startdato: String? = null, sluttdato: String? = null, event: String) : String =
+        fun kvp(startdato: String? = null, sluttdato: String? = null, event: String): String =
             """
                 "kvp": {
                 "event": "$event",
                 "aktorId": "2000000000000",
                 "enhetId": "1860",
-                "startet": ${if(startdato == null) "null" else  """{
+                "startet": ${
+                if (startdato == null) "null" else """{
                     "opprettetAv": "Z100000",
                     "opprettetDato": "$startdato",
                     "opprettetBegrunnelse": "vzcfv"
-                  }"""},
-                  "avsluttet": ${if(sluttdato == null) "null" else  """{
+                  }"""
+            },
+                  "avsluttet": ${
+                if (sluttdato == null) "null" else """{
                     "avsluttetAv": "Z100000",
                     "avsluttetDato": "2023-01-03T09:44:48.891877+01:00",
                     "avsluttetBegrunnelse": "dczxd"
                   }"""
-                }}
+            }}
     """.trimIndent()
 
         fun manglendeHjemmel() =
@@ -279,5 +293,26 @@ class Testdata {
                 "time":"2021-12-14T15:55:36.566399512"
             }]
         """.trimIndent()
+
+        fun veileder(aktørId: String) = """
+            "veileder": {
+                "aktorId":"$aktørId",
+                "veilederId":"Z994526",
+                "tilordnet":"2020-12-21T10:58:19.023+01:00"
+            }
+        """.trimIndent()
+
+        fun siste14avedtak(aktørId: String) = """
+              "siste14avedtak": {
+                "aktorId": "$aktørId",
+                "innsatsgruppe": "STANDARD_INNSATS",
+                "hovedmal": "SKAFFE_ARBEID",
+                "fattetDato": "2021-09-08T09:29:20.398043+02:00",
+                "fraArena": false
+              }
+""".trimIndent()
+
     }
+
+
 }
