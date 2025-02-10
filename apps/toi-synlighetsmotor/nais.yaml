@@ -61,6 +61,8 @@ spec:
           cluster: {{ cluster }}
         - application: rekrutteringsbistand
           cluster: {{ cluster }}
+        - application: rekrutteringsbistand-frontend
+          cluster: {{ cluster }}          
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
