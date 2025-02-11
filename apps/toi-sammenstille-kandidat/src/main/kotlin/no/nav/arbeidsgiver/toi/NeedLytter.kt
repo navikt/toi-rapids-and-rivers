@@ -31,7 +31,7 @@ class NeedLytter(
     ) {
         val aktørId = packet["aktørId"].asText()
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
-        kandidat.populerMelding(packet).toJson().also(rapidsConnection::publish)
+        kandidat.populerMelding(packet).toJson().also { rapidsConnection.publish(aktørId, it) }
     }
 }
 
