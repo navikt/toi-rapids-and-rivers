@@ -64,6 +64,7 @@ class Testdata {
             "aktørId": "123456789"
         """.trimIndent(),
             kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "AVSLUTTET"),
+            adressebeskyttelse: String? = adressebeskyttelse()
         ) =
             hendelse(
                 oppfølgingsperiode = oppfølgingsperiode,
@@ -77,6 +78,7 @@ class Testdata {
                 kvp = kvp,
                 veileder = veileder,
                 siste14avedtak = siste14avedtak,
+                adressebeskyttelse = adressebeskyttelse
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -87,6 +89,7 @@ class Testdata {
                 oppfølgingsinformasjon = oppfølgingsinformasjon,
                 participatingService = participatingService
             )
+
         fun hendelse(
             oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
@@ -99,6 +102,7 @@ class Testdata {
             kvp: String? = nullVerdiForKey("kvp"),
             veileder: String? = nullVerdiForKey("veileder"),
             siste14avedtak: String? = nullVerdiForKey("siste14avedtak"),
+            adressebeskyttelse: String? = nullVerdiForKey("adressebeskyttelse")
         ) = """
             {
                 ${
@@ -107,7 +111,6 @@ class Testdata {
                 arbeidsmarkedCv ?: nullVerdiForKey("arbeidsmarkedCv"),
                 oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
-                //fritattKandidatsøk,
                 arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
                 hjemmel ?: nullVerdiForKey("hjemmel"),
                 participatingService,
@@ -116,12 +119,13 @@ class Testdata {
                 kvp ?: nullVerdiForKey("kvp"),
                 veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
+                adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse")
             ).joinToString()
         }
             }
         """.trimIndent()
 
-        private fun nullVerdiForKey(key: String) =  """
+        private fun nullVerdiForKey(key: String) = """
                 "$key":null
         """.trimIndent()
 
@@ -282,6 +286,11 @@ class Testdata {
                   }"""
             }}
     """.trimIndent()
+
+        fun adressebeskyttelse(): String =
+            """
+              "adressebeskyttelse": "STRENGT_FORTROLIG"
+            """.trimIndent()
 
         fun manglendeHjemmel() =
             """
