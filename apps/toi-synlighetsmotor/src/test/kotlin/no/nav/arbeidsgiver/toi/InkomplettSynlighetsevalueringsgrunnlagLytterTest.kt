@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -89,6 +90,17 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
                 .containsExactlyInAnyOrder(*(feltNavn + annetBehov).toTypedArray())
             assertThat(melding.get("@behov").asIterable()).hasSize(feltNavn.size+1)
+        })
+    }
+
+    @Test
+    fun `Om det er en melding uten noen av de interessante feltene er ikke dette en relevant melding å reagere på`() {
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId"
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
         })
     }
 }
