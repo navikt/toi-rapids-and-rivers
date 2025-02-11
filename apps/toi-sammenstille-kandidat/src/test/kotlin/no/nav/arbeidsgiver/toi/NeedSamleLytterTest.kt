@@ -180,6 +180,24 @@ class NeedSamleLytterTest {
         assertThat(inspektør.size).isEqualTo(0)
     }
 
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `ikke legg på svar om svar allerede er lagt på som null`(felt: String, ikkeibruk: String) {
+        val testRapid = TestRapid()
+        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["$felt"]""",
+                løsninger = listOf(felt to "null")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
     @Test
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()

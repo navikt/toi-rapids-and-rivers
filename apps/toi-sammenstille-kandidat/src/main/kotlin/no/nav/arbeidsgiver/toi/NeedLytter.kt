@@ -41,7 +41,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
                 .toList()
                 .map(JsonNode::asText)
                 .onEach { interestedIn(it) }
-                .first { this[it].isMissingOrNull() } != informasjonsElement
+                .first { this[it].isMissingNode } != informasjonsElement
         )
             throw Exception("Uinteressant hendelse")
     }
