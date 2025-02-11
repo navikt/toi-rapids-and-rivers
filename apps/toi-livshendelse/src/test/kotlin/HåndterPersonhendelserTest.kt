@@ -226,6 +226,28 @@ class HåndterPersonhendelserTest {
     }
 
     @Test
+    fun `legg på svar om behov nummer 2 er adressebeskyttelse, dersom første behov har en løsning med null-verdi`() {
+        val aktørId = "123123123"
+        stubOAtuh()
+        stubPdl(ident = aktørId)
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                ident = aktørId,
+                behovListe = """["noeannet", "adressebeskyttelse"]""",
+                løsninger = listOf("noeannet" to "null")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
+        assertThat(melding["noeannet"].isNull).isTrue
+    }
+
+    @Test
     fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
         testRapid.sendTestMessage(
             behovsMelding(

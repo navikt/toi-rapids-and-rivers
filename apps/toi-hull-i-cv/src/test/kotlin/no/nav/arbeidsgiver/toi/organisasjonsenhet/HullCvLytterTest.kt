@@ -71,6 +71,45 @@ class HullCvLytterTest {
     }
 
     @Test
+    fun `legg på svar om behov nummer 2 er hullICv, dersom første behov har en løsning med null-verdi`() {
+        val testRapid = TestRapid()
+        startApp(testRapid)
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["noeannet", "hullICv"]""",
+                løsninger = listOf("noeannet" to "null"),
+                fødselsDato = LocalDate.now().minusYears(30)
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["hullICv"].isMissingOrNull()).isFalse
+        assertThat(melding["noeannet"].isNull).isTrue
+    }
+
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
+        val testRapid = TestRapid()
+        startApp(testRapid)
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["hullICv"]""",
+                løsninger = listOf("hullICv" to "null"),
+                fødselsDato = LocalDate.now().minusYears(30)
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()
         startApp(testRapid)
