@@ -90,10 +90,6 @@ enum class Formidlingsgruppe {
     ARBS
 }
 
-data class FritattKandidatsøk(
-    val fritattKandidatsok: Boolean
-)
-
 data class ArenaFritattKandidatsøk(
     val erFritattKandidatsøk: Boolean,
     val fnr: String? // TODO: ta bort nullable når kilde hos oss er oppdatert og ferdigkjørt

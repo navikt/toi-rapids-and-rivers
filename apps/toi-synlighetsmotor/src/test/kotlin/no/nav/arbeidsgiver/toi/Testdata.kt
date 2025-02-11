@@ -91,7 +91,6 @@ class Testdata {
             oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
-            //fritattKandidatsøk: String? = null,
             arenaFritattKandidatsøk: String? = nullVerdiForKey("arenaFritattKandidatsøk"),
             hjemmel: String? = nullVerdiForKey("hjemmel"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
