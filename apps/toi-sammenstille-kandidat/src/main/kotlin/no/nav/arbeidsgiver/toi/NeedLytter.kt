@@ -31,7 +31,7 @@ class NeedLytter(
     ) {
         val aktørId = packet["aktørId"].asText()
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
-        kandidat.populerMelding(packet).toJson().also(rapidsConnection::publish)
+        kandidat.populerMelding(packet).toJson().also { rapidsConnection.publish(aktørId, it) }
     }
 }
 
@@ -41,7 +41,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
                 .toList()
                 .map(JsonNode::asText)
                 .onEach { interestedIn(it) }
-                .first { this[it].isMissingOrNull() } != informasjonsElement
+                .first { this[it].isMissingNode } != informasjonsElement
         )
             throw Exception("Uinteressant hendelse")
     }

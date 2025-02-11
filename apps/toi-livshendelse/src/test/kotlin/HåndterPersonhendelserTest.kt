@@ -225,6 +225,20 @@ class HåndterPersonhendelserTest {
         assertThat(inspektør.size).isEqualTo(0)
     }
 
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["adressebeskyttelse"]""",
+                løsninger = listOf("adressebeskyttelse" to "null")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
     private fun stubPdl(
         ident: String = "12312312312",
         identSvar: String = """

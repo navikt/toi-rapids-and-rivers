@@ -21,7 +21,8 @@ class InkomplettSynlighetsgrunnlagLytter(
                 it.requireKey("aktørId")
                 it.interestedIn("@behov")
                 it.forbidIfAllIn("@behov", requiredFields)
-                it.requireAtLeastOneKey(requiredFields)
+                it.requireAnyKey(requiredFields)
+                it.forbidAllKeysPresent(requiredFields)
             }
         }.register(this)
     }
@@ -58,11 +59,24 @@ private fun JsonMessage.forbidIfAllIn(key: String, values: List<String>) {
     }
 }
 
-private fun JsonMessage.requireAtLeastOneKey(keys: List<String>) {
+private fun JsonMessage.requireAnyKey(keys: List<String>) {
     if (keys.onEach { interestedIn(it) }
-        .map(::get)
-        .none { it.isMissingNode }
+            .map(::get)
+            .all { it.isMissingNode }
     ) {
-        throw MessageProblems.MessageException(MessageProblems(toJson()).apply { this.error("Ingen av feltene eksisterte på meldingen") })
+        throw MessageProblems.MessageException(MessageProblems(toJson()).apply {
+            this.error("Ingen av feltene eksisterte på meldingen")
+        })
+    }
+}
+
+private fun JsonMessage.forbidAllKeysPresent(keys: List<String>) {
+    if (keys.onEach { interestedIn(it) }
+            .map(::get)
+            .none { it.isMissingNode }
+    ) {
+        throw MessageProblems.MessageException(MessageProblems(toJson()).apply {
+            this.error("Alle av feltene eksisterte på meldingen")
+        })
     }
 }

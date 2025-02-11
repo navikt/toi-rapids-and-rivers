@@ -96,7 +96,7 @@ class SynlighetsmotorTest {
 
     @Test
     fun `om Person ikke har oppfølgingsinformasjon skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(erSattTilNull = true)),
+        komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = null),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
     )
 
