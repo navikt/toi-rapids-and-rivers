@@ -4,7 +4,7 @@ on:
   push:
     paths:
     - apps/toi-sammenstille-kandidat/**
-    - .github/workflows/deploy-toi-sammenstille-kand  idat.yaml
+    - .github/workflows/deploy-toi-sammenstille-kandidat.yaml
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
 
