@@ -1,4 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import com.fasterxml.jackson.databind.node.NullNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -34,15 +36,15 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        //Muklige Koder:  "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG", "FORTROLIG", "UGRADERT", null
+        //Mulige Koder:  "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG", "FORTROLIG", "UGRADERT", null(mappes til UKJENT)
         val aktørid: String = packet["aktørId"].asText()
 
         val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
         val gradering = personhendelseService.graderingFor(aktørid)
-        packet["adressebeskyttelse"] = gradering?.name ?: throw IllegalStateException("Betyr mangel av svar at person er ugradert?")
+        packet["adressebeskyttelse"] = gradering?.name ?: "UKJENT"
 
         log.info("Sender løsning på behov for aktørid: (se securelog)")
-        secureLog.info("Sender løsning på behov for aktørid: (se securelog) TODO: verifiser at securelog logger riktig")
+        secureLog.info("Sender løsning på behov for aktørid: $aktørid")
 
         context.publish(aktørid, packet.toJson())
     }
