@@ -21,6 +21,7 @@ class SamleLytter(
                 it.requireKey("aktørId")
                 it.requireKey(feltSomSkalBehandles)
                 it.forbidValue("sammenstilt", true)
+                it.forbid("@behov")         // Hack for å ikke plukke opp meldinger publisert av need-lytter
                 it.interestedIn("system_participating_services", "system_read_count")
             }
         }.register(this)
