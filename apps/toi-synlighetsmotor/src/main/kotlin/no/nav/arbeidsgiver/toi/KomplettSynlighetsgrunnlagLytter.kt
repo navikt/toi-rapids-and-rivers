@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -10,7 +9,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
 
-class KomplettSynlighetsgrunnlagLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) :
+class KomplettSynlighetsgrunnlagLytter(
+    private val rapidsConnection: RapidsConnection,
+    private val repository: Repository
+) :
     River.PacketListener {
 
     private val requiredFields = requiredFieldsSynlilghetsbehov()
@@ -48,8 +50,44 @@ class KomplettSynlighetsgrunnlagLytter(private val rapidsConnection: RapidsConne
         )
 
         val synlighet = synlighetsevaluering()
+
+        sanityCheckAdressebeskyttelse(kandidat, synlighetsevaluering)
+
         packet["synlighet"] = synlighet
         rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+    }
+
+    private fun sanityCheckAdressebeskyttelse(kandidat: Kandidat?, evaluering: Evaluering) {
+        val erSynligUtenomAdressebeskyttelse =
+            evaluering.run {
+                harAktivCv &&
+                        harJobbprofil &&
+                        harSettHjemmel &&
+                        maaIkkeBehandleTidligereCv &&
+                        arenaIkkeFritattKandidatsøk &&
+                        erUnderOppfoelging &&
+                        harRiktigFormidlingsgruppe &&
+                        erIkkeSperretAnsatt &&
+                        erIkkeDoed &&
+                        erFerdigBeregnet &&
+                        erIkkeKvp
+            }
+
+        val harAdressebeskyttelse =
+            kandidat?.adressebeskyttelse == "STRENGT_FORTROLIG_UTLAND" ||
+                    kandidat?.adressebeskyttelse == "STRENGT_FORTROLIG" ||
+                    kandidat?.adressebeskyttelse == "FORTROLIG"
+
+        val harKode6Eller7 = !evaluering.erIkkeKode6eller7
+
+        if (erSynligUtenomAdressebeskyttelse && (harAdressebeskyttelse || harKode6Eller7)) {
+            secureLog.info(
+                "(secure) synlighet vurderes for ${kandidat?.aktørId} med " +
+                        "adressebeskyttelse: ${kandidat?.adressebeskyttelse} " +
+                        "oppfølging6eller7: ${harKode6Eller7} " +
+                        "forskjell: ${harAdressebeskyttelse != harKode6Eller7}"
+            )
+        }
     }
 }
 

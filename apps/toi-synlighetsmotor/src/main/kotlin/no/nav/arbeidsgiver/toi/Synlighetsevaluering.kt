@@ -46,11 +46,11 @@ private fun erUnderOppfølging(kandidat: Kandidat): Boolean {
     val now = Instant.now()
     val startDato = kandidat.oppfølgingsperiode.startDato.toInstant()
     val sluttDato = kandidat.oppfølgingsperiode.sluttDato?.toInstant()
-    sanityCheck(now, kandidat, startDato, sluttDato)
+    sanityCheckOppfølging(now, kandidat, startDato, sluttDato)
     return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
 }
 
-private fun sanityCheck(
+private fun sanityCheckOppfølging(
     now: Instant?,
     kandidat: Kandidat,
     startDatoOppfølging: Instant,
