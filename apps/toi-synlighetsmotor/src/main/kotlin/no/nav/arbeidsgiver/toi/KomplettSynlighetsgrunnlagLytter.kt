@@ -73,11 +73,19 @@ class KomplettSynlighetsgrunnlagLytter(
                         erIkkeKvp
             }
 
-        if (erSynligUtenomAdressebeskyttelse) {
+        val harAdressebeskyttelse =
+            kandidat?.adressebeskyttelse == "STRENGT_FORTROLIG_UTLAND" ||
+                    kandidat?.adressebeskyttelse == "STRENGT_FORTROLIG" ||
+                    kandidat?.adressebeskyttelse == "FORTROLIG"
+
+        val harKode6Eller7 = !evaluering.erIkkeKode6eller7
+
+        if (erSynligUtenomAdressebeskyttelse && (harAdressebeskyttelse || harKode6Eller7)) {
             secureLog.info(
-                "(secure) synlighet vurderes for ${kandidat?.aktørId} med" +
-                        " adressebeskyttelse: ${kandidat?.adressebeskyttelse} " +
-                        "oppfølging6eller7: ${evaluering.erIkkeKode6eller7})"
+                "(secure) synlighet vurderes for ${kandidat?.aktørId} med " +
+                        "adressebeskyttelse: ${kandidat?.adressebeskyttelse} " +
+                        "oppfølging6eller7: ${harKode6Eller7} " +
+                        "forskjell: ${harAdressebeskyttelse != harKode6Eller7}"
             )
         }
     }
