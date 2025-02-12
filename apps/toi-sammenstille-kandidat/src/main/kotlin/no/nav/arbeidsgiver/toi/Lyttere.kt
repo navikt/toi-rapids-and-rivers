@@ -20,7 +20,7 @@ class SamleLytter(
                 it.requireValue("@event_name", eventNavn)
                 it.requireKey("aktørId")
                 it.requireKey(feltSomSkalBehandles)
-                it.forbidValue("sammenstilt", true)
+                it.forbidValue("sammenstilt", true)     // Ikke egentlig nødvindig lenger men beholdes for eldre meldinger
                 it.forbid("@behov")         // Hack for å ikke plukke opp meldinger publisert av need-lytter
                 it.interestedIn("system_participating_services", "system_read_count")
             }
@@ -33,14 +33,6 @@ class SamleLytter(
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
         val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
         repository.lagreKandidat(oppdatertKandidat)
-
-        val nyPakke = oppdatertKandidat.somJsonMessage(meterRegistry)
-        nyPakke["@event_name"] = packet["@event_name"].asText()
-        nyPakke["system_participating_services"] = packet["system_participating_services"]
-        nyPakke["system_read_count"] = packet["system_read_count"]
-        nyPakke["sammenstilt"] = true
-
-        rapidsConnection.publish(aktørId, nyPakke.toJson())
     }
 
     private fun oppdaterKandidat(kandidat: Kandidat, packet: JsonMessage): Kandidat {
