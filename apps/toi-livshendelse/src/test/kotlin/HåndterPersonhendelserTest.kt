@@ -8,8 +8,8 @@ import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.*
 import java.time.Instant
 import java.time.LocalDateTime
@@ -259,6 +259,82 @@ class HåndterPersonhendelserTest {
         val inspektør = testRapid.inspektør
 
         assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `sjekk at hentGraderingPerAktørId returnerer UKJENT ved 'Fant ikke person' error`() {
+        val ident = "111111111"
+        stubOAtuh()
+        stubPdlPersonNotFound(ident)
+        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
+        assertThat(resultat).containsEntry(ident, "UKJENT")
+    }
+
+    @Test
+    fun `sjekk at hentGraderingPerAktørId kaster exception ved annen error`() {
+        val ident = "222222222"
+        stubOAtuh()
+        stubPdlOtherError(ident)
+        assertThatThrownBy { pdlKlient.hentGraderingPerAktørId(ident) }
+            .hasMessageContaining("Klarte ikke å hente gradering fra PDL-respons")
+    }
+
+    private fun stubPdlPersonNotFound(ident: String = "12312312312") {
+        val pesostegn = "$"
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/graphql"))
+                .withHeader("Authorization", WireMock.equalTo("Bearer mockedAccessToken"))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                    {
+                        "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident) { adressebeskyttelse(historikk: false) { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
+                        "variables":{"ident":"$ident"}
+                    }
+                    """.trimIndent()
+                    )
+                )
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withBody(
+                            """
+                        {
+                            "errors": [ { "message": "Fant ikke person" } ]
+                        }
+                        """.trimIndent()
+                        )
+                )
+        )
+    }
+
+    private fun stubPdlOtherError(ident: String = "12312312312") {
+        val pesostegn = "$"
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo("/graphql"))
+                .withHeader("Authorization", WireMock.equalTo("Bearer mockedAccessToken"))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                    {
+                        "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident) { adressebeskyttelse(historikk: false) { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
+                        "variables":{"ident":"$ident"}
+                    }
+                    """.trimIndent()
+                    )
+                )
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withBody(
+                            """
+                        {
+                            "errors": [ { "message": "Noe annet error" } ]
+                        }
+                        """.trimIndent()
+                        )
+                )
+        )
     }
 
     private fun stubPdl(

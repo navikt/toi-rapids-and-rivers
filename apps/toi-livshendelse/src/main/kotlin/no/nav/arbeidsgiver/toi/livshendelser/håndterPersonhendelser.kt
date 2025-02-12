@@ -44,7 +44,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
     fun graderingFor(ident: String) = pdlKlient.hentGraderingPerAktørId(ident)[ident]
 }
 
-class DiskresjonsHendelse(val ident: String, val gradering: Gradering) {
+class DiskresjonsHendelse(val ident: String, val gradering: String) {
     fun toJson(): String {
         return """
             {

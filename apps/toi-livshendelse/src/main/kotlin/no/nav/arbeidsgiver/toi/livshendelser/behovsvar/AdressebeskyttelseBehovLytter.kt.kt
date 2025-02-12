@@ -41,7 +41,7 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
 
         val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
         val gradering = personhendelseService.graderingFor(aktørid)
-        packet["adressebeskyttelse"] = gradering?.name ?: "UKJENT"
+        packet["adressebeskyttelse"] = gradering ?: "UKJENT"
 
         log.info("Sender løsning på behov for aktørid: (se securelog)")
         secureLog.info("Sender løsning på behov for aktørid: $aktørid")

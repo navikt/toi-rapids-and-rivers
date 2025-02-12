@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
-    fun hentGraderingPerAktørId(ident: String): Map<String, Gradering> {
+    fun hentGraderingPerAktørId(ident: String): Map<String, String> {
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(ident)
 
@@ -21,16 +21,22 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             .jsonBody(graphql)
             .responseObject<Respons>()
 
-        when (result) {
+        return when (result) {
             is com.github.kittinunf.result.Result.Success -> {
-                val gradering = result.get().data?.hentPerson?.hentEnesteAdressebeskyttelsenSomFinnes()?.gradering
-                    ?: behandleErrorFraPDL(result.get().errors)
+                val gradering = result.get().data?.hentPerson?.hentEnesteAdressebeskyttelsenSomFinnes()
+                    ?.gradering?.name
 
-                return result.get().data?.hentIdenter?.identer?.map(Identer::ident)?.associateWith { gradering }
-                    ?: behandleErrorFraPDL(result.get().errors)
+                if (gradering == null) {
+                    return behandleErrorFraPDL(result.get().errors, ident)
+                }
 
+                result.get().data
+                    ?.hentIdenter
+                    ?.identer
+                    ?.map { it.ident }
+                    ?.associateWith { gradering }
+                    ?: behandleErrorFraPDL(result.get().errors, ident)
             }
-
             is com.github.kittinunf.result.Result.Failure -> {
                 log.error("Noe feil skjedde ved henting av diskresjonskode for ident(se securelog)")
                 secureLog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message}")
@@ -39,11 +45,18 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         }
     }
 
-    private fun behandleErrorFraPDL(errors: List<Error>?): Nothing {
-        log.error("Klarte ikke å hente gradering fra PDL-respons: se securelog")
-        secureLog.error("Klarte ikke å hente gradering fra PDL-respons: $errors")
-        throw Exception("Klarte ikke å hente gradering fra PDL-respons")
+    private fun behandleErrorFraPDL(errors: List<Error>?, ident: String): Map<String, String> {
+
+        return if (errors?.all { it.message == "Fant ikke person" } == true) {
+            secureLog.info("Fant ikke person: $ident")
+            mapOf(ident to "UKJENT")
+        } else {
+            log.error("Klarte ikke å hente gradering fra PDL-respons: se securelog")
+            secureLog.error("Klarte ikke å hente gradering fra PDL-respons: $errors")
+            throw Exception("Klarte ikke å hente gradering fra PDL-respons")
+        }
     }
+
 
     private fun lagGraphQLSpørring(ident: String): String {
         val pesostegn = "$"
