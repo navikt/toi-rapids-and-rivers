@@ -9,5 +9,6 @@ fun requiredFieldsSynlilghetsbehov() = listOf(
     "arenaFritattKandidatsøk",
     "hjemmel",
     "måBehandleTidligereCv",
-    "kvp"
+    "kvp",
+    "adressebeskyttelse"
 )

@@ -1,9 +1,10 @@
 package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -64,7 +65,7 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
     }
 
     @Test
@@ -76,7 +77,7 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -93,10 +94,10 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        Assertions.assertThat(melding["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
-        Assertions.assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
+        assertThat(melding["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
+        assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
     @Test
@@ -108,7 +109,38 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `legg på svar om behov nummer 2 er organisasjonsenhetsnavn, dersom første behov har en løsning med null-verdi`() {
+        val testRapid = TestRapid()
+        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["noeannet", "organisasjonsenhetsnavn"]""",
+                løsninger = listOf("noeannet" to "null"),
+            )
+        )
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["organisasjonsenhetsnavn"].isMissingOrNull()).isFalse
+        assertThat(melding["noeannet"].isNull).isTrue
+    }
+
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
+        val testRapid = TestRapid()
+        startApp(Norg2Klient("http://localhost:8082"), testRapid)
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["organisasjonsenhetsnavn"]""",
+                løsninger = listOf("organisasjonsenhetsnavn" to "null"),
+            )
+        )
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -125,7 +157,7 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -137,9 +169,9 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
 
-        Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
+        assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
     }
 
     @Test
@@ -150,8 +182,8 @@ class OrganisasjonsenhetTest {
         testRapid.sendTestMessage(behovsMelding(behovListe = """["organisasjonsenhetsnavn"]""", enhetsNummer = "0404"))
 
         val inspektør = testRapid.inspektør
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
-        Assertions.assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("")
+        assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("")
     }
 
     @Test

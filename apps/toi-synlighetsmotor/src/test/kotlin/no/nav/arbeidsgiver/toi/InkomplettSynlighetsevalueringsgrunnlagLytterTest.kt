@@ -20,7 +20,8 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             "arenaFritattKandidatsøk",
             "hjemmel",
             "måBehandleTidligereCv",
-            "kvp")
+            "kvp",
+            "adressebeskyttelse")
         @JvmStatic
         private fun felter() = feltNavn.map { Arguments.of(it) }.stream()
     }

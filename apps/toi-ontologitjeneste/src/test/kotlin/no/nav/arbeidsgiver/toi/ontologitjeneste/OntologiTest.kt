@@ -1,9 +1,11 @@
 package no.nav.arbeidsgiver.toi.ontologitjeneste
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -84,7 +86,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
     }
 
     @Test
@@ -101,7 +103,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -118,7 +120,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -130,7 +132,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -147,7 +149,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
     }
 
     @Test
@@ -159,7 +161,38 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `legg på svar om behov nummer 2 er ontologi, dersom første behov har en løsning med null-verdi`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["noeannet", "ontologi"]""",
+                løsninger = listOf("noeannet" to "null"),
+            )
+        )
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["ontologi"].isMissingOrNull()).isFalse
+        assertThat(melding["noeannet"].isNull).isTrue
+    }
+
+    @Test
+    fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["ontologi"]""",
+                løsninger = listOf("ontologi" to "null"),
+            )
+        )
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -181,7 +214,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(0)
+        assertThat(inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -193,7 +226,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
 
         Assertions.assertThat(inspektør.message(0)["ontologi"]["stillingstittel"].toPrettyString()).isEqualToIgnoringWhitespace("""
         {
@@ -214,7 +247,7 @@ class OntologiTest {
 
         val inspektør = testRapid.inspektør
 
-        Assertions.assertThat(inspektør.size).isEqualTo(1)
+        assertThat(inspektør.size).isEqualTo(1)
 
         Assertions.assertThat(inspektør.message(0)["ontologi"]["kompetansenavn"].toPrettyString()).isEqualToIgnoringWhitespace("""
         { 
