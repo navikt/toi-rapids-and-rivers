@@ -164,7 +164,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val message = inspektør.message(0)
-        assertThat(message["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString())
+        assertThat(message["adressebeskyttelse"].asText()).isEqualTo("CHECK_DISABLED")
     }
 
     @Test
@@ -198,7 +198,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
+        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo("CHECK_DISABLED")
         assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
@@ -243,7 +243,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
+        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo("CHECK_DISABLED")
         assertThat(melding["noeannet"].isNull).isTrue
     }
 

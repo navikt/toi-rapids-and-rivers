@@ -39,10 +39,15 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
         //Mulige Koder:  "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG", "FORTROLIG", "UGRADERT", null(mappes til UKJENT)
         val aktørid: String = packet["aktørId"].asText()
 
+        /*
+        // Dette tar for lang tid, klarer kun 60000 pr time, må disable dette for å kverne gjennom dataene i prod
+        // Går gret nå inntil videre siden vi ikke har startet å bruke dataene fra dette kallet, beskyttelse hentes foreløpig annet sted.
+        // Sender svar, siden det er veldig mange behovkall i synlighetsmotor som venter på svar. Og da får vi verifiser resten av flyten.
         val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
         val gradering = personhendelseService.graderingFor(aktørid)
         packet["adressebeskyttelse"] = gradering ?: "UKJENT"
-
+        */
+        packet["adressebeskyttelse"] = "CHECK_DISABLED"
         log.info("Sender løsning på behov for aktørid: (se securelog)")
         secureLog.info("Sender løsning på behov for aktørid: $aktørid")
 
