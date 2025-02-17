@@ -23,4 +23,6 @@
     <root level="INFO">
         <appender-ref ref="loggIJsonFormatTilKibana"/>
     </root>
+
+    <logger name="io.micrometer.prometheusmetrics.PrometheusMeterRegistry" level="DEBUG" />
 </configuration>
