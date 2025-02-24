@@ -12,6 +12,8 @@ import no.nav.arbeidsgiver.toi.livshendelser.opprettJavalinMedTilgangskontroll
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.core.configuration.IssuerProperties
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import java.net.InetAddress
 import java.net.URI
@@ -61,10 +63,12 @@ class HentAdressebeskyttelseTest {
     fun `Hent adressebeskyttelse for person som har adressebeskyttelse`() {
         val token = hentToken(mockOAuth2Server)
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:8301/adressebeskyttelse")
+        val response = Fuel.get("http://localhost:8301/adressebeskyttelse/12345678912")
             .authentication().bearer(token.serialize())
-            .body("""{"fnr": "12345678912"}""")
             .response().second
+
+        assertThat(response.statusCode).isEqualTo(200)
+        assertThat(response.body()).isEqualTo("""{"hentAdressebeskyttelse":true}""")
     }
 
     private fun startApp(
