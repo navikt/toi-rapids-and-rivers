@@ -1,0 +1,21 @@
+name: toi-arbeidssoekerperiode
+
+on:
+  push:
+    paths:
+    - apps/toi-arbeidssoekerperiode/**
+    - .github/workflows/deploy-toi-arbeidssoekerperiode.yaml
+    - .github/workflows/deploy-toi-template.yaml
+    - buildSrc/**
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/deploy-toi-template.yaml
+    with:
+      app_name: ${{ github.workflow }}
+      deploy_dev_branch: refs/heads/baseimage-resten
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
