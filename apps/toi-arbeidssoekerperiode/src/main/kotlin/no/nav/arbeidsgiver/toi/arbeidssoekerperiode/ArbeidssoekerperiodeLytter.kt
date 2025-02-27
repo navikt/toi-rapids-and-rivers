@@ -18,7 +18,6 @@ class ArbeidssoekerperiodeLytter(private val consumer: () -> Consumer<Long, Peri
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
-
     val arbeidssokerperioderTopic = "paw.arbeidssokerperioder-v1"
 
     private val job = Job()
