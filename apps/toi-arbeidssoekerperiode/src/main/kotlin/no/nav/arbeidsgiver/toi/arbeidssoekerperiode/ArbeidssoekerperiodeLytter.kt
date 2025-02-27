@@ -43,7 +43,7 @@ class ArbeidssoekerperiodeLytter(private val consumer: () -> Consumer<Long, Peri
                                 behandleArbeidssokerPeriode(it.value()) }
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
-                            log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer: ${periode.somJson()}")
+                            log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
                             secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJson()}")
                             rapidsConnection.publish(periode.identitetsnummer, periode.somJson())
                         }

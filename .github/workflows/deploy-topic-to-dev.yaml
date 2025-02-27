@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/arbeidssoekerperide
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
