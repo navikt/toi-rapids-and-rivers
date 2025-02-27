@@ -40,11 +40,12 @@ class ArbeidssoekerperiodeLytter(private val consumer: () -> Consumer<Long, Peri
                     try {
                         val records: ConsumerRecords<Long, Periode> =
                             consumer.poll(Duration.ofSeconds(5))
-                        val arbeidssokerperioderMeldinger = records.map { behandleArbeidssokerPeriode(it.value()) }
+                        val arbeidssokerperioderMeldinger = records.map { secureLog.info("Mottok periodemelding fra asr: ${it.value().toString()}")
+                                behandleArbeidssokerPeriode(it.value()) }
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
                             log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer: ${periode.somJson()}")
-                            secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid")
+                            secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJson()}")
                             rapidsConnection.publish(periode.identitetsnummer, periode.somJson())
                         }
                         consumer.commitSync()
