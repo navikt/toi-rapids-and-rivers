@@ -1,56 +1,58 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import io.micrometer.core.instrument.MeterRegistry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerRecords
+import org.apache.kafka.common.errors.RetriableException
 import org.slf4j.LoggerFactory
+import java.time.Duration
+import kotlin.coroutines.CoroutineContext
 
-class ArbeidssoekerperiodeLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+class ArbeidssoekerperiodeLytter(private val consumer: () -> Consumer<Long, Periode>,
+               private val behandleArbeidssokerPeriode: (Periode) -> ArbeidssokerPeriode
+) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
 
-    init {
-        River(rapidsConnection).apply {
-            precondition{
-                it.requireKey("uuid")
-                it.requireKey("aktorId")
-                it.requireKey("startDato")
-                it.forbid("@event_name")
+    val arbeidssokerperioderTopic = "paw.arbeidssokerperioder-v1"
+
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
+
+    override fun onReady(rapidsConnection: RapidsConnection) {
+        job.invokeOnCompletion {
+            log.error("Shutting down Rapid", it)
+            rapidsConnection.stop()
+        }
+
+        launch {
+            consumer().use { consumer ->
+                consumer.subscribe(listOf(arbeidssokerperioderTopic))
+                log.info("Starter å konsumere topic: $arbeidssokerperioderTopic")
+
+                while (job.isActive) {
+                    try {
+                        val records: ConsumerRecords<Long, Periode> =
+                            consumer.poll(Duration.ofSeconds(5))
+                        val arbeidssokerperioderMeldinger = records.map { behandleArbeidssokerPeriode(it.value()) }
+
+                        arbeidssokerperioderMeldinger.forEach { periode ->
+                            log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer: ${periode.somJson()}")
+                            secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid")
+                            rapidsConnection.publish(periode.identitetsnummer, periode.somJson())
+                        }
+                        consumer.commitSync()
+                    } catch (e: RetriableException) {
+                        log.warn("Fikk en retriable exception, prøver på nytt", e)
+                    }
+                }
             }
-        }.register(this)
-    }
-
-    override fun onPacket(
-        packet: JsonMessage,
-        context: MessageContext,
-        metadata: MessageMetadata,
-        meterRegistry: MeterRegistry
-    ) {
-        val melding = mapOf(
-            "aktørId" to packet["aktorId"],
-            "arbeidssoekerperiode" to packet.fjernMetadataOgKonverter(),
-            "@event_name" to "arbeidssoekerperiode",
-        )
-
-        val aktørId = packet["aktorId"].asText()
-        log.info("Skal publisere arbeidssoekerperiodemelding for aktørid (se securelog)")
-        secureLog.info("Skal publisere arbeidssoekerperiodemelding for $aktørId")
-        secureLog.info("Melding fra paw: ${packet.toJson()}")
-        val nyPacket = JsonMessage.newMessage(melding)
-        //rapidsConnection.publish(aktørId, nyPacket.toJson())
-    }
-
-    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter =
-            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
-        jsonNode.remove(metadataFelter)
-        return jsonNode
+        }
     }
 }

@@ -1,62 +1,88 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import no.nav.paw.arbeidssokerregisteret.api.v1.Bruker
+import no.nav.paw.arbeidssokerregisteret.api.v1.BrukerType
+import no.nav.paw.arbeidssokerregisteret.api.v1.Metadata
+import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.consumer.MockConsumer
+import org.apache.kafka.clients.consumer.OffsetResetStrategy
+import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.Instant
+import java.util.*
 
 class ArbeidssoekerperiodeTest {
+    val arbeidssokerperioderTopic = TopicPartition("paw.arbeidssokerperioder-v1", 0)
+
+    val behandleMelding: (Periode) -> ArbeidssokerPeriode = { melding ->
+        ArbeidssokerPeriode(melding, PrometheusMeterRegistry(PrometheusConfig.DEFAULT))
+    }
 
     @Test
-    fun `Lesing av arbeidssoekerperiodeMelding fra eksternt topic skal foreløpig ikke produsere ny melding på rapid`() {
-        val testRapid = TestRapid()
-        val aktørId = "100000001"
+    fun `lesing av arbeidssøkerperioder fra topic skal publiseres på rapid`() {
+        val melding = melding()
+        val consumer = mockConsumer()
+        val rapid = TestRapid()
+        val arbeidssoekerperiodeLytter = ArbeidssoekerperiodeLytter({ consumer }, behandleMelding)
 
-        ArbeidssoekerperiodeLytter(testRapid)
+        produserArbeidssoekerperiodeMelding(consumer, melding)
+        arbeidssoekerperiodeLytter.onReady(rapid)
 
-        testRapid.sendTestMessage(arbeidssoekerperiodeMeldingFraEksterntTopic(aktørId))
-        val inspektør = testRapid.inspektør
+        Thread.sleep(600)
+        val inspektør = rapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
 
-        assertThat(inspektør.size).isEqualTo(0)
-        /*
         val meldingJson = inspektør.message(0)
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+            "id",
             "@event_name",
-            "arbeidssoekerperiode",
-            "aktørId",
-            "system_read_count",
+            "identitetsnummer",
+            "startet",
+            "avsluttet",
             "@id",
             "@opprettet",
+            "system_read_count",
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("arbeidssoekerperiode")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
-
-        val arbeidssoekerperiodeJson = meldingJson.get("arbeidssoekerperiode")
-        assertThat(arbeidssoekerperiodeJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "uuid",
-            "aktorId",
-            "startDato",
-            "sluttDato"
-        )
-
-        arbeidssoekerperiodeJson.apply {
-            assertThat(get("uuid").asText()).isEqualTo("0b0e2261-343d-488e-a70f-807f4b151a2f")
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("startDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
-            assertThat(get("sluttDato").isNull).isTrue
-        }
-
-         */
+        assertThat(meldingJson.get("identitetsnummer")).isNotNull
     }
 
-    private fun arbeidssoekerperiodeMeldingFraEksterntTopic(aktørId: String) = """
-        {
-            "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-            "aktorId": "${aktørId}",
-            "startDato": "2020-10-30T14:15:38+01:00",
-            "sluttDato": null 
+    private fun mockConsumer() = MockConsumer<Long, Periode>(OffsetResetStrategy.EARLIEST).apply {
+        schedulePollTask {
+            rebalance(listOf(arbeidssokerperioderTopic))
+            updateBeginningOffsets(mapOf(Pair(arbeidssokerperioderTopic, 0)))
         }
-    """.trimIndent()
+    }
+
+    private fun produserArbeidssoekerperiodeMelding(consumer: MockConsumer<Long, Periode>, melding: Periode, offset: Long = 0) {
+        val record = ConsumerRecord(
+            arbeidssokerperioderTopic.topic(),
+            arbeidssokerperioderTopic.partition(),
+            offset,
+            (kotlin.random.Random(System.currentTimeMillis())).nextLong(),
+            melding
+        )
+        consumer.schedulePollTask {
+            consumer.addRecord(record)
+        }
+    }
+
+    private fun melding() = Periode.newBuilder()
+        .setId(UUID.randomUUID())
+        .setStartet(Metadata.newBuilder()
+            .setAarsak("whatever")
+            .setKilde("junit")
+            .setTidspunkt(Instant.now())
+            .setUtfoertAv(Bruker.newBuilder().setId("jeje").setType(BrukerType.SYSTEM).build())
+            .build())
+        .setAvsluttet(null)
+        .setIdentitetsnummer("01010012345")
+        .build()
 }
