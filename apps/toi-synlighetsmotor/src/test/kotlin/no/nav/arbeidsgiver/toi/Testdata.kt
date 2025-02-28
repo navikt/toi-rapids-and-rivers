@@ -250,8 +250,8 @@ class Testdata {
             """
             "hjemmel": {
                 "ressurs": "$ressurs",
-                "opprettetDato": "$opprettetDato",
-                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""},
+                "opprettetDato": ${opprettetDato?.let { """"$it"""" }},
+                "slettetDato": ${slettetDato?.let { """"$it"""" }},
                 "fnr": "12345678912"
             }
         """.trimIndent()

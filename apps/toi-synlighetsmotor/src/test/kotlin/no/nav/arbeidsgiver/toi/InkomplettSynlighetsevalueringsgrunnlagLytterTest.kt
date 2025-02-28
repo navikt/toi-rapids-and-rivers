@@ -49,9 +49,9 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.hasNonNull(felt.navn)).isTrue()
-            assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
                 .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
-            assertThat(melding.get("synlighet").isMissingNode).isTrue()
+            assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
 
@@ -67,10 +67,32 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.hasNonNull(felt.navn)).isTrue()
-            assertThat(melding.get("@behov").isMissingNode).isTrue()
-            melding.get("synlighet").apply {
-                assertThat(get("erSynlig").asBoolean()).isFalse()
-                assertThat(get("ferdigBeregnet").asBoolean()).isTrue()
+            assertThat(melding.path("@behov").isMissingNode).isTrue()
+            melding.path("synlighet").apply {
+                assertThat(path("erSynlig").asBoolean()).isFalse()
+                assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
+            }
+        })
+    }
+
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `Om det kommer en melding med bare et av datafeltene den trenger for synlighetsevaluering, skal den ikke be om resten om synlighet er false på evaluering på det den har mottatt, men heller sende videre med synlighet false, også når andre behov finnes fra før`(felt: Felt) {
+        val preBehov = "Uinterresant behov"
+        testProgramMedHendelse("""
+            {
+                "@behov": ["$preBehov"],
+                "aktørId": "$aktørId",
+                ${felt.synligFalse}
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            assertThat(melding.hasNonNull(felt.navn)).isTrue()
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText)).containsExactly(preBehov)
+            melding.path("synlighet").apply {
+                assertThat(path("erSynlig").asBoolean()).isFalse()
+                assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
             }
         })
     }
@@ -102,9 +124,9 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
                 .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
-            assertThat(melding.get("@behov").asIterable()).hasSize(alleFelter.size)
+            assertThat(melding.path("@behov").asIterable()).hasSize(alleFelter.size)
         })
     }
 
@@ -121,9 +143,9 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
                 .containsExactlyInAnyOrder(*(alleFelter + annetBehov).toTypedArray())
-            assertThat(melding.get("@behov").asIterable()).hasSize(alleFelter.size+1)
+            assertThat(melding.path("@behov").asIterable()).hasSize(alleFelter.size+1)
         })
     }
 

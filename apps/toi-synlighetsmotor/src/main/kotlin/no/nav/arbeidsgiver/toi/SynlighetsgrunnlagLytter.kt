@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
 
 class SynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection,
@@ -31,14 +32,29 @@ class SynlighetsgrunnlagLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        val kandidat = Kandidat.fraJson(packet)
 
+        val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
+
+        if(!synlighetsevaluering.erSynlig()) {
+            packet["synlighet"] = synlighetsevaluering()
+            repository.lagre(
+                evaluering = synlighetsevaluering,
+                aktørId = kandidat.aktørId,
+                fødselsnummer = kandidat.fødselsNummer()
+            )
+            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+        } else {
+
+        }
     }
 }
 
 
 private fun JsonMessage.requireAny(keys: List<String>) {
     if(keys.onEach { interestedIn(it) }
-            .all { this[it].isMissingNode })
+            .map(this::get)
+            .all { it.isMissingNode })
         throw MessageProblems.MessageException(MessageProblems(toJson()).apply { this.error("Ingen av feltene fantes i meldingen") })
 }
 
