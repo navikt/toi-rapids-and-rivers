@@ -1,6 +1,16 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
+import no.nav.arbeidsgiver.toi.CvMeldingstype.*
+import no.nav.arbeidsgiver.toi.Testdata.Companion.adressebeskyttelse
+import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivOppfølgingsperiode
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
+import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
+import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
+import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -11,86 +21,109 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
 
     companion object {
         private val aktørId = "1234"
-        private val feltNavn = listOf(
-            "arbeidsmarkedCv",
-            "veileder",
-            "oppfølgingsinformasjon",
-            "siste14avedtak",
-            "oppfølgingsperiode",
-            "arenaFritattKandidatsøk",
-            "hjemmel",
-            "måBehandleTidligereCv",
-            "kvp",
-            "adressebeskyttelse")
         @JvmStatic
-        private fun felter() = feltNavn.map { Arguments.of(it) }.stream()
+        private fun felter() = Felt.entries.map { Arguments.of(it) }.stream()
     }
+    enum class Felt(val navn: String, val synligTrue: String, val synligFalse: String) {
+        ARBEIDSMARKED_CV("arbeidsmarkedCv", arbeidsmarkedCv(OPPRETT), arbeidsmarkedCv(SLETT)),
+        OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
+        OPPFØLGINGSPERIODE("oppfølgingsperiode", aktivOppfølgingsperiode(), avsluttetOppfølgingsperiode()),
+        ARENAFRITATTKANDIDATSØK("arenaFritattKandidatsøk", arenaFritattKandidatsøk(fnr = null), arenaFritattKandidatsøk(fritattKandidatsøk = true, fnr = null)),
+        HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
+        MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
+        KVP("kvp", kvp(event = "STARTET"), kvp(event = "AVSLUTTET")),
+        ADRESSEBESKYTTELSE("adressebeskyttelse", """"adressebeskyttelse":null""", adressebeskyttelse())
+    }
+
+    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak"
 
     @ParameterizedTest
     @MethodSource("felter")
-    fun `Om det kommer en melding med bare et av datafeltene den trenger for synlighetsevaluering, skal den be om resten`(felt: String) {
+    fun `Om det kommer en melding med bare et av datafeltene den trenger for synlighetsevaluering, skal den be om resten om synlighet er true på evaluering på det den har mottatt`(felt: Felt) {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "$felt": {}
+                ${felt.synligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.hasNonNull(felt)).isTrue()
+            assertThat(melding.hasNonNull(felt.navn)).isTrue()
             assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
-                .containsExactlyInAnyOrder(*feltNavn.toTypedArray())
+                .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.get("synlighet").isMissingNode).isTrue()
         })
     }
 
     @ParameterizedTest
     @MethodSource("felter")
-    fun `Om det kommer en melding med alle behov utfylt trenger man ikke be om behov på nytt`(felt: String) {
+    fun `Om det kommer en melding med bare et av datafeltene den trenger for synlighetsevaluering, skal den ikke be om resten om synlighet er false på evaluering på det den har mottatt, men heller sende videre med synlighet false`(felt: Felt) {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${feltNavn.joinToString(",","[","]"){""""$it""""}},
-                "$felt": {}
+                ${felt.synligFalse}
             }
         """.trimIndent(), {
-            assertThat(size).isEqualTo(0)
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            assertThat(melding.hasNonNull(felt.navn)).isTrue()
+            assertThat(melding.get("@behov").isMissingNode).isTrue()
+            melding.get("synlighet").apply {
+                assertThat(get("erSynlig").asBoolean()).isFalse()
+                assertThat(get("ferdigBeregnet").asBoolean()).isTrue()
+            }
         })
     }
 
     @ParameterizedTest
     @MethodSource("felter")
-    fun `Om det kommer en melding med bare noen behov utfylt trenger man be om behov på resten`(felt: String) {
+    fun `Om det kommer en melding med alle behov utfylt trenger man ikke be om behov på nytt`(felt: Felt) {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(feltNavn.subList(0, feltNavn.size-3)).joinToString(",","[","]"){""""$it""""}},
-                "$felt": {}
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                ${felt.synligTrue}
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            assertThat(field(0, "@behov").isMissingNode).isTrue()
+        })
+    }
+
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `Om det kommer en melding med bare noen behov utfylt trenger man be om behov på resten`(felt: Felt) {
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${(alleFelter.subList(0, Felt.entries.size-3)).joinToString(",","[","]"){""""$it""""}},
+                ${felt.synligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
-                .containsExactlyInAnyOrder(*feltNavn.toTypedArray())
-            assertThat(melding.get("@behov").asIterable()).hasSize(feltNavn.size)
+                .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.get("@behov").asIterable()).hasSize(alleFelter.size)
         })
     }
 
     @ParameterizedTest
     @MethodSource("felter")
-    fun `Om det lå andre behov på meldingen så skal de ikke forsvinne når man ber om nye`(felt: String) {
+    fun `Om det lå andre behov på meldingen så skal de ikke forsvinne når man ber om nye`(felt: Felt) {
         val annetBehov = "Uinterresant hendelse"
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(feltNavn.subList(0, feltNavn.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}},
-                "$felt": {}
+                "@behov": ${(alleFelter.subList(0, Felt.entries.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}},
+                ${felt.synligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.get("@behov").asIterable().map(JsonNode::asText))
-                .containsExactlyInAnyOrder(*(feltNavn + annetBehov).toTypedArray())
-            assertThat(melding.get("@behov").asIterable()).hasSize(feltNavn.size+1)
+                .containsExactlyInAnyOrder(*(alleFelter + annetBehov).toTypedArray())
+            assertThat(melding.get("@behov").asIterable()).hasSize(alleFelter.size+1)
         })
     }
 
