@@ -42,7 +42,7 @@ class KomplettSynlighetsgrunnlagLytter(
 
         val kandidat = Kandidat.fraJson(packet)
 
-        val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
+        val synlighetsevaluering = kandidat.toEvaluering()
         repository.lagre(
             evaluering = synlighetsevaluering,
             aktørId = kandidat.aktørId,

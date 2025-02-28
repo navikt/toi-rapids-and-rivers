@@ -59,4 +59,4 @@ fun main() {
 }
 
 fun log(navn: String): Logger = LoggerFactory.getLogger(navn)
-
+val secureLog = LoggerFactory.getLogger("secureLog")

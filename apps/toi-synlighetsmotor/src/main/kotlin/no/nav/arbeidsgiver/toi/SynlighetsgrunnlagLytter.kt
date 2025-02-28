@@ -34,7 +34,7 @@ class SynlighetsgrunnlagLytter(
     ) {
         val kandidat = Kandidat.fraJson(packet)
 
-        val synlighetsevaluering = lagEvalueringsGrunnlag(kandidat)
+        val synlighetsevaluering = kandidat.toEvaluering()
 
         if(!synlighetsevaluering.erSynlig()) {
             packet["synlighet"] = synlighetsevaluering()
