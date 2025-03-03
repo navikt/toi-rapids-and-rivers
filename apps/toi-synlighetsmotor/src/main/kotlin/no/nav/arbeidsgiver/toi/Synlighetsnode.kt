@@ -1,19 +1,45 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
-class Synlighetsnode<T>(
-    val isMissing: Boolean,
-    val isNull: Boolean,
-    val value: T?
-)
 
-inline fun <reified T> ObjectMapper.fromSynlighetsnode(node: JsonNode): Synlighetsnode<T> =
-    Synlighetsnode(
-        node.isMissingNode,
-        node.isNull,
-        if (node.isNull || node.isMissingNode) null
-        else treeToValue(node, T::class.java)
-    )
+interface Synlighetsnode<T>{
+    fun hvisFinnesOg(condition: (T) -> Boolean): Boolean
+    fun hvisNullEller(condition: (T) -> Boolean): Boolean
+    fun svarPåDetteFeltetLiggerPåHendelse(): Boolean
+    fun verdiEllerNull(): T?
 
+    companion object {
+        inline fun <reified T> fromJsonNode(node: JsonNode) = when {
+            node.isMissingNode -> MissingNode()
+            node.isNull -> NullNode()
+            else -> SynligNode(jacksonObjectMapper().treeToValue(node, T::class.java))
+        }
+    }
+}
+
+class SynligNode<T>(
+    private val value: T
+): Synlighetsnode<T> {
+    override fun hvisFinnesOg(condition: (T) -> Boolean) = condition(value)
+    override fun hvisNullEller(condition: (T) -> Boolean) = condition(value)
+    override fun svarPåDetteFeltetLiggerPåHendelse() = true
+    override fun verdiEllerNull() = value
+
+    override fun toString() = value.toString()
+}
+class MissingNode<T>: Synlighetsnode<T> {
+    override fun hvisFinnesOg(condition: (T) -> Boolean) = false
+    override fun hvisNullEller(condition: (T) -> Boolean) = false
+    override fun svarPåDetteFeltetLiggerPåHendelse() = false
+    override fun verdiEllerNull() = null
+    override fun toString() = "MissingNode"
+}
+class NullNode<T>: Synlighetsnode<T> {
+    override fun hvisFinnesOg(condition: (T) -> Boolean) = false
+    override fun hvisNullEller(condition: (T) -> Boolean) = true
+    override fun svarPåDetteFeltetLiggerPåHendelse() = true
+    override fun verdiEllerNull() = null
+    override fun toString() = "NullNode"
+}

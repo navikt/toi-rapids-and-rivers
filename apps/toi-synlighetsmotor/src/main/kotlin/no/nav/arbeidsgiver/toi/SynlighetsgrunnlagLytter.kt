@@ -9,6 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,34 +40,21 @@ class SynlighetsgrunnlagLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottatt melding: ${packet.toJson()}")
         val kandidat = Kandidat.fraJson(packet)
-        val evaluering = kandidat.toEvaluering()
-        log.info("Evaluering: $evaluering")
 
-        // Beregn hvilke felter som finnes og hvilke som mangler
-        val presentFields = requiredFields.filter { field ->
-            !objectMapper.fromSynlighetsnode<Any>(packet[field]).isMissing
-        }
-        log.info("Følgende requiredFields finnes: $presentFields")
+        val synlighetsevaluering = kandidat.toEvaluering()
 
-        val missingFields = requiredFields.filter { field ->
-            objectMapper.fromSynlighetsnode<Any>(packet[field]).isMissing
-        }
-        log.info("Følgende requiredFields mangler: $missingFields")
+        if(!synlighetsevaluering.erSynlig()) {
+            packet["synlighet"] = synlighetsevaluering()
+            repository.lagre(
+                evaluering = synlighetsevaluering,
+                aktørId = kandidat.aktørId,
+                fødselsnummer = kandidat.fødselsNummer()
+            )
+            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+        } else {
 
-        if (evaluering.harAktivCv && missingFields.isNotEmpty()) {
-            packet["@behov"] = missingFields + presentFields
         }
-
-        // Sett alltid synlighet i meldingen
-        packet["synlighet"] = evaluering
-        if (!evaluering.erSynlig()) {
-            repository.lagre(evaluering, kandidat.aktørId, kandidat.fødselsNummer())
-        }
-        val output = packet.toJson()
-        log.info("Publiserer melding: $output")
-        rapidsConnection.publish(kandidat.aktørId, output)
     }
 
 }
