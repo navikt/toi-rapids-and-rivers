@@ -44,7 +44,7 @@ class SynlighetsgrunnlagLytter(
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
-        if(!synlighetsevaluering.erSynlig()) {
+        if(synlighetsevaluering.minstEnRegelGirGarantertUsynlig()) {
             packet["synlighet"] = synlighetsevaluering()
             repository.lagre(
                 evaluering = synlighetsevaluering,

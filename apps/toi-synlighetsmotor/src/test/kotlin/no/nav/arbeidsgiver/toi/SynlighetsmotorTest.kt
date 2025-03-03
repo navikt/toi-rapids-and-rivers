@@ -267,16 +267,16 @@ class SynlighetsmotorTest {
 }
 
 private fun evalueringMedAltTrue() = Evaluering(
-    harAktivCv = true,
-    harJobbprofil = true,
-    harSettHjemmel = true,
-    maaIkkeBehandleTidligereCv = true,
-    arenaIkkeFritattKandidatsøk = true,
-    erUnderOppfoelging = true,
-    harRiktigFormidlingsgruppe = true,
-    erIkkeKode6eller7 = true,
-    erIkkeSperretAnsatt = true,
-    erIkkeDoed = true,
-    erIkkeKvp = true,
-    erFerdigBeregnet = true
+    harAktivCv = true.tilBooleanVerdi(),
+    harJobbprofil = true.tilBooleanVerdi(),
+    harSettHjemmel = true.tilBooleanVerdi(),
+    maaIkkeBehandleTidligereCv = true.tilBooleanVerdi(),
+    arenaIkkeFritattKandidatsøk = true.tilBooleanVerdi(),
+    erUnderOppfoelging = true.tilBooleanVerdi(),
+    harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
+    erIkkeKode6eller7 = true.tilBooleanVerdi(),
+    erIkkeSperretAnsatt = true.tilBooleanVerdi(),
+    erIkkeDoed = true.tilBooleanVerdi(),
+    erIkkeKvp = true.tilBooleanVerdi(),
+    komplettBeregningsgrunnlag = true
 )

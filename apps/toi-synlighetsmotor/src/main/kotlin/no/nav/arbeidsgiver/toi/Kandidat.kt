@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -19,48 +18,49 @@ data class Kandidat(
     private val kvp: Synlighetsnode<Kvp>,
     val adressebeskyttelse: Synlighetsnode<String>,
 ) {
-    private val erAAP: Boolean
-        get() = oppfølgingsinformasjon.hvisFinnesOg(Oppfølgingsinformasjon::erAAP)
+    private val erAAP: BooleanVerdi
+        get() = oppfølgingsinformasjon.hvisIkkeNullOg(Oppfølgingsinformasjon::erAAP)
 
-    private val erKvp: Boolean
-        get() = kvp.hvisFinnesOg { it.event == "STARTET" }
+    private val erKvp: BooleanVerdi
+        get() = kvp.hvisIkkeNullOg { it.event == "STARTET" }
 
     /**
      * Reglene for synligheten spesifiseres i denne klassen. Ved endringer i denne klassen, pass på at dokumentasjonen i microsoft loop er oppdatert med endringene.
      */
     fun toEvaluering() = Evaluering(
-        harAktivCv = arbeidsmarkedCv.hvisFinnesOg { arbeidsmarkedCv ->
-            arbeidsmarkedCv.meldingstype.let {
-                listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
-            }
-        },
-        harJobbprofil = arbeidsmarkedCv.hvisFinnesOg {  it.endreJobbprofil != null || it.opprettJobbprofil != null },
-        harSettHjemmel = harSettHjemmel(),
-        maaIkkeBehandleTidligereCv = måBehandleTidligereCv.hvisNullEller{ !it.maaBehandleTidligereCv },
-        arenaIkkeFritattKandidatsøk = arenaFritattKandidatsøk.hvisNullEller{ !it.erFritattKandidatsøk },
-        erUnderOppfoelging = erUnderOppfølging(),
-        harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisFinnesOg {
-            it.formidlingsgruppe == Formidlingsgruppe.ARBS
-        },
-        erIkkeKode6eller7 = erIkkeKode6EllerKode7(),
-        erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisFinnesOg { !it.sperretAnsatt },
-        erIkkeDoed = oppfølgingsinformasjon.hvisFinnesOg { !it.erDoed },
+        harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
+        harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
+        harSettHjemmel = hjemmel.hvisIkkeNullOg(::harSettHjemmel),
+        maaIkkeBehandleTidligereCv = måBehandleTidligereCv.hvisNullEller(::maaIkkeBehandleTidligereCv),
+        arenaIkkeFritattKandidatsøk = arenaFritattKandidatsøk.hvisNullEller(::erIkkeArenaFritattKandidatsøk),
+        erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
+        harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
+        erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
+        erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeSperretAnsatt),
+        erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
-        erFerdigBeregnet = beregningsgrunnlag()
+        komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
-    private fun harSettHjemmel() = hjemmel.hvisFinnesOg { hjemmel ->
-        val opprettetDato = hjemmel.opprettetDato
-        val slettetDato = hjemmel.slettetDato
-        hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL && opprettetDato != null && slettetDato == null
+    private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
+    private fun erIkkeArenaFritattKandidatsøk(it: ArenaFritattKandidatsøk) = !it.erFritattKandidatsøk
+    private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
+    private fun erIkkeSperretAnsatt(it: Oppfølgingsinformasjon) = !it.sperretAnsatt
+    private fun erIkkeDød(it: Oppfølgingsinformasjon) = !it.erDoed
+    private fun harAktivCv(arbeidsmarkedCv: CvMelding) = arbeidsmarkedCv.meldingstype.let {
+        listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
     }
-
-    private fun erUnderOppfølging() = oppfølgingsperiode.hvisFinnesOg { oppfølgingsperiode ->
+    private fun harJobbprofil(cvMelding: CvMelding) = cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
+    private fun harSettHjemmel(hjemmel: Hjemmel) =
+        hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL &&
+                hjemmel.opprettetDato != null &&
+                hjemmel.slettetDato == null
+    private fun erUnderOppfølging(oppfølgingsperiode: Oppfølgingsperiode): Boolean {
         val now = Instant.now()
         val startDato = oppfølgingsperiode.startDato.toInstant()
         val sluttDato = oppfølgingsperiode.sluttDato?.toInstant()
         sanityCheckOppfølging(now, this, startDato, sluttDato)
-        startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
+        return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
     }
 
     private fun sanityCheckOppfølging(
@@ -77,16 +77,16 @@ data class Kandidat(
             log("erUnderOppfølging").error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
             secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
-        if(kandidat.arenaFritattKandidatsøk.hvisFinnesOg { it.erFritattKandidatsøk  } && !kandidat.erAAP) {
+        if(kandidat.arenaFritattKandidatsøk.hvisIkkeNullOg { it.erFritattKandidatsøk  }.default(false) && (!kandidat.erAAP).default(false)) {
             log("erUnderOppfølging").info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
             secureLog.info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, fnr: ${kandidat.fødselsNummer()}, hovedmål: ${kandidat.oppfølgingsinformasjon} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon}, rettighetsgruppe: ${kandidat.oppfølgingsinformasjon}")
         }
     }
 
-    private fun erIkkeKode6EllerKode7(): Boolean = oppfølgingsinformasjon.hvisFinnesOg { oppfølgingsinformasjon ->
+    private fun erIkkeKode6EllerKode7(oppfølgingsinformasjon: Oppfølgingsinformasjon): Boolean =
         (oppfølgingsinformasjon.diskresjonskode == null
                 || oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
-    }
+
 
     private fun beregningsgrunnlag() = listOf(arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
         arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp).all { it.svarPåDetteFeltetLiggerPåHendelse() }
@@ -102,14 +102,14 @@ data class Kandidat(
             val json = mapper.readTree(jsonMessage.toJson())
             return Kandidat(
                 aktørId = json["aktørId"].asText(),
-                arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv")),
-                oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon")),
-                oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode")),
-                arenaFritattKandidatsøk = Synlighetsnode.fromJsonNode(json.path("arenaFritattKandidatsøk")),
-                hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel")),
-                måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv")),
-                kvp = Synlighetsnode.fromJsonNode(json.path("kvp")),
-                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"))
+                arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
+                oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
+                oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
+                arenaFritattKandidatsøk = Synlighetsnode.fromJsonNode(json.path("arenaFritattKandidatsøk"), mapper),
+                hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
+                måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
+                kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
+                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper)
             )
         }
     }
