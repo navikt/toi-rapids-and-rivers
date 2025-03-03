@@ -9,7 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 
-class InkomplettSynlighetsgrunnlagLytter(
+/*class InkomplettSynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
@@ -79,4 +79,4 @@ private fun JsonMessage.forbidAllKeysPresent(keys: List<String>) {
             this.error("Alle av feltene eksisterte på meldingen")
         })
     }
-}
+}*/

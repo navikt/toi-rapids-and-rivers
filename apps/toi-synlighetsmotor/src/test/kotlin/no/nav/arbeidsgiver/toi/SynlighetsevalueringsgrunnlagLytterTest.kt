@@ -17,14 +17,14 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
+class SynlighetsevalueringsgrunnlagLytterTest {
 
     companion object {
         private val aktørId = "1234"
         @JvmStatic
         private fun felter() = Felt.entries.map { Arguments.of(it) }.stream()
     }
-    enum class Felt(val navn: String, val synligTrue: String, val synligFalse: String) {
+    enum class Felt(val navn: String, val skalGiSynligTrue: String, val skalGiSynligFalse: String) {
         ARBEIDSMARKED_CV("arbeidsmarkedCv", arbeidsmarkedCv(OPPRETT), arbeidsmarkedCv(SLETT)),
         OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
         OPPFØLGINGSPERIODE("oppfølgingsperiode", aktivOppfølgingsperiode(), avsluttetOppfølgingsperiode()),
@@ -43,7 +43,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                ${felt.synligTrue}
+                ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -61,7 +61,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                ${felt.synligFalse}
+                ${felt.skalGiSynligFalse}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -83,7 +83,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             {
                 "@behov": ["$preBehov"],
                 "aktørId": "$aktørId",
-                ${felt.synligFalse}
+                ${felt.skalGiSynligFalse}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -104,7 +104,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
-                ${felt.synligTrue}
+                ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -119,7 +119,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             {
                 "aktørId": "$aktørId",
                 "@behov": ${(alleFelter.subList(0, Felt.entries.size-3)).joinToString(",","[","]"){""""$it""""}},
-                ${felt.synligTrue}
+                ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -138,7 +138,7 @@ class InkomplettSynlighetsevalueringsgrunnlagLytterTest {
             {
                 "aktørId": "$aktørId",
                 "@behov": ${(alleFelter.subList(0, Felt.entries.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}},
-                ${felt.synligTrue}
+                ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)

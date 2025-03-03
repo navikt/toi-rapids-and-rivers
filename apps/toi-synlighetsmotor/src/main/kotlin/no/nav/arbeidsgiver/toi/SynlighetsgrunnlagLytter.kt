@@ -36,6 +36,7 @@ class SynlighetsgrunnlagLytter(
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
+
         if(!synlighetsevaluering.erSynlig()) {
             packet["synlighet"] = synlighetsevaluering()
             repository.lagre(
@@ -43,10 +44,19 @@ class SynlighetsgrunnlagLytter(
                 aktørId = kandidat.aktørId,
                 fødselsnummer = kandidat.fødselsNummer()
             )
-            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
-        } else {
 
+        } else {
+            val behov = packet["@behov"]
+            val existingBehov: Set<String> =
+                if (behov.isArray) {
+                    behov.mapNotNull { if (it.isTextual) it.asText() else null }.toSet()
+                } else {
+                    emptySet()
+                }
+
+            packet["@behov"] = existingBehov+requiredFields
         }
+        rapidsConnection.publish(kandidat.aktørId, packet.toJson())
     }
 }
 
