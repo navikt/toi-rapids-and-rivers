@@ -109,4 +109,4 @@ spec:
       access: readwrite
     - team: toi
       application: toi-stilling-indekser
-      access: read
+      access: readwrite
