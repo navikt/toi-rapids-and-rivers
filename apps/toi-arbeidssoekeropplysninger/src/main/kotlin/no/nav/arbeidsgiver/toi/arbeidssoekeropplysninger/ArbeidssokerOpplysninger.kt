@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
+package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -10,12 +10,11 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import no.nav.paw.arbeidssokerregisteret.api.v1.JaNeiVetIkke
+import no.nav.paw.arbeidssokerregisteret.api.v4.OpplysningerOmArbeidssoeker
 import java.util.*
 
-class ArbeidssokerPeriode(@JsonIgnore private val melding: Periode,
+class ArbeidssokerOpplysninger(@JsonIgnore private val melding: OpplysningerOmArbeidssoeker,
                           @JsonIgnore val meterRegistry: MeterRegistry) {
     companion object {
         @JsonIgnore
@@ -27,15 +26,14 @@ class ArbeidssokerPeriode(@JsonIgnore private val melding: Periode,
     }
 
     @JsonProperty("@event_name")
-    private val event_name = "arbeidssokerperiode"
+    private val event_name = "arbeidssokeropplysninger"
 
-    // ID er meldingsid. Denne id'en for å koble brukeren mot ArbeidssoekerOpplysninger
-    // Kan også brukes til å koble sammen opplysninger om arbeidssøkeren som kommer inn på andre topic
+    // ID er kun en meldingsid.
     val id: UUID = melding.id
-    // FNR/DNR - merk at hvis noen endrer dnr/fnr, så kommer det en ny melding på nytt nummer.
-    val identitetsnummer: String = melding.identitetsnummer
-    val startet: ZonedDateTime = melding.startet.tidspunkt.atZone(ZoneId.of("Europe/Oslo"))
-    val avsluttet: ZonedDateTime? = melding.avsluttet?.tidspunkt?.atZone(ZoneId.of("Europe/Oslo"))
+    // periodeId er identifikatoren av brukeren.... Den må kobles til en mottatt arbeidssøkerperiode.id for å koble brukeren
+    val periodeId = melding.periodeId
+    val helsetilstandHindrerArbeid: Boolean = melding.helse?.helsetilstandHindrerArbeid == JaNeiVetIkke.JA
+    val andreForholdHindrerArbeid: Boolean = melding.annet?.andreForholdHindrerArbeid == JaNeiVetIkke.JA
 
     fun somJson() = JsonMessage(objectMapper.writeValueAsString(this), MessageProblems("{}"), metrics = meterRegistry).toJson()
 }

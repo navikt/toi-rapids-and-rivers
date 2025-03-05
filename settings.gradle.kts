@@ -21,5 +21,7 @@ include(
     "apps:toi-kvp",
     "apps:toi-livshendelse",
     "apps:toi-evaluertdatalogger",
+    "apps:asr-domain",
+    "apps:toi-arbeidssoekeropplysninger",
     "apps:toi-arbeidssoekerperiode"
 )
