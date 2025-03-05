@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - ny_stilling_indekser
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
@@ -21,6 +20,4 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: topic-dev.yaml
     permissions:
-      contents: read
-      id-token: write
-      security-events: write
+        id-token: write
