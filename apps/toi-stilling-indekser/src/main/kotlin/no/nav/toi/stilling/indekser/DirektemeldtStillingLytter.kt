@@ -14,7 +14,7 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection) : River.Pac
             precondition {
                 it.requireKey("stillingsinfo")
                 it.requireKey("direktemeldtStilling")
-                it.requireValue("@event_name", "DirektemeldtStillingIndekser")
+                it.requireValue("@event_name", "direktemeldtStillingRepubliser")
             }
             validate { it.requireKey("stillingsId") }
         }.register(this)
