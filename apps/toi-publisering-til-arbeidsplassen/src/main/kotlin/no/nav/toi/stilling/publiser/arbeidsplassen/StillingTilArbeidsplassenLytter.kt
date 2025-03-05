@@ -13,7 +13,7 @@ class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : Rive
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("direktemeldtStilling")
-                it.requireKey("stillingId")
+                it.requireKey("stillingsId")
                 it.requireValue("@event_name", "publiserTilArbeidsplassen")
             }
         }.register(this)
