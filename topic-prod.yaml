@@ -107,3 +107,9 @@ spec:
     - team: toi
       application: toi-evaluertdatalogger
       access: readwrite
+    - team: toi
+      application: toi-arbeidssoekerperiode
+      access: readwrite
+    - team: toi
+      application: toi-stilling-indekser
+      access: readwrite
