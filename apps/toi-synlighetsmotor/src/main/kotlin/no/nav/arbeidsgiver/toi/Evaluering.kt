@@ -35,6 +35,7 @@ class Evaluering(
     val erIkkeSperretAnsatt: BooleanVerdi,
     val erIkkeDoed: BooleanVerdi,
     val erIkkeKvp: BooleanVerdi,
+    val harIkkeAdressebeskyttelse: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
     val erFerdigBeregnet = komplettBeregningsgrunnlag || minstEnRegelGirGarantertUsynlig()
@@ -48,6 +49,7 @@ class Evaluering(
             erIkkeKode6eller7,
             erIkkeSperretAnsatt,
             erIkkeDoed,
+            harIkkeAdressebeskyttelse,
             erFerdigBeregnet,
             erIkkeKvp).all { it==True }
 
@@ -61,7 +63,7 @@ class Evaluering(
             erIkkeKode6eller7,
             erIkkeSperretAnsatt,
             erIkkeDoed,
-            erIkkeKvp).any { it==False }
+            erIkkeKvp, harIkkeAdressebeskyttelse).any { it==False }
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),

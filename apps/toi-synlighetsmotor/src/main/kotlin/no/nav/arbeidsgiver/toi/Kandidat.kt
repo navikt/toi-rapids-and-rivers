@@ -39,6 +39,7 @@ data class Kandidat(
         erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeSperretAnsatt),
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
+        harIkkeAdressebeskyttelse = adressebeskyttelse.hvisNullEller { it != "STRENGT_FORTROLIG_UTLAND" && it != "STRENGT_FORTROLIG" && it != "FORTROLIG" },
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 

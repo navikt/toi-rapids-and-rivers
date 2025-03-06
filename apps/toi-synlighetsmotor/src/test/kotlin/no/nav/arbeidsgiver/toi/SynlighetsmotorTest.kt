@@ -278,5 +278,6 @@ private fun evalueringMedAltTrue() = Evaluering(
     erIkkeSperretAnsatt = true.tilBooleanVerdi(),
     erIkkeDoed = true.tilBooleanVerdi(),
     erIkkeKvp = true.tilBooleanVerdi(),
+    harIkkeAdressebeskyttelse = true.tilBooleanVerdi(),
     komplettBeregningsgrunnlag = true
 )

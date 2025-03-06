@@ -110,7 +110,9 @@ class Repository(private val dataSource: DataSource) {
         erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne).tilBooleanVerdi(), // TODO
         erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne).tilBooleanVerdi(), // TODO
         erIkkeKvp = resultset.getBoolean(erIkkeKvpKolonne).tilBooleanVerdi(), // TODO
+        harIkkeAdressebeskyttelse = BooleanVerdi.missing, // TODO denne har vi ikke i databasen ennå
         komplettBeregningsgrunnlag = resultset.getBoolean(erFerdigBeregnetKolonne)
+
     )
 
     private fun kolonneString(kolonner: List<String>) =
