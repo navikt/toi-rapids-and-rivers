@@ -2,23 +2,33 @@ package no.nav.arbeidsgiver.toi.livshendelser
 
 import AdressebeskyttelseLytter
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.javalin.Javalin
+import no.nav.arbeidsgiver.toi.livshendelser.rest.hentAdressebeskyttelse
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.system.exitProcess
+import no.nav.arbeidsgiver.toi.livshendelser.rest.*
+import no.nav.security.token.support.core.configuration.IssuerProperties
 
 private val env = System.getenv()
 
 private val secureLog = LoggerFactory.getLogger("secureLog")
 
+fun opprettJavalinMedTilgangskontroll(): Javalin =
+    Javalin.create {
+        it.http.defaultContentType = "application/json"
+    }.start(8301)
 
 fun main() {
     try {
         startApp(
             rapidsConnection(),
-            PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env))
+            PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env)),
+            opprettJavalinMedTilgangskontroll(),
+            hentIssuerProperties(env)
         )
     }
     catch (e: Exception) {
@@ -30,8 +40,13 @@ fun main() {
 
 fun startApp(
     rapidsConnection: RapidsConnection,
-    pdlKlient: PdlKlient
-) {
+    pdlKlient: PdlKlient,
+    javalin: Javalin,
+    issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>,
+
+    ) {
+    javalin.get("/adressebeskyttelse/{fnr}", hentAdressebeskyttelse(pdlKlient, issuerProperties))
+
     val log = LoggerFactory.getLogger("Application.kt")
     try {
         rapidsConnection.also {

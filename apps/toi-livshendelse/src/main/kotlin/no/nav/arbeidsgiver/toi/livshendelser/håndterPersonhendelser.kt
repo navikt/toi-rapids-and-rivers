@@ -22,20 +22,13 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             .mapNotNull {
                 it.personidenter?.firstOrNull()
             }
-            .flatMap(::diskresjonsHendelseForIdent)
+            .flatMap{ it -> pdlKlient.diskresjonsHendelseForIdent(it) }
             .forEach(::publiserHendelse)
 
         if(personHendelser.isEmpty()) {
             Thread.sleep(1000)
         }
     }
-
-    private fun diskresjonsHendelseForIdent(ident: String) = kallPdl(ident)
-        .map { (aktørId, gradering) ->
-            DiskresjonsHendelse(ident = aktørId, gradering = gradering)
-        }
-
-    private fun kallPdl(ident: String) = pdlKlient.hentGraderingPerAktørId(ident)
 
     fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) {
         rapidsConnection.publish(diskresjonsHendelse.ident, diskresjonsHendelse.toJson())
