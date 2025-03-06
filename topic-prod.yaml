@@ -90,9 +90,6 @@ spec:
       application: toi-arbeidsgiver-notifikasjon
       access: readwrite
     - team: toi
-      application: toi-arbeidssoekeropplysninger
-      access: readwrite
-    - team: toi
       application: toi-arena-fritatt-kandidatsok
       access: readwrite
     - team: toi
@@ -106,6 +103,9 @@ spec:
       access: readwrite
     - team: toi
       application: toi-evaluertdatalogger
+      access: readwrite
+    - team: toi
+      application: toi-arbeidssoekeropplysninger
       access: readwrite
     - team: toi
       application: toi-arbeidssoekerperiode
