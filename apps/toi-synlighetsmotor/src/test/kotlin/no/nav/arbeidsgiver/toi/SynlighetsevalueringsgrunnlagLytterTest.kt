@@ -31,7 +31,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         ARENAFRITATTKANDIDATSØK("arenaFritattKandidatsøk", arenaFritattKandidatsøk(fnr = null), arenaFritattKandidatsøk(fritattKandidatsøk = true, fnr = null)),
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
-        KVP("kvp", kvp(event = "STARTET"), kvp(event = "AVSLUTTET")),
+        KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
         ADRESSEBESKYTTELSE("adressebeskyttelse", """"adressebeskyttelse":null""", adressebeskyttelse())
     }
 
