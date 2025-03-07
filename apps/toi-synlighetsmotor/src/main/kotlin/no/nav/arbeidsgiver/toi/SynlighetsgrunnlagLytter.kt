@@ -57,7 +57,7 @@ class SynlighetsgrunnlagLytter(
         } else {
             val behov = packet["@behov"].asIterable().map(JsonNode::asText)
             if(!behov.containsAll(requiredFields)) {
-                packet["@behov"] = requiredFieldsSynlilghetsbehov()
+                packet["@behov"] = packet["@behov"] + requiredFieldsSynlilghetsbehov()
                 rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
         }
