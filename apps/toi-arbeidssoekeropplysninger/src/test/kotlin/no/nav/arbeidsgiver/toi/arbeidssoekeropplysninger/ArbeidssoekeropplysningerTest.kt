@@ -12,46 +12,69 @@ import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.wait.strategy.Wait
+import org.testcontainers.utility.DockerImageName
 import java.time.Instant
 import java.util.*
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ArbeidssoekeropplysningerTest {
+    private val localEnv = mutableMapOf<String, String>(
+        "DB_DATABASE" to "test",
+        "DB_USERNAME" to "test",
+        "DB_PASSWORD" to "test"
+    )
+    val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
+    val localPostgres = PostgreSQLContainer(DockerImageName.parse("postgres:17-alpine"))
+        .waitingFor(Wait.forListeningPort())
+        .apply { start() }
+        .also { localConfig ->
+            localEnv["DB_HOST"] = localConfig.host
+            localEnv["DB_PORT"] = localConfig.getMappedPort(5432).toString()
+        }
+
     val arbeidssokeropplysningerTopic = TopicPartition("paw.opplysninger-om-arbeidssoeker-v1", 0)
 
-    val behandleMelding: (OpplysningerOmArbeidssoeker) -> ArbeidssokerOpplysninger = { melding ->
-        ArbeidssokerOpplysninger(melding, PrometheusMeterRegistry(PrometheusConfig.DEFAULT))
+    lateinit var repository: Repository
+
+    @BeforeAll
+    fun init() {
+        val databaseConfig = DatabaseConfig(localEnv, meterRegistry)
+        val dataSource = databaseConfig.lagDatasource()
+        kjørFlywayMigreringer(dataSource)
+
+        repository = Repository(dataSource)
+    }
+
+    @AfterAll
+    fun teardown() {
+        localPostgres.close()
     }
 
     @Test
-    fun `lesing av arbeidssøkeropplysninger fra topic skal publiseres på rapid`() {
-        val melding = melding()
+    fun `lesing av arbeidssøkeropplysninger fra topic lagres i database`() {
+        val periodeId = UUID.randomUUID()
+        val melding = melding(periodeId)
         val consumer = mockConsumer()
         val rapid = TestRapid()
-        val arbeidssoekeropplysningerLytter = ArbeidssoekeropplysningerLytter({ consumer }, behandleMelding)
+        val arbeidssoekeropplysningerLytter = ArbeidssoekeropplysningerLytter({ consumer }, repository)
 
         produserArbeidssoekeropplysningerMelding(consumer, melding)
         arbeidssoekeropplysningerLytter.onReady(rapid)
 
         Thread.sleep(600)
-        val inspektør = rapid.inspektør
-        assertThat(inspektør.size).isEqualTo(1)
 
-        val meldingJson = inspektør.message(0)
+        val periodeOpplysninger = repository.hentPeriodeOpplysninger(periodeId)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "id",
-            "@event_name",
-            "periodeId",
-            "helsetilstandHindrerArbeid",
-            "andreForholdHindrerArbeid",
-            "@id",
-            "@opprettet",
-            "system_read_count",
-            "system_participating_services"
-        )
-
-        assertThat(meldingJson.get("periodeId")).isNotNull
+        assertThat(periodeOpplysninger).isNotNull
+        assertThat(periodeOpplysninger?.helsetilstandHindrerArbeid).isFalse()
+        assertThat(periodeOpplysninger?.andreForholdHindrerArbeid).isTrue()
     }
 
     private fun mockConsumer() = MockConsumer<Long, OpplysningerOmArbeidssoeker>(OffsetResetStrategy.EARLIEST).apply {
@@ -74,9 +97,9 @@ class ArbeidssoekeropplysningerTest {
         }
     }
 
-    private fun melding() = OpplysningerOmArbeidssoeker.newBuilder()
+    private fun melding(periodeId: UUID) = OpplysningerOmArbeidssoeker.newBuilder()
         .setId(UUID.randomUUID())
-        .setPeriodeId(UUID.randomUUID())
+        .setPeriodeId(periodeId)
         .setAnnet(Annet.newBuilder()
             .setAndreForholdHindrerArbeid(JaNeiVetIkke.JA)
             .build()

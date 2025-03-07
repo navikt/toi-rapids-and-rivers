@@ -13,8 +13,11 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Lytter på paw.opplysninger-om-arbeidssoeker-v1 og publiserer arbeidssøkerperioder på rapid
+ */
 class ArbeidssoekeropplysningerLytter(private val consumer: () -> Consumer<Long, OpplysningerOmArbeidssoeker>,
-                                      private val behandleArbeidssokerOpplysninger: (OpplysningerOmArbeidssoeker) -> ArbeidssokerOpplysninger
+                                      private val repository: Repository
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
     private val secureLog = LoggerFactory.getLogger("secureLog")
@@ -39,14 +42,11 @@ class ArbeidssoekeropplysningerLytter(private val consumer: () -> Consumer<Long,
                     try {
                         val records: ConsumerRecords<Long, OpplysningerOmArbeidssoeker> =
                             consumer.poll(Duration.ofSeconds(5))
-                        val arbeidssokerperioderMeldinger = records.map { secureLog.info("Mottok arbeidssøkeropplysningermelding fra asr: ${it.value().toString()}")
-                                behandleArbeidssokerOpplysninger(it.value()) }
 
-                        arbeidssokerperioderMeldinger.forEach { arbeidssokerOpplysninger ->
-                            log.info("Publiserer arbeidssokeropplysninger for periode på rapid, se securelog for periodeid.")
-                            secureLog.info("Publiserer arbeidssokeropplysninger for periodeId ${arbeidssokerOpplysninger.periodeId} på rapid: ${arbeidssokerOpplysninger.somJson()}")
-                            rapidsConnection.publish(arbeidssokerOpplysninger.periodeId.toString(), arbeidssokerOpplysninger.somJson())
-                        }
+                        val arbeidssokerOpplysninger = records.map {
+                            log.info("Mottok arbeidssokeropplysninger for periode fra $arbeidssokeropplysningerTopic for periode ${it.value().periodeId}")
+                            it.value() }.toList()
+                        repository.lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger)
                         consumer.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)
