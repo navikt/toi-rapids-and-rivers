@@ -15,8 +15,15 @@ class DatabaseConfig(env: Map<String, String>,
     private val user = env.variable("DB_USERNAME")
     private val pw = env.variable("DB_PASSWORD")
 
+    private val sslcert = env["DB_SSLCERT"]
+    private val sslkey = env["DB_SSLKEY"]
+    private val sslrootcert = env["DB_SSLROOTCERT"]
+    private val sslmode = env["DB_SSLMODE"]
+    private val sslsuffix = if (sslcert == null ) "" else
+        "?ssl=on&sslrootcert=$sslrootcert&sslcert=$sslcert&sslmode=$sslmode&sslkey=$sslkey"
+
     fun lagDatasource() = HikariConfig().apply {
-        jdbcUrl = "jdbc:postgresql://$host:$port/$database"
+        jdbcUrl = "jdbc:postgresql://$host:$port/$database$sslsuffix"
         minimumIdle = 1
         maximumPoolSize = 7
         driverClassName = "org.postgresql.Driver"
