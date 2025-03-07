@@ -16,7 +16,7 @@ class DatabaseConfig(env: Map<String, String>,
     private val pw = env.variable("DB_PASSWORD")
 
     private val sslcert = env["DB_SSLCERT"]
-    private val sslkey = env["DB_SSLKEY"]
+    private val sslkey = env["DB_SSLKEY_PK8"]
     private val sslrootcert = env["DB_SSLROOTCERT"]
     private val sslmode = env["DB_SSLMODE"]
     private val sslsuffix = if (sslcert == null ) "" else
