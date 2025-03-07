@@ -99,7 +99,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
 
     @ParameterizedTest
     @MethodSource("felter")
-    fun `Om det kommer en melding med alle behov utfylt trenger man ikke be om behov på nytt`(felt: Felt) {
+    fun `Om det kommer en melding med alle behov lagt på trenger man ikke be om behov på nytt`(felt: Felt) {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
@@ -107,14 +107,13 @@ class SynlighetsevalueringsgrunnlagLytterTest {
                 ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
-            assertThat(size).isEqualTo(1)
-            assertThat(field(0, "@behov").isMissingNode).isTrue()
+            assertThat(size).isEqualTo(0)
         })
     }
 
     @ParameterizedTest
     @MethodSource("felter")
-    fun `Om det kommer en melding med bare noen behov utfylt trenger man be om behov på resten`(felt: Felt) {
+    fun `Om det kommer en melding med bare noen behov lagt på trenger man be om behov på resten`(felt: Felt) {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",

@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
@@ -27,6 +28,7 @@ class SynlighetsgrunnlagLytter(
     init {
         River(rapidsConnection).apply {
             precondition {
+                it.interestedIn("@behov")
                 it.forbid("synlighet")
                 it.requireAny(requiredFields)
                 it.interestedIn("aktørId")
@@ -51,11 +53,14 @@ class SynlighetsgrunnlagLytter(
                 aktørId = kandidat.aktørId,
                 fødselsnummer = kandidat.fødselsNummer()
             )
+            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-            packet["@behov"] = requiredFieldsSynlilghetsbehov()
+            val behov = packet["@behov"].asIterable().map(JsonNode::asText)
+            if(!behov.containsAll(requiredFields)) {
+                packet["@behov"] = requiredFieldsSynlilghetsbehov()
+                rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+            }
         }
-        rapidsConnection.publish(kandidat.aktørId, packet.toJson())
-
     }
 }
 private fun JsonMessage.requireAny(keys: List<String>) {
