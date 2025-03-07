@@ -44,25 +44,27 @@ class SynlighetsgrunnlagLytter(
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
-        if(synlighetsevaluering.minstEnRegelGirGarantertUsynlig()) {
+        if (synlighetsevaluering.minstEnRegelGirGarantertUsynlig()) {
             packet["synlighet"] = synlighetsevaluering()
             repository.lagre(
                 evaluering = synlighetsevaluering,
                 aktørId = kandidat.aktørId,
                 fødselsnummer = kandidat.fødselsNummer()
             )
-            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-
+            packet["@behov"] = requiredFieldsSynlilghetsbehov()
         }
+        rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+
     }
-
 }
-
 private fun JsonMessage.requireAny(keys: List<String>) {
-    if (keys.onEach { interestedIn(it) }
-            .map(this::get)
-            .all { it.isMissingNode }
-    )
-        throw MessageProblems.MessageException(MessageProblems(toJson()).apply { error("Ingen av feltene fantes i meldingen") })
+    keys.forEach { interestedIn(it) }
+    if (keys.map(this::get).all { it.isMissingNode }) {
+        throw MessageProblems.MessageException(
+            MessageProblems(toJson()).apply {
+                error("Ingen av feltene fantes i meldingen")
+            }
+        )
+    }
 }
