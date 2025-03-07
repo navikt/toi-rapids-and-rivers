@@ -59,12 +59,9 @@ class SynlighetsgrunnlagLytter(
     }
 }
 private fun JsonMessage.requireAny(keys: List<String>) {
-    keys.forEach { interestedIn(it) }
-    if (keys.map(this::get).all { it.isMissingNode }) {
-        throw MessageProblems.MessageException(
-            MessageProblems(toJson()).apply {
-                error("Ingen av feltene fantes i meldingen")
-            }
-        )
-    }
+    if (keys.onEach { interestedIn(it) }
+            .map(this::get)
+            .all { it.isMissingNode }
+    )
+        throw MessageProblems.MessageException(MessageProblems(toJson()).apply { error("Ingen av feltene fantes i meldingen") })
 }

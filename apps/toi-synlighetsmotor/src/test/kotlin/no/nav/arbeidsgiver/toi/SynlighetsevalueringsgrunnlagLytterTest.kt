@@ -48,7 +48,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.hasNonNull(felt.navn)).isTrue()
+            assertThat(melding.path(felt.navn).isMissingNode).isFalse()
             assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
                 .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
