@@ -19,6 +19,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.sql.DataSource
+import kotlin.jvm.Throws
 
 class Repository(private val datasource: DataSource) {
     companion object {
@@ -69,7 +70,7 @@ class Repository(private val datasource: DataSource) {
 
     fun lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger: List<OpplysningerOmArbeidssoeker>): List<Long> {
         val ider = mutableListOf<Long>()
-
+        // NB: Det hadde vært en bedre løsning å bruke TxTemplate fra pam-cv-api-gcp
         datasource.connection.use { conn ->
             val autoCommit = conn.autoCommit
             try {
@@ -78,6 +79,9 @@ class Repository(private val datasource: DataSource) {
                     ider.add(lagreArbeidssøkeropplysninger(it, conn))
                 }
                 conn.commit()
+            } catch (t: Throwable) {
+                conn.rollback()
+                throw t
             } finally {
                 conn.autoCommit = autoCommit
             }
