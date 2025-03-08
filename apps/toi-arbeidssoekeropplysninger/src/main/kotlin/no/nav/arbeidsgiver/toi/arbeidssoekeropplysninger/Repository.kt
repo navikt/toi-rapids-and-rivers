@@ -19,11 +19,11 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.sql.DataSource
-import kotlin.jvm.Throws
 
 class Repository(private val datasource: DataSource) {
     companion object {
         private val logg = LoggerFactory.getLogger(Repository::class.java)
+        private val sikkerLogg = LoggerFactory.getLogger("secureLog")
 
         private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -33,7 +33,7 @@ class Repository(private val datasource: DataSource) {
     }
 
     fun lagreOppfølgingsperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
-        logg.info("Mottok rapid: $rapidOppfølgingsperiode")
+        sikkerLogg.info("Mottok rapid: $rapidOppfølgingsperiode")
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
@@ -97,7 +97,7 @@ class Repository(private val datasource: DataSource) {
     }
 
     private fun lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker, conn: Connection): Long {
-        logg.info("Mottok rapid: $arbeidssokerOpplysninger")
+        sikkerLogg.info("Mottok rapid: $arbeidssokerOpplysninger")
 
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         val sql = """
