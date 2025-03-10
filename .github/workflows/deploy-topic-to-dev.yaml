@@ -19,3 +19,5 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: topic-dev.yaml
+    permissions:
+        id-token: write
