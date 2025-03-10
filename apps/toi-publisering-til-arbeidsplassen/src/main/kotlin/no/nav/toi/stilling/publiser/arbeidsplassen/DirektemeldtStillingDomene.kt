@@ -8,13 +8,14 @@ import java.time.ZonedDateTime
 import java.util.*
 
 data class DirektemeldtStilling(
-    val stillingsid: UUID,
-    val innhold: DirektemeldtStillingBlob,
+    val stillingsId: UUID,
+    val innhold: DirektemeldtStillingInnhold,
     val opprettet: ZonedDateTime,
     val opprettetAv: String,
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
-    val status: String
+    val status: String,
+    val annonseId: Long?
 ) {
     companion object {
         private val mapper = jacksonObjectMapper()
@@ -56,7 +57,7 @@ data class DirektemeldtStillingArbeidsgiver(
     val employees: Int?
 )
 
-data class DirektemeldtStillingBlob(
+data class DirektemeldtStillingInnhold(
     val title: String,
     val administration: DirektemeldtStillingAdministration?,
     val mediaList: List<Media> = ArrayList(),

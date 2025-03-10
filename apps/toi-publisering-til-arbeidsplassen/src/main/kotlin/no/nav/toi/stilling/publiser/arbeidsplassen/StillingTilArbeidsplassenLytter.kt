@@ -27,7 +27,7 @@ class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : Rive
     ) {
         val stilling = fraJson(packet)
 
-        log.info("Mottok stilling med stillingsid ${stilling.stillingsid}")
+        log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
 
     }
 }
