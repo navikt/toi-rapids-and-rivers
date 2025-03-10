@@ -20,4 +20,6 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: topic-dev.yaml
     permissions:
-        id-token: write
+      contents: read
+      id-token: write
+      security-events: write
