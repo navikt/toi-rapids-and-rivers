@@ -107,3 +107,6 @@ spec:
     - team: toi
       application: toi-stilling-indekser
       access: readwrite
+    - team: toi
+      application: toi-publisering-til-arbeidsplassen
+      access: readwrite
