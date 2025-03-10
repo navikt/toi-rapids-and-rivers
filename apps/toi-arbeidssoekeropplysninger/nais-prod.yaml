@@ -2,3 +2,4 @@ kafka_pool: nav-prod
 cloudsql_tier: db-custom-2-7680
 kafka_consumer_group_id: toi-arbeidssoekeropplysninger-rapidconsumer-1
 arbeidssoker_opplysninger_kafka_group_id: toi-arbeidssoekeropplysninger-1
+publiser_til_rapid_enabled: disabled

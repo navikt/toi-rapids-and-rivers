@@ -170,7 +170,7 @@ class Repository(private val datasource: DataSource) {
     /**
      * Henter ubehandlede periodeopplysniger - kun hvis vi har mottatt periodemelding med identitetsnummer
      */
-    fun hentUbehandledePeriodeOpplysninger(): List<PeriodeOpplysninger> {
+    fun hentUbehandledePeriodeOpplysninger(limit: Int = 1000): List<PeriodeOpplysninger> {
         val periodeOpplysninger = mutableListOf<PeriodeOpplysninger>()
         datasource.connection.use { conn ->
             val sql = """
@@ -183,8 +183,10 @@ class Repository(private val datasource: DataSource) {
                 where 
                   behandlet_dato is null and identitetsnummer is not null
                 order by periode_mottatt_dato asc
+                limit ?
             """.trimIndent()
             conn.prepareStatement(sql).apply {
+                setInt(1, limit)
             }.use { statement ->
                 val rs = statement.executeQuery()
                 while (rs.next()) {
@@ -207,14 +209,22 @@ data class Periode(
 
 data class PeriodeOpplysninger(
     val id: Long? = null,
+    @JsonProperty("periode_id")
     val periodeId: UUID,
     val identitetsnummer: String? = null,
+    @JsonProperty("periode_startet")
     val periodeStartet: ZonedDateTime? = null,
+    @JsonProperty("periode_avsluttet")
     val periodeAvsluttet: ZonedDateTime? = null,
+    @JsonProperty("periode_mottatt")
     val periodeMottattDato: ZonedDateTime? = null,
+    @JsonProperty("opplysninger_mottatt")
     val opplysningerMottattDato: ZonedDateTime? = null,
+    @JsonProperty("behandlet_dato")
     val behandletDato: ZonedDateTime? = null, // Tidspunkt for når komplett melding er publisert på rapid
+    @JsonProperty("helsetilstand_hindrer_arbeid")
     val helsetilstandHindrerArbeid: Boolean? = null,
+    @JsonProperty("andre_forhold_hindrer_arbeid")
     val andreForholdHindrerArbeid: Boolean? = null
 ) {
     companion object {

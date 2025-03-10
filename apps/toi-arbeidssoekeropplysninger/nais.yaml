@@ -12,6 +12,7 @@ spec:
     path: /isalive
   readiness:
     path: /isready
+  leaderElection: true
   prometheus:
     enabled: true
     path: /metrics
@@ -49,5 +50,7 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: ARBEIDSSOKER_OPPLYSNINGER_KAFKA_GROUP_ID
       value: {{arbeidssoker_opplysninger_kafka_group_id}}
+    - name: PUBLISER_TIL_RAPID_ENABLED
+      value: {{publiser_til_rapid_enabled}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
