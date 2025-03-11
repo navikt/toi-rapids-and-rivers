@@ -34,11 +34,11 @@ spec:
     max: 1
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 1000m
+      memory: 3072Mi
     requests:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 200m
+      memory: 1536Mi
   secureLogs:
     enabled: true
   kafka:
