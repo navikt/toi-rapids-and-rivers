@@ -20,5 +20,8 @@ include(
     "apps:toi-arena-fritatt-kandidatsok",
     "apps:toi-kvp",
     "apps:toi-livshendelse",
-    "apps:toi-evaluertdatalogger"
+    "apps:toi-evaluertdatalogger",
+    "apps:asr-domain",
+    "apps:toi-arbeidssoekeropplysninger",
+    "apps:toi-arbeidssoekerperiode"
 )
