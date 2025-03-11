@@ -23,5 +23,6 @@ include(
     "apps:toi-evaluertdatalogger",
     "apps:asr-domain",
     "apps:toi-arbeidssoekeropplysninger",
-    "apps:toi-arbeidssoekerperiode"
+    "apps:toi-arbeidssoekerperiode",
+    "apps:toi-publisering-til-arbeidsplassen"
 )
