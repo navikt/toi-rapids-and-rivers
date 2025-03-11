@@ -181,7 +181,7 @@ class Repository(private val datasource: DataSource) {
                          andre_forhold_hindrer_arbeid
                 from periodemelding
                 where 
-                  behandlet_dato is null and identitetsnummer is not null
+                  behandlet_dato is null and opplysninger_mottatt_dato is not null and identitetsnummer is not null
                 order by periode_mottatt_dato asc
                 limit ?
             """.trimIndent()
