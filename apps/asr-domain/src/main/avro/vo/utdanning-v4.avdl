@@ -1,0 +1,27 @@
+@namespace("no.nav.paw.arbeidssokerregisteret.api.v4")
+protocol Utdanning {
+	import idl "ja_nei_vet_ikke-v1.avdl";
+
+	record Utdanning {
+		/**
+		  * NUS kode for utdanning, oversikt over NUS koder er tilgjengelig fra SSB.
+ 		*/
+		string nus;
+
+		/**
+		  * Bare inkludert dersom informasjonen er innhetet, feks for
+		  * nus kode 0,1,2 og 9 gir det ikke mening å hente inn info for
+		  * dette feltet.
+		  *
+ 		*/
+		no.nav.paw.arbeidssokerregisteret.api.v1.JaNeiVetIkke? bestaatt = null;
+
+		/**
+		  * Bare inkludert dersom informasjonen er innhetet, feks for
+		  * nus kode 0,1,2 og 9 gir det ikke mening å hente inn info for
+		  * dette feltet.
+		  *
+ 		*/
+		no.nav.paw.arbeidssokerregisteret.api.v1.JaNeiVetIkke? godkjent = null;
+	}
+}
