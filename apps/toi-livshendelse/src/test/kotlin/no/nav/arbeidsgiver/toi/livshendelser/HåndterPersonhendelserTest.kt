@@ -1,9 +1,9 @@
+package no.nav.arbeidsgiver.toi.livshendelser
+
+import AdressebeskyttelseLytter
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
-import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
-import no.nav.arbeidsgiver.toi.livshendelser.PersonhendelseService
 import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse

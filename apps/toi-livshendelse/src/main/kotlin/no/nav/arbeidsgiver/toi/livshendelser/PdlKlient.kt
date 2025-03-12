@@ -45,6 +45,13 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         }
     }
 
+    fun diskresjonsHendelseForIdent(ident: String) = kallPdl(ident)
+        .map { (aktørId, gradering) ->
+            DiskresjonsHendelse(ident = aktørId, gradering = gradering)
+        }
+
+    private fun kallPdl(ident: String) = hentGraderingPerAktørId(ident)
+
     private fun behandleErrorFraPDL(errors: List<Error>?, ident: String): Map<String, String> {
 
         return if (errors?.all { it.message == "Fant ikke person" } == true) {
