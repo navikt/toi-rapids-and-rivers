@@ -10,6 +10,8 @@ import java.time.*
 import java.time.DayOfWeek.*
 import java.time.Month.*
 
+private val log = noClassLogger()
+
 private val uinteressanteHendelser = listOf(
     "application_up",
     "application_ready",
@@ -88,7 +90,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             }
         }
     } catch (e: Exception) {
-        log.error("Feil i jobb", e)
+        log.error("Feil i jobb: $e", e)
         throw e
     }
 }
