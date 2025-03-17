@@ -7,8 +7,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
-import java.time.DayOfWeek.SATURDAY
-import java.time.DayOfWeek.SUNDAY
+import java.time.DayOfWeek.*
 import java.time.Month.*
 
 private val uinteressanteHendelser = listOf(
@@ -70,14 +69,14 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                                     .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n" +
                                 sorterteEventer
                                     .filterNot(SisteEvent::erUtdatert)
-                            .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
+                                    .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
                     )
                 } else {
                     log.info(
                         "Tid siden hendelser:\n" + sorterteEventer.joinToString(
-                                "\n",
-                                transform = SisteEvent::beskrivelse
-                            ) + "\n\n"
+                            "\n",
+                            transform = SisteEvent::beskrivelse
+                        ) + "\n\n"
                     )
                 }
                 hendelserSomIkkeSendesLenger.filterNot(sisteEvent::containsKey).forEach {
@@ -139,6 +138,7 @@ private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now(ZoneId
         it.toLocalDate().erKristiHimmelfartsdag() -> true
         it.dayOfWeek == SATURDAY -> true
         it.dayOfWeek == SUNDAY -> true
+        it.dayOfWeek == MONDAY && it.hour < 10 -> true
         it.hour < 9 -> true
         it.hour > 15 -> true
         else -> false
