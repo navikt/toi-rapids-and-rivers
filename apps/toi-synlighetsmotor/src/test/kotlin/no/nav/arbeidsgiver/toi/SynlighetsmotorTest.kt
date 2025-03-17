@@ -120,8 +120,11 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person ikke har oppfølgingsinformasjon skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = null),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
+
+
+
 
     @Test
     fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
