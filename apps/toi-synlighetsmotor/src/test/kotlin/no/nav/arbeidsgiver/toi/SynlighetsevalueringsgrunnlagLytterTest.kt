@@ -66,7 +66,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.hasNonNull(felt.navn)).isTrue()
+            assertThat(felt.navn in melding.fieldNames().asSequence().toList()).isTrue()
             assertThat(melding.path("@behov").isMissingNode).isTrue()
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
@@ -88,7 +88,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.hasNonNull(felt.navn)).isTrue()
+            assertThat(felt.navn in melding.fieldNames().asSequence().toList()).isTrue()
             assertThat(melding.path("@behov").asIterable().map(JsonNode::asText)).containsExactly(preBehov)
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
@@ -153,6 +153,42 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId"
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
+
+    @Test
+    fun `Om det er en melding der alle behovene er utfylt, så skal synlighet legges på`() {
+        val alleFelterSattTilÅGiSynligTrue = (Felt.entries.map(Felt::skalGiSynligTrue) + """"adressebeskyttelse":null""").joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            (Felt.entries.map(Felt::navn) +"adressebeskyttelse").forEach { feltNavn ->
+                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+            }
+            assertThat(melding.path("@behov").isMissingNode).isTrue()
+            melding.path("synlighet").apply {
+                assertThat(path("erSynlig").asBoolean()).isTrue()
+                assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
+            }
+        })
+    }
+
+    @Test
+    fun `Om det er en melding der alle behovene er utfylt, untatt adressebeskyttelse, så skal synlighetsmotor vente til adressebeskyttelse er lagt på`() {
+        val alleFelterSattTilÅGiSynligTrue = (Felt.entries.map(Felt::skalGiSynligTrue)).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(0)
