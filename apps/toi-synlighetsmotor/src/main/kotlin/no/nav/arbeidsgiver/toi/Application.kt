@@ -21,8 +21,6 @@ fun startApp(
     javalin.get("/evaluering/{fnr}", evaluerKandidatFraContextGet(repository::hentMedFnr, issuerProperties))
 
     rapidsConnection.also {
-        //KomplettSynlighetsgrunnlagLytter(it, repository)
-        //InkomplettSynlighetsgrunnlagLytter(it)
         SynlighetsgrunnlagLytter(it, repository)
     }.start()
 }
