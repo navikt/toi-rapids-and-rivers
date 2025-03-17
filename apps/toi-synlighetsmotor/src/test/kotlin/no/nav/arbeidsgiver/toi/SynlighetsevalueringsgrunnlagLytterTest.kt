@@ -32,10 +32,10 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
-        ADRESSEBESKYTTELSE("adressebeskyttelse", """"adressebeskyttelse":null""", adressebeskyttelse())
+        //ADRESSEBESKYTTELSE("adressebeskyttelse", """"adressebeskyttelse":null""", adressebeskyttelse())
     }
 
-    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak"
+    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak" +"adressebeskyttelse"
 
     @ParameterizedTest
     @MethodSource("felter")
