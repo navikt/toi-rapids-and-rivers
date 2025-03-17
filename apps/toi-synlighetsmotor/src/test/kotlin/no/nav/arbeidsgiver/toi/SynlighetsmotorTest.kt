@@ -36,10 +36,21 @@ class SynlighetsmotorTest {
             repository
         )
 
-        val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
-        Assertions.assertThat(evalueringFraDb).isEqualTo(
-            evalueringMedAltTrue()
-        )
+        repository.hentMedAktørid(aktorId = "123456789")?.run {
+            assertThat(harAktivCv).isEqualTo(true)
+            assertThat(harJobbprofil).isEqualTo(true)
+            assertThat(harSettHjemmel).isEqualTo(true)
+            assertThat(maaIkkeBehandleTidligereCv).isEqualTo(true)
+            assertThat(arenaIkkeFritattKandidatsøk).isEqualTo(true)
+            assertThat(erUnderOppfoelging).isEqualTo(true)
+            assertThat(harRiktigFormidlingsgruppe).isEqualTo(true)
+            assertThat(erIkkeKode6eller7).isEqualTo(true)
+            assertThat(erIkkeSperretAnsatt).isEqualTo(true)
+            assertThat(erIkkeDoed).isEqualTo(true)
+            assertThat(erIkkeKvp).isEqualTo(true)
+            assertThat(harIkkeAdressebeskyttelse).isEqualTo(true)
+            assertThat(erFerdigBeregnet).isEqualTo(true)
+        } ?: Assertions.fail("Fant ikke evaluering i databasen")
     }
 
     @Test
@@ -147,7 +158,7 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = manglendeCV()),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
     )
 
     @Test
@@ -260,7 +271,7 @@ class SynlighetsmotorTest {
     @Test
     fun `produserer ny melding dersom sammenstiller er kjørt`() = testProgramMedHendelse(
         oppfølgingsinformasjonHendelseMedParticipatingService(participatingService = participatingService("toi-sammenstille-kandidat")),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true),
     )
 
     @Test

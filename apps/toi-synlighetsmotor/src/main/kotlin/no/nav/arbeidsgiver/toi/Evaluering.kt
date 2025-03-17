@@ -89,6 +89,7 @@ class Evaluering(
                 Synlighet(this?.erSynlig() ?: false, this?.erFerdigBeregnet ?: false, obfuskertEvaluering)
             }
     }
+
 }
 
 data class Synlighet(
