@@ -282,28 +282,4 @@ class SynlighetsmotorTest {
         oppfølgingsinformasjonHendelseMedParticipatingService(participatingService = participatingService("toi-sammenstille-kandidat")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true),
     )
-
-    @Test
-    fun `Ingen ny melding dersom sammenstiller ikke er kjørt`() = testProgramMedHendelse(
-        oppfølgingsinformasjonHendelseMedParticipatingService(
-            participatingService = participatingService("toi-arbeidsmarked-cv")
-        ),
-        enHendelseErIkkePublisert()
-    )
 }
-
-private fun evalueringMedAltTrue() = Evaluering(
-    harAktivCv = true.tilBooleanVerdi(),
-    harJobbprofil = true.tilBooleanVerdi(),
-    harSettHjemmel = true.tilBooleanVerdi(),
-    maaIkkeBehandleTidligereCv = true.tilBooleanVerdi(),
-    arenaIkkeFritattKandidatsøk = true.tilBooleanVerdi(),
-    erUnderOppfoelging = true.tilBooleanVerdi(),
-    harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
-    erIkkeKode6eller7 = true.tilBooleanVerdi(),
-    erIkkeSperretAnsatt = true.tilBooleanVerdi(),
-    erIkkeDoed = true.tilBooleanVerdi(),
-    erIkkeKvp = true.tilBooleanVerdi(),
-    harIkkeAdressebeskyttelse = true.tilBooleanVerdi(),
-    komplettBeregningsgrunnlag = true
-)

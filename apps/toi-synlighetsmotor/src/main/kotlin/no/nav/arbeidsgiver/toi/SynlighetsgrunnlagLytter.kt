@@ -31,7 +31,7 @@ class SynlighetsgrunnlagLytter(
                 it.interestedIn("@behov")
                 it.forbid("synlighet")
                 it.requireAny(requiredFields)
-                it.interestedIn("aktørId")
+                it.requireKey("aktørId")
             }
         }.register(this)
     }
