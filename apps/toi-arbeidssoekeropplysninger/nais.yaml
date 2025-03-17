@@ -1,0 +1,56 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: toi-arbeidssoekeropplysninger
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: /isalive
+  readiness:
+    path: /isready
+  leaderElection: true
+  prometheus:
+    enabled: true
+    path: /metrics
+  gcp:
+    sqlInstances:
+      - name: toi-arbeidssoekeropplysninger
+        type: POSTGRES_17
+        diskType: SSD
+        highAvailability: true
+        diskSize: 50
+        diskAutoresize: true
+        tier: "{{ cloudsql_tier }}"
+        databases:
+          - name: toiarbeidssoekeropplysninger
+            envVarPrefix: DB
+        cascadingDelete: false
+  replicas:
+    min: 1
+    max: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 3072Mi
+    requests:
+      cpu: 200m
+      memory: 1536Mi
+  secureLogs:
+    enabled: true
+  kafka:
+    pool: {{ kafka_pool }}
+  env:
+    - name: KAFKA_RAPID_TOPIC
+      value: toi.rapid-1
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: {{ kafka_consumer_group_id }}
+    - name: ARBEIDSSOKER_OPPLYSNINGER_KAFKA_GROUP_ID
+      value: {{arbeidssoker_opplysninger_kafka_group_id}}
+    - name: PUBLISER_TIL_RAPID_ENABLED
+      value: {{publiser_til_rapid_enabled}}
+    - name: KAFKA_RESET_POLICY
+      value: "earliest"
