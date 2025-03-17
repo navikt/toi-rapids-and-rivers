@@ -6,7 +6,8 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
-import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelse
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseEtterBehovsHenting
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseFørBehovsHenting
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
@@ -18,7 +19,6 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendels
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -49,16 +49,22 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()),
+    fun `komplett kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
+        hendelseEtterBehovsHenting(oppfølgingsinformasjon = oppfølgingsinformasjon()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
-            synlighet = false, ferdigBeregnet = false
+            synlighet = false, ferdigBeregnet = true
         )
     )
 
     @Test
+    fun `inkomplett kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
+        hendelseFørBehovsHenting(oppfølgingsinformasjon = oppfølgingsinformasjon()),
+        enHendelseErPublisertMedBehov()
+    )
+
+    @Test
     fun `kandidat med kun cv skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(arbeidsmarkedCv = arbeidsmarkedCv()),
+        hendelseEtterBehovsHenting(arbeidsmarkedCv = arbeidsmarkedCv()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
     )
 

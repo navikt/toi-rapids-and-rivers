@@ -49,11 +49,9 @@ class Evaluering(
             erIkkeKode6eller7,
             erIkkeSperretAnsatt,
             erIkkeDoed,
-            harIkkeAdressebeskyttelse,
-            erFerdigBeregnet,
-            erIkkeKvp).all { it==True }
+            erIkkeKvp).all { it==True } && erFerdigBeregnet
 
-    fun minstEnRegelGirGarantertUsynlig() = listOf(harAktivCv,
+    private fun minstEnRegelGirGarantertUsynlig() = listOf(harAktivCv,
             harJobbprofil,
             harSettHjemmel,
             maaIkkeBehandleTidligereCv,
@@ -63,7 +61,7 @@ class Evaluering(
             erIkkeKode6eller7,
             erIkkeSperretAnsatt,
             erIkkeDoed,
-            erIkkeKvp, harIkkeAdressebeskyttelse).any { it==False }
+            erIkkeKvp).any { it==False }
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),
