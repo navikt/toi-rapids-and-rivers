@@ -39,7 +39,7 @@ data class Kandidat(
         erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeSperretAnsatt),
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
-        harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg { it == "UKJENT" || it == "UGRADERT" },
+        harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
@@ -87,6 +87,8 @@ data class Kandidat(
     private fun erIkkeKode6EllerKode7(oppfølgingsinformasjon: Oppfølgingsinformasjon): Boolean =
         (oppfølgingsinformasjon.diskresjonskode == null
                 || oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
+
+    private fun harIkkeAdressebeskyttelse(adressebeskyttelse: String) = adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT"
 
 
     private fun beregningsgrunnlag() = listOf(arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
