@@ -32,10 +32,10 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
-        //ADRESSEBESKYTTELSE("adressebeskyttelse", """"adressebeskyttelse":null""", adressebeskyttelse())
+        ADRESSEBESKYTTELSE("adressebeskyttelse", """"adressebeskyttelse":"UGRADERT"""", adressebeskyttelse("STRENGT_FORTROLIG")),
     }
 
-    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak" +"adressebeskyttelse"
+    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak"
 
     @ParameterizedTest
     @MethodSource("felter")
@@ -160,38 +160,107 @@ class SynlighetsevalueringsgrunnlagLytterTest {
     }
 
     @Test
-    fun `Om det er en melding der alle behovene er utfylt, så skal synlighet legges på`() {
-        val alleFelterSattTilÅGiSynligTrue = (Felt.entries.map(Felt::skalGiSynligTrue) + """"adressebeskyttelse":null""").joinToString()
+    fun `Om både livshendelse og oppfølginsinformasjon sier at synlig er false skal synlig være false`() {
+        val alleFelterSattTilÅGiSynligTrue = ((Felt.entries-Felt.ADRESSEBESKYTTELSE-Felt.OPPFØLGINGSINFORMASJON)
+            .map(Felt::skalGiSynligTrue)).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                ${oppfølgingsinformasjon(diskresjonskode = "6")},
+                ${Felt.ADRESSEBESKYTTELSE.skalGiSynligFalse},
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            (Felt.entries.map(Felt::navn) +"adressebeskyttelse").forEach { feltNavn ->
+            (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").isMissingNode).isTrue()
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             melding.path("synlighet").apply {
-                assertThat(path("erSynlig").asBoolean()).isTrue()
+                assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
             }
         })
     }
 
     @Test
-    fun `Om det er en melding der alle behovene er utfylt, untatt adressebeskyttelse, så skal synlighetsmotor vente til adressebeskyttelse er lagt på`() {
-        val alleFelterSattTilÅGiSynligTrue = (Felt.entries.map(Felt::skalGiSynligTrue)).joinToString()
+    fun `Om bare livshendelse men ikke oppfølginsinformasjon sier at synlig er false skal synlig være false`() {
+
+        val alleFelterSattTilÅGiSynligTrue = ((Felt.entries-Felt.ADRESSEBESKYTTELSE-Felt.OPPFØLGINGSINFORMASJON)
+            .map(Felt::skalGiSynligTrue)).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
+                ${Felt.ADRESSEBESKYTTELSE.skalGiSynligFalse},
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
-            assertThat(size).isEqualTo(0)
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
+                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+            }
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            melding.path("synlighet").apply {
+                assertThat(path("erSynlig").asBoolean()).isFalse()
+                assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
+            }
+        })
+    }
+
+    @Test
+    fun `Om bare oppfølginsinformasjon men ikke livshendelse sier at synlig er false skal synlig være false`() {
+        val alleFelterSattTilÅGiSynligTrue = ((Felt.entries-Felt.ADRESSEBESKYTTELSE-Felt.OPPFØLGINGSINFORMASJON)
+            .map(Felt::skalGiSynligTrue)).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                ${oppfølgingsinformasjon(diskresjonskode = "6")},
+                ${Felt.ADRESSEBESKYTTELSE.skalGiSynligTrue},
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
+                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+            }
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            melding.path("synlighet").apply {
+                assertThat(path("erSynlig").asBoolean()).isFalse()
+                assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
+            }
+        })
+    }
+
+    @Test
+    fun `Om både oppfølginsinformasjon og livshendelse sier at synlig er true skal synlig være true`(){
+        val alleFelterSattTilÅGiSynligTrue = ((Felt.entries-Felt.ADRESSEBESKYTTELSE-Felt.OPPFØLGINGSINFORMASJON)
+            .map(Felt::skalGiSynligTrue)).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
+                ${Felt.ADRESSEBESKYTTELSE.skalGiSynligTrue},
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
+                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+            }
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            melding.path("synlighet").apply {
+                assertThat(path("erSynlig").asBoolean()).isTrue()
+                assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
+            }
         })
     }
 }

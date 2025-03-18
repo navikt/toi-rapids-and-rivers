@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
@@ -333,9 +332,9 @@ class Testdata {
             }}
     """.trimIndent()
 
-        fun adressebeskyttelse(): String =
+        fun adressebeskyttelse(gradering: String = "UGRADERT"): String =
             """
-              "adressebeskyttelse": "STRENGT_FORTROLIG"
+              "adressebeskyttelse": "$gradering"
             """.trimIndent()
 
         fun manglendeHjemmel() =

@@ -49,6 +49,7 @@ class Evaluering(
             erIkkeKode6eller7,
             erIkkeSperretAnsatt,
             erIkkeDoed,
+            harIkkeAdressebeskyttelse,
             erIkkeKvp).all { it==True } && erFerdigBeregnet
 
     private fun minstEnRegelGirGarantertUsynlig() = listOf(harAktivCv,
@@ -61,6 +62,7 @@ class Evaluering(
             erIkkeKode6eller7,
             erIkkeSperretAnsatt,
             erIkkeDoed,
+            harIkkeAdressebeskyttelse,
             erIkkeKvp).any { it==False }
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(

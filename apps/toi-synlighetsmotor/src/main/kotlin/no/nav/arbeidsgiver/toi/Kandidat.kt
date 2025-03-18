@@ -39,7 +39,7 @@ data class Kandidat(
         erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeSperretAnsatt),
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
-        harIkkeAdressebeskyttelse = adressebeskyttelse.hvisNullEller { it != "STRENGT_FORTROLIG_UTLAND" && it != "STRENGT_FORTROLIG" && it != "FORTROLIG" },
+        harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg { it == "UKJENT" || it == "UGRADERT" },
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
@@ -90,7 +90,7 @@ data class Kandidat(
 
 
     private fun beregningsgrunnlag() = listOf(arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp).all { it.svarPåDetteFeltetLiggerPåHendelse() }
+        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
 
     companion object {

@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.flywaydb.core.Flyway
 import java.sql.ResultSet
 import javax.sql.DataSource
 
