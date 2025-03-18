@@ -42,6 +42,13 @@ class SynlighetsgrunnlagLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        if(packet["@behov"].map { it.asText() }.contains("adressebeskyttelse") &&
+            packet["adressebeskyttelse"].isMissingNode
+        ) {
+            // TODO: Dette er bare midlertidig, siden adressebesyttelse ikke er en del av evalueringen ennå.
+            return
+        }
+
         val kandidat = Kandidat.fraJson(packet)
 
         val synlighetsevaluering = kandidat.toEvaluering()
