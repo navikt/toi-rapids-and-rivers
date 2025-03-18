@@ -79,14 +79,14 @@ class Evaluering(
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this == null || !erIkkeKode6eller7.default(true) || !erIkkeKvp.default(true)) {
+            if (this == null || !erIkkeKode6eller7.default(true) || !harIkkeAdressebeskyttelse.default(true) || !erIkkeKvp.default(true)) {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
             } else {
                 tilEvalueringUtenDiskresjonskode()
             }
 
 
-        operator fun Evaluering?.invoke() =
+        fun Evaluering?.somSynlighet() =
             lagEvalueringSomObfuskererKandidaterMedDiskresjonskode().let { obfuskertEvaluering ->
                 Synlighet(this?.erSynlig() ?: false, this?.erFerdigBeregnet ?: false, obfuskertEvaluering)
             }

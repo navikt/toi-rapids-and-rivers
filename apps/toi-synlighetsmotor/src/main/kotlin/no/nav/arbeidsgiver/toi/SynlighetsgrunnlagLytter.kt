@@ -10,7 +10,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
+import no.nav.arbeidsgiver.toi.Evaluering.Companion.somSynlighet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -47,7 +47,7 @@ class SynlighetsgrunnlagLytter(
         val synlighetsevaluering = kandidat.toEvaluering()
 
         if (synlighetsevaluering.erFerdigBeregnet) {
-            packet["synlighet"] = synlighetsevaluering()
+            packet["synlighet"] = synlighetsevaluering.somSynlighet()
             repository.lagre(
                 evaluering = synlighetsevaluering,
                 aktørId = kandidat.aktørId,
