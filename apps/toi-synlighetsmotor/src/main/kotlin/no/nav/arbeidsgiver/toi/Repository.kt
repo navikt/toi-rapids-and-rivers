@@ -99,18 +99,20 @@ class Repository(private val dataSource: DataSource) {
 
 
     private fun evalueringFraDB(resultset: ResultSet) = Evaluering(
-        harAktivCv = resultset.getBoolean(harAktivCvKolonne),
-        harJobbprofil = resultset.getBoolean(harJobbprofilkolonne),
-        harSettHjemmel = resultset.getBoolean(harSettHjemmelKolonne),
-        maaIkkeBehandleTidligereCv = resultset.getBoolean(måIkkeBehandleTidligereCvKolonne),
-        arenaIkkeFritattKandidatsøk = resultset.getBoolean(arenaIkkeFritattKandidatsøkKolonne),
-        erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne),
-        harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne),
-        erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne),
-        erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne),
-        erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne),
-        erIkkeKvp = resultset.getBoolean(erIkkeKvpKolonne),
-        erFerdigBeregnet = resultset.getBoolean(erFerdigBeregnetKolonne)
+        harAktivCv = resultset.getBoolean(harAktivCvKolonne).tilBooleanVerdi(), // TODO
+        harJobbprofil = resultset.getBoolean(harJobbprofilkolonne).tilBooleanVerdi(), // TODO
+        harSettHjemmel = resultset.getBoolean(harSettHjemmelKolonne).tilBooleanVerdi(), // TODO
+        maaIkkeBehandleTidligereCv = resultset.getBoolean(måIkkeBehandleTidligereCvKolonne).tilBooleanVerdi(), // TODO
+        arenaIkkeFritattKandidatsøk = resultset.getBoolean(arenaIkkeFritattKandidatsøkKolonne).tilBooleanVerdi(), // TODO
+        erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne).tilBooleanVerdi(), // TODO
+        harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne).tilBooleanVerdi(), // TODO
+        erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne).tilBooleanVerdi(), // TODO
+        erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne).tilBooleanVerdi(), // TODO
+        erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne).tilBooleanVerdi(), // TODO
+        erIkkeKvp = resultset.getBoolean(erIkkeKvpKolonne).tilBooleanVerdi(), // TODO
+        harIkkeAdressebeskyttelse = BooleanVerdi.missing, // TODO denne har vi ikke i databasen ennå
+        komplettBeregningsgrunnlag = resultset.getBoolean(erFerdigBeregnetKolonne)
+
     )
 
     private fun kolonneString(kolonner: List<String>) =
@@ -123,17 +125,17 @@ class Repository(private val dataSource: DataSource) {
         return mapOf(
             aktøridKolonne to aktørId,
             fødselsnummerKolonne to fødselsnummer,
-            harAktivCvKolonne to harAktivCv,
-            harJobbprofilkolonne to harJobbprofil,
-            harSettHjemmelKolonne to harSettHjemmel,
-            måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv,
-            arenaIkkeFritattKandidatsøkKolonne to arenaIkkeFritattKandidatsøk,
-            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging,
-            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe,
-            erIkkeKode6Eller7Kolonne to erIkkeKode6eller7,
-            erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt,
-            erIkkeDødKolonne to erIkkeDoed,
-            erIkkeKvpKolonne to erIkkeKvp,
+            harAktivCvKolonne to harAktivCv.default(false),     //TODO
+            harJobbprofilkolonne to harJobbprofil.default(false),     //TODO
+            harSettHjemmelKolonne to harSettHjemmel.default(false),     //TODO
+            måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv.default(false),     //TODO
+            arenaIkkeFritattKandidatsøkKolonne to arenaIkkeFritattKandidatsøk.default(false),     //TODO
+            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(false),     //TODO
+            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(false),     //TODO
+            erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(false),     //TODO
+            erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(false),     //TODO
+            erIkkeDødKolonne to erIkkeDoed.default(false),     //TODO
+            erIkkeKvpKolonne to erIkkeKvp.default(false),     //TODO
             erFerdigBeregnetKolonne to erFerdigBeregnet
         )
     }
