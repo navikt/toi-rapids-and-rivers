@@ -46,13 +46,6 @@ class SynlighetsgrunnlagLytter(
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
-        if(packet["@behov"].map { it.asText() }.contains("adressebeskyttelse") &&
-            packet["adressebeskyttelse"].isMissingNode
-            ) {
-            // TODO: Dette er bare midlertidig, siden adressebesyttelse ikke er en del av evalueringen ennå.
-            return
-        }
-
         if (synlighetsevaluering.erFerdigBeregnet) {
             packet["synlighet"] = synlighetsevaluering()
             repository.lagre(
