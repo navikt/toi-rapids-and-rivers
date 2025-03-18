@@ -49,6 +49,9 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
 
         log.info("Sender løsning på behov for aktørid: (se securelog)")
         secureLog.info("Sender løsning på behov for aktørid: $aktørid")
+        if(gradering != null && gradering != "UGRADERT" ) {
+            secureLog.info("Adressebeskyttelse  ${aktørid} $gradering ${packet["@event_name"].asText()}")
+        }
 
         context.publish(aktørid, packet.toJson())
     }
