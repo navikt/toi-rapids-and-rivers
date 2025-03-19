@@ -41,8 +41,7 @@ class Evaluering(
     val harIkkeAdressebeskyttelse: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
-    val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig()
-    fun erSynlig() = listOf(
+    private val felterBortsettFraAdressebeskyttelse = listOf(
         harAktivCv,
         harJobbprofil,
         harSettHjemmel,
@@ -53,25 +52,15 @@ class Evaluering(
         erIkkeKode6eller7,
         erIkkeSperretAnsatt,
         erIkkeDoed,
-        harIkkeAdressebeskyttelse,
         erIkkeKvp
-    ).all { it == True } && erFerdigBeregnet
+    )
 
-    private fun ukomplettMenGirUsynlig() = listOf(
-        harAktivCv,
-        harJobbprofil,
-        harSettHjemmel,
-        maaIkkeBehandleTidligereCv,
-        arenaIkkeFritattKandidatsøk,
-        erUnderOppfoelging,
-        harRiktigFormidlingsgruppe,
-        erIkkeKode6eller7,
-        erIkkeSperretAnsatt,
-        erIkkeDoed,
-        erIkkeKvp
-    ).run {
-        none { it == Missing } && any { it == False }
-    }
+    private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
+    val harAltBortsettFraAdressebeskyttelse = felterBortsettFraAdressebeskyttelse.none { it == Missing }
+    private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
+    val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
+    fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
+        .all { it == True } && erFerdigBeregnet
 
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
@@ -85,6 +74,7 @@ class Evaluering(
         erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
         erIkkeDoed = erIkkeDoed.default(false)
     )
+
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =

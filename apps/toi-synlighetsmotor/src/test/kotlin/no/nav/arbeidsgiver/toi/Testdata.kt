@@ -47,7 +47,17 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
         Assertions.assertThat(size).isEqualTo(1)
         Assertions.assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
         Assertions.assertThat(message(0).path("synlighet").isMissingNode).isTrue()
-        Assertions.assertThat(field(0, "@behov").map(JsonNode::asText)).isEqualTo(requiredFieldsSynlilghetsbehov())
+        Assertions.assertThat(field(0, "@behov").map(JsonNode::asText)).isEqualTo(listOf(
+            "arbeidsmarkedCv",
+            "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+            "oppfølgingsinformasjon",
+            "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+            "oppfølgingsperiode",
+            "arenaFritattKandidatsøk",
+            "hjemmel",
+            "måBehandleTidligereCv",
+            "kvp"
+        ))
     }
 
 fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =

@@ -263,14 +263,16 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         })
     }
 
-    @Test
-    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er ikke synlig, skal sende melding om synlig false`() {
-        val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+    @ParameterizedTest
+    @MethodSource("felter")
+    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er ikke synlig, skal sende melding om synlig false`(felt: Felt) {
+        val alleFelterUntattEttSattTilÅGiSynligTrue = (Felt.entries-felt).map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
-                $alleFelterSattTilÅGiSynligTrue
+                $alleFelterUntattEttSattTilÅGiSynligTrue,
+                ${felt.skalGiSynligFalse}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)

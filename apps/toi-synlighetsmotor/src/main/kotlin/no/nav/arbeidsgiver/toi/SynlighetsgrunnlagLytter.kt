@@ -17,13 +17,26 @@ import org.slf4j.LoggerFactory
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
 
+private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
+    "arbeidsmarkedCv",
+    "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+    "oppfølgingsinformasjon",
+    "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+    "oppfølgingsperiode",
+    "arenaFritattKandidatsøk",
+    "hjemmel",
+    "måBehandleTidligereCv",
+    "kvp"
+)
+
+
 class SynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection,
     private val repository: Repository,
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : River.PacketListener {
 
-    private val requiredFields = requiredFieldsSynlilghetsbehov()
+    private val requiredFields = requiredFieldsSynlighetsbehovUntattadressebeskyttelse()
 
     init {
         River(rapidsConnection).apply {
@@ -55,11 +68,19 @@ class SynlighetsgrunnlagLytter(
             )
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-            val behov = packet["@behov"].asIterable().map(JsonNode::asText)
-            if (!behov.containsAll(requiredFields)) {
-                packet["@behov"] = (packet["@behov"].map { it.asText() } + requiredFieldsSynlilghetsbehov()).distinct()
+            val behov = packet["@behov"].map(JsonNode::asText)
+            if (behov.containsAll(requiredFields)) {
+                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse) {
+                    val extraBehov = listOf("adressebeskyttelse")
+                    packet["@behov"] = (behov + extraBehov).distinct()
+                    rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+                }
+            } else {
+                val extraBehov = requiredFieldsSynlighetsbehovUntattadressebeskyttelse()
+                packet["@behov"] = (behov + extraBehov).distinct()
                 rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
+
         }
     }
 }
