@@ -287,4 +287,34 @@ class SynlighetsevalueringsgrunnlagLytterTest {
             }
         })
     }
+
+    @Test
+    fun `Om man får inn bare adressebeskyttelse som gir false skal man legge på behov på resten av informasjonen`() {
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                $adressebeskyttelseIkkeSynlig
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("synlighet").isMissingNode).isTrue()
+        })
+    }
+
+    @Test
+    fun `Om man får inn bare adressebeskyttelse som gir true skal man legge på behov på resten av informasjonen`() {
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                $adressebeskyttelseSynlig
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("synlighet").isMissingNode).isTrue()
+        })
+    }
 }
