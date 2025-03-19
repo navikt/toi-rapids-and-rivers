@@ -226,7 +226,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
-                $$adressebeskyttelseSynlig,
+                $adressebeskyttelseSynlig,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {

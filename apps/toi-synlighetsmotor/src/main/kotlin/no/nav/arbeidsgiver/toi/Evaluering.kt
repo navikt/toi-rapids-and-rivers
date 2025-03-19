@@ -5,20 +5,23 @@ fun Boolean.tilBooleanVerdi() = if (this) True else False
 interface BooleanVerdi {
     fun default(defaultVerdi: Boolean): Boolean
     operator fun not(): BooleanVerdi
+
     companion object {
         val missing: BooleanVerdi get() = Missing
     }
 }
 
-private object True: BooleanVerdi {
+private object True : BooleanVerdi {
     override fun default(defaultVerdi: Boolean) = true
     override fun not() = False
 }
-private object False: BooleanVerdi {
+
+private object False : BooleanVerdi {
     override fun default(defaultVerdi: Boolean) = false
     override fun not() = True
 }
-private object Missing: BooleanVerdi {
+
+private object Missing : BooleanVerdi {
     override fun default(defaultVerdi: Boolean) = defaultVerdi
     override fun not() = this
 }
@@ -38,32 +41,38 @@ class Evaluering(
     val harIkkeAdressebeskyttelse: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
-    val erFerdigBeregnet = komplettBeregningsgrunnlag || minstEnRegelGirGarantertUsynlig()
-    fun erSynlig() = listOf(harAktivCv,
-            harJobbprofil,
-            harSettHjemmel,
-            maaIkkeBehandleTidligereCv,
-            arenaIkkeFritattKandidatsøk,
-            erUnderOppfoelging,
-            harRiktigFormidlingsgruppe,
-            erIkkeKode6eller7,
-            erIkkeSperretAnsatt,
-            erIkkeDoed,
-            harIkkeAdressebeskyttelse,
-            erIkkeKvp).all { it==True } && erFerdigBeregnet
+    val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig()
+    fun erSynlig() = listOf(
+        harAktivCv,
+        harJobbprofil,
+        harSettHjemmel,
+        maaIkkeBehandleTidligereCv,
+        arenaIkkeFritattKandidatsøk,
+        erUnderOppfoelging,
+        harRiktigFormidlingsgruppe,
+        erIkkeKode6eller7,
+        erIkkeSperretAnsatt,
+        erIkkeDoed,
+        harIkkeAdressebeskyttelse,
+        erIkkeKvp
+    ).all { it == True } && erFerdigBeregnet
 
-    private fun minstEnRegelGirGarantertUsynlig() = listOf(harAktivCv,
-            harJobbprofil,
-            harSettHjemmel,
-            maaIkkeBehandleTidligereCv,
-            arenaIkkeFritattKandidatsøk,
-            erUnderOppfoelging,
-            harRiktigFormidlingsgruppe,
-            erIkkeKode6eller7,
-            erIkkeSperretAnsatt,
-            erIkkeDoed,
-            harIkkeAdressebeskyttelse,
-            erIkkeKvp).any { it==False }
+    private fun ukomplettMenGirUsynlig() = listOf(
+        harAktivCv,
+        harJobbprofil,
+        harSettHjemmel,
+        maaIkkeBehandleTidligereCv,
+        arenaIkkeFritattKandidatsøk,
+        erUnderOppfoelging,
+        harRiktigFormidlingsgruppe,
+        erIkkeKode6eller7,
+        erIkkeSperretAnsatt,
+        erIkkeDoed,
+        erIkkeKvp
+    ).run {
+        none { it == Missing } && any { it == False }
+    }
+
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),
@@ -79,7 +88,10 @@ class Evaluering(
 
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this == null || !erIkkeKode6eller7.default(true) || !harIkkeAdressebeskyttelse.default(true) || !erIkkeKvp.default(true)) {
+            if (this == null || !erIkkeKode6eller7.default(true) || !harIkkeAdressebeskyttelse.default(true) || !erIkkeKvp.default(
+                    true
+                )
+            ) {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
             } else {
                 tilEvalueringUtenDiskresjonskode()

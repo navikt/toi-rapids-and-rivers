@@ -56,13 +56,14 @@ class SynlighetsgrunnlagLytter(
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
             val behov = packet["@behov"].asIterable().map(JsonNode::asText)
-            if(!behov.containsAll(requiredFields)) {
+            if (!behov.containsAll(requiredFields)) {
                 packet["@behov"] = (packet["@behov"].map { it.asText() } + requiredFieldsSynlilghetsbehov()).distinct()
                 rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
         }
     }
 }
+
 private fun JsonMessage.requireAny(keys: List<String>) {
     if (keys.onEach { interestedIn(it) }
             .map(this::get)
