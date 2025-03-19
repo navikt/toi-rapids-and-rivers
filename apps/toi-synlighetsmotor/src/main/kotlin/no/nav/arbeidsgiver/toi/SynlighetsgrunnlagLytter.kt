@@ -28,7 +28,7 @@ private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "måBehandleTidligereCv",
     "kvp"
 )
-
+private const val adressebeskyttelseFelt = "adressebeskyttelse"
 
 class SynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection,
@@ -70,8 +70,8 @@ class SynlighetsgrunnlagLytter(
         } else {
             val behov = packet["@behov"].map(JsonNode::asText)
             if (behov.containsAll(requiredFields)) {
-                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse) {
-                    val extraBehov = listOf("adressebeskyttelse")
+                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
+                    val extraBehov = listOf(adressebeskyttelseFelt)
                     packet["@behov"] = (behov + extraBehov).distinct()
                     rapidsConnection.publish(kandidat.aktørId, packet.toJson())
                 }
