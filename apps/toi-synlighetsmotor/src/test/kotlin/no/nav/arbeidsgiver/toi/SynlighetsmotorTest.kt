@@ -19,13 +19,70 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendels
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
+
+    private val testDatabase = TestDatabase()
+    private val repository = Repository(testDatabase.dataSource)
+
+    @BeforeEach
+    fun setUp() {
+        testDatabase.slettAlt()
+    }
+
     @Test
     fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
-        val repository = Repository(TestDatabase().dataSource)
+        repository.lagre(
+            Evaluering(
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false
+            ), "123456789", null
+        )
+        assertThat(repository.hentMedAktørid(aktorId = "123456789")).isNotNull()
+
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+                synlighet = true,
+                ferdigBeregnet = true
+            ),
+            repository
+        )
+
+        repository.hentMedAktørid(aktorId = "123456789")?.run {
+            assertThat(harAktivCv.default(false)).isEqualTo(true)
+            assertThat(harJobbprofil.default(false)).isEqualTo(true)
+            assertThat(harSettHjemmel.default(false)).isEqualTo(true)
+            assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
+            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
+            assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
+            assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
+            assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
+            assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
+            assertThat(erIkkeDoed.default(false)).isEqualTo(true)
+            assertThat(erIkkeKvp.default(false)).isEqualTo(true)
+            //assertThat(harIkkeAdressebeskyttelse).isEqualTo(true) TODO: denne har vi ikke i databasen ennå
+            assertThat(erFerdigBeregnet).isEqualTo(true)
+        } ?: Assertions.fail("Fant ikke evaluering i databasen")
+    }
+
+    @Test
+    fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen, og opprette om nødvendig`() {
+        assertThat(repository.hentMedAktørid(aktorId = "123456789")).isNull()
 
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(),

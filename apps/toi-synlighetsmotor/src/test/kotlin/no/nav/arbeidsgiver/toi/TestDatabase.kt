@@ -20,7 +20,7 @@ class TestDatabase {
         slettAlt()
     }
 
-    private fun slettAlt() {
+    fun slettAlt() {
         dataSource.connection.use { connection ->
             connection.prepareStatement(
                 "DELETE FROM evaluering"
