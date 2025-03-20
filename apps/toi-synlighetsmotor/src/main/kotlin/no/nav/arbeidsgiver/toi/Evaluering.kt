@@ -5,20 +5,23 @@ fun Boolean.tilBooleanVerdi() = if (this) True else False
 interface BooleanVerdi {
     fun default(defaultVerdi: Boolean): Boolean
     operator fun not(): BooleanVerdi
+
     companion object {
         val missing: BooleanVerdi get() = Missing
     }
 }
 
-private object True: BooleanVerdi {
+private object True : BooleanVerdi {
     override fun default(defaultVerdi: Boolean) = true
     override fun not() = False
 }
-private object False: BooleanVerdi {
+
+private object False : BooleanVerdi {
     override fun default(defaultVerdi: Boolean) = false
     override fun not() = True
 }
-private object Missing: BooleanVerdi {
+
+private object Missing : BooleanVerdi {
     override fun default(defaultVerdi: Boolean) = defaultVerdi
     override fun not() = this
 }
@@ -38,30 +41,27 @@ class Evaluering(
     val harIkkeAdressebeskyttelse: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
-    val erFerdigBeregnet = komplettBeregningsgrunnlag || minstEnRegelGirGarantertUsynlig()
-    fun erSynlig() = listOf(harAktivCv,
-            harJobbprofil,
-            harSettHjemmel,
-            maaIkkeBehandleTidligereCv,
-            arenaIkkeFritattKandidatsøk,
-            erUnderOppfoelging,
-            harRiktigFormidlingsgruppe,
-            erIkkeKode6eller7,
-            erIkkeSperretAnsatt,
-            erIkkeDoed,
-            erIkkeKvp).all { it==True } && erFerdigBeregnet
+    private val felterBortsettFraAdressebeskyttelse = listOf(
+        harAktivCv,
+        harJobbprofil,
+        harSettHjemmel,
+        maaIkkeBehandleTidligereCv,
+        arenaIkkeFritattKandidatsøk,
+        erUnderOppfoelging,
+        harRiktigFormidlingsgruppe,
+        erIkkeKode6eller7,
+        erIkkeSperretAnsatt,
+        erIkkeDoed,
+        erIkkeKvp
+    )
 
-    private fun minstEnRegelGirGarantertUsynlig() = listOf(harAktivCv,
-            harJobbprofil,
-            harSettHjemmel,
-            maaIkkeBehandleTidligereCv,
-            arenaIkkeFritattKandidatsøk,
-            erUnderOppfoelging,
-            harRiktigFormidlingsgruppe,
-            erIkkeKode6eller7,
-            erIkkeSperretAnsatt,
-            erIkkeDoed,
-            erIkkeKvp).any { it==False }
+    private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
+    val harAltBortsettFraAdressebeskyttelse = felterBortsettFraAdressebeskyttelse.none { it == Missing }
+    private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
+    val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
+    fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
+        .all { it == True } && erFerdigBeregnet
+
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),
@@ -75,16 +75,20 @@ class Evaluering(
         erIkkeDoed = erIkkeDoed.default(false)
     )
 
+
     companion object {
         fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-            if (this == null || !erIkkeKode6eller7.default(true) || !erIkkeKvp.default(true)) {
+            if (this == null || !erIkkeKode6eller7.default(true) || !harIkkeAdressebeskyttelse.default(true) || !erIkkeKvp.default(
+                    true
+                )
+            ) {
                 EvalueringUtenDiskresjonskode.medAlleVerdierFalse()
             } else {
                 tilEvalueringUtenDiskresjonskode()
             }
 
 
-        operator fun Evaluering?.invoke() =
+        fun Evaluering?.somSynlighet() =
             lagEvalueringSomObfuskererKandidaterMedDiskresjonskode().let { obfuskertEvaluering ->
                 Synlighet(this?.erSynlig() ?: false, this?.erFerdigBeregnet ?: false, obfuskertEvaluering)
             }

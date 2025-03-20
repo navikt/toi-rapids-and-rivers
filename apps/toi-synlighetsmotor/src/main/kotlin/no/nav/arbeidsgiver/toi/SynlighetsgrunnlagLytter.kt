@@ -10,12 +10,25 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.arbeidsgiver.toi.Evaluering.Companion.invoke
+import no.nav.arbeidsgiver.toi.Evaluering.Companion.somSynlighet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
+
+private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
+    "arbeidsmarkedCv",
+    "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+    "oppfølgingsinformasjon",
+    "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+    "oppfølgingsperiode",
+    "arenaFritattKandidatsøk",
+    "hjemmel",
+    "måBehandleTidligereCv",
+    "kvp"
+)
+private const val adressebeskyttelseFelt = "adressebeskyttelse"
 
 class SynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection,
@@ -23,14 +36,14 @@ class SynlighetsgrunnlagLytter(
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : River.PacketListener {
 
-    private val requiredFields = requiredFieldsSynlilghetsbehov()
+    private val requiredFields = requiredFieldsSynlighetsbehovUntattadressebeskyttelse()
 
     init {
         River(rapidsConnection).apply {
             precondition {
                 it.interestedIn("@behov")
                 it.forbid("synlighet")
-                it.requireAny(requiredFields)
+                it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
             }
         }.register(this)
@@ -42,19 +55,12 @@ class SynlighetsgrunnlagLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        if(packet["@behov"].map { it.asText() }.contains("adressebeskyttelse") &&
-            packet["adressebeskyttelse"].isMissingNode
-        ) {
-            // TODO: Dette er bare midlertidig, siden adressebesyttelse ikke er en del av evalueringen ennå.
-            return
-        }
-
         val kandidat = Kandidat.fraJson(packet)
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
         if (synlighetsevaluering.erFerdigBeregnet) {
-            packet["synlighet"] = synlighetsevaluering()
+            packet["synlighet"] = synlighetsevaluering.somSynlighet()
             repository.lagre(
                 evaluering = synlighetsevaluering,
                 aktørId = kandidat.aktørId,
@@ -62,14 +68,23 @@ class SynlighetsgrunnlagLytter(
             )
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-            val behov = packet["@behov"].asIterable().map(JsonNode::asText)
-            if(!behov.containsAll(requiredFields)) {
-                packet["@behov"] = (packet["@behov"].map { it.asText() } + requiredFieldsSynlilghetsbehov()).toSet()
+            val behov = packet["@behov"].map(JsonNode::asText)
+            if (behov.containsAll(requiredFields)) {
+                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
+                    val extraBehov = listOf(adressebeskyttelseFelt)
+                    packet["@behov"] = (behov + extraBehov).distinct()
+                    rapidsConnection.publish(kandidat.aktørId, packet.toJson())
+                }
+            } else {
+                val extraBehov = requiredFieldsSynlighetsbehovUntattadressebeskyttelse()
+                packet["@behov"] = (behov + extraBehov).distinct()
                 rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
+
         }
     }
 }
+
 private fun JsonMessage.requireAny(keys: List<String>) {
     if (keys.onEach { interestedIn(it) }
             .map(this::get)

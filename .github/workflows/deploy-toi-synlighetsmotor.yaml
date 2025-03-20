@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/ny-lytter
+      deploy_dev_branch: refs/heads/skru-på-addressebeskyttelse
     secrets: inherit
     permissions:
       contents: read

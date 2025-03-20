@@ -125,17 +125,18 @@ class Repository(private val dataSource: DataSource) {
         return mapOf(
             aktøridKolonne to aktørId,
             fødselsnummerKolonne to fødselsnummer,
-            harAktivCvKolonne to harAktivCv.default(false),     //TODO
-            harJobbprofilkolonne to harJobbprofil.default(false),     //TODO
-            harSettHjemmelKolonne to harSettHjemmel.default(false),     //TODO
-            måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv.default(false),     //TODO
-            arenaIkkeFritattKandidatsøkKolonne to arenaIkkeFritattKandidatsøk.default(false),     //TODO
-            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(false),     //TODO
-            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(false),     //TODO
-            erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(false),     //TODO
-            erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(false),     //TODO
-            erIkkeDødKolonne to erIkkeDoed.default(false),     //TODO
-            erIkkeKvpKolonne to erIkkeKvp.default(false),     //TODO
+            harAktivCvKolonne to harAktivCv.default(true),     //TODO
+            harJobbprofilkolonne to harJobbprofil.default(true),     //TODO
+            harSettHjemmelKolonne to harSettHjemmel.default(true),     //TODO
+            måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv.default(true),     //TODO
+            arenaIkkeFritattKandidatsøkKolonne to (arenaIkkeFritattKandidatsøk.default(true)
+                    && harIkkeAdressebeskyttelse.default(true)),     //TODO
+            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(true),     //TODO
+            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(true),     //TODO
+            erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(true),     //TODO
+            erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(true),     //TODO
+            erIkkeDødKolonne to erIkkeDoed.default(true),     //TODO
+            erIkkeKvpKolonne to erIkkeKvp.default(true),     //TODO
             erFerdigBeregnetKolonne to erFerdigBeregnet
         )
     }
