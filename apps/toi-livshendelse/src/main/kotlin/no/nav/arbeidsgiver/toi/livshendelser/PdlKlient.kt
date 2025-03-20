@@ -52,7 +52,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             mapOf(ident to "UKJENT")
         } else {
             log.error("Klarte ikke å hente gradering fra PDL-respons: se securelog")
-            secureLog.error("Klarte ikke å hente gradering fra PDL-respons: $errors")
+            secureLog.error("Klarte ikke å hente gradering fra PDL-respons for $ident: $errors")
             throw Exception("Klarte ikke å hente gradering fra PDL-respons")
         }
     }
