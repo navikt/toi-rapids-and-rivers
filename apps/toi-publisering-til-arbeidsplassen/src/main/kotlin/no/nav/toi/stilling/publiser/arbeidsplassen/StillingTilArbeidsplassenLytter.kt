@@ -6,7 +6,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.toi.stilling.publiser.arbeidsplassen.DirektemeldtStilling.Companion.fraJson
 
 class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : River.PacketListener  {
     init {
@@ -25,8 +24,7 @@ class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : Rive
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val stilling = fraJson(packet)
-
+        val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
         log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
 
     }
