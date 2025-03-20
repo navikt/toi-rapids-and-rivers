@@ -1,13 +1,10 @@
+package no.nav.toi.stilling.publiser.arbeidsplassen
+
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import no.nav.toi.stilling.publiser.arbeidsplassen.startApp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RapidTest {
-
 
     @Test
     fun `Melding blir sendt på rapid`() {
@@ -55,8 +52,8 @@ class RapidTest {
                         "source": "DIR",
                         "medium": "DIR",
                         "reference": "123e4567-e89b-12d3-a456-426614174000",
-                        "published": "2025-03-20T13:34:41.173316565",
-                        "expires": "2025-04-23T00:00:00",
+                        "published": "2025-03-20T13:34:41.173316565Z",
+                        "expires": "2025-04-23T00:00:00Z",
                         "employer": {
                             "name": "Testarbeidsgiver AS",
                             "orgnr": "123456789",
@@ -66,14 +63,14 @@ class RapidTest {
                         },
                         "locationList": [
                             {
-                                "address": null
-                                "postalCode": null
-                                "county":"VESTFOLD"
-                                "municipal":"FÆRDER"
-                                "municipalCode":"3911"
-                                "city": null
-                                "country": "NORGE"
-                                "latitude": null
+                                "address": null,
+                                "postalCode": null,
+                                "county": "VESTFOLD",
+                                "municipal": "FÆRDER",
+                                "municipalCode": "3911",
+                                "city": null,
+                                "country": "NORGE",
+                                "latitude": null,
                                 "longitude": null
                             }
                         ],
