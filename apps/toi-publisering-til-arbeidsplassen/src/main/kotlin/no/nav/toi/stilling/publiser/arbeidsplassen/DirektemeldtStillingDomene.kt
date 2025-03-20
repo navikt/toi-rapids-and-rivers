@@ -7,6 +7,20 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.ZonedDateTime
 import java.util.*
 
+data class RapidHendelse(
+    val stillingsId: String,
+    val direktemeldtStilling: DirektemeldtStilling
+) {
+    companion object {
+        private val mapper = jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .registerModule(JavaTimeModule())
+
+        fun fraJson(jsonMessage: JsonMessage): RapidHendelse = mapper.readValue(jsonMessage.toJson(), RapidHendelse::class.java)
+    }
+}
+
 data class DirektemeldtStilling(
     val stillingsId: UUID,
     val innhold: DirektemeldtStillingInnhold,
@@ -16,16 +30,7 @@ data class DirektemeldtStilling(
     val sistEndretAv: String,
     val status: String,
     val annonseId: Long?
-) {
-    companion object {
-        private val mapper = jacksonObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .registerModule(JavaTimeModule())
-
-        fun fraJson(jsonMessage: JsonMessage): DirektemeldtStilling = mapper.readValue(jsonMessage.toJson(), DirektemeldtStilling::class.java)
-    }
-}
+)
 
 data class DirektemeldtStillingKategori(
     val code: String?,
