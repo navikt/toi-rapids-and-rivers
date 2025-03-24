@@ -38,10 +38,11 @@ class PubliserOpplysningerJobb(private val repository: Repository,
                 // Her kunne vi sikkert brukt noe Job og corutine greier for at det skal passe med resten av arkitekture
                 // Stoler på at Joar tar den ballen ved behov
                 Thread.sleep(Duration.ofSeconds(5))
-                do {
-                    val n = behandleOpplysninger()
-                    logg.info("Publiserte $n arbeidsøkerperioder")
-                } while (n> 0)
+                if (leaderElector.isLeader())
+                    do {
+                        val n = behandleOpplysninger()
+                        logg.info("Publiserte $n arbeidsøkerperioder")
+                    } while (n> 0)
             }
         }
     }
