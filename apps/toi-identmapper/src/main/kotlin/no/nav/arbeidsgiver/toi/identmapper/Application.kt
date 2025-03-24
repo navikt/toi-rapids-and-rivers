@@ -34,7 +34,7 @@ fun startApp(
             }
         })
 
-        listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
+        listOf("fnr", "fodselsnr", "fodselsnummer", "identitetsnummer").forEach { fnrKey ->
             Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
         }
     }.start()
