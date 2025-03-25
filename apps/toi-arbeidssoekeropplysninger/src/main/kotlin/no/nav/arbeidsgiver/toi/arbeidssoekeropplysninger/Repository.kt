@@ -38,11 +38,12 @@ class Repository(private val datasource: DataSource) {
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
             val sql = """
-                insert into periodemelding(periode_id, identitetsnummer, periode_startet, periode_avsluttet, periode_mottatt_dato) 
-                values(?, ?, ?, ?, ?)
+                insert into periodemelding(periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato) 
+                values(?, ?, ?, ?, ?, ?)
                 on conflict(periode_id) do update
                 set periode_startet = EXCLUDED.periode_startet,
                     identitetsnummer = EXCLUDED.identitetsnummer,
+                    aktor_id = EXCLUDED.aktor_id,
                     periode_avsluttet = EXCLUDED.periode_avsluttet,
                     periode_mottatt_dato = EXCLUDED.periode_mottatt_dato,
                     behandlet_dato = null
@@ -51,12 +52,13 @@ class Repository(private val datasource: DataSource) {
             conn.prepareStatement(sql).apply {
                 setObject(1, periode.periodeId)
                 setString(2, periode.identitetsnummer)
-                setTimestamp(3, Timestamp.from(periode.startet.toInstant()))
+                setString(3, periode.aktørId)
+                setTimestamp(4, Timestamp.from(periode.startet.toInstant()))
                 if (periode.avsluttet == null)
-                    setNull(4, Types.TIMESTAMP)
+                    setNull(5, Types.TIMESTAMP)
                 else
-                    setTimestamp(4, Timestamp.from(periode.avsluttet.toInstant()))
-                setTimestamp(5, Timestamp.from(Instant.now()))
+                    setTimestamp(5, Timestamp.from(periode.avsluttet.toInstant()))
+                setTimestamp(6, Timestamp.from(Instant.now()))
             }.use { statement ->
                 val rs = statement.executeQuery()
                 if (rs.next()) {
@@ -128,7 +130,7 @@ class Repository(private val datasource: DataSource) {
     fun hentPeriodeOpplysninger(periodeId: UUID): PeriodeOpplysninger? {
         datasource.connection.use { conn ->
             val sql = """
-                select id, periode_id, identitetsnummer, periode_startet, periode_avsluttet, periode_mottatt_dato,
+                select id, periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato,
                          opplysninger_mottatt_dato,
                          behandlet_dato,
                          helsetilstand_hindrer_arbeid,
@@ -168,13 +170,13 @@ class Repository(private val datasource: DataSource) {
     }
 
     /**
-     * Henter ubehandlede periodeopplysniger - kun hvis vi har mottatt periodemelding med identitetsnummer
+     * Henter ubehandlede periodeopplysniger - kun hvis vi har mottatt periodemelding med identitetsnummer og aktørId
      */
     fun hentUbehandledePeriodeOpplysninger(limit: Int = 1000): List<PeriodeOpplysninger> {
         val periodeOpplysninger = mutableListOf<PeriodeOpplysninger>()
         datasource.connection.use { conn ->
             val sql = """
-                select id, periode_id, identitetsnummer, periode_startet, periode_avsluttet, periode_mottatt_dato,
+                select id, periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato,
                          opplysninger_mottatt_dato,
                          behandlet_dato,
                          helsetilstand_hindrer_arbeid,
@@ -182,6 +184,7 @@ class Repository(private val datasource: DataSource) {
                 from periodemelding
                 where 
                   behandlet_dato is null and opplysninger_mottatt_dato is not null and identitetsnummer is not null
+                  and aktor_id is not null
                 order by periode_mottatt_dato asc
                 limit ?
             """.trimIndent()
@@ -200,9 +203,10 @@ class Repository(private val datasource: DataSource) {
 
 
 data class Periode(
-    @JsonProperty("id")
+    @JsonProperty("periode_id")
     val periodeId: UUID,
     val identitetsnummer: String,
+    val aktørId: String?,
     val startet: ZonedDateTime,
     val avsluttet: ZonedDateTime?
 )
@@ -212,6 +216,7 @@ data class PeriodeOpplysninger(
     @JsonProperty("periode_id")
     val periodeId: UUID,
     val identitetsnummer: String? = null,
+    val aktørId: String? = null,
     @JsonProperty("periode_startet")
     val periodeStartet: ZonedDateTime? = null,
     @JsonProperty("periode_avsluttet")
@@ -232,6 +237,7 @@ data class PeriodeOpplysninger(
             id = rs.getLong("id"),
             periodeId = rs.getObject("periode_id", UUID::class.java),
             identitetsnummer = rs.getString("identitetsnummer"),
+            aktørId = rs.getString("aktor_id"),
             periodeStartet = rs.getTimestamp("periode_startet")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             periodeAvsluttet = rs.getTimestamp("periode_avsluttet")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             periodeMottattDato = rs.getTimestamp("periode_mottatt_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),

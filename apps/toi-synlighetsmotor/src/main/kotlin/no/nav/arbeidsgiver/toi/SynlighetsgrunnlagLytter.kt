@@ -43,7 +43,7 @@ class SynlighetsgrunnlagLytter(
             precondition {
                 it.interestedIn("@behov")
                 it.forbid("synlighet")
-                it.requireAny(requiredFields + "adressebeskyttelse")
+                it.requireAny(requiredFields + "adressebeskyttelse" + "arbeidssokerperiode" + "arbeidssokeropplysninger")
                 it.requireKey("aktørId")
             }
         }.register(this)

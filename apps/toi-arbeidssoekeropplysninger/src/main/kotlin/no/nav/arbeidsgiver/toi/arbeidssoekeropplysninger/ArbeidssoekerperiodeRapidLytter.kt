@@ -24,11 +24,10 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
     init {
         River(rapidsConnection).apply {
             precondition{
-                it.requireKey("id")
-                it.requireKey("identitetsnummer")
-                it.requireKey("startet")
-                it.interestedIn("avsluttet")
-                it.interestedIn("sistEndretDato") // Ikke interessert i denne hvor kom den fra?
+                //it.requireKey("arbeidssokerperiode")
+                //it.requireKey("fodselsnummer")
+                //it.requireKey("aktørId")
+                //it.interestedIn("sistEndretDato") // Ikke interessert i denne hvor kom den fra?
                 it.requireValue("@event_name", "arbeidssokerperiode")
             }
         }.register(this)
@@ -40,16 +39,18 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok oppfølgingsperiodemelding ${packet["id"]}")
+        println("Mottok $packet")
+        log.info("Mottok oppfølgingsperiodemelding ${packet["@id"]}")
         repository.lagreOppfølgingsperiodemelding(packet.fjernMetadataOgKonverter());
-        secureLog.info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["id"]} for fnr ${packet["identitetsnummer"]}")
+        secureLog.info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["@id"]} for fnr ${packet["fodselsnummer"]}")
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
         val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter =
-            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
-        jsonNode.remove(metadataFelter)
-        return jsonNode
+        val periodeNode = jsonNode["arbeidssokerperiode"] as ObjectNode
+
+        return jsonNode["aktørId"]?.let { aktørId ->
+            jsonNode.putIfAbsent("aktørId", aktørId)
+        } ?: periodeNode
     }
 }

@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
@@ -72,11 +70,14 @@ class PubliserOpplysningerJobb(private val repository: Repository,
 
     fun publiserArbeidssøkeropplysning(opplysning: PeriodeOpplysninger) {
         val jsonNode = objectMapper.valueToTree<JsonNode>(opplysning)
-        (jsonNode as ObjectNode).put("@event_name", "arbeidssøkeropplysninger")
+        val melding = mapOf(
+            "fodselsnummer" to opplysning.identitetsnummer!!,
+            "aktørId" to opplysning.aktørId!!,
+            "arbeidssokeropplysninger" to jsonNode,
+            "@event_name" to "arbeidssokeropplysninger"
+        )
 
-        val message = JsonMessage(objectMapper.writeValueAsString(jsonNode), MessageProblems("{}"),
-            metrics = meterRegistry).toJson()
-
-        rapidConnection.publish(opplysning.identitetsnummer!!, message)
+        val nyMelding = JsonMessage.newMessage(melding)
+        rapidConnection.publish(nyMelding.toJson())
     }
 }
