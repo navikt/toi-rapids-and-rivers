@@ -123,6 +123,18 @@ class HarAdressebeskyttelseTest {
         assertThat(response.statusCode).isEqualTo(401)
     }
 
+    @Test
+    fun `Token må ha Nav-ident`() {
+        val fnr = "12345678912"
+        val token = hentToken(mockOAuth2Server, navIdent = null).serialize()
+        startApp(pdlKlient, testRapid)
+        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+            .authentication().bearer(token)
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(401)
+    }
+
     private fun startApp(
         pdlKlient: PdlKlient,
         rapid: TestRapid
@@ -138,15 +150,20 @@ class HarAdressebeskyttelseTest {
     }
 }
 
-private fun hentToken(mockOAuth2Server: MockOAuth2Server, issuerId: String = "isso-idtoken", expiry: Long = 3600) = mockOAuth2Server.issueToken(
+private fun hentToken(
+    mockOAuth2Server: MockOAuth2Server,
+    issuerId: String = "isso-idtoken",
+    navIdent: String? = "A123456",
+    expiry: Long = 3600
+) = mockOAuth2Server.issueToken(
     issuerId, "someclientid",
     DefaultOAuth2TokenCallback(
         issuerId = issuerId,
-        claims = mapOf(
+        claims = listOfNotNull(
             Pair("name", "navn"),
-            Pair("NAVident", "A123456"),
+            navIdent?.let { Pair("NAVident", it) },
             Pair("unique_name", "unique_name"),
-        ),
+        ).toMap(),
         audience = listOf("audience"),
         expiry = expiry
     )
