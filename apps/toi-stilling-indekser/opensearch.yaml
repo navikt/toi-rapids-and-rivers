@@ -1,0 +1,24 @@
+apiVersion: aiven.io/v1alpha1
+kind: OpenSearch
+metadata:
+  labels:
+    team: toi
+  name: opensearch-toi-toi-stilling
+  namespace: toi
+spec:
+  plan: {{ opensearch_plan }}
+  project: {{ opensearch_project }}
+
+---
+apiVersion: aiven.io/v1alpha1
+kind: ServiceIntegration
+metadata:
+  labels:
+    team: toi
+  name: opensearch-toi-toi-stilling
+  namespace: toi
+spec:
+  project: {{ opensearch_project }}
+  integrationType: prometheus
+  destinationEndpointId: {{ opensearch_endpoint_id }}
+  sourceServiceName: opensearch-toi-toi-stilling
