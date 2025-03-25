@@ -9,7 +9,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val log = noClassLogger()
-val secureLog = LoggerFactory.getLogger("secureLog")!!
 
 fun main() {
     log.info("Starter app.")
@@ -20,9 +19,11 @@ fun main() {
     }.start()
 }
 
+
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
 
+val secureLog = LoggerFactory.getLogger("secureLog")!!
 
 fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
     val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
