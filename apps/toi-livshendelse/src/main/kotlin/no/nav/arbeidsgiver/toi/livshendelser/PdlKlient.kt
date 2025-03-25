@@ -39,7 +39,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             }
             is com.github.kittinunf.result.Result.Failure -> {
                 log.error("Noe feil skjedde ved henting av diskresjonskode for ident(se securelog)")
-                secureLog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message}")
+                secureLog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message} ${result.error.message} ${result.error.response.statusCode}")
                 throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
             }
         }
@@ -59,7 +59,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             mapOf(ident to "UKJENT")
         } else {
             log.error("Klarte ikke å hente gradering fra PDL-respons: se securelog")
-            secureLog.error("Klarte ikke å hente gradering fra PDL-respons: $errors")
+            secureLog.error("Klarte ikke å hente gradering fra PDL-respons for $ident: $errors")
             throw Exception("Klarte ikke å hente gradering fra PDL-respons")
         }
     }

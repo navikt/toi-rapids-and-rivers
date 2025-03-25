@@ -4,4 +4,4 @@ pdl_scope: api://prod-fss.pdl.pdl-api/.default
 pdl_host: pdl-api.prod-fss-pub.nais.io
 pdl_url: https://pdl-api.prod-fss-pub.nais.io/graphql
 pdl_kafka_group_id: toi-livshendelse-2
-max_replicas: 1
+max_replicas: 5

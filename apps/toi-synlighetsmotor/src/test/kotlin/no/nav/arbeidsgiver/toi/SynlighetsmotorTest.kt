@@ -6,7 +6,8 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
-import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelse
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseEtterBehovsHenting
+import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseFørBehovsHenting
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
@@ -18,14 +19,40 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendels
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
+
+    private val testDatabase = TestDatabase()
+    private val repository = Repository(testDatabase.dataSource)
+
+    @BeforeEach
+    fun setUp() {
+        testDatabase.slettAlt()
+    }
+
     @Test
     fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
-        val repository = Repository(TestDatabase().dataSource)
+        repository.lagre(
+            Evaluering(
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false
+            ), "123456789", null
+        )
+        assertThat(repository.hentMedAktørid(aktorId = "123456789")).isNotNull()
 
         testProgramMedHendelse(
             komplettHendelseSomFørerTilSynlighetTrue(),
@@ -36,10 +63,51 @@ class SynlighetsmotorTest {
             repository
         )
 
-        val evalueringFraDb = repository.hentMedAktørid(aktorId = "123456789")
-        Assertions.assertThat(evalueringFraDb).isEqualTo(
-            evalueringMedAltTrue()
+        repository.hentMedAktørid(aktorId = "123456789")?.run {
+            assertThat(harAktivCv.default(false)).isEqualTo(true)
+            assertThat(harJobbprofil.default(false)).isEqualTo(true)
+            assertThat(harSettHjemmel.default(false)).isEqualTo(true)
+            assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
+            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
+            assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
+            assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
+            assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
+            assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
+            assertThat(erIkkeDoed.default(false)).isEqualTo(true)
+            assertThat(erIkkeKvp.default(false)).isEqualTo(true)
+            //assertThat(harIkkeAdressebeskyttelse).isEqualTo(true) TODO: denne har vi ikke i databasen ennå
+            assertThat(erFerdigBeregnet).isEqualTo(true)
+        } ?: Assertions.fail("Fant ikke evaluering i databasen")
+    }
+
+    @Test
+    fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen, og opprette om nødvendig`() {
+        assertThat(repository.hentMedAktørid(aktorId = "123456789")).isNull()
+
+        testProgramMedHendelse(
+            komplettHendelseSomFørerTilSynlighetTrue(),
+            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
+                synlighet = true,
+                ferdigBeregnet = true
+            ),
+            repository
         )
+
+        repository.hentMedAktørid(aktorId = "123456789")?.run {
+            assertThat(harAktivCv.default(false)).isEqualTo(true)
+            assertThat(harJobbprofil.default(false)).isEqualTo(true)
+            assertThat(harSettHjemmel.default(false)).isEqualTo(true)
+            assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
+            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
+            assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
+            assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
+            assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
+            assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
+            assertThat(erIkkeDoed.default(false)).isEqualTo(true)
+            assertThat(erIkkeKvp.default(false)).isEqualTo(true)
+            //assertThat(harIkkeAdressebeskyttelse).isEqualTo(true) TODO: denne har vi ikke i databasen ennå
+            assertThat(erFerdigBeregnet).isEqualTo(true)
+        } ?: Assertions.fail("Fant ikke evaluering i databasen")
     }
 
     @Test
@@ -49,17 +117,29 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(oppfølgingsinformasjon = oppfølgingsinformasjon()),
+    fun `komplett kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
+        hendelseEtterBehovsHenting(oppfølgingsinformasjon = oppfølgingsinformasjon()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
-            synlighet = false, ferdigBeregnet = false
+            synlighet = false, ferdigBeregnet = true
         )
     )
 
     @Test
-    fun `kandidat med kun cv skal ikke være synlig`() = testProgramMedHendelse(
-        hendelse(arbeidsmarkedCv = arbeidsmarkedCv()),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
+    fun `inkomplett kandidat med kun oppfølgingsinformasjon skal ikke være synlig`() = testProgramMedHendelse(
+        hendelseFørBehovsHenting(oppfølgingsinformasjon = oppfølgingsinformasjon()),
+        enHendelseErPublisertMedBehov()
+    )
+
+    @Test
+    fun `kandidat med kun cv før andre behov er hentet skal ikke være synlig`() = testProgramMedHendelse(
+        hendelseFørBehovsHenting(arbeidsmarkedCv = arbeidsmarkedCv()),
+        enHendelseErPublisertMedBehov()
+    )
+
+    @Test
+    fun `kandidat med kun cv etter andre behov er hentetskal ikke være synlig`() = testProgramMedHendelse(
+        hendelseEtterBehovsHenting(arbeidsmarkedCv = arbeidsmarkedCv()),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
     @Test
@@ -97,8 +177,11 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person ikke har oppfølgingsinformasjon skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = null),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
+
+
+
 
     @Test
     fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
@@ -141,7 +224,7 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = manglendeCV()),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, false)
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
     )
 
     @Test
@@ -254,29 +337,6 @@ class SynlighetsmotorTest {
     @Test
     fun `produserer ny melding dersom sammenstiller er kjørt`() = testProgramMedHendelse(
         oppfølgingsinformasjonHendelseMedParticipatingService(participatingService = participatingService("toi-sammenstille-kandidat")),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, false),
-    )
-
-    @Test
-    fun `Ingen ny melding dersom sammenstiller ikke er kjørt`() = testProgramMedHendelse(
-        oppfølgingsinformasjonHendelseMedParticipatingService(
-            participatingService = participatingService("toi-arbeidsmarked-cv")
-        ),
-        enHendelseErIkkePublisert()
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true),
     )
 }
-
-private fun evalueringMedAltTrue() = Evaluering(
-    harAktivCv = true,
-    harJobbprofil = true,
-    harSettHjemmel = true,
-    maaIkkeBehandleTidligereCv = true,
-    arenaIkkeFritattKandidatsøk = true,
-    erUnderOppfoelging = true,
-    harRiktigFormidlingsgruppe = true,
-    erIkkeKode6eller7 = true,
-    erIkkeSperretAnsatt = true,
-    erIkkeDoed = true,
-    erIkkeKvp = true,
-    erFerdigBeregnet = true
-)

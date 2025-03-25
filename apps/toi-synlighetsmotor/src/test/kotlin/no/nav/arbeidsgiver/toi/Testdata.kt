@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
@@ -41,6 +42,24 @@ fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
         }
     }
 
+fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
+    {
+        Assertions.assertThat(size).isEqualTo(1)
+        Assertions.assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
+        Assertions.assertThat(message(0).path("synlighet").isMissingNode).isTrue()
+        Assertions.assertThat(field(0, "@behov").map(JsonNode::asText)).isEqualTo(listOf(
+            "arbeidsmarkedCv",
+            "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+            "oppfølgingsinformasjon",
+            "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
+            "oppfølgingsperiode",
+            "arenaFritattKandidatsøk",
+            "hjemmel",
+            "måBehandleTidligereCv",
+            "kvp"
+        ))
+    }
+
 fun enHendelseErIkkePublisert(): TestRapid.RapidInspector.() -> Unit =
     {
         Assertions.assertThat(size).isEqualTo(0)
@@ -66,18 +85,18 @@ class Testdata {
             kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "AVSLUTTET"),
             adressebeskyttelse: String? = adressebeskyttelse()
         ) =
-            hendelse(
+            hendelseEtterBehovsHenting(
                 oppfølgingsperiode = oppfølgingsperiode,
-                oppfølgingsinformasjon = oppfølgingsinformasjon,
+                oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
-                arenaFritattKandidatsøk = arenaFritattKandidatsøk,
+                arenaFritattKandidatsøk = arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
                 hjemmel = hjemmel,
                 participatingService = participatingService,
-                måBehandleTidligereCv = måBehandleTidligereCv,
+                måBehandleTidligereCv = måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
                 aktørId = aktørId,
                 kvp = kvp,
-                veileder = veileder,
-                siste14avedtak = siste14avedtak,
+                veileder = veileder ?: nullVerdiForKey("veileder"),
+                siste14avedtak = siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
                 adressebeskyttelse = adressebeskyttelse
             )
 
@@ -85,12 +104,48 @@ class Testdata {
             oppfølgingsinformasjon: String = oppfølgingsinformasjon(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat")
         ) =
-            hendelse(
+            hendelseEtterBehovsHenting(
                 oppfølgingsinformasjon = oppfølgingsinformasjon,
                 participatingService = participatingService
             )
 
-        fun hendelse(
+
+        fun hendelseFørBehovsHenting(
+            oppfølgingsperiode: String? = null,
+            oppfølgingsinformasjon: String? = null,
+            arbeidsmarkedCv: String? = null,
+            arenaFritattKandidatsøk: String? = null,
+            hjemmel: String? = null,
+            participatingService: String? = participatingService("toi-sammenstille-kandidat"),
+            måBehandleTidligereCv: String? = null,
+            aktørId: String? = """"aktørId": "123456789"""",
+            kvp: String? = null,
+            veileder: String? = null,
+            siste14avedtak: String? = null,
+            adressebeskyttelse: String? = null
+        ) = """
+            {
+                ${
+            listOfNotNull(
+                """"@event_name": "hendelse"""",
+                arbeidsmarkedCv,
+                oppfølgingsinformasjon,
+                oppfølgingsperiode,
+                arenaFritattKandidatsøk,
+                hjemmel,
+                participatingService,
+                måBehandleTidligereCv,
+                aktørId,
+                kvp,
+                veileder,
+                siste14avedtak,
+                adressebeskyttelse
+            ).joinToString()
+        }
+            }
+        """.trimIndent()
+
+        fun hendelseEtterBehovsHenting(
             oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
@@ -250,8 +305,8 @@ class Testdata {
             """
             "hjemmel": {
                 "ressurs": "$ressurs",
-                "opprettetDato": "$opprettetDato",
-                "slettetDato": ${if (slettetDato == null) null else "\"$slettetDato\""},
+                "opprettetDato": ${opprettetDato?.let { """"$it"""" }},
+                "slettetDato": ${slettetDato?.let { """"$it"""" }},
                 "fnr": "12345678912"
             }
         """.trimIndent()
@@ -287,9 +342,9 @@ class Testdata {
             }}
     """.trimIndent()
 
-        fun adressebeskyttelse(): String =
+        fun adressebeskyttelse(gradering: String = "UGRADERT"): String =
             """
-              "adressebeskyttelse": "STRENGT_FORTROLIG"
+              "adressebeskyttelse": "$gradering"
             """.trimIndent()
 
         fun manglendeHjemmel() =

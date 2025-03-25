@@ -7,9 +7,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.*
-import java.time.DayOfWeek.SATURDAY
-import java.time.DayOfWeek.SUNDAY
+import java.time.DayOfWeek.*
 import java.time.Month.*
+
+private val log = noClassLogger()
 
 private val uinteressanteHendelser = listOf(
     "application_up",
@@ -70,14 +71,14 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                                     .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n" +
                                 sorterteEventer
                                     .filterNot(SisteEvent::erUtdatert)
-                            .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
+                                    .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
                     )
                 } else {
                     log.info(
                         "Tid siden hendelser:\n" + sorterteEventer.joinToString(
-                                "\n",
-                                transform = SisteEvent::beskrivelse
-                            ) + "\n\n"
+                            "\n",
+                            transform = SisteEvent::beskrivelse
+                        ) + "\n\n"
                     )
                 }
                 hendelserSomIkkeSendesLenger.filterNot(sisteEvent::containsKey).forEach {
@@ -89,7 +90,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             }
         }
     } catch (e: Exception) {
-        log.error("Feil i jobb", e)
+        log.error("Feil i jobb: $e", e)
         throw e
     }
 }
@@ -106,7 +107,7 @@ class SisteEvent(private val eventName: String, private val duration: Duration) 
             "adressebeskyttelse" -> justertGrenseverdiForAlarm(Duration.ofDays(9))
             "kvp" -> justertGrenseverdiForAlarm(Duration.ofHours(4))
             "siste14avedtak" -> justertGrenseverdiForAlarm(Duration.ofHours(3))
-            "arbeidsgiversKandidatliste.VisningKontaktinfo" -> justertGrenseverdiForAlarm(Duration.ofHours(2))
+            "arbeidsgiversKandidatliste.VisningKontaktinfo" -> justertGrenseverdiForAlarm(Duration.ofHours(3))
             "notifikasjon.cv-delt" -> justertGrenseverdiForAlarm(Duration.ofHours(2))
             else -> Duration.ofHours(1)
         }
@@ -139,6 +140,7 @@ private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now(ZoneId
         it.toLocalDate().erKristiHimmelfartsdag() -> true
         it.dayOfWeek == SATURDAY -> true
         it.dayOfWeek == SUNDAY -> true
+        it.dayOfWeek == MONDAY && it.hour < 10 -> true
         it.hour < 9 -> true
         it.hour > 15 -> true
         else -> false

@@ -33,22 +33,22 @@ val evaluerKandidatFraContextGet: ((String) ->  Evaluering?, Map<Rolle,Pair<Stri
     }
 }
 private fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode() =
-    if (this == null || !erIkkeKode6eller7 || !erIkkeKvp) {
+    if (this == null || !erIkkeKode6eller7.default(true) || !erIkkeKvp.default(true)) {
         EvalueringUtenDiskresjonskodeDTO.medAlleVerdierFalse()
     } else {
         tilEvalueringUtenDiskresjonskodeDTO()
     }
 
 private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDiskresjonskodeDTO(
-    harAktivCv = harAktivCv,
-    harJobbprofil = harJobbprofil,
-    harSettHjemmel = harSettHjemmel,
-    maaIkkeBehandleTidligereCv = maaIkkeBehandleTidligereCv,
-    erIkkeFritattKandidatsøk = arenaIkkeFritattKandidatsøk,
-    erUnderOppfoelging = erUnderOppfoelging,
-    harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe,
-    erIkkeSperretAnsatt = erIkkeSperretAnsatt,
-    erIkkeDoed = erIkkeDoed,
+    harAktivCv = harAktivCv.default(false),
+    harJobbprofil = harJobbprofil.default(false),
+    harSettHjemmel = harSettHjemmel.default(false),
+    maaIkkeBehandleTidligereCv = maaIkkeBehandleTidligereCv.default(false),
+    erIkkeFritattKandidatsøk = arenaIkkeFritattKandidatsøk.default(false),
+    erUnderOppfoelging = erUnderOppfoelging.default(false),
+    harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
+    erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
+    erIkkeDoed = erIkkeDoed.default(false),
     erFerdigBeregnet = erFerdigBeregnet
 )
 
