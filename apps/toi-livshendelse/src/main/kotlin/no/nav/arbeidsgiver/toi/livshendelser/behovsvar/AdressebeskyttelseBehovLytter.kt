@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
+import no.nav.arbeidsgiver.toi.livshendelser.PersonhendelseService
 import no.nav.arbeidsgiver.toi.livshendelser.log
 import org.slf4j.LoggerFactory
 

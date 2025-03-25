@@ -17,17 +17,17 @@ private val env = System.getenv()
 
 private val secureLog = LoggerFactory.getLogger("secureLog")
 
-fun opprettJavalinMedTilgangskontroll(): Javalin =
+fun opprettJavalinMedTilgangskontroll(port: Int): Javalin =
     Javalin.create {
         it.http.defaultContentType = "application/json"
-    }.start(8301)
+    }.start(port)
 
 fun main() {
     try {
         startApp(
             rapidsConnection(),
             PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env)),
-            opprettJavalinMedTilgangskontroll(),
+            opprettJavalinMedTilgangskontroll(8080),
             hentIssuerProperties(env)
         )
     }

@@ -18,15 +18,17 @@ import java.time.ZoneOffset
 class HåndterPersonhendelserTest {
 
     companion object {
-        private val wiremock = WireMockServer(8083).also(WireMockServer::start)
-        private val mockOAuth2Server = WireMockServer(18301).also(WireMockServer::start)
+        private val pdlPort = 8084
+        private val oAuthPort = 18302
+        private val wiremock = WireMockServer(pdlPort).also(WireMockServer::start)
+        private val mockOAuth2Server = WireMockServer(oAuthPort).also(WireMockServer::start)
         val envs = mapOf(
-            "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token",
+            "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:$oAuthPort/isso-idtoken/token",
             "AZURE_APP_CLIENT_SECRET" to "test1",
             "AZURE_APP_CLIENT_ID" to "test2",
             "PDL_SCOPE" to "test3",
         )
-        val pdlKlient = PdlKlient("http://localhost:8083/graphql", AccessTokenClient(envs))
+        val pdlKlient = PdlKlient("http://localhost:$pdlPort/graphql", AccessTokenClient(envs))
         val testRapid = TestRapid().also { AdressebeskyttelseLytter(pdlKlient, it) }
 
         val personhendelseService =
@@ -53,7 +55,7 @@ class HåndterPersonhendelserTest {
     fun `sjekk at gradering er sendt for en hendelse med en ident`() {
         val aktørId = "123123123"
         stubOAtuh()
-        stubPdl(ident = aktørId)
+        wiremock.stubPdl(ident = aktørId)
 
         val personHendelse = personhendelse(personidenter = listOf(aktørId))
 
@@ -74,7 +76,7 @@ class HåndterPersonhendelserTest {
     fun `sjekk at hendelser ikke sendes for andre opplysningstype`() {
 
         stubOAtuh()
-        stubPdl()
+        wiremock.stubPdl()
 
         val personHendelse = personhendelse(opplysningstype = "NOE_ANNET")
 
@@ -90,7 +92,7 @@ class HåndterPersonhendelserTest {
     fun `sjekk at en tom liste av hendelser håndteres korrekt`() {
 
         stubOAtuh()
-        stubPdl()
+        wiremock.stubPdl()
 
         personhendelseService.håndter(
             listOf()
@@ -104,7 +106,7 @@ class HåndterPersonhendelserTest {
     fun `sjekk at gradering sendes per ident for en person med flere aktørider`() {
 
         stubOAtuh()
-        stubPdl(
+        wiremock.stubPdl(
             identSvar = """
             {
                 "ident" : "987654321"
@@ -156,7 +158,7 @@ class HåndterPersonhendelserTest {
     fun `legg på svar om første behov er adressebeskyttelse`() {
         val aktørId = "123123123"
         stubOAtuh()
-        stubPdl(ident = aktørId)
+        wiremock.stubPdl(ident = aktørId)
 
         testRapid.sendTestMessage(behovsMelding(ident = aktørId, behovListe = """["adressebeskyttelse"]"""))
 
@@ -171,7 +173,7 @@ class HåndterPersonhendelserTest {
     fun `ikke legg på svar om andre uløste behov enn adressebeskyttelse er først i listen`() {
         val aktørId = "123123123"
         stubOAtuh()
-        stubPdl(ident = aktørId)
+        wiremock.stubPdl(ident = aktørId)
 
         testRapid.sendTestMessage(behovsMelding(ident = aktørId, behovListe = """["noeannet", "adressebeskyttelse"]"""))
 
@@ -184,7 +186,7 @@ class HåndterPersonhendelserTest {
     fun `legg på svar om behov nummer 2 er adressebeskyttelse, dersom første behov har en løsning`() {
         val aktørId = "123123123"
         stubOAtuh()
-        stubPdl(ident = aktørId)
+        wiremock.stubPdl(ident = aktørId)
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -229,7 +231,7 @@ class HåndterPersonhendelserTest {
     fun `legg på svar om behov nummer 2 er adressebeskyttelse, dersom første behov har en løsning med null-verdi`() {
         val aktørId = "123123123"
         stubOAtuh()
-        stubPdl(ident = aktørId)
+        wiremock.stubPdl(ident = aktørId)
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -331,55 +333,6 @@ class HåndterPersonhendelserTest {
                         {
                             "errors": [ { "message": "Noe annet error" } ]
                         }
-                        """.trimIndent()
-                        )
-                )
-        )
-    }
-
-    private fun stubPdl(
-        ident: String = "12312312312",
-        identSvar: String = """
-        {
-            "ident" : "$ident"
-        }
-    """.trimIndent()
-    ) {
-        val pesostegn = "$"
-        wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/graphql"))
-                .withHeader("Authorization", WireMock.equalTo("Bearer mockedAccessToken"))
-                .withRequestBody(
-                    WireMock.equalToJson(
-                        """
-                        {
-                            "query": "query( ${pesostegn}ident: ID!) { hentPerson(ident: ${pesostegn}ident) { adressebeskyttelse(historikk: false) { gradering }} hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }} }",
-                            "variables":{"ident":"$ident"}
-                        }
-                    """.trimIndent()
-                    )
-                )
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(200)
-                        .withBody(
-                            """
-                            {
-                                "data": {
-                                    "hentPerson": {
-                                            "adressebeskyttelse": [
-                                                {
-                                                    "gradering" : "STRENGT_FORTROLIG"
-                                                }
-                                            ]
-                                    },
-                                    "hentIdenter": {
-                                        "identer": [
-                                            $identSvar
-                                        ]
-                                    }
-                                }
-                            }
                         """.trimIndent()
                         )
                 )

@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.arbeidsgiver.toi.livshendelser.opprettJavalinMedTilgangskontroll
+import no.nav.arbeidsgiver.toi.livshendelser.stubPdl
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.core.configuration.IssuerProperties
@@ -21,30 +22,33 @@ import java.net.URI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HentAdressebeskyttelseTest {
 
-    private val wiremock = WireMockServer(8083).also(WireMockServer::start)
+    private val appPort = 8080
+    private val pdlPort = 8083
+    private val oAuthPort = 18301
+    private val wiremock = WireMockServer(pdlPort).also(WireMockServer::start)
     private val mockOAuth2Server = MockOAuth2Server()
 
 
     val envs = mapOf(
-        "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:18301/isso-idtoken/token",
+        "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "http://localhost:$oAuthPort/isso-idtoken/token",
         "AZURE_APP_CLIENT_SECRET" to "test1",
         "AZURE_APP_CLIENT_ID" to "test2",
         "PDL_SCOPE" to "test3",
     )
-    val pdlKlient = PdlKlient("http://localhost:8083/graphql", AccessTokenClient(envs))
+    val pdlKlient = PdlKlient("http://localhost:$pdlPort/graphql", AccessTokenClient(envs))
     val testRapid = TestRapid()
 
     private lateinit var javalin: Javalin
 
     @BeforeAll
     fun beforeAll() {
-        mockOAuth2Server.start(InetAddress.getByName("localhost"), 18300)
+        mockOAuth2Server.start(InetAddress.getByName("localhost"), oAuthPort)
 
     }
 
     @BeforeEach
     fun beforeEach() {
-        javalin = opprettJavalinMedTilgangskontroll()
+        javalin = opprettJavalinMedTilgangskontroll(appPort)
     }
 
     @AfterEach
@@ -61,14 +65,16 @@ class HentAdressebeskyttelseTest {
 
     @Test
     fun `Hent adressebeskyttelse for person som har adressebeskyttelse`() {
-        val token = hentToken(mockOAuth2Server)
+        val fnr = "12345678912"
+        wiremock.stubPdl(ident = fnr, token = null)
+        val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:8301/adressebeskyttelse/12345678912")
-            .authentication().bearer(token.serialize())
+        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+            .authentication().bearer(token)
             .response().second
 
         assertThat(response.statusCode).isEqualTo(200)
-        assertThat(response.body()).isEqualTo("""{"hentAdressebeskyttelse":true}""")
+        assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"hentAdressebeskyttelse":true}""")
     }
 
     private fun startApp(
@@ -78,7 +84,7 @@ class HentAdressebeskyttelseTest {
         no.nav.arbeidsgiver.toi.livshendelser.startApp(
             rapid, pdlKlient, javalin, mapOf(
                 Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
-                    URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
+                    URI("http://localhost:$oAuthPort/isso-idtoken/.well-known/openid-configuration").toURL(),
                     listOf("audience")
                 ))
             )
