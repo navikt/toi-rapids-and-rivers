@@ -1,0 +1,23 @@
+name: Deploy Opensearch prod
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - apps/toi-stilling-indekser/opensearch.yaml
+      - .github/workflows/deploy-opensearch-stilling-prod.yml
+jobs:
+  deploy-opensearch:
+    name: Deploy Opensearch instance to cluster
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: deploy to prod
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: apps/toi-stilling-indekser/opensearch.yaml
+          VARS: apps/toi-stilling-indekser/nais-prod.yaml
