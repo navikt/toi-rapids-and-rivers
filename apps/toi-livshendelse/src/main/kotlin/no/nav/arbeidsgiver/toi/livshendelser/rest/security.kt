@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.livshendelser.rest
 
 import io.javalin.http.Context
-import io.javalin.http.ForbiddenResponse
 import io.javalin.http.UnauthorizedResponse
 import io.javalin.security.RouteRole
 import no.nav.security.token.support.core.configuration.IssuerProperties
