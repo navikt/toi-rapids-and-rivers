@@ -8,5 +8,6 @@ COPY build/libs/*.jar ./
 # way in the ENTRYPOINT command in this Dockerfile.
 COPY logback.xml ./
 
+
 # Set logback.xml explicitly, to avoid accidentally using any logback.xml bundled in the JAR-files of the app's dependencies
 ENTRYPOINT ["java", "-Duser.timezone=Europe/Oslo", "-Dlogback.configurationFile=/$APP_NAME/logback.xml", "-jar", "app.jar"]
