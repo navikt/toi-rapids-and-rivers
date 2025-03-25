@@ -89,6 +89,16 @@ class HarAdressebeskyttelseTest {
         assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":false}""")
     }
 
+    @Test
+    fun `Feil om token mangler`() {
+        val fnr = "12345678912"
+        startApp(pdlKlient, testRapid)
+        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(401)
+    }
+
     private fun startApp(
         pdlKlient: PdlKlient,
         rapid: TestRapid

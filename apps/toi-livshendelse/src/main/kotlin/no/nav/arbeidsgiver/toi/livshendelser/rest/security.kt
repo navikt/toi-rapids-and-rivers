@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.livshendelser.rest
 
 import io.javalin.http.Context
 import io.javalin.http.ForbiddenResponse
+import io.javalin.http.UnauthorizedResponse
 import io.javalin.security.RouteRole
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import no.nav.security.token.support.core.http.HttpRequest
@@ -21,7 +22,7 @@ fun Context.sjekkTilgang(
         Rolle.UNPROTECTED -> return
         Rolle.VEILEDER ->
             if (autentiserVeileder(claims, this)) return
-            else throw ForbiddenResponse("Ingen tilgang")
+            else throw UnauthorizedResponse("Ingen tilgang")
     }
 }
 
