@@ -11,8 +11,8 @@ private val log = noClassLogger()
 private val secureLog = LoggerFactory.getLogger("secureLog")
 
 fun main() {
-    log.info("Starter App")
-    secureLog.info("Starter App. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+    log.info("Starter app.")
+    secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
     RapidApplication.create(System.getenv()).also { rapidsConnection ->
         val kandidatfeedProducer = KafkaProducer<String, String>(producerConfig)
