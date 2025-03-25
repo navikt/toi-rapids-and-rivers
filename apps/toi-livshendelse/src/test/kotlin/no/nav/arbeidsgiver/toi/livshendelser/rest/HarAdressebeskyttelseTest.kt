@@ -124,7 +124,7 @@ class HarAdressebeskyttelseTest {
     }
 
     @Test
-    fun `Token må ha Nav-ident`() {
+    fun `Sjekk på adressebeskyttelse token må ha Nav-ident`() {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, navIdent = null).serialize()
         startApp(pdlKlient, testRapid)
@@ -142,6 +142,18 @@ class HarAdressebeskyttelseTest {
         startApp(pdlKlient, testRapid)
         val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
             .authentication().bearer(token)
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(401)
+    }
+
+    @Test
+    fun `Sjekk på adressebeskyttelse token må ha rett algoritme`() {
+        val fnr = "12345678912"
+        val payload = hentToken(mockOAuth2Server).serialize().split(".")[1]
+        startApp(pdlKlient, testRapid)
+        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+            .authentication().bearer("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.$payload.")
             .response().second
 
         assertThat(response.statusCode).isEqualTo(401)
