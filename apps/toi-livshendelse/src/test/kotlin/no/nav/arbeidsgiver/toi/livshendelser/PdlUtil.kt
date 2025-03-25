@@ -11,6 +11,7 @@ fun WireMockServer.stubPdl(
             "ident" : "$ident"
         }
     """.trimIndent(),
+    gradering: String = "STRENGT_FORTROLIG",
     token: String? = "mockedAccessToken"
 ) {
     val pesostegn = "$"
@@ -37,7 +38,7 @@ fun WireMockServer.stubPdl(
                                     "hentPerson": {
                                             "adressebeskyttelse": [
                                                 {
-                                                    "gradering" : "STRENGT_FORTROLIG"
+                                                    "gradering" : "$gradering"
                                                 }
                                             ]
                                     },

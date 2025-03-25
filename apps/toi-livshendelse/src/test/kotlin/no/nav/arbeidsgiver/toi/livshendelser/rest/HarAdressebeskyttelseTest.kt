@@ -75,6 +75,20 @@ class HarAdressebeskyttelseTest {
         assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":true}""")
     }
 
+    @Test
+    fun `Returner at person ikke har adressebeskyttelse for person som ikke har adressebeskyttelse`() {
+        val fnr = "12345678912"
+        wiremock.stubPdl(ident = fnr, gradering = "UGRADERT", token = null)
+        val token = hentToken(mockOAuth2Server).serialize()
+        startApp(pdlKlient, testRapid)
+        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+            .authentication().bearer(token)
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(200)
+        assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":false}""")
+    }
+
     private fun startApp(
         pdlKlient: PdlKlient,
         rapid: TestRapid
