@@ -5,7 +5,6 @@ import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.javalin.Javalin
-import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.arbeidsgiver.toi.livshendelser.opprettJavalinMedTilgangskontroll
@@ -13,14 +12,13 @@ import no.nav.arbeidsgiver.toi.livshendelser.stubPdl
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.core.configuration.IssuerProperties
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import java.net.InetAddress
 import java.net.URI
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class HentAdressebeskyttelseTest {
+class HarAdressebeskyttelseTest {
 
     private val appPort = 8080
     private val pdlPort = 8083
@@ -64,7 +62,7 @@ class HentAdressebeskyttelseTest {
 
 
     @Test
-    fun `Hent adressebeskyttelse for person som har adressebeskyttelse`() {
+    fun `Returner at har adressebeskyttelse for person som har adressebeskyttelse`() {
         val fnr = "12345678912"
         wiremock.stubPdl(ident = fnr, token = null)
         val token = hentToken(mockOAuth2Server).serialize()
@@ -74,7 +72,7 @@ class HentAdressebeskyttelseTest {
             .response().second
 
         assertThat(response.statusCode).isEqualTo(200)
-        assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"hentAdressebeskyttelse":true}""")
+        assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":true}""")
     }
 
     private fun startApp(

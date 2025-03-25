@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi.livshendelser
 import AdressebeskyttelseLytter
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
-import no.nav.arbeidsgiver.toi.livshendelser.rest.hentAdressebeskyttelse
+import no.nav.arbeidsgiver.toi.livshendelser.rest.harAdressebeskyttelse
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -45,7 +45,7 @@ fun startApp(
     issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>,
 
     ) {
-    javalin.get("/adressebeskyttelse/{fnr}", hentAdressebeskyttelse(pdlKlient, issuerProperties))
+    javalin.get("/adressebeskyttelse/{fnr}", harAdressebeskyttelse(pdlKlient, issuerProperties))
 
     val log = LoggerFactory.getLogger("Application.kt")
     try {

@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.security.token.support.core.configuration.IssuerProperties
 
 
-fun hentAdressebeskyttelse(pdlKlient: PdlKlient, issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>): (Context) -> Unit {
+fun harAdressebeskyttelse(pdlKlient: PdlKlient, issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>): (Context) -> Unit {
     return { context ->
         context.sjekkTilgang(Rolle.VEILEDER, issuerProperties)
 
