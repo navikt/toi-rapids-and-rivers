@@ -6,7 +6,6 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
@@ -46,7 +45,6 @@ class ArbeidssoekerperiodeRapidLytterTest {
         localPostgres.close()
     }
 
-    @Disabled("Rapiden mottar ingen meldinger og jeg aner ikke hvorfor")
     @Test
     fun `lesing av arbeidssøkerperioder fra rapid skal lagres i database hvis aktørId er med`() {
         val periodeId = UUID.randomUUID()
@@ -55,7 +53,9 @@ class ArbeidssoekerperiodeRapidLytterTest {
         val rapid = TestRapid()
 
         val arbeidssoekeropplysningerLytter = ArbeidssoekerperiodeRapidLytter(rapid, repository)
+        println("Sender: $meldingUtenAktørId")
         rapid.sendTestMessage(meldingUtenAktørId)
+        println("Sender: $meldingMedAktørId")
         rapid.sendTestMessage(meldingMedAktørId)
 
         // Bør vurdere å bruke mock her og så heller teste all repository i egen test?
@@ -73,8 +73,7 @@ class ArbeidssoekerperiodeRapidLytterTest {
           "arbeidssokerperiode": {
             "periode_id": "$periodeId",
             "identitetsnummer": "01010012345",
-            "aktørId": "jaja",
-            "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]"
+            "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
             "avsluttet": null
           }
           """

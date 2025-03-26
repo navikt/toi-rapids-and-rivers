@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
@@ -19,6 +21,10 @@ import org.slf4j.LoggerFactory
 class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) : River.PacketListener {
     companion object {
         private val secureLog = LoggerFactory.getLogger("secureLog")
+        private val jacksonMapper = jacksonObjectMapper()
+            .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(JavaTimeModule())
     }
 
     init {
@@ -46,11 +52,10 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
+        val jsonNode = jacksonMapper.readTree(this.toJson()) as ObjectNode
         val periodeNode = jsonNode["arbeidssokerperiode"] as ObjectNode
-
-        return jsonNode["aktørId"]?.let { aktørId ->
-            jsonNode.putIfAbsent("aktørId", aktørId)
-        } ?: periodeNode
+        val aktørId = jsonNode["aktørId"]
+        periodeNode.putIfAbsent("aktørId", aktørId)
+        return periodeNode
     }
 }
