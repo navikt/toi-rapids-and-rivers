@@ -22,7 +22,6 @@ class ArbeidsplassenRestKlientImpl(
 
     override fun publiserStilling(stilling: ArbeidsplassenStilling) {
         val body = objectMapper.writeValueAsString(stilling)
-        println("body: $body")
         val (_, response: Response, result: Result<String, FuelError>) = Fuel
             .post(path = "$baseUrl/stillingsimport/api/v1/transfers/$PROVIDER_ID")
             .header("Accept", "application/x-json-stream")
@@ -41,8 +40,10 @@ class ArbeidsplassenRestKlientImpl(
                     error(feilmelding)
                 }
                 val resultSomStreng = response.body().asString("text/html;charset=UTF-8")
-                log.debug("resultSomStreng: $resultSomStreng")
+                log.info("resultSomStreng: $resultSomStreng")
                 val arbeidsplassenResultat = objectMapper.readValue(resultSomStreng, ArbeidsplassenResultat::class.java)
+                log.info("Resultat av publisering til Arbeidsplassen: $arbeidsplassenResultat")
+
                 if (arbeidsplassenResultat.status == "ERROR") {
                     val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen: ${arbeidsplassenResultat.message}"
                     log.error(feilmeldingVedPublisering)
