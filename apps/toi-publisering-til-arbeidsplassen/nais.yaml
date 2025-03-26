@@ -29,6 +29,8 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
+  envFrom:
+    - secret: rekrutteringsbistand-arbeidsplassen-secret
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1

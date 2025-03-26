@@ -6,8 +6,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.publiser.arbeidsplassen.dto.RapidHendelse
 
-class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : River.PacketListener  {
+class StillingTilArbeidsplassenLytter(
+    rapidsConnection: RapidsConnection,
+    private val arbeidsplassenRestKlient: ArbeidsplassenRestKlient,
+) : River.PacketListener  {
     init {
         River(rapidsConnection).apply {
             precondition {
@@ -26,6 +30,7 @@ class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : Rive
     ) {
         val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
         log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
-
+        val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(stilling)
+        arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
     }
 }

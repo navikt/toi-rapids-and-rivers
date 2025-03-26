@@ -20,7 +20,7 @@ class RapidTest {
     ) {
         val rapid = TestRapid()
 
-        startApp(rapid)
+        startApp(rapid, ArbeidsplassenRestKlientMock())
 
         rapid.sendTestMessage(hendelse)
         rapid.inspektør.assertion()

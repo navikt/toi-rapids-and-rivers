@@ -1,3 +1,4 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-publisering-til-arbeidsplassen-rapidconsumer-1
-import_api_url: http://pam-import-api.teampam
+import_api_base_url: https://arbeidsplassen-api.ekstern.dev.nav.no
+
