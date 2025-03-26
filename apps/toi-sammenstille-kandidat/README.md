@@ -2,7 +2,7 @@
 
 Henter ut CV og veilederinformasjon, lagrer i database, og legger sammenstillt kandidatinformasjon tilbake på rapid
 
-# Republisering
+## Republisering
 
 ### Passord 
 - Passord for republisering hentes fra NAIS: `kubectl get secret passord-for-republisering -n toi -o jsonpath="{ .data['PASSORD_FOR_REPUBLISERING']}" | base64 -d`
