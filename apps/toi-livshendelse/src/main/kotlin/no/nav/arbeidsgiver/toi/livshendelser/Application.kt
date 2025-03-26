@@ -30,7 +30,7 @@ fun main() {
 
     try {
         lateinit var rapidIsAlive: () -> Boolean
-        val rapidsConnection = RapidApplication.create(System.getenv(), configure = { _, kafkarapid ->
+        val rapidsConnection = RapidApplication.create(System.getenv(), builder = {withHttpPort(9000)}, configure = { _, kafkarapid ->
             rapidIsAlive = kafkarapid::isRunning
         })
         startApp(
