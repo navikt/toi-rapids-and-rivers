@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: toi-stilling-indekser
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  groups:
+    - name: toi-stilling-indekser
+      rules:
+        - alert: toi-stilling-indekser
+          expr: kube_deployment_status_replicas_available{deployment="toi-stilling-indekser"} == 0
+          for: 2m
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/app/r/s/jLTfP"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-stilling-indekser
+          expr: sum(increase(log_messages_errors{app="toi-stilling-indekser", level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/app/r/s/jLTfP"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-stilling-indekser
+          expr: sum(increase(log_messages_errors{app="toi-stilling-indekser", level="Warning"}[10m])) > 3
+          for: 1s
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/app/r/s/jLTfP"
+          labels:
+            namespace: toi
+            severity: warning
