@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.livshendelser
 import AdressebeskyttelseLytter
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
+import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.livshendelser.rest.harAdressebeskyttelse
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.person.pdl.leesah.Personhendelse
@@ -28,11 +29,16 @@ fun main() {
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
     try {
+        lateinit var rapidIsAlive: () -> Boolean
+        val rapidsConnection = RapidApplication.create(System.getenv(), configure = { _, kafkarapid ->
+            rapidIsAlive = kafkarapid::isRunning
+        })
         startApp(
-            rapidsConnection(),
+            rapidsConnection,
             PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env)),
             opprettJavalinMedTilgangskontroll(8080),
-            hentIssuerProperties(env)
+            hentIssuerProperties(env),
+            rapidIsAlive
         )
     } catch (e: Exception) {
         secureLog.error("Uhåndtert exception, stanser applikasjonen", e)
@@ -46,8 +52,9 @@ fun startApp(
     pdlKlient: PdlKlient,
     javalin: Javalin,
     issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>,
-
+    rapidIsAlive: () -> Boolean,
     ) {
+    javalin.get("/isalive", isAlive(rapidIsAlive))
     javalin.post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
 
     val log = LoggerFactory.getLogger("Application.kt")
@@ -67,7 +74,11 @@ fun startApp(
     }
 }
 
-fun rapidsConnection() = RapidApplication.create(System.getenv())
+private val isAlive: (() -> Boolean) -> (Context) -> Unit = { isAlive ->
+    { context ->
+        context.status(if (isAlive()) 200 else 500)
+    }
+}
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)

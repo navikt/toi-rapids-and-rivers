@@ -167,9 +167,30 @@ class HarAdressebeskyttelseTest {
         assertThat(response.statusCode).isEqualTo(401)
     }
 
+    @Test
+    fun `isAlive kaster 500 om rapid er død`() {
+        startApp(pdlKlient, testRapid) { false }
+
+        val response = Fuel.get("http://localhost:$appPort/isalive")
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(500)
+    }
+
+    @Test
+    fun `isAlive returnerer 200 om rapid er i livet`() {
+        startApp(pdlKlient, testRapid) { true }
+
+        val response = Fuel.get("http://localhost:$appPort/isalive")
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(200)
+    }
+
     private fun startApp(
         pdlKlient: PdlKlient,
-        rapid: TestRapid
+        rapid: TestRapid,
+        rapidIsAlive: () -> Boolean = { true }
     ) {
         no.nav.arbeidsgiver.toi.livshendelser.startApp(
             rapid, pdlKlient, javalin, mapOf(
@@ -177,7 +198,7 @@ class HarAdressebeskyttelseTest {
                     URI("http://localhost:$oAuthPort/isso-idtoken/.well-known/openid-configuration").toURL(),
                     listOf("audience")
                 ))
-            )
+            ), rapidIsAlive
         )
     }
 }
