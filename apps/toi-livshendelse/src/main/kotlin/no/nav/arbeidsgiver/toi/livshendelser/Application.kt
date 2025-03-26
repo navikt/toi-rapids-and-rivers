@@ -55,6 +55,7 @@ fun startApp(
     rapidIsAlive: () -> Boolean,
     ) {
     javalin.get("/isalive", isAlive(rapidIsAlive))
+    javalin.get("isready", isAlive(rapidIsAlive))
     javalin.post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
 
     val log = LoggerFactory.getLogger("Application.kt")
