@@ -45,7 +45,7 @@ fun startApp(
     issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>,
 
     ) {
-    javalin.get("/adressebeskyttelse/{fnr}", harAdressebeskyttelse(pdlKlient, issuerProperties))
+    javalin.post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
 
     val log = LoggerFactory.getLogger("Application.kt")
     try {

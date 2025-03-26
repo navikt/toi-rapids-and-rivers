@@ -9,11 +9,15 @@ fun harAdressebeskyttelse(pdlKlient: PdlKlient, issuerProperties: Map<Rolle, Pai
     return { context ->
         context.sjekkTilgang(Rolle.VEILEDER, issuerProperties)
 
-        val harAdressebeskyttelse = pdlKlient.diskresjonsHendelseForIdent(context.pathParam("fnr")).any{ it.gradering != "UGRADERT" }
+        val harAdressebeskyttelse = pdlKlient.diskresjonsHendelseForIdent(context.bodyAsClass(FnrReguest::class.java).fnr).any{ it.gradering != "UGRADERT" }
         context.json(AdressebeskyttelseDTO(harAdressebeskyttelse)).status(200)
     }
 }
 
-data class AdressebeskyttelseDTO(
+private data class AdressebeskyttelseDTO(
     val harAdressebeskyttelse: Boolean
+)
+
+private data class FnrReguest(
+    val fnr: String
 )

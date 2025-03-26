@@ -67,7 +67,8 @@ class HarAdressebeskyttelseTest {
         wiremock.stubPdl(ident = fnr, token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer(token)
             .response().second
 
@@ -81,7 +82,8 @@ class HarAdressebeskyttelseTest {
         wiremock.stubPdl(ident = fnr, gradering = "UGRADERT", token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer(token)
             .response().second
 
@@ -93,7 +95,8 @@ class HarAdressebeskyttelseTest {
     fun `Feil om token mangler`() {
         val fnr = "12345678912"
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .response().second
 
         assertThat(response.statusCode).isEqualTo(401)
@@ -104,7 +107,8 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, expiry = -1000).serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer(token)
             .response().second
 
@@ -116,7 +120,8 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, issuerId = "falskissuer").serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer(token)
             .response().second
 
@@ -128,7 +133,8 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, navIdent = null).serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer(token)
             .response().second
 
@@ -140,7 +146,8 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, audience = listOf("Feil aud")).serialize()
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer(token)
             .response().second
 
@@ -152,7 +159,8 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val payload = hentToken(mockOAuth2Server).serialize().split(".")[1]
         startApp(pdlKlient, testRapid)
-        val response = Fuel.get("http://localhost:$appPort/adressebeskyttelse/$fnr")
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
             .authentication().bearer("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.$payload.")
             .response().second
 
