@@ -38,6 +38,8 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: IMPORT_API_BASE_URL
+      value: {{ import_api_base_url }}
   accessPolicy:
     outbound:
       rules:
