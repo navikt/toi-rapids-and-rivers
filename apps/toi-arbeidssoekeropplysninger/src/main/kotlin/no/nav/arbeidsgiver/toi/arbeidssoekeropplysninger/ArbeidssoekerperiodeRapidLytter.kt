@@ -24,10 +24,11 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
     init {
         River(rapidsConnection).apply {
             precondition{
-                //it.requireKey("arbeidssokerperiode")
-                //it.requireKey("fodselsnummer")
-                //it.requireKey("aktørId")
-                //it.interestedIn("sistEndretDato") // Ikke interessert i denne hvor kom den fra?
+                it.requireKey("arbeidssokerperiode")
+                it.requireKey("fodselsnummer")
+                it.requireKey("aktørId")
+                it.interestedIn("@id") // Ikke interessert i denne hvor kom den fra?
+                it.interestedIn("sistEndretDato") // Ikke interessert i denne hvor kom den fra?
                 it.requireValue("@event_name", "arbeidssokerperiode")
             }
         }.register(this)
@@ -39,7 +40,6 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        println("Mottok $packet")
         log.info("Mottok oppfølgingsperiodemelding ${packet["@id"]}")
         repository.lagreOppfølgingsperiodemelding(packet.fjernMetadataOgKonverter());
         secureLog.info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["@id"]} for fnr ${packet["fodselsnummer"]}")
