@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/baseimage-resten
+      deploy_dev_branch: refs/heads/logback6
     secrets: inherit
     permissions:
       contents: read
