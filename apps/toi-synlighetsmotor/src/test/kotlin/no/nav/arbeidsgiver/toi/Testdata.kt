@@ -56,7 +56,9 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "arenaFritattKandidatsøk",
             "hjemmel",
             "måBehandleTidligereCv",
-            "kvp"
+            "kvp",
+            "arbeidssokerperiode",
+            "arbeidssokeropplysninger"
         ))
     }
 
@@ -71,6 +73,8 @@ class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode: String = aktivOppfølgingsperiode(),
+            arbeidssøkerperiode: String = aktivArbeidssøkerperiode(),
+            arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
             arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(fnr = "12312312312"),
@@ -87,6 +91,8 @@ class Testdata {
         ) =
             hendelseEtterBehovsHenting(
                 oppfølgingsperiode = oppfølgingsperiode,
+                arbeidssøkerperiode = arbeidssøkerperiode,
+                arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
                 arenaFritattKandidatsøk = arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
@@ -112,6 +118,8 @@ class Testdata {
 
         fun hendelseFørBehovsHenting(
             oppfølgingsperiode: String? = null,
+            arbeidssøkerperiode: String? = null,
+            arbeidssøkeropplysninger: String? = null,
             oppfølgingsinformasjon: String? = null,
             arbeidsmarkedCv: String? = null,
             arenaFritattKandidatsøk: String? = null,
@@ -130,6 +138,8 @@ class Testdata {
                 """"@event_name": "hendelse"""",
                 arbeidsmarkedCv,
                 oppfølgingsinformasjon,
+                arbeidssøkerperiode,
+                arbeidssøkeropplysninger,
                 oppfølgingsperiode,
                 arenaFritattKandidatsøk,
                 hjemmel,
@@ -147,6 +157,8 @@ class Testdata {
 
         fun hendelseEtterBehovsHenting(
             oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
+            arbeidssøkerperiode: String? = nullVerdiForKey("arbeidssokerperiode"),
+            arbeidssøkeropplysninger: String? = nullVerdiForKey("arbeidssokeropplysninger"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
             arenaFritattKandidatsøk: String? = nullVerdiForKey("arenaFritattKandidatsøk"),
@@ -218,6 +230,29 @@ class Testdata {
                 "aktorId": "123456789",
                 "startDato": "2020-10-30T14:15:38+01:00",
                 "sluttDato": null
+            }
+        """.trimIndent()
+
+        fun aktivArbeidssøkerperiode() =
+            """
+            "fodselsnummer": "01010012345",
+            "aktorId": "123456789",
+            "arbeidssokerperiode": {
+                "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
+                "identitetsnummer": "01010012345",
+                "startet": "2020-10-30T14:15:38+01:00",
+                "avsluttet": null
+            }
+        """.trimIndent()
+        fun arbeidssøkeropplysninger() =
+            """
+            "fodselsnummer": "01010012345",
+            "aktorId": "123456789",
+            "arbeidssokeropplysninger": {
+                "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
+                "identitetsnummer": "01010012345",
+                "startet": "2020-10-30T14:15:38+01:00",
+                "avsluttet": null
             }
         """.trimIndent()
 

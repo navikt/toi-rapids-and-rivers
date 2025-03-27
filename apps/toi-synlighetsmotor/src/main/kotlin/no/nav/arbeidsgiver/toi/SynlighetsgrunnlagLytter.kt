@@ -26,7 +26,9 @@ private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "arenaFritattKandidatsøk",
     "hjemmel",
     "måBehandleTidligereCv",
-    "kvp"
+    "kvp",
+    "arbeidssokerperiode",
+    "arbeidssokeropplysninger"
 )
 private const val adressebeskyttelseFelt = "adressebeskyttelse"
 
@@ -43,7 +45,7 @@ class SynlighetsgrunnlagLytter(
             precondition {
                 it.interestedIn("@behov")
                 it.forbid("synlighet")
-                it.requireAny(requiredFields + "adressebeskyttelse" + "arbeidssokerperiode" + "arbeidssokeropplysninger")
+                it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
             }
         }.register(this)

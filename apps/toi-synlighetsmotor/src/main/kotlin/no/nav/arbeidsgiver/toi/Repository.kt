@@ -22,6 +22,9 @@ class Repository(private val dataSource: DataSource) {
     private val erIkkeSperretAnsattKolonne = "er_ikke_sperret_ansatt"
     private val erIkkeDødKolonne = "er_ikke_doed"
     private val erIkkeKvpKolonne = "er_ikke_kvp"
+    private val erArbeidssøkerKolonne = "er_arbeidssoker"
+    private val erIkkeAndreForholdHindrerArbeidKolonne = "er_ikke_annet_hindrer_arb"
+    private val erIkkeHelseHindrerArbeidKolonne = "er_ikke_helse_hindrer_arb"
     private val erFerdigBeregnetKolonne = "er_ferdig_beregnet"
 
     fun lagre(evaluering: Evaluering, aktørId: String, fødselsnummer: String?) {
@@ -111,6 +114,9 @@ class Repository(private val dataSource: DataSource) {
         erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne).tilBooleanVerdi(), // TODO
         erIkkeKvp = resultset.getBoolean(erIkkeKvpKolonne).tilBooleanVerdi(), // TODO
         harIkkeAdressebeskyttelse = BooleanVerdi.missing, // TODO denne har vi ikke i databasen ennå
+        erArbeidssøker = resultset.getBoolean(erArbeidssøkerKolonne).tilBooleanVerdi(),
+        erIkkeAndreForholdHindrerArbeid = resultset.getBoolean(erIkkeAndreForholdHindrerArbeidKolonne).tilBooleanVerdi(),
+        erIkkeHelseHindrerArbeid = resultset.getBoolean(erIkkeHelseHindrerArbeidKolonne).tilBooleanVerdi(),
         komplettBeregningsgrunnlag = resultset.getBoolean(erFerdigBeregnetKolonne)
 
     )
@@ -137,6 +143,9 @@ class Repository(private val dataSource: DataSource) {
             erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(true),     //TODO
             erIkkeDødKolonne to erIkkeDoed.default(true),     //TODO
             erIkkeKvpKolonne to erIkkeKvp.default(true),     //TODO
+            erArbeidssøkerKolonne to erArbeidssøker.default(false), //???
+            erIkkeAndreForholdHindrerArbeidKolonne to erIkkeAndreForholdHindrerArbeid.default(true),
+            erIkkeHelseHindrerArbeidKolonne to erIkkeHelseHindrerArbeid.default(true),
             erFerdigBeregnetKolonne to erFerdigBeregnet
         )
     }

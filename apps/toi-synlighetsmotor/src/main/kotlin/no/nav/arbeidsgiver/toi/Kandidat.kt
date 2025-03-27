@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -16,6 +17,8 @@ data class Kandidat(
     private val hjemmel: Synlighetsnode<Hjemmel>,
     private val måBehandleTidligereCv: Synlighetsnode<MåBehandleTidligereCv>,
     private val kvp: Synlighetsnode<Kvp>,
+    private val arbeidssøkerperiode: Synlighetsnode<Arbeidssøkerperiode>,
+    private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     val adressebeskyttelse: Synlighetsnode<String>,
 ) {
     private val erAAP: BooleanVerdi
@@ -40,9 +43,15 @@ data class Kandidat(
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
+        erArbeidssøker = arbeidssøkerperiode.hvisIkkeNullOg(::erArbeidssøker),
+        erIkkeAndreForholdHindrerArbeid = arbeidssøkeropplysninger.hvisIkkeNullOg(::erIkkeAndreForholdHindrerArbeid),
+        erIkkeHelseHindrerArbeid = arbeidssøkeropplysninger.hvisIkkeNullOg(::erIkkeHelseHindrerArbeid),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
+    private fun erArbeidssøker(it: Arbeidssøkerperiode) = it.startet != null && it.avsluttet == null
+    private fun erIkkeAndreForholdHindrerArbeid(it: Arbeidssøkeropplysninger) = it.andreForholdHindrerArbeid?.let { ! it } ?: true
+    private fun erIkkeHelseHindrerArbeid(it: Arbeidssøkeropplysninger) = it.helseHindrerArbeid?.let { ! it } ?: true
     private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
     private fun erIkkeArenaFritattKandidatsøk(it: ArenaFritattKandidatsøk) = !it.erFritattKandidatsøk
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
@@ -112,7 +121,9 @@ data class Kandidat(
                 hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
                 måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
-                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper)
+                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
+                arbeidssøkerperiode = Synlighetsnode.fromJsonNode(json.path("arbeidssokerperiode"), mapper),
+                arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
             )
         }
     }
@@ -150,6 +161,18 @@ enum class CvMeldingstype {
 data class Oppfølgingsperiode(
     val startDato: ZonedDateTime,
     val sluttDato: ZonedDateTime?
+)
+
+data class Arbeidssøkerperiode(
+    val startet: ZonedDateTime?,
+    val avsluttet: ZonedDateTime?
+)
+
+data class Arbeidssøkeropplysninger(
+    @JsonProperty("helsetilstand_hindrer_arbeid")
+    val helseHindrerArbeid: Boolean?,
+    @JsonProperty("andre_forhold_hindrer_arbeid")
+    val andreForholdHindrerArbeid: Boolean?
 )
 
 data class Oppfølgingsinformasjon(

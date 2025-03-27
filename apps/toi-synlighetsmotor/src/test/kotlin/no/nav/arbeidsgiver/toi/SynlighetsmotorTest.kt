@@ -49,6 +49,10 @@ class SynlighetsmotorTest {
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+
                 false
             ), "123456789", null
         )

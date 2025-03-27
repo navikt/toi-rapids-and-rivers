@@ -3,8 +3,10 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.arbeidsgiver.toi.CvMeldingstype.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.adressebeskyttelse
+import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivArbeidssøkerperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
@@ -22,7 +24,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
     companion object {
         private val aktørId = "1234"
         @JvmStatic
-        private fun felter() = Felt.entries.map { Arguments.of(it) }.stream()
+        private fun felter() = Felt.entries.filterNot { it.navn == "arbeidssokerperiode" || it.navn == "arbeidssokeropplysninger"}.map { Arguments.of(it) }.stream()
     }
     enum class Felt(val navn: String, val skalGiSynligTrue: String, val skalGiSynligFalse: String) {
         ARBEIDSMARKED_CV("arbeidsmarkedCv", arbeidsmarkedCv(OPPRETT), arbeidsmarkedCv(SLETT)),
@@ -32,6 +34,8 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
+        ARBEIDSSOKERPERIODE("arbeidssokerperiode", aktivArbeidssøkerperiode(), aktivArbeidssøkerperiode()),
+        ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
     }
 
     private val adressebeskyttelseFeltNavn = "adressebeskyttelse"
