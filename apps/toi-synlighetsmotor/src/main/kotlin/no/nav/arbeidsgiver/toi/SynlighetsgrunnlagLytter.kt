@@ -11,11 +11,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.Evaluering.Companion.somSynlighet
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-val Any.log: Logger
-    get() = LoggerFactory.getLogger(this::class.java)
 
 private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "arbeidsmarkedCv",
@@ -28,12 +23,12 @@ private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "måBehandleTidligereCv",
     "kvp"
 )
+
 private const val adressebeskyttelseFelt = "adressebeskyttelse"
 
 class SynlighetsgrunnlagLytter(
     private val rapidsConnection: RapidsConnection,
     private val repository: Repository,
-    private val objectMapper: ObjectMapper = jacksonObjectMapper()
 ) : River.PacketListener {
 
     private val requiredFields = requiredFieldsSynlighetsbehovUntattadressebeskyttelse()

@@ -51,11 +51,15 @@ data class Kandidat(
     private fun harAktivCv(arbeidsmarkedCv: CvMelding) = arbeidsmarkedCv.meldingstype.let {
         listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
     }
-    private fun harJobbprofil(cvMelding: CvMelding) = cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
+
+    private fun harJobbprofil(cvMelding: CvMelding) =
+        cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
+
     private fun harSettHjemmel(hjemmel: Hjemmel) =
         hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL &&
                 hjemmel.opprettetDato != null &&
                 hjemmel.slettetDato == null
+
     private fun erUnderOppfølging(oppfølgingsperiode: Oppfølgingsperiode): Boolean {
         val now = Instant.now()
         val startDato = oppfølgingsperiode.startDato.toInstant()
@@ -71,15 +75,16 @@ data class Kandidat(
         sluttDatoOppfølging: Instant?
     ) {
         if (startDatoOppfølging.isAfter(now)) {
-            log("erUnderOppfølging").error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
+            log.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
             secureLog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
         if (sluttDatoOppfølging?.isAfter(now) == true) {
-            log("erUnderOppfølging").error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
+            log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
             secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
-        if(kandidat.arenaFritattKandidatsøk.hvisIkkeNullOg { it.erFritattKandidatsøk  }.default(false) && (!kandidat.erAAP).default(false)) {
-            log("erUnderOppfølging").info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
+        if (kandidat.arenaFritattKandidatsøk.hvisIkkeNullOg { it.erFritattKandidatsøk }
+                .default(false) && (!kandidat.erAAP).default(false)) {
+            log.info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
             secureLog.info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, fnr: ${kandidat.fødselsNummer()}, hovedmål: ${kandidat.oppfølgingsinformasjon} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon}, rettighetsgruppe: ${kandidat.oppfølgingsinformasjon}")
         }
     }
@@ -88,11 +93,14 @@ data class Kandidat(
         (oppfølgingsinformasjon.diskresjonskode == null
                 || oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
 
-    private fun harIkkeAdressebeskyttelse(adressebeskyttelse: String) = adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT"
+    private fun harIkkeAdressebeskyttelse(adressebeskyttelse: String) =
+        adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT"
 
 
-    private fun beregningsgrunnlag() = listOf(arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse).all { it.svarPåDetteFeltetLiggerPåHendelse() }
+    private fun beregningsgrunnlag() = listOf(
+        arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
+        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse
+    ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
 
     companion object {
@@ -118,11 +126,9 @@ data class Kandidat(
     }
 
     fun fødselsNummer() =
-        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer ?:
-        arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer ?:
-        hjemmel.verdiEllerNull()?.fnr ?:
-        oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer ?:
-        arenaFritattKandidatsøk.verdiEllerNull()?.fnr
+        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
+            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer ?: hjemmel.verdiEllerNull()?.fnr
+            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer ?: arenaFritattKandidatsøk.verdiEllerNull()?.fnr
 }
 
 data class CvMelding(
