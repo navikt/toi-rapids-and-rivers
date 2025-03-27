@@ -5,19 +5,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import no.nav.arbeidsgiver.toi.arbeidssoekerperiode.SecureLogLogger.Companion.secure
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
-import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class ArbeidssoekerperiodeLytter(private val consumer: () -> Consumer<Long, Periode>,
-               private val behandleArbeidssokerPeriode: (Periode) -> ArbeidssokerPeriode
+class ArbeidssoekerperiodeLytter(
+    private val consumer: () -> Consumer<Long, Periode>,
+    private val behandleArbeidssokerPeriode: (Periode) -> ArbeidssokerPeriode
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
     val arbeidssokerperioderTopic = "paw.arbeidssokerperioder-v1"
 
     private val job = Job()
@@ -37,14 +37,15 @@ class ArbeidssoekerperiodeLytter(private val consumer: () -> Consumer<Long, Peri
 
                 while (job.isActive) {
                     try {
-                        val records: ConsumerRecords<Long, Periode> =
-                            consumer.poll(Duration.ofSeconds(5))
-                        val arbeidssokerperioderMeldinger = records.map { secureLog.info("Mottok periodemelding fra asr: ${it.value().toString()}")
-                                behandleArbeidssokerPeriode(it.value()) }
+                        val records: ConsumerRecords<Long, Periode> = consumer.poll(Duration.ofSeconds(5))
+                        val arbeidssokerperioderMeldinger = records.map {
+                            secure(log).info("Mottok periodemelding fra asr: ${it.value()}")
+                            behandleArbeidssokerPeriode(it.value())
+                        }
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
                             log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
-                            secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJson()}")
+                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJson()}")
                             rapidsConnection.publish(periode.identitetsnummer, periode.somJson())
                         }
                         consumer.commitSync()

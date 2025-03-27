@@ -9,18 +9,17 @@ import no.nav.paw.arbeidssokerregisteret.api.v4.OpplysningerOmArbeidssoeker
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
-import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Lytter på paw.opplysninger-om-arbeidssoeker-v1 og publiserer arbeidssøkerperioder på rapid
  */
-class ArbeidssoekeropplysningerLytter(private val consumer: () -> Consumer<Long, OpplysningerOmArbeidssoeker>,
-                                      private val repository: Repository
+class ArbeidssoekeropplysningerLytter(
+    private val consumer: () -> Consumer<Long, OpplysningerOmArbeidssoeker>,
+    private val repository: Repository
 ) : CoroutineScope, RapidsConnection.StatusListener {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
     val arbeidssokeropplysningerTopic = "paw.opplysninger-om-arbeidssoeker-v1"
 
     private val job = Job()
@@ -45,7 +44,8 @@ class ArbeidssoekeropplysningerLytter(private val consumer: () -> Consumer<Long,
 
                         val arbeidssokerOpplysninger = records.map {
                             log.info("Mottok arbeidssokeropplysninger for periode fra $arbeidssokeropplysningerTopic for periode ${it.value().periodeId}")
-                            it.value() }.toList()
+                            it.value()
+                        }.toList()
                         repository.lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger)
                         consumer.commitSync()
                     } catch (e: RetriableException) {
