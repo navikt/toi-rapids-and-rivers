@@ -121,18 +121,13 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
         }
     }
 
-
-
     fun hentIndeksAliasPekerPå(): String? {
         val request = GetAliasRequest.Builder().index("$stillingAlias*").build()
 
         val response = client.indices().getAlias(request)
-
         val indekser = response.result()
 
-        log.info("Størrelse på aliaser ${indekser}")
-
-        val antallAlias = indekser.filter { it.value.aliases().size > 0 }
+        val antallAlias = indekser.filter { it.value.aliases().isNotEmpty() }
 
         return when (antallAlias.size) {
             0 -> null

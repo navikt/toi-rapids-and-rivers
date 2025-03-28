@@ -44,11 +44,12 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
     fun skalReindeksere(): Boolean {
         if (!client.finnesIndeks(stillingAlias)) return false
         val gjeldendeVersjon = hentGjeldendeIndeksversjon() ?: return false // indeks finnes ikke enda
-        val nyIndeksVersjon = env["INDEKS_VERSJON"]?.toInt() ?: throw NullPointerException("Miljøvariabel INDEKS_VERSJON")
-        return nyIndeksVersjon > gjeldendeVersjon
+        val nyIndeksVersjon = env["INDEKS_VERSJON"]?: throw NullPointerException("Miljøvariabel INDEKS_VERSJON")
+
+        return nyIndeksVersjon != gjeldendeVersjon
     }
 
-    fun hentGjeldendeIndeksversjon(): Int? {
+    fun hentGjeldendeIndeksversjon(): String? {
         val indeks = client.hentIndeksAliasPekerPå() ?: return null
         return hentVersjon(indeks)
     }
@@ -63,20 +64,19 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
         return client.hentIndeksAliasPekerPå()
     }
 
-    private fun hentVersjon(indeksNavn: String): Int {
-        return indeksNavn.split("_").last().toInt()
+    private fun hentVersjon(indeksNavn: String): String {
+        return indeksNavn.split("_").last()
     }
-
 
     fun hentNyesteIndeks(): String {
         return hentIndeksNavn(hentVersjonFraNaisConfig())
     }
 
-    private fun hentVersjonFraNaisConfig(): Int {
-        return env["INDEKS_VERSJON"]?.toInt() ?: throw NullPointerException("Miljøvariabel INDEKS_VERSJON")
+    private fun hentVersjonFraNaisConfig(): String {
+        return env["INDEKS_VERSJON"] ?: throw NullPointerException("Miljøvariabel INDEKS_VERSJON")
     }
 
-    private fun hentIndeksNavn(versjon: Int): String {
+    private fun hentIndeksNavn(versjon: String): String {
         return "${stillingAlias}_$versjon"
     }
 
