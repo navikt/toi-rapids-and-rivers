@@ -1,5 +1,5 @@
 kafka_pool: nav-prod
 kafka_consumer_group_id: toi-stilling-indekser-rapidconsumer-1
-indeks: "stilling_20250328"
+indeks: stilling_20250328
 stilling_api_url: http://rekrutteringsbistand-stilling-api
-stilling_api_scope: "api://prod-gcp.toi.rekrutteringsbistand-stilling-api/.default"
+stilling_api_scope: api://prod-gcp.toi.rekrutteringsbistand-stilling-api/.default
