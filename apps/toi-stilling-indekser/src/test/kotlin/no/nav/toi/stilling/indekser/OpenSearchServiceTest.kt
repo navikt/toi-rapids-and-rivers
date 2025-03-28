@@ -42,7 +42,7 @@ class OpenSearchServiceTest {
         env["OPEN_SEARCH_USERNAME"] = osContainer.container.username
         env["OPEN_SEARCH_PASSWORD"] = osContainer.container.password
 
-        env["INDEKS_VERSJON"] = "1"
+        env["INDEKS_VERSJON"] = "20250328"
         env["STILLING_API_URL"] = "enUrl"
         env["STILLING_API_SCOPE"] = "scope"
         env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] = "enUrl2"
@@ -57,11 +57,11 @@ class OpenSearchServiceTest {
     }
 
     @Test
-    fun `Indeks stilling_1 skal bli opprettet`() {
+    fun `Indeks skal bli opprettet`() {
         opprettIndeks()
         val indeks = openSearchService.hentGjeldendeIndeks()
 
-        assertThat(indeks).isEqualTo("stilling_1")
+        assertThat(indeks).isEqualTo("stilling_20250328")
     }
 
     @Test
@@ -70,8 +70,8 @@ class OpenSearchServiceTest {
         val alias = openSearchClient.indices().alias
         val result = alias.result()
 
-        val opprettetAlias = result["stilling_1"]?.aliases()?.get("stilling")
-        val ikkeEksisterendeAlias = result["stilling_2"]?.aliases()?.get("stilling")
+        val opprettetAlias = result["stilling_20250328"]?.aliases()?.get("stilling")
+        val ikkeEksisterendeAlias = result["stilling_20250329"]?.aliases()?.get("stilling")
 
         assertThat(opprettetAlias).isNotNull
         assertThat(ikkeEksisterendeAlias).isNull()
@@ -80,7 +80,7 @@ class OpenSearchServiceTest {
     @Test
     fun `Alias 'stilling' skal peke på ny index etter reindeksering og bytte av alias`() {
         opprettIndeks()
-        env["INDEKS_VERSJON"] = "2"
+        env["INDEKS_VERSJON"] = "20250329"
 
         openSearchService.initialiserReindeksering()
 
@@ -88,24 +88,24 @@ class OpenSearchServiceTest {
 
         val gjeldendeIndeksMedAlias = indexClient.hentIndeksAliasPekerPå()
 
-        assertThat(gjeldendeIndeksMedAlias).isEqualTo("stilling_2")
+        assertThat(gjeldendeIndeksMedAlias).isEqualTo("stilling_20250329")
     }
 
     @Test
     fun `Ny indeks skal bli opprettet ved reindeksering og gamle skal fortsatt finnes`() {
         opprettIndeks()
 
-        var index1 = indexClient.finnesIndeks("stilling_1")
-        var indeks3 = indexClient.finnesIndeks("stilling_3")
+        var index1 = indexClient.finnesIndeks("stilling_20250328")
+        var indeks3 = indexClient.finnesIndeks("stilling_20250330")
 
         assertThat(index1).isTrue()
         assertThat(indeks3).isFalse()
 
-        env["INDEKS_VERSJON"] = "3"
+        env["INDEKS_VERSJON"] = "20250330"
         openSearchService.initialiserReindeksering()
 
-        index1 = indexClient.finnesIndeks("stilling_1")
-        indeks3 = indexClient.finnesIndeks("stilling_3")
+        index1 = indexClient.finnesIndeks("stilling_20250328")
+        indeks3 = indexClient.finnesIndeks("stilling_20250330")
 
         assertThat(index1).isTrue()
         assertThat(indeks3).isTrue()
@@ -120,11 +120,11 @@ class OpenSearchServiceTest {
         }
 
         testMetoderOpenSearch.refreshIndex()
-        val antallDokumenter = testMetoderOpenSearch.hentAntallDokumenter("stilling_1")
+        val antallDokumenter = testMetoderOpenSearch.hentAntallDokumenter("stilling_20250328")
 
         assertThat(antallDokumenter).isEqualTo(1)
 
-        val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_1")
+        val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
 
         assertThat(rekrutteringsbistandStilling?.stilling?.uuid.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
     }
