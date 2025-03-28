@@ -31,6 +31,9 @@ spec:
     outbound:
       external:
         - host: {{ pdl_host }}
+    inbound:
+      rules:
+        - application: rekrutteringsbistand-kandidatsok-api
   kafka:
     pool: {{ kafka_pool }}
   azure:
