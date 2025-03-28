@@ -135,7 +135,7 @@ class OpenSearchServiceTest {
 
     private val melding =             """
             {
-                "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
+                "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
                 "stillingsinfo": {
                     "eierNavIdent": "T123456",
                     "eierNavn": "Tester",
@@ -144,7 +144,7 @@ class OpenSearchServiceTest {
                     "stillingskategori": "STILLING"
                 },
                 "direktemeldtStilling": {
-                    "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+                    "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
                     "innhold": {
                         "title": "Teststilling",
                         "administration": {
