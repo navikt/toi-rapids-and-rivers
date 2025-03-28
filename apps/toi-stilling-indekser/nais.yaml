@@ -29,6 +29,9 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
+  openSearch:
+    access: admin
+    instance: toi-stilling
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
@@ -38,3 +41,13 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: INDEKS_VERSJON
+      value: "{{indeks}}"
+    - name: STILLING_API_URL
+      value: {{ stilling_api_url }}
+    - name: STILLING_API_SCOPE
+      value: {{ stilling_api_scope }}
+  accessPolicy:
+    outbound:
+      rules:
+        - application: rekrutteringsbistand-stilling-api

@@ -1,0 +1,281 @@
+{
+  "date_detection": false,
+  "properties": {
+    "stillingsinfo": {
+      "properties": {
+        "eierNavident": {
+          "type": "keyword"
+        },
+        "eierNavn": {
+          "type": "text"
+        },
+        "stillingsid": {
+          "type": "keyword"
+        },
+        "stillingsinfoid": {
+          "type": "keyword"
+        },
+        "stillingskategori": {
+          "type": "keyword"
+        }
+      }
+    },
+    "stilling": {
+      "properties": {
+        "uuid": {
+          "type": "keyword"
+        },
+        "annonsenr": {
+          "type": "keyword"
+        },
+        "updated": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "created": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "published": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "publishedByAdmin": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "expires": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "status": {
+          "type": "keyword"
+        },
+        "privacy": {
+          "type": "keyword"
+        },
+        "source": {
+          "type": "keyword"
+        },
+        "reference": {
+          "type": "keyword"
+        },
+        "medium": {
+          "type": "keyword"
+        },
+        "tittel": {
+          "type": "text",
+          "copy_to": "stilling.tittel_no"
+        },
+        "tittel_no": {
+          "type": "text",
+          "analyzer": "norwegian"
+        },
+        "businessName": {
+          "type": "text",
+          "copy_to": "stilling.employername"
+        },
+        "employername": {
+          "type": "text",
+          "position_increment_gap": 100
+        },
+        "adtext_no": {
+          "type": "text",
+          "analyzer": "norwegian_html"
+        },
+        "geography_all_no": {
+          "type": "text",
+          "analyzer": "norwegian"
+        },
+        "county_facet": {
+          "type": "keyword"
+        },
+        "category_no": {
+          "type": "text",
+          "analyzer": "norwegian"
+        },
+        "searchtags_no": {
+          "type": "text",
+          "analyzer": "norwegian"
+        },
+        "contacts": {
+          "type": "nested",
+          "properties": {
+            "name": {
+              "type": "text"
+            },
+            "title": {
+              "type": "text"
+            },
+            "email": {
+              "type": "text"
+            },
+            "phone": {
+              "type": "text"
+            },
+            "role": {
+              "type": "text"
+            }
+          }
+        },
+        "locations": {
+          "type": "nested",
+          "properties": {
+            "address": {
+              "type": "text"
+            },
+            "city": {
+              "type": "text"
+            },
+            "county": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              },
+              "copy_to": [
+                "stilling.county_facet",
+                "stilling.geography_all_no"
+              ]
+            },
+            "countyCode": {
+              "type": "keyword"
+            },
+            "municipal": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              },
+              "copy_to": [
+                "stilling.geography_all_no"
+              ]
+            },
+            "municipalCode": {
+              "type": "keyword"
+            },
+            "postalCode": {
+              "type": "keyword"
+            },
+            "latitude": {
+              "type": "keyword",
+              "index": false,
+              "doc_values": false
+            },
+            "longitude": {
+              "type": "keyword",
+              "index": false,
+              "doc_values": false
+            },
+            "country": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              },
+              "copy_to": [
+                "stilling.geography_all_no"
+              ]
+            }
+          }
+        },
+        "administration": {
+          "properties": {
+            "status": {
+              "type": "keyword"
+            },
+            "remarks": {
+              "type": "keyword"
+            },
+            "comments": {
+              "type": "text"
+            },
+            "reportee": {
+              "type": "text"
+            },
+            "navIdent": {
+              "type": "keyword"
+            }
+          }
+        },
+        "categories": {
+          "properties": {
+            "styrkCode": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "text",
+              "copy_to": [
+                "stilling.category_no"
+              ]
+            }
+          }
+        },
+        "employer": {
+          "properties": {
+            "name": {
+              "type": "text",
+              "copy_to": "stilling.employername"
+            },
+            "orgnr": {
+              "type": "keyword"
+            },
+            "parentOrgnr": {
+              "type": "keyword"
+            },
+            "publicName": {
+              "type": "text"
+            }
+          }
+        },
+        "properties": {
+          "dynamic": false,
+          "properties": {
+            "adtext": {
+              "type": "text",
+              "index": false,
+              "copy_to": "stilling.adtext_no"
+            },
+            "author": {
+              "type": "keyword"
+            },
+            "employer": {
+              "type": "text",
+              "copy_to": "stilling.employername"
+            },
+            "jobtitle": {
+              "type": "text",
+              "copy_to": "stilling.searchtags_no"
+            },
+            "location": {
+              "type": "text",
+              "copy_to": "stilling.geography_all_no"
+            },
+            "starttime": {
+              "type": "text"
+            },
+            "applicationdue": {
+              "type": "keyword"
+            },
+            "extent": {
+              "type": "keyword"
+            },
+            "engagementtype": {
+              "type": "keyword"
+            },
+            "positioncount": {
+              "type": "integer",
+              "ignore_malformed": true
+            },
+            "tags": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}
