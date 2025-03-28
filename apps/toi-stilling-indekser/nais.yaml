@@ -32,6 +32,9 @@ spec:
   openSearch:
     access: admin
     instance: toi-stilling
+  azure:
+    application:
+      enabled: true
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
