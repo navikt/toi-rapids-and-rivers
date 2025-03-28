@@ -24,5 +24,6 @@ include(
     "apps:asr-domain",
     "apps:toi-arbeidssoekeropplysninger",
     "apps:toi-arbeidssoekerperiode",
-    "apps:toi-publisering-til-arbeidsplassen"
+    "apps:toi-publisering-til-arbeidsplassen",
+    "apps:toi-stilling-indekser"
 )

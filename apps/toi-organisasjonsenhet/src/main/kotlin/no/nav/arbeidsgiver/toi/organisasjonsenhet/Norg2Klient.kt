@@ -3,15 +3,12 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
-import org.slf4j.LoggerFactory
 
 private typealias OrgenhetNummer = String
 private typealias OrgenhetNavn = String
 private typealias OrgenhetCache = MutableMap<OrgenhetNummer, OrgenhetNavn>
 
 class Norg2Klient(private val norg2Url: String) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
-
     private val cache = populerCache()
 
     private fun populerCache(): OrgenhetCache {
@@ -32,7 +29,7 @@ class Norg2Klient(private val norg2Url: String) {
         }
 
     private fun hentOrgenhetNavnFraNorg2(nummer: OrgenhetNummer): OrgenhetNavn? {
-        val (req, response, result) = Fuel.get("$norg2Url/enhet?enhetsnummerListe=$nummer")
+        val (_, response, result) = Fuel.get("$norg2Url/enhet?enhetsnummerListe=$nummer")
             .responseObject<List<OrgEnhet>>()
 
         return when (result) {

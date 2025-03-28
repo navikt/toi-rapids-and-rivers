@@ -1,0 +1,6 @@
+kafka_pool: nav-prod
+kafka_consumer_group_id: toi-stilling-indekser-rapidconsumer-1
+indeks: "1"
+opensearch_plan: "business-4"
+opensearch_project: "nav-prod"
+opensearch_endpoint_id: "76685598-1048-4f56-b34a-9769ef747a92"

@@ -3,23 +3,18 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.helse.rapids_rivers.*
-import org.slf4j.LoggerFactory
 
 class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
-
     init {
         River(rapidsConnection).apply {
-            precondition{
+            precondition {
                 it.demandAtFørstkommendeUløsteBehovEr("organisasjonsenhetsnavn")
             }
             validate {

@@ -11,7 +11,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import org.slf4j.LoggerFactory
+import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 
 /**
  * Lytter på rapiden etter arbeidssøkerperioder publisert av toi.arbeidssoekerperiode
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory
  */
 class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) : River.PacketListener {
     companion object {
-        private val secureLog = LoggerFactory.getLogger("secureLog")
         private val jacksonMapper = jacksonObjectMapper()
             .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -48,7 +47,7 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
     ) {
         log.info("Mottok oppfølgingsperiodemelding ${packet["@id"]}")
         repository.lagreOppfølgingsperiodemelding(packet.fjernMetadataOgKonverter());
-        secureLog.info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["@id"]} for fnr ${packet["fodselsnummer"]}")
+        secure(log).info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["id"]} for fnr ${packet["identitetsnummer"]}")
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

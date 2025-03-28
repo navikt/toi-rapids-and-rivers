@@ -9,19 +9,19 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import org.slf4j.LoggerFactory
+import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.thread
 
-class PubliserOpplysningerJobb(private val repository: Repository,
+class PubliserOpplysningerJobb(
+    private val repository: Repository,
     private val rapidConnection: RapidsConnection,
     private val leaderElector: LeaderElector,
-    private val meterRegistry: MeterRegistry) {
+    private val meterRegistry: MeterRegistry
+) {
 
     companion object {
-        private val secureLog = LoggerFactory.getLogger("secureLog")
-        private val logg = LoggerFactory.getLogger(PubliserOpplysningerJobb::class.java)
         private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
@@ -39,7 +39,7 @@ class PubliserOpplysningerJobb(private val repository: Repository,
                 if (leaderElector.isLeader())
                     do {
                         val n = behandleOpplysninger()
-                        logg.info("Publiserte $n arbeidsøkerperioder")
+                        log.info("Publiserte $n arbeidsøkerperioder")
                     } while (n> 0)
             }
         }
@@ -49,21 +49,22 @@ class PubliserOpplysningerJobb(private val repository: Repository,
         try {
             val opplysninger = repository.hentUbehandledePeriodeOpplysninger()
             if (opplysninger.isNotEmpty()) {
-                logg.info("Publiserer ${opplysninger.size} opplysninger om arbeidssøker")
+                log.info("Publiserer ${opplysninger.size} opplysninger om arbeidssøker")
                 opplysninger.forEach { opplysning ->
                     publiserArbeidssøkeropplysning(opplysning)
                     repository.behandlePeriodeOpplysning(opplysning.periodeId)
-                    secureLog.info("""
+                    secure(log).info("""
                         Publiserte opplysning om ${opplysning.identitetsnummer} start: ${opplysning.periodeStartet}
                         stopp ${opplysning.periodeAvsluttet} mottatt: ${opplysning.opplysningerMottattDato}
                         helsetilstandHindrerArbeid: ${opplysning.helsetilstandHindrerArbeid}
                         andreForholdHindrerArbeid: $opplysning.andreForholdHindrerArbeid
-                        """.trimIndent())
+                        """.trimIndent()
+                    )
                 }
             }
             return opplysninger.size
         } catch (e: Exception) {
-            logg.warn("Greide ikke å behandle ubehandlede opplysninger: ${e.message}", e)
+            log.warn("Greide ikke å behandle ubehandlede opplysninger: ${e.message}", e)
         }
         return 0
     }

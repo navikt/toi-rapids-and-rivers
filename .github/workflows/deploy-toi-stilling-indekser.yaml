@@ -1,0 +1,21 @@
+name: toi-stilling-indekser
+
+on:
+  push:
+    paths:
+      - apps/toi-stilling-indekser/**
+      - .github/workflows/deploy-toi-stilling-indekser.yaml
+      - .github/workflows/deploy-toi-template.yaml
+      - buildSrc/**
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/deploy-toi-template.yaml
+    with:
+      app_name: ${{ github.workflow }}
+      deploy_dev_branch: refs/heads/logback7
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write

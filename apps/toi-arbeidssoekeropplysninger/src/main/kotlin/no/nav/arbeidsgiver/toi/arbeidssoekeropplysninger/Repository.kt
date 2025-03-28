@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 import no.nav.paw.arbeidssokerregisteret.api.v1.JaNeiVetIkke
 import no.nav.paw.arbeidssokerregisteret.api.v4.OpplysningerOmArbeidssoeker
-import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.Timestamp
@@ -22,9 +22,6 @@ import javax.sql.DataSource
 
 class Repository(private val datasource: DataSource) {
     companion object {
-        private val logg = LoggerFactory.getLogger(Repository::class.java)
-        private val sikkerLogg = LoggerFactory.getLogger("secureLog")
-
         private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
@@ -33,7 +30,7 @@ class Repository(private val datasource: DataSource) {
     }
 
     fun lagreOppfølgingsperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
-        sikkerLogg.info("Mottok rapid: $rapidOppfølgingsperiode")
+        secure(log).info("Mottok rapid: $rapidOppfølgingsperiode")
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
@@ -98,8 +95,11 @@ class Repository(private val datasource: DataSource) {
         }
     }
 
-    private fun lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker, conn: Connection): Long {
-        sikkerLogg.info("Mottok rapid: $arbeidssokerOpplysninger")
+    private fun lagreArbeidssøkeropplysninger(
+        arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker,
+        conn: Connection
+    ): Long {
+        secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
 
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         val sql = """
@@ -241,10 +241,13 @@ data class PeriodeOpplysninger(
             periodeStartet = rs.getTimestamp("periode_startet")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             periodeAvsluttet = rs.getTimestamp("periode_avsluttet")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             periodeMottattDato = rs.getTimestamp("periode_mottatt_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
-            opplysningerMottattDato = rs.getTimestamp("opplysninger_mottatt_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
+            opplysningerMottattDato = rs.getTimestamp("opplysninger_mottatt_dato")?.toInstant()
+                ?.atZone(ZoneId.of("Europe/Oslo")),
             behandletDato = rs.getTimestamp("behandlet_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
-            helsetilstandHindrerArbeid = rs.getBoolean("helsetilstand_hindrer_arbeid").let { if (rs.wasNull()) null else it },
-            andreForholdHindrerArbeid = rs.getBoolean("andre_forhold_hindrer_arbeid").let { if (rs.wasNull()) null else it }
+            helsetilstandHindrerArbeid = rs.getBoolean("helsetilstand_hindrer_arbeid")
+                .let { if (rs.wasNull()) null else it },
+            andreForholdHindrerArbeid = rs.getBoolean("andre_forhold_hindrer_arbeid")
+                .let { if (rs.wasNull()) null else it }
         )
     }
 }
