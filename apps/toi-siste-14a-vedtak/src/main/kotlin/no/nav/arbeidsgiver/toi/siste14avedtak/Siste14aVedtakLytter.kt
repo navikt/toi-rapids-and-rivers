@@ -9,11 +9,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import org.slf4j.LoggerFactory
+import no.nav.arbeidsgiver.toi.siste14avedtak.SecureLogLogger.Companion.secure
 
 class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
-
-    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     init {
         River(rapidsConnection).apply {
@@ -41,7 +39,7 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
         )
 
         log.info("Skal publisere siste14aVedtakmelding med aktørid (se securelog) og fattetDato ${packet["fattetDato"].asText()}")
-        secureLog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asText()} og fattetDato ${packet["fattetDato"].asText()}")
+        secure(log).info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asText()} og fattetDato ${packet["fattetDato"].asText()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())

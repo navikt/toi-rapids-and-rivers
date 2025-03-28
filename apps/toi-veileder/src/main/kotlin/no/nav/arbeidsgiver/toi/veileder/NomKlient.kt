@@ -9,15 +9,12 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.result.Result
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import net.minidev.json.JSONObject
-import org.slf4j.LoggerFactory
 
 class NomKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
-    private val log = LoggerFactory.getLogger(NomKlient::class.java)
     private val objectMapper = jacksonObjectMapper()
 
     fun hentVeilederinformasjon(ident: String): Veilederinformasjon? {

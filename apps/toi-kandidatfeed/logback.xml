@@ -1,6 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <appender name="loggIJsonFormatTilKibana" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    <!-- Log detailed information about the Logback initialization process. -->
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
 
     <appender name="secureLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -21,8 +25,7 @@
     </logger>
 
     <root level="INFO">
-        <appender-ref ref="loggIJsonFormatTilKibana"/>
+        <appender-ref ref="STDOUT_JSON"/>
     </root>
-
-    <logger name="io.micrometer.prometheusmetrics.PrometheusMeterRegistry" level="DEBUG" />
 </configuration>
+
