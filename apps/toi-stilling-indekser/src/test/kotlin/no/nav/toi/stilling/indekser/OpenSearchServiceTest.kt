@@ -135,7 +135,7 @@ class OpenSearchServiceTest {
 
     private val melding =             """
             {
-                "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+                "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
                 "stillingsinfo": {
                     "eierNavIdent": "T123456",
                     "eierNavn": "Tester",
