@@ -30,7 +30,14 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val melding = Melding.fraJson(packet)
+        val melding: Melding
+        try {
+            melding = Melding.fraJson(packet)
+        }catch (e: Exception) {
+            log.error("Gå forbi feil format på melding", e)
+            return
+        }
+
         val direktemeldtStilling = melding.direktemeldtStilling
         val stillingsinfo = melding.stillingsinfo
 
