@@ -49,6 +49,8 @@ data class Kandidat(
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
+    // TODO Vi kan vurdere om vi skal bruke Arbeidssøkeropplysninger for å sjekke om bruker er arbeidssøker. De meldingene
+    // er lettere å resende siden de ligger i en database.
     private fun erArbeidssøker(it: Arbeidssøkerperiode) = it.startet != null && it.avsluttet == null
     private fun erIkkeAndreForholdHindrerArbeid(it: Arbeidssøkeropplysninger) = it.andreForholdHindrerArbeid?.let { ! it } ?: true
     private fun erIkkeHelseHindrerArbeid(it: Arbeidssøkeropplysninger) = it.helseHindrerArbeid?.let { ! it } ?: true
