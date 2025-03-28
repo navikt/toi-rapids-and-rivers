@@ -67,7 +67,7 @@ fun startIndeksering(
     if(openSearchService.skalReindeksere()) {
         LoggerFactory.getLogger("Applikasjon").info("Skal starte reindeksering")
         openSearchService.initialiserReindeksering()
-        //stillingApiClient.triggSendingAvStillingerPåRapid()
+        stillingApiClient.triggSendingAvStillingerPåRapid()
 
         // TODO Her må det startes en lytter som lytter på ekstern topic fra start
     } else {
