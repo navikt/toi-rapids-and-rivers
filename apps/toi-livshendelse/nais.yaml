@@ -40,6 +40,13 @@ spec:
     application:
       enabled: true
       allowAllUsers: false
+      claims:
+        extra:
+          - NAVident
+        groups:
+          - id: {{adGruppeJobbsøkerrettet}}
+          - id: {{adGruppeArbeidsgiverrettet}}
+          - id: {{adGruppeUtvikler}}
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
