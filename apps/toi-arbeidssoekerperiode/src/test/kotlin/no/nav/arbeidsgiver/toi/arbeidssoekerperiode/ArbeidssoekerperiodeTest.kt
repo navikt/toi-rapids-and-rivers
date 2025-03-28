@@ -33,25 +33,23 @@ class ArbeidssoekerperiodeTest {
         produserArbeidssoekerperiodeMelding(consumer, melding)
         arbeidssoekerperiodeLytter.onReady(rapid)
 
-        Thread.sleep(600)
+        Thread.sleep(800)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
         val meldingJson = inspektør.message(0)
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "id",
             "@event_name",
-            "identitetsnummer",
-            "startet",
-            "avsluttet",
+            "fodselsnummer",
+            "arbeidssokerperiode",
             "@id",
             "@opprettet",
             "system_read_count",
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("identitetsnummer")).isNotNull
+        assertThat(meldingJson.get("fodselsnummer")).isNotNull
     }
 
     private fun mockConsumer() = MockConsumer<Long, Periode>(OffsetResetStrategy.EARLIEST).apply {

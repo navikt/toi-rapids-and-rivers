@@ -93,7 +93,7 @@ class RepositoryTest {
     @Test
     fun `skal lagre arbeidssøkerperiode i database`() {
         val periodeId = UUID.randomUUID()
-        val periodeMelding = periodeMelding(periodeId)
+        val periodeMelding = periodeMeldingInnhold(periodeId)
 
         repository.lagreOppfølgingsperiodemelding(periodeMelding)
 
@@ -107,7 +107,7 @@ class RepositoryTest {
     @Test
     fun `skal lagre arbeidssøkerperiode i database og oppdatere med opplysninger`() {
         val periodeId = UUID.randomUUID()
-        val periodeMelding = periodeMelding(periodeId)
+        val periodeMelding = periodeMeldingInnhold(periodeId)
         val opplysningerMelding = melding(periodeId)
 
         repository.lagreOppfølgingsperiodemelding(periodeMelding)
@@ -125,7 +125,7 @@ class RepositoryTest {
     @Test
     fun `skal lagre arbeidssøkeropplysninger i database og oppdatere med arbeidssøkerperiode`() {
         val periodeId = UUID.randomUUID()
-        val periodeMelding = periodeMelding(periodeId)
+        val periodeMelding = periodeMeldingInnhold(periodeId)
         val opplysningerMelding = melding(periodeId)
 
         repository.lagreArbeidssøkeropplysninger(opplysningerMelding)
@@ -146,7 +146,7 @@ class RepositoryTest {
         val opplysningerMelding = melding(periodeId)
 
         repository.lagreArbeidssøkeropplysninger(opplysningerMelding)
-        repository.lagreOppfølgingsperiodemelding(periodeMelding)
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(periodeId))
 
         val ubehandledeOpplysninger = repository.hentUbehandledePeriodeOpplysninger()
         assertThat(ubehandledeOpplysninger.map { it.periodeId }).contains(periodeId)
@@ -180,13 +180,23 @@ class RepositoryTest {
         )
         .build()
 
+    private fun periodeMeldingInnhold(periodeId: UUID): JsonNode = jacksonObjectMapper().readTree("""
+        {
+            "periode_id": "$periodeId",
+            "identitetsnummer": "01010012345",
+            "aktørId": "123456789",
+            "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
+            "avsluttet": null
+          }
+        """.trimIndent()
+    )
     private fun periodeMelding(periodeId: UUID): JsonNode = jacksonObjectMapper().readTree("""
         {
           "@event_name": "arbeidssokerperiode",
-          "id": "$periodeId",
-          "identitetsnummer": "01010012345",
-          "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
-          "avsluttet": null
+          "arbeidssokerperiode": ${periodeMeldingInnhold(periodeId)},
+          "aktørId": "123456789",
+          "fodselsnummer": "01010012345",
+          "@id": "whatever"
           }
         """.trimIndent()
     )
