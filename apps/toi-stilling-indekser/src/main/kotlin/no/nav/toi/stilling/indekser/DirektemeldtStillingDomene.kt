@@ -10,7 +10,7 @@ import java.util.*
 
 data class Melding(
     val stillingsId: String,
-    val stillingsinfo: Stillingsinfo,
+    val stillingsinfo: Stillingsinfo?,
     val direktemeldtStilling: DirektemeldtStilling
 ) {
     companion object {
