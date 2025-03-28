@@ -127,6 +127,6 @@ data class Stillingsinfo(
     val eierNavident: String?,
     val eierNavn: String?,
     val stillingsid: String,
-    val stillingsinfoid: String,
+    val stillingsinfoid: String?,
     val stillingskategori: String?
 )
