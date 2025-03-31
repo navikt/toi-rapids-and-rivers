@@ -38,6 +38,8 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
             return
         }
 
+        // TODO hva er riktig oppførsel hvis stillingsinfoid er null? Skal stillingsinfo være nullable?
+
         val direktemeldtStilling = melding.direktemeldtStilling
         val stillingsinfo = melding.stillingsinfo
 
