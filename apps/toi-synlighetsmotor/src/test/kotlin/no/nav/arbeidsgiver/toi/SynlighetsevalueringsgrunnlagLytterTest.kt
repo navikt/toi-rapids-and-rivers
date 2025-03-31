@@ -34,8 +34,8 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
-        ARBEIDSSOKERPERIODE("arbeidssokerperiode", aktivArbeidssøkerperiode(), aktivArbeidssøkerperiode()),
-        ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
+        ARBEIDSSOKERPERIODE("arbeidssokerperiode", aktivArbeidssøkerperiode(), aktivArbeidssøkerperiode(avsluttet = true)),
+        ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger(true, true)),
     }
 
     private val adressebeskyttelseFeltNavn = "adressebeskyttelse"
@@ -333,6 +333,20 @@ class SynlighetsevalueringsgrunnlagLytterTest {
             val melding = message(0)
             assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
+        })
+    }
+
+    @Test
+    fun `om man får en melding med alle felter untatt arbeidssøkerperiode og arbeidssøkeropplysninger utfylt så skal synlighetsmotor vente til man har fått svar på arbeidssøkerperiode og arbeidssøkeropplysninger også`() {
+        val alleFelterSattTilÅGiSynligTrue = (Felt.entries - Felt.ARBEIDSSOKERPERIODE - Felt.ARBEIDSSOKEROPPLYSNINGER).map(Felt::skalGiSynligTrue).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
         })
     }
 }

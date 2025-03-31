@@ -56,13 +56,15 @@ class Evaluering(
         erIkkeSperretAnsatt,
         erIkkeDoed,
         erIkkeKvp,
-        //erArbeidssøker, // Disse feltene skal foreløpig ikke være en del av evalueringen
+        //erArbeidssøker, // Disse feltene skal foreløpig ikke være en del av evalueringen, fjern fra harAltBortsettFraAdressebeskyttelse når de implementeres
         //erIkkeAndreForholdHindrerArbeid,
         //erIkkeHelseHindrerArbeid
     )
 
     private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
-    val harAltBortsettFraAdressebeskyttelse = felterBortsettFraAdressebeskyttelse.none { it == Missing }
+    val harAltBortsettFraAdressebeskyttelse =
+        (felterBortsettFraAdressebeskyttelse + erArbeidssøker + erIkkeAndreForholdHindrerArbeid + erIkkeHelseHindrerArbeid)
+            .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
     fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)

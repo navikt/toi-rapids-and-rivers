@@ -186,7 +186,9 @@ class Testdata {
                 kvp ?: nullVerdiForKey("kvp"),
                 veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
-                adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse")
+                adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse"),
+                arbeidssøkerperiode ?: nullVerdiForKey("arbeidssokerperiode"),
+                arbeidssøkeropplysninger ?: nullVerdiForKey("arbeidssokeropplysninger")
             ).joinToString()
         }
             }
@@ -233,25 +235,25 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun aktivArbeidssøkerperiode() =
+        fun aktivArbeidssøkerperiode(avsluttet: Boolean = false) =
             """
             "arbeidssokerperiode": {
                 "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
                 "identitetsnummer": "01010012345",
                 "startet": "2020-10-30T14:15:38+01:00",
-                "avsluttet": null
+                "avsluttet": ${if(avsluttet) """"2021-10-30T14:15:38+01:00"""" else "null"}
             }
         """.trimIndent()
 
-        fun arbeidssøkeropplysninger() =
+        fun arbeidssøkeropplysninger(helseHindrerArbeid: Boolean = false, andreForholdHindrerArbeid: Boolean = false) =
             """
             "arbeidssokeropplysninger": {
                 "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
                 "identitetsnummer": "01010012345",
                 "periode_startet": "2020-10-30T14:15:38+01:00",
-                "periode_avsluttet": null
-                "helsetilstand_hindrer_arbeid": true,
-                "andre_forhold_hindrer_arbeid": false
+                "periode_avsluttet": null,
+                "helsetilstand_hindrer_arbeid": $helseHindrerArbeid,
+                "andre_forhold_hindrer_arbeid": $andreForholdHindrerArbeid
             }
         """.trimIndent()
 

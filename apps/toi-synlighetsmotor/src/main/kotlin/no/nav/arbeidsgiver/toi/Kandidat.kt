@@ -110,7 +110,8 @@ data class Kandidat(
 
     private fun beregningsgrunnlag() = listOf(
         arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse
+        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse, arbeidssøkerperiode,
+        arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
 
