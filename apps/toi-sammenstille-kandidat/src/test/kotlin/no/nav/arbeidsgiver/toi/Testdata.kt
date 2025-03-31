@@ -31,35 +31,6 @@ fun cvMelding(aktørId: String) = """
         }
     """.trimIndent()
 
-fun arbeidssøkerperiodeMelding(aktørId: String) = """
-        {
-          "aktørId": "$aktørId",
-          "arbeidssokerperiode": {
-            "identitetsnummer": "01010012345",
-            "startet": "2024-01-01T00:00:00.000+01:00",
-            "avsluttet": null,
-            "aktoerId": "$aktørId",
-            "sistEndret": 1636718935.195
-          },
-          "@event_name": "arbeidssokerperiode"
-        }
-    """.trimIndent()
-
-fun arbeidssøkeropplysningerMelding(aktørId: String) = """
-        {
-          "aktørId": "$aktørId",
-          "arbeidssokeropplysninger": {
-            "identitetsnummer": "01010012345",
-            "opplysningerMottattDato": "2024-01-01T00:00:00.000+01:00",
-            "helsetilstand_hindrer_arbeid": true,
-            "andre_forhold_hindrer_arbeid": false,
-            "aktoerId": "$aktørId",
-            "sistEndret": 1636718935.195
-          },
-          "@event_name": "arbeidssokeropplysninger"
-        }
-    """.trimIndent()
-
 fun arbeidsmarkedCvMelding(aktørId: String) = """
         {
           "aktørId": "$aktørId",

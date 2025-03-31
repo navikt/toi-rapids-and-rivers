@@ -101,30 +101,6 @@ class SammenstillTest {
     }
 
     @Test
-    fun `Når arbeidssøkerperiode mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
-        val aktørId = "12141321"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(arbeidssøkerperiodeMelding(aktørId))
-
-        val antallLagredeKandidater = testDatabase.hentAntallKandidater()
-        assertThat(antallLagredeKandidater).isEqualTo(1)
-    }
-
-    @Test
-    fun `Når arbeidssøkeropplysninger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
-        val aktørId = "12141321"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-        testRapid.sendTestMessage(arbeidssøkeropplysningerMelding(aktørId))
-
-        val antallLagredeKandidater = testDatabase.hentAntallKandidater()
-        assertThat(antallLagredeKandidater).isEqualTo(1)
-    }
-
-    @Test
     fun `Når kvp-melding har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
         val testRapid = TestRapid()
