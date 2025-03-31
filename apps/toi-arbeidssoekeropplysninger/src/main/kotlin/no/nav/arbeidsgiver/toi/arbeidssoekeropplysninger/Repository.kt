@@ -127,6 +127,30 @@ class Repository(private val datasource: DataSource) {
         return 0
     }
 
+    fun hentPeriodeOpplysninger(aktørId: String): PeriodeOpplysninger? {
+        datasource.connection.use { conn ->
+            val sql = """
+                select id, periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato,
+                         opplysninger_mottatt_dato,
+                         behandlet_dato,
+                         helsetilstand_hindrer_arbeid,
+                         andre_forhold_hindrer_arbeid
+                from periodemelding
+                where aktor_id=?
+            """.trimIndent()
+            conn.prepareStatement(sql).apply {
+                setString(1, aktørId)
+            }.use { statement ->
+                val rs = statement.executeQuery()
+                if (rs.next()) {
+                    return PeriodeOpplysninger.fraDatabase(rs)
+                } else {
+                    return null
+                }
+            }
+        }
+    }
+
     fun hentPeriodeOpplysninger(periodeId: UUID): PeriodeOpplysninger? {
         datasource.connection.use { conn ->
             val sql = """
