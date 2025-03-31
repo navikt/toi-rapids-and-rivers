@@ -22,7 +22,6 @@ private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "hjemmel",
     "måBehandleTidligereCv",
     "kvp",
-    "arbeidssokerperiode",
     "arbeidssokeropplysninger"
 )
 

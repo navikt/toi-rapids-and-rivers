@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.arbeidsgiver.toi.CvMeldingstype.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.adressebeskyttelse
-import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivArbeidssøkerperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
@@ -24,7 +23,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
     companion object {
         private val aktørId = "1234"
         @JvmStatic
-        private fun felter() = Felt.entries.filterNot { it.navn == "arbeidssokerperiode" || it.navn == "arbeidssokeropplysninger"}.map { Arguments.of(it) }.stream()
+        private fun felter() = Felt.entries.filterNot { it.navn == "arbeidssokeropplysninger"}.map { Arguments.of(it) }.stream()
     }
     enum class Felt(val navn: String, val skalGiSynligTrue: String, val skalGiSynligFalse: String) {
         ARBEIDSMARKED_CV("arbeidsmarkedCv", arbeidsmarkedCv(OPPRETT), arbeidsmarkedCv(SLETT)),
@@ -34,7 +33,6 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
-        ARBEIDSSOKERPERIODE("arbeidssokerperiode", aktivArbeidssøkerperiode(), aktivArbeidssøkerperiode(avsluttet = true)),
         ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger(true, true)),
     }
 
@@ -337,8 +335,8 @@ class SynlighetsevalueringsgrunnlagLytterTest {
     }
 
     @Test
-    fun `om man får en melding med alle felter untatt arbeidssøkerperiode og arbeidssøkeropplysninger utfylt så skal synlighetsmotor vente til man har fått svar på arbeidssøkerperiode og arbeidssøkeropplysninger også`() {
-        val alleFelterSattTilÅGiSynligTrue = (Felt.entries - Felt.ARBEIDSSOKERPERIODE - Felt.ARBEIDSSOKEROPPLYSNINGER).map(Felt::skalGiSynligTrue).joinToString()
+    fun `om man får en melding med alle felter untatt arbeidssøkeropplysninger utfylt så skal synlighetsmotor vente til man har fått svar på arbeidssøkeropplysninger også`() {
+        val alleFelterSattTilÅGiSynligTrue = (Felt.entries - Felt.ARBEIDSSOKEROPPLYSNINGER).map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",

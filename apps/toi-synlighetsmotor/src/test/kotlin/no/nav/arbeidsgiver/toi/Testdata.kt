@@ -57,7 +57,6 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "hjemmel",
             "måBehandleTidligereCv",
             "kvp",
-            "arbeidssokerperiode",
             "arbeidssokeropplysninger"
         ))
     }
@@ -73,7 +72,6 @@ class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode: String = aktivOppfølgingsperiode(),
-            arbeidssøkerperiode: String = aktivArbeidssøkerperiode(),
             arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
@@ -91,7 +89,6 @@ class Testdata {
         ) =
             hendelseEtterBehovsHenting(
                 oppfølgingsperiode = oppfølgingsperiode,
-                arbeidssøkerperiode = arbeidssøkerperiode,
                 arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
@@ -232,16 +229,6 @@ class Testdata {
                 "aktorId": "123456789",
                 "startDato": "2020-10-30T14:15:38+01:00",
                 "sluttDato": null
-            }
-        """.trimIndent()
-
-        fun aktivArbeidssøkerperiode(avsluttet: Boolean = false) =
-            """
-            "arbeidssokerperiode": {
-                "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "identitetsnummer": "01010012345",
-                "startet": "2020-10-30T14:15:38+01:00",
-                "avsluttet": ${if(avsluttet) """"2021-10-30T14:15:38+01:00"""" else "null"}
             }
         """.trimIndent()
 

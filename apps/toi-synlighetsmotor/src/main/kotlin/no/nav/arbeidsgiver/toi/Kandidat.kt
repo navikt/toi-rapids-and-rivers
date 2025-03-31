@@ -17,7 +17,6 @@ data class Kandidat(
     private val hjemmel: Synlighetsnode<Hjemmel>,
     private val måBehandleTidligereCv: Synlighetsnode<MåBehandleTidligereCv>,
     private val kvp: Synlighetsnode<Kvp>,
-    private val arbeidssøkerperiode: Synlighetsnode<Arbeidssøkerperiode>,
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     val adressebeskyttelse: Synlighetsnode<String>,
 ) {
@@ -43,15 +42,13 @@ data class Kandidat(
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
-        erArbeidssøker = arbeidssøkerperiode.hvisIkkeNullOg(::erArbeidssøker),
+        erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
         erIkkeAndreForholdHindrerArbeid = arbeidssøkeropplysninger.hvisIkkeNullOg(::erIkkeAndreForholdHindrerArbeid),
         erIkkeHelseHindrerArbeid = arbeidssøkeropplysninger.hvisIkkeNullOg(::erIkkeHelseHindrerArbeid),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
-    // TODO Vi kan vurdere om vi skal bruke Arbeidssøkeropplysninger for å sjekke om bruker er arbeidssøker. De meldingene
-    // er lettere å resende siden de ligger i en database.
-    private fun erArbeidssøker(it: Arbeidssøkerperiode) = it.startet != null && it.avsluttet == null
+    private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
     private fun erIkkeAndreForholdHindrerArbeid(it: Arbeidssøkeropplysninger) = it.andreForholdHindrerArbeid?.let { ! it } ?: true
     private fun erIkkeHelseHindrerArbeid(it: Arbeidssøkeropplysninger) = it.helseHindrerArbeid?.let { ! it } ?: true
     private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
@@ -110,7 +107,7 @@ data class Kandidat(
 
     private fun beregningsgrunnlag() = listOf(
         arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse, arbeidssøkerperiode,
+        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse,
         arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
@@ -133,7 +130,6 @@ data class Kandidat(
                 måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
                 adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
-                arbeidssøkerperiode = Synlighetsnode.fromJsonNode(json.path("arbeidssokerperiode"), mapper),
                 arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
             )
         }
@@ -172,17 +168,19 @@ data class Oppfølgingsperiode(
     val sluttDato: ZonedDateTime?
 )
 
-data class Arbeidssøkerperiode(
-    val startet: ZonedDateTime?,
-    val avsluttet: ZonedDateTime?
-)
-
 data class Arbeidssøkeropplysninger(
+    @JsonProperty("periode_startet")
+    val periodeStartet: ZonedDateTime? = null,
+    @JsonProperty("periode_avsluttet")
+    val periodeAvsluttet: ZonedDateTime? = null,
     @JsonProperty("helsetilstand_hindrer_arbeid")
     val helseHindrerArbeid: Boolean?,
     @JsonProperty("andre_forhold_hindrer_arbeid")
     val andreForholdHindrerArbeid: Boolean?
-)
+) {
+    fun erArbeidssøker() =
+        periodeStartet != null && periodeAvsluttet == null
+}
 
 data class Oppfølgingsinformasjon(
     val erDoed: Boolean,
