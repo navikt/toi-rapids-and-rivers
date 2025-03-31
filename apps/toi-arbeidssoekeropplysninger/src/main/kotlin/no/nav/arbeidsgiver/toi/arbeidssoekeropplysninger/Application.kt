@@ -31,7 +31,8 @@ fun main() {
 
         val consumer = { KafkaConsumer<Long, OpplysningerOmArbeidssoeker>(consumerConfig) }
 
-        val arbeidssokerperioderRapidLytter = ArbeidssoekerperiodeRapidLytter(this, repository)
+        ArbeidssoekeropplysningerBehovLytter(this, repository)
+        ArbeidssoekerperiodeRapidLytter(this, repository)
         val arbeidssoekeropplysningerLytter = ArbeidssoekeropplysningerLytter(consumer, repository)
         register(arbeidssoekeropplysningerLytter)
 
