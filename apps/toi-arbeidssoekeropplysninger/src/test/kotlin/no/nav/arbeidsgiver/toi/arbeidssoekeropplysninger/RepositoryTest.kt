@@ -22,6 +22,8 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.utility.DockerImageName
 import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -89,6 +91,30 @@ class RepositoryTest {
         }
     }
 
+    @Test
+    fun `skal kun hente nyeste arbeidssøkerperiode for aktørid`() {
+        val meldinger = listOf(
+            melding(UUID.randomUUID()),
+            melding(UUID.randomUUID()),
+            melding(UUID.randomUUID())
+        )
+
+        repository.lagreArbeidssøkeropplysninger(meldinger)
+
+        val aktørId = UUID.randomUUID().toString()
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(meldinger[0].periodeId,
+            ZonedDateTime.now().minusMonths(10), aktørId = aktørId))
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(meldinger[1].periodeId,
+            ZonedDateTime.now().minusMonths(5), ZonedDateTime.now().minusMonths(2), aktørId = aktørId))
+        val nyesteId = repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(meldinger[2].periodeId,
+            ZonedDateTime.now().minusMonths(1), aktørId = aktørId))
+
+        val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
+        assertThat(nyesteId).isEqualTo(periodeOpplysninger?.id)
+
+        val ubehandlede = repository.hentUbehandledePeriodeOpplysninger().filter { it.aktørId == aktørId }
+        assertThat(ubehandlede.map { it.id }).containsOnly(nyesteId)
+    }
 
     @Test
     fun `skal lagre arbeidssøkerperiode i database`() {
@@ -184,16 +210,25 @@ class RepositoryTest {
         )
         .build()
 
-    private fun periodeMeldingInnhold(periodeId: UUID): JsonNode = jacksonObjectMapper().readTree("""
-        {
-            "periode_id": "$periodeId",
-            "identitetsnummer": "01010012345",
-            "aktørId": "123456789",
-            "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
-            "avsluttet": null
-          }
-        """.trimIndent()
-    )
+    private fun periodeMeldingInnhold(periodeId: UUID,
+                                      start: ZonedDateTime = ZonedDateTime.parse("2025-04-07T15:00:00.0+01:00"),
+                                      slutt: ZonedDateTime? = null,
+                                      aktørId: String = "123456789"): JsonNode {
+        val startStr = start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val sluttStr = slutt?.let{'"'.plus(it.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)).plus('"')} ?: "null"
+
+        return jacksonObjectMapper().readTree("""
+            {
+                "periode_id": "$periodeId",
+                "identitetsnummer": "01010012345",
+                "aktørId": "$aktørId",
+                "startet": "$startStr",
+                "avsluttet": $sluttStr
+              }
+            """.trimIndent()
+        )
+    }
+
     private fun periodeMelding(periodeId: UUID): JsonNode = jacksonObjectMapper().readTree("""
         {
           "@event_name": "arbeidssokerperiode",

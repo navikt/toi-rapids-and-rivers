@@ -101,15 +101,14 @@ class Repository(private val datasource: DataSource) {
     ): Long {
         secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
 
-        // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
+        // Vi endrer ikke behandlet_dato siden vi ikke bruker disse opplysnigene i synlighetsmotoren
         val sql = """
             insert into periodemelding(periode_id, helsetilstand_hindrer_arbeid, andre_forhold_hindrer_arbeid, opplysninger_mottatt_dato) 
             values(?, ?, ?, ?)
             on conflict(periode_id) do update
             set helsetilstand_hindrer_arbeid = EXCLUDED.helsetilstand_hindrer_arbeid,
                 andre_forhold_hindrer_arbeid = EXCLUDED.andre_forhold_hindrer_arbeid,
-                opplysninger_mottatt_dato = EXCLUDED.opplysninger_mottatt_dato,
-                behandlet_dato = null
+                opplysninger_mottatt_dato = EXCLUDED.opplysninger_mottatt_dato
             returning id
         """.trimIndent()
         conn.prepareStatement(sql).apply {
@@ -136,7 +135,7 @@ class Repository(private val datasource: DataSource) {
                          helsetilstand_hindrer_arbeid,
                          andre_forhold_hindrer_arbeid
                 from periodemelding
-                where aktor_id=?
+                where id in (select id from nyeste_asr_periode where aktor_id = ?)
             """.trimIndent()
             conn.prepareStatement(sql).apply {
                 setString(1, aktørId)
@@ -207,7 +206,8 @@ class Repository(private val datasource: DataSource) {
                          andre_forhold_hindrer_arbeid
                 from periodemelding
                 where 
-                  behandlet_dato is null and opplysninger_mottatt_dato is not null and identitetsnummer is not null
+                  id in (select id from nyeste_asr_periode 
+                    where behandlet_dato is null)
                   and aktor_id is not null
                 order by periode_mottatt_dato asc
                 limit ?
