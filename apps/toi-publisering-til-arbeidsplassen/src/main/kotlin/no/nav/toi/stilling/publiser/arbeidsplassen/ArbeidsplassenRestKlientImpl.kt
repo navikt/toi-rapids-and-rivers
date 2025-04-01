@@ -1,12 +1,12 @@
 package no.nav.toi.stilling.publiser.arbeidsplassen
 
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.result.Result
 import no.nav.toi.stilling.publiser.arbeidsplassen.dto.ArbeidsplassenResultat
 import no.nav.toi.stilling.publiser.arbeidsplassen.dto.ArbeidsplassenStilling
 import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 
 interface ArbeidsplassenRestKlient {
     fun publiserStilling(stilling: ArbeidsplassenStilling)
@@ -15,42 +15,44 @@ interface ArbeidsplassenRestKlient {
 class ArbeidsplassenRestKlientImpl(
     val baseUrl: URI,
     val autorizationToken: String,
+    private val httpClient: HttpClient = HttpClient.newHttpClient()
 ): ArbeidsplassenRestKlient {
     companion object {
         val PROVIDER_ID = "15054" // Fast og endres ikke - samme i prod og dev
     }
 
     override fun publiserStilling(stilling: ArbeidsplassenStilling) {
-        val body = objectMapper.writeValueAsString(stilling)
-        val (_, response: Response, result: Result<String, FuelError>) = Fuel
-            .post(path = "$baseUrl/stillingsimport/api/v1/transfers/$PROVIDER_ID")
+        val stillingAsString = objectMapper.writeValueAsString(stilling)
+        val url = URI.create("$baseUrl/stillingsimport/api/v1/transfers/$PROVIDER_ID")
+        log.info("Publiserer stilling til url: $url")
+        val request = HttpRequest.newBuilder()
+            .uri(url)
             .header("Accept", "application/x-json-stream")
             .header("Cache-Control", "no-cache")
             .header("Content-type", "application/x-json-stream")
             .header("Authorization", "Bearer $autorizationToken")
-            .body(body)
-            .responseString()
+            .POST(HttpRequest.BodyPublishers.ofString(stillingAsString))
+            .timeout(Duration.ofSeconds(30))
+            .build()
 
-        val feilmelding = "Klarte ikke å publisere stilling til Arbeidsplassen ${response.statusCode} ${response.responseMessage}"
-        when (result) {
-            is Result.Failure -> error(feilmelding)
-            is Result.Success -> {
-                if (response.statusCode != 200) {
-                    log.error(feilmelding)
-                    error(feilmelding)
-                }
-                val resultSomStreng = response.body().asString("text/html;charset=UTF-8")
-                log.info("resultSomStreng: $resultSomStreng")
-                val arbeidsplassenResultat = objectMapper.readValue(resultSomStreng, ArbeidsplassenResultat::class.java)
-                log.info("Resultat av publisering til Arbeidsplassen: $arbeidsplassenResultat")
-
-                if (arbeidsplassenResultat.status == "ERROR") {
-                    val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen: ${arbeidsplassenResultat.message}"
-                    log.error(feilmeldingVedPublisering)
-                    error(feilmeldingVedPublisering)
-                }
-                log.info("Publiserte stilling til Arbeidsplassen OK: $arbeidsplassenResultat")
-            }
+        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        val statusCode = response.statusCode()
+        if (statusCode != 200) {
+            val feilmelding = "Klarte ikke å publisere stilling til Arbeidsplassen $statusCode"
+            log.error(feilmelding)
+            error(feilmelding)
         }
+
+        val resultatSomStreng = response.body()
+        log.info("resultatSomStreng: $resultatSomStreng")
+        val arbeidsplassenResultat = objectMapper.readValue(resultatSomStreng, ArbeidsplassenResultat::class.java)
+        log.info("Resultat av publisering til Arbeidsplassen: $arbeidsplassenResultat")
+
+        if (arbeidsplassenResultat.status == "ERROR") {
+            val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen: ${arbeidsplassenResultat.message}"
+            log.error(feilmeldingVedPublisering)
+            error(feilmeldingVedPublisering)
+        }
+        log.info("Publiserte stilling til Arbeidsplassen OK: $arbeidsplassenResultat")
     }
 }
