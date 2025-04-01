@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.opensearch.client.opensearch.OpenSearchClient
@@ -24,16 +27,11 @@ class OpenSearchServiceTest {
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
 
-    private val httpClient: HttpClient = HttpClient.newBuilder()
-        .followRedirects(HttpClient.Redirect.ALWAYS)
-        .build()
-
     private lateinit var openSearchClient: OpenSearchClient
     private lateinit var indexClient: IndexClient
     private lateinit var openSearchService: OpenSearchService
-    private lateinit var stillingApiClient: StillingApiClient
+    private val stillingApiClient = mockk<StillingApiClient>()
 
-    private val accessTokenClient = mockk<AccessTokenClient>()
     private lateinit var testMetoderOpenSearch: TestMetoderOpenSearch
 
     @BeforeEach
@@ -52,8 +50,9 @@ class OpenSearchServiceTest {
         openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
         indexClient = IndexClient(openSearchClient, objectMapper)
         openSearchService = OpenSearchService(indexClient, env)
-        stillingApiClient = StillingApiClient(env, httpClient, accessTokenClient)
         testMetoderOpenSearch = TestMetoderOpenSearch(openSearchClient)
+
+        every { stillingApiClient.triggSendingAvStillingerPåRapid() } just runs
     }
 
     @Test
@@ -83,7 +82,6 @@ class OpenSearchServiceTest {
         env["INDEKS_VERSJON"] = "20250329"
 
         openSearchService.initialiserReindeksering()
-
         openSearchService.byttTilNyIndeks()
 
         val gjeldendeIndeksMedAlias = indexClient.hentIndeksAliasPekerPå()

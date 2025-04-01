@@ -78,27 +78,66 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
         log.info("Indeks '$indeksNavn' ble opprettet: $indeksOpprettet")
     }
 
-    fun oppdaterAlias(indeksNavn: String) {
+    fun oppdaterAlias(indeksNavn: String, fjernAlias: Boolean = false) {
+        if(fjernAlias) fjernAlias()
+        lagAlias(indeksNavn)
+        log.info("Oppdaterte alias $stillingAlias til å peke på $indeksNavn")
+    }
+//
+//    fun oppdaterAlias(indeksNavn: String) {
+//        val request = UpdateAliasesRequest.Builder().actions { actions ->
+//            // Remove action
+//            actions.remove { remove ->
+//                remove.index("$stillingAlias*")
+//                    .alias(stillingAlias)
+//            }
+//            // Add action
+//            actions.add { add ->
+//                add.index(indeksNavn)
+//                    .alias(stillingAlias)
+//            }
+//        }.build()
+//
+//        val aliasOppdatert = client.indices().updateAliases(request).acknowledged()
+//
+//        if (!aliasOppdatert) {
+//            throw Exception("Klarte ikke oppdatere alias $stillingAlias til å peke på $indeksNavn")
+//        }
+//        log.info("Oppdatere alias $stillingAlias til å peke på $indeksNavn")
+//    }
+
+    private fun fjernAlias() {
         val request = UpdateAliasesRequest.Builder().actions { actions ->
             // Remove action
             actions.remove { remove ->
                 remove.index("$stillingAlias*")
                     .alias(stillingAlias)
             }
+        }.build()
+        val aliasOppdatert = client.indices().updateAliases(request).acknowledged()
+
+        if (!aliasOppdatert) {
+            throw Exception("Klarte ikke fjerne alias $stillingAlias")
+        }
+        log.info("Fjernet alias $stillingAlias")
+    }
+
+    private fun lagAlias(indeksNavn: String) {
+        val request = UpdateAliasesRequest.Builder().actions { actions ->
             // Add action
             actions.add { add ->
                 add.index(indeksNavn)
                     .alias(stillingAlias)
             }
         }.build()
-
         val aliasOppdatert = client.indices().updateAliases(request).acknowledged()
 
         if (!aliasOppdatert) {
-            throw Exception("Klarte ikke oppdatere alias $stillingAlias til å peke på $indeksNavn")
+            throw Exception("Klarte ikke opprette alias $stillingAlias")
         }
-        log.info("Oppdaterte alias $stillingAlias til å peke på $indeksNavn")
+        log.info("Opprettet alias $stillingAlias")
     }
+
 
     fun hentIndeksAliasPekerPå(): String? {
         val request = GetAliasRequest.Builder().index("$stillingAlias*").build()

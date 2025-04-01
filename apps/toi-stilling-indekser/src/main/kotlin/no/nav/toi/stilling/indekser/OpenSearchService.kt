@@ -62,7 +62,7 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
 
     fun byttTilNyIndeks() {
         val indeksnavn = hentNyesteIndeks()
-        client.oppdaterAlias(indeksnavn)
+        client.oppdaterAlias(indeksnavn, true)
     }
 
     fun hentGjeldendeIndeks(): String? {
