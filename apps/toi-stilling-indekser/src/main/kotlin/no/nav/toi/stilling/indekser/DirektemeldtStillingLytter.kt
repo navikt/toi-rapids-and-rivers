@@ -14,7 +14,7 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
     init {
         River(rapidsConnection).apply {
             precondition {
-                it.requireKey("stillingsinfo")
+                it.interestedIn("stillingsinfo")
                 it.requireKey("direktemeldtStilling")
                 it.requireValue("@event_name", "direktemeldtStillingRepubliser")
 
@@ -38,7 +38,7 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
             return
         }
 
-        // TODO hva er riktig oppførsel hvis stillingsinfoid er null? Skal stillingsinfo være nullable?
+        // TODO lag håndtering for indeksering og reindeksering
 
         val direktemeldtStilling = melding.direktemeldtStilling
         val stillingsinfo = melding.stillingsinfo
@@ -49,9 +49,8 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
             stillingsinfo = stillingsinfo
         )
 
-        log.info("Mottok melding for indeksering: $direktemeldtStilling")
+        log.info("Mottok ${direktemeldtStilling.stillingsid} for indeksering: $direktemeldtStilling")
 
         openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
-
     }
 }

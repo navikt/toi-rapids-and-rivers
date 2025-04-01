@@ -2,13 +2,19 @@ package no.nav.toi.stilling.indekser
 
 class OpenSearchService(private val client: IndexClient, private val env: MutableMap<String, String>) {
 
-    fun initialiserIndeksering() {
+    fun initialiserIndeksering() : Boolean {
         val indeks = hentNyesteIndeks()
 
         log.info("Initialiser indeksering på indeks $indeks")
 
         val indeksBleOpprettet = opprettIndeksHvisDenIkkeFinnes(indeks)
-        if (indeksBleOpprettet) client.oppdaterAlias(indeks)
+        if (indeksBleOpprettet){
+            client.oppdaterAlias(indeks)
+        } else {
+            log.info("Indeks er allerede opprettet og dermed gjøres det ingenting")
+        }
+
+        return indeksBleOpprettet
     }
 
     fun initialiserReindeksering() {
@@ -56,7 +62,6 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
 
     fun byttTilNyIndeks() {
         val indeksnavn = hentNyesteIndeks()
-        client.fjernAlias()
         client.oppdaterAlias(indeksnavn)
     }
 

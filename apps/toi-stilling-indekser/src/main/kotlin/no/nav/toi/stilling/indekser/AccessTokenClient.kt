@@ -65,7 +65,6 @@ class AccessTokenClient(env: MutableMap<String, String>,
         return token
     }
 
-
     private fun getFormDataAsString(f: Map<String, String>) : String {
         val params = mutableListOf<String>()
         f.forEach { d ->

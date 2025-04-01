@@ -57,7 +57,6 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
         return response
     }
 
-
     fun finnesIndeks(indeksnavn: String): Boolean {
         val request: ExistsRequest = ExistsRequest.Builder().index(indeksnavn).build()
         return client.indices().exists(request).value()
@@ -98,27 +97,7 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
         if (!aliasOppdatert) {
             throw Exception("Klarte ikke oppdatere alias $stillingAlias til å peke på $indeksNavn")
         }
-        log.info("Oppdatere alias $stillingAlias til å peke på $indeksNavn")
-    }
-
-    fun fjernAlias() {
-        log.info("Prøver å fjerne aliaser")
-        val request = UpdateAliasesRequest.Builder().actions { actions ->
-            // Remove action
-            actions.remove { remove ->
-                remove.index("$stillingAlias*")
-                    .alias(stillingAlias)
-            }
-        }.build()
-
-        val aliasOppdatert = client.indices().updateAliases(request).acknowledged()
-
-        val alias = hentIndeksAliasPekerPå()
-
-        log.info("Alias peker på noe etter fosøk av fjerning: $alias")
-        if (!aliasOppdatert) {
-            throw Exception("Klarte ikke fjerne alias")
-        }
+        log.info("Oppdaterte alias $stillingAlias til å peke på $indeksNavn")
     }
 
     fun hentIndeksAliasPekerPå(): String? {

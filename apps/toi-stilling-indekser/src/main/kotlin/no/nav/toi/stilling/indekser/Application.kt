@@ -72,10 +72,13 @@ fun startIndeksering(
         // TODO Her må det startes en lytter som lytter på ekstern topic fra start
     } else {
         LoggerFactory.getLogger("Applikasjon").info("Skal initialisere indeksering")
-        openSearchService.initialiserIndeksering()
-        //stillingApiClient.triggSendingAvStillingerPåRapid()
 
-        // TODO Her må det startes en lytter som lytter på ekstern topic fra start
+        if(openSearchService.initialiserIndeksering()) {
+            stillingApiClient.triggSendingAvStillingerPåRapid()
+            // TODO Her må det startes en lytter som lytter på ekstern topic fra start
+        }
+
+        // Det skal ikke skje noe
     }
 }
 
