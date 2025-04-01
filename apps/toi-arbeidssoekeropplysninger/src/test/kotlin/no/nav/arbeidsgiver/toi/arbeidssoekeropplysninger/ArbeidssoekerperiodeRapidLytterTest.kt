@@ -46,13 +46,17 @@ class ArbeidssoekerperiodeRapidLytterTest {
     }
 
     @Test
-    fun `lesing av arbeidssøkerperioder fra rapid skal lagres i database`() {
+    fun `lesing av arbeidssøkerperioder fra rapid skal lagres i database hvis aktørId er med`() {
         val periodeId = UUID.randomUUID()
-        val melding = rapidPeriodeMelding(periodeId.toString())
+        val meldingUtenAktørId = rapidPeriodeMelding(periodeId.toString())
+        val meldingMedAktørId = rapidPeriodeMelding(periodeId.toString(), "123456789")
         val rapid = TestRapid()
 
         val arbeidssoekeropplysningerLytter = ArbeidssoekerperiodeRapidLytter(rapid, repository)
-        rapid.sendTestMessage(melding)
+        println("Sender: $meldingUtenAktørId")
+        rapid.sendTestMessage(meldingUtenAktørId)
+        println("Sender: $meldingMedAktørId")
+        rapid.sendTestMessage(meldingMedAktørId)
 
         // Bør vurdere å bruke mock her og så heller teste all repository i egen test?
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(periodeId)
@@ -61,13 +65,19 @@ class ArbeidssoekerperiodeRapidLytterTest {
         println(periodeOpplysninger)
     }
 
-    private fun rapidPeriodeMelding(periodeId: String): String = """
+    private fun rapidPeriodeMelding(periodeId: String, aktørId: String? = null): String = StringBuilder(
+        """
         {
           "@event_name": "arbeidssokerperiode",
-          "id": "$periodeId",
-          "identitetsnummer": "01010012345",
-          "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
-          "avsluttet": null
+          "fodselsnummer": "01010012345", 
+          "arbeidssokerperiode": {
+            "periode_id": "$periodeId",
+            "identitetsnummer": "01010012345",
+            "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
+            "avsluttet": null
           }
-        """.trimIndent()
-    }
+          """
+    ).append(aktørId?.let { ", \"aktørId\": \"$it\"" } ?: "")
+        .append("\n}")
+        .toString().trimIndent()
+}

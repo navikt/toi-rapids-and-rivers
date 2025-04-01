@@ -21,7 +21,8 @@ private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "arenaFritattKandidatsøk",
     "hjemmel",
     "måBehandleTidligereCv",
-    "kvp"
+    "kvp",
+    "arbeidssokeropplysninger"
 )
 
 private const val adressebeskyttelseFelt = "adressebeskyttelse"

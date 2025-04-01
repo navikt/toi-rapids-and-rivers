@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
@@ -13,12 +13,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 
-/**
- * Lytter på rapiden etter arbeidssøkerperioder publisert av toi.arbeidssoekerperiode
- * Vi må lagrer disse meldingene slik at vi kan korrelere id i arbeidssøkerperioden med periodeId i arbeidssøkeropplysninger
- * for å finne identitetsnummer (fnr)
- */
-class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) : River.PacketListener {
+class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository)
+    : River.PacketListener {
     companion object {
         private val jacksonMapper = jacksonObjectMapper()
             .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
@@ -28,13 +24,11 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
 
     init {
         River(rapidsConnection).apply {
-            precondition{
-                it.requireKey("arbeidssokerperiode")
-                it.requireKey("fodselsnummer")
+            precondition {
+                it.demandAtFørstkommendeUløsteBehovEr("arbeidssokeropplysninger")
+            }
+            validate {
                 it.requireKey("aktørId")
-                it.interestedIn("@id")
-                it.interestedIn("sistEndretDato")
-                it.requireValue("@event_name", "arbeidssokerperiode")
             }
         }.register(this)
     }
@@ -45,16 +39,26 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok arbeidssøkerperiodemelding ${packet["@id"]}")
-        repository.lagreOppfølgingsperiodemelding(packet.fjernMetadataOgKonverter());
-        secure(log).info("Mottok og lagret arbeidssøkerperiodemelding med id ${packet["@id"]} for fnr ${packet["fodselsnummer"]}")
+        val aktørId = packet["aktørId"].asText()
+        val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
+        val jsonInnhold = periodeOpplysninger?.let { jacksonMapper.valueToTree<JsonNode>(it) } ?: NullNode.instance
+
+        secure(log).info("Mottok og behov for arbeidssøkeropplysninger for aktørid: $aktørId")
+
+        packet["arbeidssokeropplysninger"] = jsonInnhold
+        context.publish(aktørId, packet.toJson())
     }
 
-    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonMapper.readTree(this.toJson()) as ObjectNode
-        val periodeNode = jsonNode["arbeidssokerperiode"] as ObjectNode
-        val aktørId = jsonNode["aktørId"]
-        periodeNode.putIfAbsent("aktørId", aktørId)
-        return periodeNode
+    private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
+        require("@behov") { behovNode ->
+            if (behovNode
+                    .toList()
+                    .map(JsonNode::asText)
+                    .onEach { interestedIn(it) }
+                    .first { this[it].isMissingNode } != informasjonsElement
+            )
+                throw Exception("Uinteressant hendelse")
+        }
+
     }
 }

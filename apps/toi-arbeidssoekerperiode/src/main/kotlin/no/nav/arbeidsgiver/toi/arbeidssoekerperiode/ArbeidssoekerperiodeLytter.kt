@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,8 +46,16 @@ class ArbeidssoekerperiodeLytter(
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
                             log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
-                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJson()}")
-                            rapidsConnection.publish(periode.identitetsnummer, periode.somJson())
+                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
+
+                            val melding = mapOf(
+                                "fodselsnummer" to periode.identitetsnummer,
+                                "arbeidssokerperiode" to periode.somJsonNode(),
+                                "@event_name" to "arbeidssokerperiode",
+                            )
+
+                            val nyPacket = JsonMessage.newMessage(melding)
+                            rapidsConnection.publish(nyPacket.toJson())
                         }
                         consumer.commitSync()
                     } catch (e: RetriableException) {

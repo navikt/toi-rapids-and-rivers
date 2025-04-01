@@ -49,6 +49,10 @@ class SynlighetsmotorTest {
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+                false.tilBooleanVerdi(),
+
                 false
             ), "123456789", null
         )
@@ -75,6 +79,9 @@ class SynlighetsmotorTest {
             assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
             assertThat(erIkkeDoed.default(false)).isEqualTo(true)
             assertThat(erIkkeKvp.default(false)).isEqualTo(true)
+            assertThat(erArbeidssøker.default(false)).isEqualTo(true)
+            assertThat(erIkkeHelseHindrerArbeid.default(false)).isEqualTo(true)
+            assertThat(erIkkeAndreForholdHindrerArbeid.default(false)).isEqualTo(true)
             //assertThat(harIkkeAdressebeskyttelse).isEqualTo(true) TODO: denne har vi ikke i databasen ennå
             assertThat(erFerdigBeregnet).isEqualTo(true)
         } ?: Assertions.fail("Fant ikke evaluering i databasen")
