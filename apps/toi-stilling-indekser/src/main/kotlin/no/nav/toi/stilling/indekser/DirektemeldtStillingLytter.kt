@@ -17,8 +17,8 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
                 it.interestedIn("stillingsinfo")
                 it.requireKey("direktemeldtStilling")
                 it.requireValue("@event_name", "direktemeldtStillingRepubliser")
-
-//                it.requireKey("") // Lag en key her som sier om det er indekser eller reindekser
+                it.forbid("stilling") // Ikke les meldingen på nytt etter at den har vært innom stillingPopulator
+//              it.requireKey("") // Lag en key her som sier om det er indekser eller reindekser
             }
             validate { it.requireKey("stillingsId") }
         }.register(this)
