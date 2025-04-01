@@ -39,7 +39,7 @@ spec:
     - name: KAFKA_RESET_POLICY
       value: "earliest"
     - name: IMPORT_API_BASE_URL
-      value: {{ import_api_base_url }}
+      value: http://pam-import-api.teampam
   accessPolicy:
     outbound:
       rules:
