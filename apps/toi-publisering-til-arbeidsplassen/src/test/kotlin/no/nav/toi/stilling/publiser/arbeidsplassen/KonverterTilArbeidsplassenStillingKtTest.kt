@@ -21,7 +21,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
     @Test
     fun `Felter blir konvertert til riktig format`() {
          val direktemeldtStilling = DirektemeldtStilling(
-             stillingsId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+             stillingsid = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
              innhold  = DirektemeldtStillingInnhold(
                  title = "Tittel",
                  published = ZonedDateTime.of(LocalDateTime.of(2025, 3, 25, 14, 0), ZoneId.of("UTC")),

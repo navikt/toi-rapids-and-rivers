@@ -16,7 +16,7 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
     val employer = innhold.employer
 
     val arbeidsplassenStilling = ArbeidsplassenStilling(
-        reference = direktemeldtStilling.stillingsId.toString(),
+        reference = direktemeldtStilling.stillingsid.toString(),
         positions = properties["positioncount"]?.toInt() ?: 1,
         title = innhold.title,
         adText = properties["adtext"] ?: "",

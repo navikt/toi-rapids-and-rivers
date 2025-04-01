@@ -22,7 +22,7 @@ data class RapidHendelse(
 }
 
 data class DirektemeldtStilling(
-    val stillingsId: UUID,
+    val stillingsid: UUID,
     val innhold: DirektemeldtStillingInnhold,
     val opprettet: ZonedDateTime,
     val opprettetAv: String,

@@ -28,8 +28,9 @@ class StillingTilArbeidsplassenLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        log.info("Mottok stilling ${packet.toJson()}")
         val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
-        log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
+        log.info("Mottok stilling med stillingsId ${stilling.stillingsid}")
         val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(stilling)
         arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
     }
