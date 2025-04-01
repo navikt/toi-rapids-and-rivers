@@ -32,8 +32,8 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
                 it.requireKey("arbeidssokerperiode")
                 it.requireKey("fodselsnummer")
                 it.requireKey("aktørId")
-                it.interestedIn("@id") // Ikke interessert i denne hvor kom den fra?
-                it.interestedIn("sistEndretDato") // Ikke interessert i denne hvor kom den fra?
+                it.interestedIn("@id")
+                it.interestedIn("sistEndretDato")
                 it.requireValue("@event_name", "arbeidssokerperiode")
             }
         }.register(this)
