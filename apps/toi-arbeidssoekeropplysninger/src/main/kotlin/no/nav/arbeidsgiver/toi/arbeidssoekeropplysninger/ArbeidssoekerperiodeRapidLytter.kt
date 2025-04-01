@@ -45,9 +45,9 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok oppfølgingsperiodemelding ${packet["@id"]}")
+        log.info("Mottok arbeidssøkerperiodemelding ${packet["@id"]}")
         repository.lagreOppfølgingsperiodemelding(packet.fjernMetadataOgKonverter());
-        secure(log).info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["@id"]} for fnr ${packet["fodselsnummer"]}")
+        secure(log).info("Mottok og lagret arbeidssøkerperiodemelding med id ${packet["@id"]} for fnr ${packet["fodselsnummer"]}")
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

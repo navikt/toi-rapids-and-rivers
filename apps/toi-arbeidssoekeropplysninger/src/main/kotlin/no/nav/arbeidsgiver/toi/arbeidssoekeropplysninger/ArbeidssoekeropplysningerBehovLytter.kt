@@ -11,6 +11,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 
 class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository)
     : River.PacketListener {
@@ -41,6 +42,8 @@ class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsC
         val aktørId = packet["aktørId"].asText()
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
         val jsonInnhold = periodeOpplysninger?.let { jacksonMapper.valueToTree<JsonNode>(it) } ?: NullNode.instance
+
+        secure(log).info("Mottok og behov for arbeidssøkeropplysninger for aktørid: $aktørId")
 
         packet["arbeidssokeropplysninger"] = jsonInnhold
         context.publish(aktørId, packet.toJson())

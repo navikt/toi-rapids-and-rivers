@@ -39,7 +39,8 @@ class PubliserOpplysningerJobb(
                 if (leaderElector.isLeader())
                     do {
                         val n = behandleOpplysninger()
-                        log.info("Publiserte $n arbeidsøkerperioder")
+                        if (n > 0)
+                            log.info("Publiserte $n arbeidsøkerperioder")
                     } while (n> 0)
             }
         }
