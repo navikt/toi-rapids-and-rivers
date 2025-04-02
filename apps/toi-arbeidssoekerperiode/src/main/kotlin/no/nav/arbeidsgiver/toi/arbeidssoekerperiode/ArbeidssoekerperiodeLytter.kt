@@ -62,7 +62,7 @@ class ArbeidssoekerperiodeLytter(
                             )
 
                             val nyPacket = JsonMessage.newMessage(melding)
-                            rapidsConnection.publish(nyPacket.toJson())
+                            rapidsConnection.publish(periode.identitetsnummer, nyPacket.toJson())
                         }
                         consumer.commitSync()
                     } catch (e: RetriableException) {

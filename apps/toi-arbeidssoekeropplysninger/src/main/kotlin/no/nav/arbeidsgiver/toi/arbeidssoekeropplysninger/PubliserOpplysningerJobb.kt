@@ -80,6 +80,6 @@ class PubliserOpplysningerJobb(
         )
 
         val nyMelding = JsonMessage.newMessage(melding)
-        rapidConnection.publish(nyMelding.toJson())
+        rapidConnection.publish(opplysning.aktørId, nyMelding.toJson())
     }
 }
