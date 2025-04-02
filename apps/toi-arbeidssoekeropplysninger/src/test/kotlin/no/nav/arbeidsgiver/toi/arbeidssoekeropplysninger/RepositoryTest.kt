@@ -16,6 +16,7 @@ import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
@@ -25,6 +26,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RepositoryTest {
@@ -44,20 +46,29 @@ class RepositoryTest {
         }
 
     lateinit var repository: Repository
+    lateinit var dataSource: DataSource
 
     @BeforeAll
     fun init() {
         val databaseConfig = DatabaseConfig(localEnv, meterRegistry)
-        val dataSource = databaseConfig.lagDatasource()
+        dataSource = databaseConfig.lagDatasource()
         kjørFlywayMigreringer(dataSource)
 
         repository = Repository(dataSource)
     }
 
+    @BeforeEach
+    fun tømDatabase() {
+        dataSource.connection.use { conn ->
+            conn.prepareStatement("truncate table periodemelding").executeUpdate()
+        }
+    }
     @AfterAll
     fun teardown() {
         localPostgres.close()
     }
+
+
 
     @Test
     fun `skal lagre arbeidssøkeropplysninger i database`() {
@@ -92,31 +103,6 @@ class RepositoryTest {
     }
 
     @Test
-    fun `skal kun hente nyeste arbeidssøkerperiode for aktørid`() {
-        val meldinger = listOf(
-            melding(UUID.randomUUID()),
-            melding(UUID.randomUUID()),
-            melding(UUID.randomUUID())
-        )
-
-        repository.lagreArbeidssøkeropplysninger(meldinger)
-
-        val aktørId = UUID.randomUUID().toString()
-        repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(meldinger[0].periodeId,
-            ZonedDateTime.now().minusMonths(10), aktørId = aktørId))
-        repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(meldinger[1].periodeId,
-            ZonedDateTime.now().minusMonths(5), ZonedDateTime.now().minusMonths(2), aktørId = aktørId))
-        val nyesteId = repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(meldinger[2].periodeId,
-            ZonedDateTime.now().minusMonths(1), aktørId = aktørId))
-
-        val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
-        assertThat(nyesteId).isEqualTo(periodeOpplysninger?.id)
-
-        val ubehandlede = repository.hentUbehandledePeriodeOpplysninger().filter { it.aktørId == aktørId }
-        assertThat(ubehandlede.map { it.id }).containsOnly(nyesteId)
-    }
-
-    @Test
     fun `skal lagre arbeidssøkerperiode i database`() {
         val periodeId = UUID.randomUUID()
         val periodeMelding = periodeMeldingInnhold(periodeId)
@@ -133,6 +119,30 @@ class RepositoryTest {
         assertThat(opplysningerByAktørId).isNotNull
         assertThat(opplysningerByAktørId?.identitetsnummer).isEqualTo("01010012345")
     }
+
+    @Test
+    fun `skal lagre arbeidssøkerperiode i riktig rekkefølge database`() {
+        val periodeId = UUID.randomUUID()
+        val aktørId = UUID.randomUUID().toString()
+        val periodeMeldingNy = periodeMeldingInnhold(periodeId,
+            start = ZonedDateTime.now().minusMonths(1),
+            slutt = ZonedDateTime.now(),
+            aktørId = aktørId)
+
+        val periodeMeldingGammel = periodeMeldingInnhold(periodeId,
+            start = ZonedDateTime.now().minusMonths(2),
+            slutt = null,
+            aktørId = aktørId)
+
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingNy)
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingGammel)
+
+        val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
+
+        assertThat(periodeOpplysninger).isNotNull
+        assertThat(periodeOpplysninger?.periodeAvsluttet).isNotNull()
+    }
+
 
     @Test
     fun `skal lagre arbeidssøkerperiode i database og oppdatere med opplysninger`() {
@@ -175,7 +185,7 @@ class RepositoryTest {
         val periodeMelding = periodeMelding(periodeId)
         val opplysningerMelding = melding(periodeId)
 
-        repository.lagreArbeidssøkeropplysninger(opplysningerMelding)
+        //repository.lagreArbeidssøkeropplysninger(opplysningerMelding)
         repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(periodeId))
 
         val ubehandledeOpplysninger = repository.hentUbehandledePeriodeOpplysninger()

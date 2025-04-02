@@ -46,7 +46,7 @@ class Repository(private val datasource: DataSource) {
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
             val sql = """
-                insert into periodemelding(periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato) 
+                insert into periodemelding as p(periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato) 
                 values(?, ?, ?, ?, ?, ?)
                 on conflict(periode_id) do update
                 set periode_startet = EXCLUDED.periode_startet,
@@ -55,6 +55,8 @@ class Repository(private val datasource: DataSource) {
                     periode_avsluttet = EXCLUDED.periode_avsluttet,
                     periode_mottatt_dato = EXCLUDED.periode_mottatt_dato,
                     behandlet_dato = null
+                where 
+                    p.periode_startet is null or p.periode_startet < EXCLUDED.periode_startet
                 returning id
             """.trimIndent()
             conn.prepareStatement(sql).apply {
@@ -146,14 +148,18 @@ class Repository(private val datasource: DataSource) {
                          helsetilstand_hindrer_arbeid,
                          andre_forhold_hindrer_arbeid
                 from periodemelding
-                where id in (select id from nyeste_asr_periode where aktor_id = ?)
+                where aktor_id = ?
             """.trimIndent()
             conn.prepareStatement(sql).apply {
                 setString(1, aktørId)
             }.use { statement ->
                 val rs = statement.executeQuery()
                 if (rs.next()) {
-                    return PeriodeOpplysninger.fraDatabase(rs)
+                    val opplysninger = PeriodeOpplysninger.fraDatabase(rs)
+                    if (rs.next()) {
+                        secure(log).error("Fant mer enn en aktiv periode for aktørId $aktørId")
+                    }
+                    return opplysninger
                 } else {
                     return null
                 }
@@ -217,8 +223,8 @@ class Repository(private val datasource: DataSource) {
                          andre_forhold_hindrer_arbeid
                 from periodemelding
                 where 
-                  id in (select id from nyeste_asr_periode 
-                    where behandlet_dato is null)
+                  behandlet_dato is null 
+                  and periode_startet is not null
                   and aktor_id is not null
                 order by periode_mottatt_dato asc
                 limit ?
