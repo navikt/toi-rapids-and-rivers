@@ -27,11 +27,22 @@ class Repository(private val datasource: DataSource) {
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+
+        // Disse periodene skal ende opp som at de ikke er aktive
+        private val loggbarePerioder = listOf(UUID.fromString("c097fde5-2138-4f59-8c27-d1cd2ee99bd4"),
+            UUID.fromString("78b5f7f1-e227-4527-8347-20306dab841a"),
+            UUID.fromString("8e508dc8-d7c6-4757-9b13-d9d2eee91b9e"),
+            UUID.fromString("e45e30f9-ea0d-4ab3-a7ca-eaae9092cf1c"),
+        )
+
     }
 
     fun lagreOppfølgingsperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
-        secure(log).info("Mottok rapid: $rapidOppfølgingsperiode")
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
+        if (loggbarePerioder.contains(periode.periodeId))
+            secure(log).info("Mottok oppfølgingsperiode ${periode.periodeId} for ${periode.aktørId}. " +
+                "Start ${periode.startet} avslutt: ${periode.avsluttet}")
+
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
             val sql = """
@@ -99,7 +110,7 @@ class Repository(private val datasource: DataSource) {
         arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker,
         conn: Connection
     ): Long {
-        secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
+        //secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
 
         // Vi endrer ikke behandlet_dato siden vi ikke bruker disse opplysnigene i synlighetsmotoren
         val sql = """
