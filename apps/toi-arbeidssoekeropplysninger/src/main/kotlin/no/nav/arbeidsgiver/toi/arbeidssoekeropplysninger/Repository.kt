@@ -286,9 +286,9 @@ data class PeriodeOpplysninger(
                 ?.atZone(ZoneId.of("Europe/Oslo")),
             behandletDato = rs.getTimestamp("behandlet_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             helsetilstandHindrerArbeid = rs.getBoolean("helsetilstand_hindrer_arbeid")
-                .let { if (rs.wasNull()) null else it },
+                .let { if (rs.wasNull()) false else it },
             andreForholdHindrerArbeid = rs.getBoolean("andre_forhold_hindrer_arbeid")
-                .let { if (rs.wasNull()) null else it }
+                .let { if (rs.wasNull()) false else it }
         )
     }
 }
