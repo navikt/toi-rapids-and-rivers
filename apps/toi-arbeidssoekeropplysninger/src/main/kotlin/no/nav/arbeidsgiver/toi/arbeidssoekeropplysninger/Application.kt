@@ -5,8 +5,6 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.paw.arbeidssokerregisteret.api.v4.OpplysningerOmArbeidssoeker
-import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.flywaydb.core.Flyway
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,12 +25,8 @@ fun main() {
     val repository = Repository(dataSource)
 
     RapidApplication.create(System.getenv()).apply {
-        val consumer = { KafkaConsumer<Long, OpplysningerOmArbeidssoeker>(consumerConfig) }
-
-        ArbeidssoekeropplysningerBehovLytter(this, repository) // Vi kan slutte å lytte på disse opplysningene
+        ArbeidssoekeropplysningerBehovLytter(this, repository)
         ArbeidssoekerperiodeRapidLytter(this, repository)
-        //val arbeidssoekeropplysningerLytter = ArbeidssoekeropplysningerLytter(consumer, repository)
-        //register(arbeidssoekeropplysningerLytter)
 
         val httpClient: HttpClient = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)

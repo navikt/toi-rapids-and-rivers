@@ -27,21 +27,12 @@ class Repository(private val datasource: DataSource) {
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
-
-        // Disse periodene skal ende opp som at de ikke er aktive
-        private val loggbarePerioder = listOf(UUID.fromString("c097fde5-2138-4f59-8c27-d1cd2ee99bd4"),
-            UUID.fromString("78b5f7f1-e227-4527-8347-20306dab841a"),
-            UUID.fromString("8e508dc8-d7c6-4757-9b13-d9d2eee91b9e"),
-            UUID.fromString("e45e30f9-ea0d-4ab3-a7ca-eaae9092cf1c"),
-        )
-
     }
 
-    fun lagreOppfølgingsperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
+    fun lagreArbeidssøkerperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
-        if (loggbarePerioder.contains(periode.periodeId))
-            secure(log).info("Mottok oppfølgingsperiode ${periode.periodeId} for ${periode.aktørId}. " +
-                "Start ${periode.startet} avslutt: ${periode.avsluttet}")
+        secure(log).info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
+            "Start ${periode.startet} avslutt: ${periode.avsluttet}")
 
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
@@ -80,75 +71,14 @@ class Repository(private val datasource: DataSource) {
         return 0
     }
 
-    fun lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger: List<OpplysningerOmArbeidssoeker>): List<Long> {
-        val ider = mutableListOf<Long>()
-        // NB: Det hadde vært en bedre løsning å bruke TxTemplate fra pam-cv-api-gcp
-        datasource.connection.use { conn ->
-            val autoCommit = conn.autoCommit
-            try {
-                conn.autoCommit = false
-                arbeidssokerOpplysninger.forEach {
-                    ider.add(lagreArbeidssøkeropplysninger(it, conn))
-                }
-                conn.commit()
-            } catch (t: Throwable) {
-                conn.rollback()
-                throw t
-            } finally {
-                conn.autoCommit = autoCommit
-            }
-        }
-
-        return ider
-    }
-
-    fun lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker): Long {
-        datasource.connection.use { conn ->
-            return lagreArbeidssøkeropplysninger(arbeidssokerOpplysninger, conn)
-        }
-    }
-
-    private fun lagreArbeidssøkeropplysninger(
-        arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker,
-        conn: Connection
-    ): Long {
-        //secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
-
-        // Vi endrer ikke behandlet_dato siden vi ikke bruker disse opplysnigene i synlighetsmotoren
-        val sql = """
-            insert into periodemelding(periode_id, helsetilstand_hindrer_arbeid, andre_forhold_hindrer_arbeid, opplysninger_mottatt_dato) 
-            values(?, ?, ?, ?)
-            on conflict(periode_id) do update
-            set helsetilstand_hindrer_arbeid = EXCLUDED.helsetilstand_hindrer_arbeid,
-                andre_forhold_hindrer_arbeid = EXCLUDED.andre_forhold_hindrer_arbeid,
-                opplysninger_mottatt_dato = EXCLUDED.opplysninger_mottatt_dato
-            returning id
-        """.trimIndent()
-        conn.prepareStatement(sql).apply {
-            setObject(1, arbeidssokerOpplysninger.periodeId)
-            setBoolean(2, arbeidssokerOpplysninger.helse?.helsetilstandHindrerArbeid == JaNeiVetIkke.JA)
-            setBoolean(3, arbeidssokerOpplysninger.annet?.andreForholdHindrerArbeid == JaNeiVetIkke.JA)
-            setTimestamp(4, Timestamp.from(Instant.now()))
-        }.use { statement ->
-            val rs = statement.executeQuery()
-            if (rs.next()) {
-                val id = rs.getLong(1)
-                return id
-            }
-        }
-        return 0
-    }
-
     fun hentPeriodeOpplysninger(aktørId: String): PeriodeOpplysninger? {
         datasource.connection.use { conn ->
             val sql = """
                 select id, periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato,
-                         opplysninger_mottatt_dato,
-                         behandlet_dato,
-                         helsetilstand_hindrer_arbeid,
-                         andre_forhold_hindrer_arbeid
+                         behandlet_dato
                 from periodemelding
                 where aktor_id = ?
+                order by periode_startet desc
             """.trimIndent()
             conn.prepareStatement(sql).apply {
                 setString(1, aktørId)
@@ -171,10 +101,7 @@ class Repository(private val datasource: DataSource) {
         datasource.connection.use { conn ->
             val sql = """
                 select id, periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato,
-                         opplysninger_mottatt_dato,
-                         behandlet_dato,
-                         helsetilstand_hindrer_arbeid,
-                         andre_forhold_hindrer_arbeid
+                         behandlet_dato
                 from periodemelding
                 where periode_id=?
             """.trimIndent()
@@ -217,10 +144,7 @@ class Repository(private val datasource: DataSource) {
         datasource.connection.use { conn ->
             val sql = """
                 select id, periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato,
-                         opplysninger_mottatt_dato,
-                         behandlet_dato,
-                         helsetilstand_hindrer_arbeid,
-                         andre_forhold_hindrer_arbeid
+                         behandlet_dato
                 from periodemelding
                 where 
                   behandlet_dato is null 
@@ -264,14 +188,8 @@ data class PeriodeOpplysninger(
     val periodeAvsluttet: ZonedDateTime? = null,
     @JsonProperty("periode_mottatt")
     val periodeMottattDato: ZonedDateTime? = null,
-    @JsonProperty("opplysninger_mottatt")
-    val opplysningerMottattDato: ZonedDateTime? = null,
     @JsonProperty("behandlet_dato")
-    val behandletDato: ZonedDateTime? = null, // Tidspunkt for når komplett melding er publisert på rapid
-    @JsonProperty("helsetilstand_hindrer_arbeid")
-    val helsetilstandHindrerArbeid: Boolean? = null,
-    @JsonProperty("andre_forhold_hindrer_arbeid")
-    val andreForholdHindrerArbeid: Boolean? = null
+    val behandletDato: ZonedDateTime? = null // Tidspunkt for når komplett melding er publisert på rapid
 ) {
     companion object {
         fun fraDatabase(rs: ResultSet) = PeriodeOpplysninger(
@@ -282,13 +200,7 @@ data class PeriodeOpplysninger(
             periodeStartet = rs.getTimestamp("periode_startet")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             periodeAvsluttet = rs.getTimestamp("periode_avsluttet")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             periodeMottattDato = rs.getTimestamp("periode_mottatt_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
-            opplysningerMottattDato = rs.getTimestamp("opplysninger_mottatt_dato")?.toInstant()
-                ?.atZone(ZoneId.of("Europe/Oslo")),
             behandletDato = rs.getTimestamp("behandlet_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
-            helsetilstandHindrerArbeid = rs.getBoolean("helsetilstand_hindrer_arbeid")
-                .let { if (rs.wasNull()) false else it },
-            andreForholdHindrerArbeid = rs.getBoolean("andre_forhold_hindrer_arbeid")
-                .let { if (rs.wasNull()) false else it }
         )
     }
 }

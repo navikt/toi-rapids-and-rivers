@@ -49,9 +49,6 @@ class PubliserOpplysningerJobbTest {
             identitetsnummer = "01010012345",
             aktørId = "1234566789",
             periodeStartet = ZonedDateTime.now().minusMonths(2),
-            periodeMottattDato = ZonedDateTime.now(),
-            opplysningerMottattDato = ZonedDateTime.now(),
-            helsetilstandHindrerArbeid = true,
-            andreForholdHindrerArbeid = false
+            periodeMottattDato = ZonedDateTime.now()
         )
 }

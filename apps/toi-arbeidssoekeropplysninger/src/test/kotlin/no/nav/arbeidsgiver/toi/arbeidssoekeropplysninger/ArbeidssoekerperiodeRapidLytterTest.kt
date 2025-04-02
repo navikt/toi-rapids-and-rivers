@@ -52,17 +52,13 @@ class ArbeidssoekerperiodeRapidLytterTest {
         val meldingMedAktørId = rapidPeriodeMelding(periodeId.toString(), "123456789")
         val rapid = TestRapid()
 
-        val arbeidssoekeropplysningerLytter = ArbeidssoekerperiodeRapidLytter(rapid, repository)
-        println("Sender: $meldingUtenAktørId")
+        ArbeidssoekerperiodeRapidLytter(rapid, repository)
         rapid.sendTestMessage(meldingUtenAktørId)
-        println("Sender: $meldingMedAktørId")
         rapid.sendTestMessage(meldingMedAktørId)
 
-        // Bør vurdere å bruke mock her og så heller teste all repository i egen test?
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(periodeId)
         assertThat(periodeOpplysninger).isNotNull
         assertThat(periodeOpplysninger!!.identitetsnummer).isEqualTo("01010012345")
-        println(periodeOpplysninger)
     }
 
     private fun rapidPeriodeMelding(periodeId: String, aktørId: String? = null): String = StringBuilder(

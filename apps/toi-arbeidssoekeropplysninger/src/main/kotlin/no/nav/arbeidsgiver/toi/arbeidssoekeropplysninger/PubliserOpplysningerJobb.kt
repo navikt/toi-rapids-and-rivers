@@ -56,9 +56,7 @@ class PubliserOpplysningerJobb(
                     repository.behandlePeriodeOpplysning(opplysning.periodeId)
                     secure(log).info("""
                         Publiserte opplysning om ${opplysning.identitetsnummer} start: ${opplysning.periodeStartet}
-                        stopp ${opplysning.periodeAvsluttet} mottatt: ${opplysning.opplysningerMottattDato}
-                        helsetilstandHindrerArbeid: ${opplysning.helsetilstandHindrerArbeid}
-                        andreForholdHindrerArbeid: $opplysning.andreForholdHindrerArbeid
+                        stopp ${opplysning.periodeAvsluttet} 
                         """.trimIndent()
                     )
                 }
@@ -80,6 +78,6 @@ class PubliserOpplysningerJobb(
         )
 
         val nyMelding = JsonMessage.newMessage(melding)
-        rapidConnection.publish(nyMelding.toJson())
+        rapidConnection.publish(opplysning.aktørId, nyMelding.toJson())
     }
 }
