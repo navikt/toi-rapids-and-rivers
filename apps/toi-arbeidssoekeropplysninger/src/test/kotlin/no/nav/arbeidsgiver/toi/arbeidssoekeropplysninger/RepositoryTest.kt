@@ -112,7 +112,6 @@ class RepositoryTest {
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(periodeId)
 
         assertThat(periodeOpplysninger).isNotNull
-        assertThat(periodeOpplysninger?.helsetilstandHindrerArbeid).isNull()
         assertThat(periodeOpplysninger?.identitetsnummer).isEqualTo("01010012345")
 
         val opplysningerByAktørId = repository.hentPeriodeOpplysninger("123456789")
