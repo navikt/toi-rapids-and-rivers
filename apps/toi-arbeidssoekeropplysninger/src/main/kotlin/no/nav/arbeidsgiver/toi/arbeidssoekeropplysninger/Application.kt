@@ -29,7 +29,7 @@ fun main() {
     RapidApplication.create(System.getenv()).apply {
         val consumer = { KafkaConsumer<Long, OpplysningerOmArbeidssoeker>(consumerConfig) }
 
-        ArbeidssoekeropplysningerBehovLytter(this, repository)
+        //ArbeidssoekeropplysningerBehovLytter(this, repository) // Vi kan slutte å lytte på disse opplysningene
         ArbeidssoekerperiodeRapidLytter(this, repository)
         val arbeidssoekeropplysningerLytter = ArbeidssoekeropplysningerLytter(consumer, repository)
         register(arbeidssoekeropplysningerLytter)

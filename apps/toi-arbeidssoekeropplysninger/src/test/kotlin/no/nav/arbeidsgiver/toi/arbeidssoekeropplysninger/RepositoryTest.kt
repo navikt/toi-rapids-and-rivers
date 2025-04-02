@@ -16,13 +16,17 @@ import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.utility.DockerImageName
 import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
+import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RepositoryTest {
@@ -42,20 +46,29 @@ class RepositoryTest {
         }
 
     lateinit var repository: Repository
+    lateinit var dataSource: DataSource
 
     @BeforeAll
     fun init() {
         val databaseConfig = DatabaseConfig(localEnv, meterRegistry)
-        val dataSource = databaseConfig.lagDatasource()
+        dataSource = databaseConfig.lagDatasource()
         kjørFlywayMigreringer(dataSource)
 
         repository = Repository(dataSource)
     }
 
+    @BeforeEach
+    fun tømDatabase() {
+        dataSource.connection.use { conn ->
+            conn.prepareStatement("truncate table periodemelding").executeUpdate()
+        }
+    }
     @AfterAll
     fun teardown() {
         localPostgres.close()
     }
+
+
 
     @Test
     fun `skal lagre arbeidssøkeropplysninger i database`() {
@@ -89,7 +102,6 @@ class RepositoryTest {
         }
     }
 
-
     @Test
     fun `skal lagre arbeidssøkerperiode i database`() {
         val periodeId = UUID.randomUUID()
@@ -107,6 +119,30 @@ class RepositoryTest {
         assertThat(opplysningerByAktørId).isNotNull
         assertThat(opplysningerByAktørId?.identitetsnummer).isEqualTo("01010012345")
     }
+
+    @Test
+    fun `skal lagre arbeidssøkerperiode i riktig rekkefølge database`() {
+        val periodeId = UUID.randomUUID()
+        val aktørId = UUID.randomUUID().toString()
+        val periodeMeldingNy = periodeMeldingInnhold(periodeId,
+            start = ZonedDateTime.now().minusMonths(1),
+            slutt = ZonedDateTime.now(),
+            aktørId = aktørId)
+
+        val periodeMeldingGammel = periodeMeldingInnhold(periodeId,
+            start = ZonedDateTime.now().minusMonths(2),
+            slutt = null,
+            aktørId = aktørId)
+
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingNy)
+        repository.lagreOppfølgingsperiodemelding(periodeMeldingGammel)
+
+        val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
+
+        assertThat(periodeOpplysninger).isNotNull
+        assertThat(periodeOpplysninger?.periodeAvsluttet).isNotNull()
+    }
+
 
     @Test
     fun `skal lagre arbeidssøkerperiode i database og oppdatere med opplysninger`() {
@@ -149,7 +185,7 @@ class RepositoryTest {
         val periodeMelding = periodeMelding(periodeId)
         val opplysningerMelding = melding(periodeId)
 
-        repository.lagreArbeidssøkeropplysninger(opplysningerMelding)
+        //repository.lagreArbeidssøkeropplysninger(opplysningerMelding)
         repository.lagreOppfølgingsperiodemelding(periodeMeldingInnhold(periodeId))
 
         val ubehandledeOpplysninger = repository.hentUbehandledePeriodeOpplysninger()
@@ -184,16 +220,25 @@ class RepositoryTest {
         )
         .build()
 
-    private fun periodeMeldingInnhold(periodeId: UUID): JsonNode = jacksonObjectMapper().readTree("""
-        {
-            "periode_id": "$periodeId",
-            "identitetsnummer": "01010012345",
-            "aktørId": "123456789",
-            "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
-            "avsluttet": null
-          }
-        """.trimIndent()
-    )
+    private fun periodeMeldingInnhold(periodeId: UUID,
+                                      start: ZonedDateTime = ZonedDateTime.parse("2025-04-07T15:00:00.0+01:00"),
+                                      slutt: ZonedDateTime? = null,
+                                      aktørId: String = "123456789"): JsonNode {
+        val startStr = start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val sluttStr = slutt?.let{'"'.plus(it.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)).plus('"')} ?: "null"
+
+        return jacksonObjectMapper().readTree("""
+            {
+                "periode_id": "$periodeId",
+                "identitetsnummer": "01010012345",
+                "aktørId": "$aktørId",
+                "startet": "$startStr",
+                "avsluttet": $sluttStr
+              }
+            """.trimIndent()
+        )
+    }
+
     private fun periodeMelding(periodeId: UUID): JsonNode = jacksonObjectMapper().readTree("""
         {
           "@event_name": "arbeidssokerperiode",

@@ -27,15 +27,26 @@ class Repository(private val datasource: DataSource) {
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+
+        // Disse periodene skal ende opp som at de ikke er aktive
+        private val loggbarePerioder = listOf(UUID.fromString("c097fde5-2138-4f59-8c27-d1cd2ee99bd4"),
+            UUID.fromString("78b5f7f1-e227-4527-8347-20306dab841a"),
+            UUID.fromString("8e508dc8-d7c6-4757-9b13-d9d2eee91b9e"),
+            UUID.fromString("e45e30f9-ea0d-4ab3-a7ca-eaae9092cf1c"),
+        )
+
     }
 
     fun lagreOppfølgingsperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
-        secure(log).info("Mottok rapid: $rapidOppfølgingsperiode")
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
+        if (loggbarePerioder.contains(periode.periodeId))
+            secure(log).info("Mottok oppfølgingsperiode ${periode.periodeId} for ${periode.aktørId}. " +
+                "Start ${periode.startet} avslutt: ${periode.avsluttet}")
+
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
         datasource.connection.use { conn ->
             val sql = """
-                insert into periodemelding(periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato) 
+                insert into periodemelding as p(periode_id, identitetsnummer, aktor_id, periode_startet, periode_avsluttet, periode_mottatt_dato) 
                 values(?, ?, ?, ?, ?, ?)
                 on conflict(periode_id) do update
                 set periode_startet = EXCLUDED.periode_startet,
@@ -44,6 +55,8 @@ class Repository(private val datasource: DataSource) {
                     periode_avsluttet = EXCLUDED.periode_avsluttet,
                     periode_mottatt_dato = EXCLUDED.periode_mottatt_dato,
                     behandlet_dato = null
+                where 
+                    p.periode_startet is null or p.periode_startet < EXCLUDED.periode_startet
                 returning id
             """.trimIndent()
             conn.prepareStatement(sql).apply {
@@ -99,17 +112,16 @@ class Repository(private val datasource: DataSource) {
         arbeidssokerOpplysninger: OpplysningerOmArbeidssoeker,
         conn: Connection
     ): Long {
-        secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
+        //secure(log).info("Mottok rapid: $arbeidssokerOpplysninger")
 
-        // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid
+        // Vi endrer ikke behandlet_dato siden vi ikke bruker disse opplysnigene i synlighetsmotoren
         val sql = """
             insert into periodemelding(periode_id, helsetilstand_hindrer_arbeid, andre_forhold_hindrer_arbeid, opplysninger_mottatt_dato) 
             values(?, ?, ?, ?)
             on conflict(periode_id) do update
             set helsetilstand_hindrer_arbeid = EXCLUDED.helsetilstand_hindrer_arbeid,
                 andre_forhold_hindrer_arbeid = EXCLUDED.andre_forhold_hindrer_arbeid,
-                opplysninger_mottatt_dato = EXCLUDED.opplysninger_mottatt_dato,
-                behandlet_dato = null
+                opplysninger_mottatt_dato = EXCLUDED.opplysninger_mottatt_dato
             returning id
         """.trimIndent()
         conn.prepareStatement(sql).apply {
@@ -136,14 +148,18 @@ class Repository(private val datasource: DataSource) {
                          helsetilstand_hindrer_arbeid,
                          andre_forhold_hindrer_arbeid
                 from periodemelding
-                where aktor_id=?
+                where aktor_id = ?
             """.trimIndent()
             conn.prepareStatement(sql).apply {
                 setString(1, aktørId)
             }.use { statement ->
                 val rs = statement.executeQuery()
                 if (rs.next()) {
-                    return PeriodeOpplysninger.fraDatabase(rs)
+                    val opplysninger = PeriodeOpplysninger.fraDatabase(rs)
+                    if (rs.next()) {
+                        secure(log).error("Fant mer enn en aktiv periode for aktørId $aktørId")
+                    }
+                    return opplysninger
                 } else {
                     return null
                 }
@@ -207,7 +223,8 @@ class Repository(private val datasource: DataSource) {
                          andre_forhold_hindrer_arbeid
                 from periodemelding
                 where 
-                  behandlet_dato is null and opplysninger_mottatt_dato is not null and identitetsnummer is not null
+                  behandlet_dato is null 
+                  and periode_startet is not null
                   and aktor_id is not null
                 order by periode_mottatt_dato asc
                 limit ?
@@ -269,9 +286,9 @@ data class PeriodeOpplysninger(
                 ?.atZone(ZoneId.of("Europe/Oslo")),
             behandletDato = rs.getTimestamp("behandlet_dato")?.toInstant()?.atZone(ZoneId.of("Europe/Oslo")),
             helsetilstandHindrerArbeid = rs.getBoolean("helsetilstand_hindrer_arbeid")
-                .let { if (rs.wasNull()) null else it },
+                .let { if (rs.wasNull()) false else it },
             andreForholdHindrerArbeid = rs.getBoolean("andre_forhold_hindrer_arbeid")
-                .let { if (rs.wasNull()) null else it }
+                .let { if (rs.wasNull()) false else it }
         )
     }
 }
