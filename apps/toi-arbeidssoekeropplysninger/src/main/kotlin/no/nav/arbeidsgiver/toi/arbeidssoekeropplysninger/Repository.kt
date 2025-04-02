@@ -56,7 +56,7 @@ class Repository(private val datasource: DataSource) {
                     periode_mottatt_dato = EXCLUDED.periode_mottatt_dato,
                     behandlet_dato = null
                 where 
-                    p.periode_startet is null or p.periode_startet < EXCLUDED.periode_startet
+                    p.periode_avsluttet is null
                 returning id
             """.trimIndent()
             conn.prepareStatement(sql).apply {
