@@ -150,7 +150,7 @@ class Repository(private val datasource: DataSource) {
                   behandlet_dato is null 
                   and periode_startet is not null
                   and aktor_id is not null
-                order by periode_mottatt_dato asc
+                order by periode_startet asc
                 limit ?
             """.trimIndent()
             conn.prepareStatement(sql).apply {
