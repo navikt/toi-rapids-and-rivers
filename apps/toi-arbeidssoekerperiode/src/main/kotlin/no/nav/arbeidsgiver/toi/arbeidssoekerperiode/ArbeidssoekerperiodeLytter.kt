@@ -52,8 +52,7 @@ class ArbeidssoekerperiodeLytter(
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
                             log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
-                            if (loggbarePerioder.contains(periode.periodeId))
-                                secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
+                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
 
                             val melding = mapOf(
                                 "fodselsnummer" to periode.identitetsnummer,
@@ -66,7 +65,6 @@ class ArbeidssoekerperiodeLytter(
                         }
                         consumer.commitSync()
                     } catch (e: RetriableException) {
-                        // TODO: Er dette riktig? Vil gjentakende consumer.poll() hente de samme data hvis vi ikke tar commit mellom?
                         log.warn("Fikk en retriable exception, prøver på nytt. ${e.message}", e)
                     }
                 }

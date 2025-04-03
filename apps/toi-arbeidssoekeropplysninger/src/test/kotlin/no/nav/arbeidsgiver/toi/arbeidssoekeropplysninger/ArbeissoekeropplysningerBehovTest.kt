@@ -54,7 +54,7 @@ class ArbeissoekeropplysningerBehovTest {
 
         repository = Repository(dataSource)
         val periode = jacksonMapper.valueToTree<JsonNode>(Periode(UUID.randomUUID(), aktørId, aktørId, ZonedDateTime.now(), null))
-        repository.lagreOppfølgingsperiodemelding(periode)
+        repository.lagreArbeidssøkerperiodemelding(periode)
         ArbeidssoekeropplysningerBehovLytter(testRapid, repository)
         ArbeidssoekerperiodeRapidLytter(testRapid, repository)
     }
