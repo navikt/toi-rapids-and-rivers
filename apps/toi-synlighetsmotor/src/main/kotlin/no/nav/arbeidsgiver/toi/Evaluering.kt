@@ -40,8 +40,6 @@ class Evaluering(
     val erIkkeKvp: BooleanVerdi,
     val harIkkeAdressebeskyttelse: BooleanVerdi,
     val erArbeidssøker: BooleanVerdi,
-    val erIkkeAndreForholdHindrerArbeid: BooleanVerdi,
-    val erIkkeHelseHindrerArbeid: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
     private val felterBortsettFraAdressebeskyttelse = listOf(
@@ -56,14 +54,12 @@ class Evaluering(
         erIkkeSperretAnsatt,
         erIkkeDoed,
         erIkkeKvp,
-        //erArbeidssøker, // Disse feltene skal foreløpig ikke være en del av evalueringen, fjern fra harAltBortsettFraAdressebeskyttelse når de implementeres
-        //erIkkeAndreForholdHindrerArbeid,
-        //erIkkeHelseHindrerArbeid
+        //erArbeidssøker // Disse feltene skal foreløpig ikke være en del av evalueringen, fjern fra harAltBortsettFraAdressebeskyttelse når de implementeres
     )
 
     private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
     val harAltBortsettFraAdressebeskyttelse =
-        (felterBortsettFraAdressebeskyttelse + erArbeidssøker + erIkkeAndreForholdHindrerArbeid + erIkkeHelseHindrerArbeid)
+        (felterBortsettFraAdressebeskyttelse + erArbeidssøker)
             .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
@@ -81,9 +77,7 @@ class Evaluering(
         harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
         erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
         erIkkeDoed = erIkkeDoed.default(false),
-        erArbeidssøker = erArbeidssøker.default(false),
-        erIkkeAndreForholdHindrerArbeid = erIkkeAndreForholdHindrerArbeid.default(false),
-        erIkkeHelseHindrerArbeid = erIkkeHelseHindrerArbeid.default(false)
+        erArbeidssøker = erArbeidssøker.default(false)
     )
 
 
@@ -123,9 +117,7 @@ data class EvalueringUtenDiskresjonskode(
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
     val erIkkeDoed: Boolean,
-    val erArbeidssøker: Boolean,
-    val erIkkeAndreForholdHindrerArbeid: Boolean,
-    val erIkkeHelseHindrerArbeid: Boolean
+    val erArbeidssøker: Boolean
     ) {
     companion object {
         fun medAlleVerdierFalse() = EvalueringUtenDiskresjonskode(
@@ -138,9 +130,7 @@ data class EvalueringUtenDiskresjonskode(
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
             erIkkeDoed = false,
-            erArbeidssøker = false,
-            erIkkeAndreForholdHindrerArbeid = false,
-            erIkkeHelseHindrerArbeid = false
+            erArbeidssøker = false
         )
     }
 }

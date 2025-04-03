@@ -33,7 +33,7 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
-        ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger(true, true)),
+        ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
     }
 
     private val adressebeskyttelseFeltNavn = "adressebeskyttelse"

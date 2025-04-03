@@ -43,14 +43,10 @@ data class Kandidat(
         erIkkeKvp = !erKvp,
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
         erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
-        erIkkeAndreForholdHindrerArbeid = arbeidssøkeropplysninger.hvisIkkeNullOg(::erIkkeAndreForholdHindrerArbeid),
-        erIkkeHelseHindrerArbeid = arbeidssøkeropplysninger.hvisIkkeNullOg(::erIkkeHelseHindrerArbeid),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
     private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
-    private fun erIkkeAndreForholdHindrerArbeid(it: Arbeidssøkeropplysninger) = it.andreForholdHindrerArbeid?.let { ! it } ?: true
-    private fun erIkkeHelseHindrerArbeid(it: Arbeidssøkeropplysninger) = it.helseHindrerArbeid?.let { ! it } ?: true
     private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
     private fun erIkkeArenaFritattKandidatsøk(it: ArenaFritattKandidatsøk) = !it.erFritattKandidatsøk
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
@@ -172,11 +168,7 @@ data class Arbeidssøkeropplysninger(
     @JsonProperty("periode_startet")
     val periodeStartet: ZonedDateTime? = null,
     @JsonProperty("periode_avsluttet")
-    val periodeAvsluttet: ZonedDateTime? = null,
-    @JsonProperty("helsetilstand_hindrer_arbeid")
-    val helseHindrerArbeid: Boolean?,
-    @JsonProperty("andre_forhold_hindrer_arbeid")
-    val andreForholdHindrerArbeid: Boolean?
+    val periodeAvsluttet: ZonedDateTime? = null
 ) {
     fun erArbeidssøker() =
         periodeStartet != null && periodeAvsluttet == null
