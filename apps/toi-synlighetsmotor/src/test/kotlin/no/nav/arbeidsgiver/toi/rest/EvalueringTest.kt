@@ -237,6 +237,7 @@ private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjon
     harRiktigFormidlingsgruppe = true,
     erIkkeSperretAnsatt = true,
     erIkkeDoed = true,
+    erArbeidssøker = true,
     erFerdigBeregnet = true
 )
 
@@ -250,5 +251,6 @@ private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjo
     harRiktigFormidlingsgruppe = false,
     erIkkeSperretAnsatt = false,
     erIkkeDoed = false,
+    erArbeidssøker = false,
     erFerdigBeregnet = false
 )

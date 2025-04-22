@@ -49,6 +49,7 @@ private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDis
     harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
     erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
     erIkkeDoed = erIkkeDoed.default(false),
+    erArbeidssøker = erArbeidssøker.default(false),
     erFerdigBeregnet = erFerdigBeregnet
 )
 
@@ -62,6 +63,7 @@ data class EvalueringUtenDiskresjonskodeDTO(
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
     val erIkkeDoed: Boolean,
+    val erArbeidssøker: Boolean,
     val erFerdigBeregnet: Boolean
 ) {
     companion object {
@@ -75,6 +77,7 @@ data class EvalueringUtenDiskresjonskodeDTO(
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
             erIkkeDoed = false,
+            erArbeidssøker = false,
             erFerdigBeregnet = false
         )
     }
