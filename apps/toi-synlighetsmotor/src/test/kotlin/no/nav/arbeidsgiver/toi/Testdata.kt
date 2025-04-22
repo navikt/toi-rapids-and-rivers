@@ -232,15 +232,17 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun arbeidssøkeropplysninger() =
-            """
-            "arbeidssokeropplysninger": {
-                "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "identitetsnummer": "01010012345",
-                "periode_startet": "2020-10-30T14:15:38+01:00",
-                "periode_avsluttet": null
-            }
-        """.trimIndent()
+        fun arbeidssøkeropplysninger(aktiv: Boolean = true) :String {
+            val avsluttet = if (aktiv) "null" else "\"2020-10-31T14:15:38+01:00\""
+            return """
+                "arbeidssokeropplysninger": {
+                    "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
+                    "identitetsnummer": "01010012345",
+                    "periode_startet": "2020-10-30T14:15:38+01:00",
+                    "periode_avsluttet": $avsluttet
+                }
+            """.trimIndent()
+        }
 
         fun avsluttetOppfølgingsperiode() =
             """

@@ -49,17 +49,17 @@ class Evaluering(
         maaIkkeBehandleTidligereCv,
         arenaIkkeFritattKandidatsøk,
         erUnderOppfoelging,
-        harRiktigFormidlingsgruppe,
+        //harRiktigFormidlingsgruppe, // ARBS skal ikke lenger være en del av evalueringen. Kommentert ut frem til vi er sikre på at det kan slettes helt
         erIkkeKode6eller7,
         erIkkeSperretAnsatt,
         erIkkeDoed,
         erIkkeKvp,
-        //erArbeidssøker // Disse feltene skal foreløpig ikke være en del av evalueringen, fjern fra harAltBortsettFraAdressebeskyttelse når de implementeres
+        erArbeidssøker
     )
 
     private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
     val harAltBortsettFraAdressebeskyttelse =
-        (felterBortsettFraAdressebeskyttelse + erArbeidssøker)
+        (felterBortsettFraAdressebeskyttelse + harRiktigFormidlingsgruppe)
             .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig

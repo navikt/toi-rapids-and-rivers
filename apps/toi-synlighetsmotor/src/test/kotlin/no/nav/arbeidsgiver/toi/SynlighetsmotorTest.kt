@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
@@ -20,6 +21,7 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -184,19 +186,27 @@ class SynlighetsmotorTest {
 
 
 
+    @Test
+    fun `om Person ikke er aktiv i arbeidssøkerregisteret skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidssøkeropplysninger = arbeidssøkeropplysninger(aktiv = false)),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
+    )
 
+    @Disabled("Testen kan slettes når vi er klare for å slette bruk av ARBS")
     @Test
     fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
     )
 
+    @Disabled("Testen kan slettes når vi er klare for å slette bruk av ARBS")
     @Test
     fun `om Person har formidlingsgruppe IARBS skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IARBS")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
+    @Disabled("Testen kan slettes når vi er klare for å slette bruk av ARBS")
     @Test
     fun `om Person har feil formidlingsgruppe skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS")),
