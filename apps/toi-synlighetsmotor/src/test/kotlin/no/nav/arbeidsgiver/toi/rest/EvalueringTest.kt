@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.arbeidsgiver.toi.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
