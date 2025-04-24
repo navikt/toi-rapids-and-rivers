@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach

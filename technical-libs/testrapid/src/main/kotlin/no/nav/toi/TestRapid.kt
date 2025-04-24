@@ -1,20 +1,14 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.toi
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.KeyMessageContext
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 
-class TestRapid(private val meterRegistry: MeterRegistry = SimpleMeterRegistry(), private val maxTriggedeMeldinger: Int = 10) :
+class TestRapid(private val meterRegistry: io.micrometer.core.instrument.MeterRegistry = io.micrometer.core.instrument.simple.SimpleMeterRegistry(), private val maxTriggedeMeldinger: Int = 10) :
     RapidsConnection() {
     private companion object {
-        private val objectMapper = jacksonObjectMapper()
-            .registerModule(JavaTimeModule())
+        private val objectMapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
+            .registerModule(com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
 
@@ -26,12 +20,15 @@ class TestRapid(private val meterRegistry: MeterRegistry = SimpleMeterRegistry()
     }
 
     fun sendTestMessage(message: String) {
-        notifyMessage(message, this, MessageMetadata("test.message", -1, -1, null, emptyMap()), meterRegistry)
+        notifyMessage(message, this,
+            com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata("test.message", -1, -1, null, emptyMap()), meterRegistry)
         sjekkForLoop()
     }
 
     fun sendTestMessage(message: String, key: String) {
-        notifyMessage(message, KeyMessageContext(this, key), MessageMetadata("test.message", -1, -1, key, emptyMap()), meterRegistry)
+        notifyMessage(message,
+            com.github.navikt.tbd_libs.rapids_and_rivers_api.KeyMessageContext(this, key),
+            com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata("test.message", -1, -1, key, emptyMap()), meterRegistry)
         sjekkForLoop()
     }
 
@@ -48,9 +45,24 @@ class TestRapid(private val meterRegistry: MeterRegistry = SimpleMeterRegistry()
         val messages = keyOgMeldinger()
         messages.filterIndexed { index, _ -> index>=kjørFra }.forEach { (key, message) ->
             if(key == null) {
-                notifyMessage(message.toString(), this, MessageMetadata("test.message", -1, -1, null, emptyMap()), meterRegistry)
+                notifyMessage(message.toString(), this,
+                    com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata(
+                        "test.message",
+                        -1,
+                        -1,
+                        null,
+                        emptyMap()
+                    ), meterRegistry)
             } else {
-                notifyMessage(message.toString(), KeyMessageContext(this, key), MessageMetadata("test.message", -1, -1, key, emptyMap()), meterRegistry)
+                notifyMessage(message.toString(),
+                    com.github.navikt.tbd_libs.rapids_and_rivers_api.KeyMessageContext(this, key),
+                    com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata(
+                        "test.message",
+                        -1,
+                        -1,
+                        key,
+                        emptyMap()
+                    ), meterRegistry)
             }
         }
         val newMessages = keyOgMeldinger()

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
 import no.nav.security.token.support.core.configuration.IssuerProperties
+import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions
 import java.net.URI
 import java.time.ZonedDateTime

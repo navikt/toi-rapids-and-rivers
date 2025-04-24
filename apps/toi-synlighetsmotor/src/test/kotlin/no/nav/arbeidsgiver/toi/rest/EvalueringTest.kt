@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
-import no.nav.arbeidsgiver.toi.TestRapid
+import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
@@ -47,7 +47,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -71,7 +71,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -94,7 +94,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -129,7 +129,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -161,7 +161,7 @@ class EvalueringTest {
     @Test
     fun `POST mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
         val token = hentToken(mockOAuth2Server)
 
         startApp(repository, rapid)
@@ -184,7 +184,7 @@ class EvalueringTest {
     @Test
     fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
         val token = hentToken(mockOAuth2Server)
 
         startApp(repository, rapid)
@@ -205,7 +205,7 @@ class EvalueringTest {
 
     private fun startApp(
         repository: Repository,
-        rapid: TestRapid
+        rapid: no.nav.toi.TestRapid
     ) {
         no.nav.arbeidsgiver.toi.startApp(repository, javalin, rapid, mapOf(Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
             URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),

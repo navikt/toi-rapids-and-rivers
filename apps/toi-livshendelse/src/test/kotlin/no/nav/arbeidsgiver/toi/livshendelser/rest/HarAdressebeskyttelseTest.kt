@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.livshendelser.rest
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient

@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.arenafritattkandidatsok
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.*

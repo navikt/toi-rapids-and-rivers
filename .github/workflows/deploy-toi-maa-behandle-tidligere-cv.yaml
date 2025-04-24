@@ -7,6 +7,7 @@ on:
     - .github/workflows/deploy-toi-maa-behandle-tidligere-cv.yaml
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
+    - technical-libs/testrapid
 
 jobs:
   build-deploy:
