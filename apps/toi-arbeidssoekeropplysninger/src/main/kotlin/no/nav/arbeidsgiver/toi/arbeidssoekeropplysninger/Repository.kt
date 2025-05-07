@@ -84,15 +84,7 @@ class Repository(private val datasource: DataSource) {
                 setString(1, aktørId)
             }.use { statement ->
                 val rs = statement.executeQuery()
-                if (rs.next()) {
-                    val opplysninger = PeriodeOpplysninger.fraDatabase(rs)
-                    if (rs.next()) {
-                        secure(log).error("Fant mer enn en aktiv periode for aktørId $aktørId")
-                    }
-                    return opplysninger
-                } else {
-                    return null
-                }
+                return if (rs.next()) PeriodeOpplysninger.fraDatabase(rs) else null
             }
         }
     }
