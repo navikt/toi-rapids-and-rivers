@@ -27,6 +27,7 @@ class StillingsinfoClient(env: MutableMap<String, String>,
 
         val request = HttpRequest.newBuilder()
             .headers("Authorization", "Bearer $token")
+            .headers("Content-Type", "application/json")
             .uri(URI(stillingsinfoUrl))
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
             .build()
