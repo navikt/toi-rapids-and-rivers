@@ -7,18 +7,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 
-class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
-                                 private val openSearchService: OpenSearchService,
-                                 private val indeks: String
+class IndekserStillingLytter(rapidsConnection: RapidsConnection,
+                             private val openSearchService: OpenSearchService,
+                             private val indeks: String
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             precondition {
                 it.interestedIn("stillingsinfo")
                 it.requireKey("direktemeldtStilling")
-                it.requireValue("@event_name", "direktemeldtStillingRepubliser")
+                it.requireValue("@event_name", "indekserDirektemeldtStilling")
                 it.forbid("stilling") // Ikke les meldingen på nytt etter at den har vært innom stillingPopulator
-//              it.requireKey("") // Lag en key her som sier om det er indekser eller reindekser
             }
             validate { it.requireKey("stillingsId") }
         }.register(this)
@@ -37,8 +36,6 @@ class DirektemeldtStillingLytter(rapidsConnection: RapidsConnection,
             log.error("Gå forbi feil format på melding", e)
             return
         }
-
-        // TODO lag håndtering for indeksering og reindeksering
 
         val direktemeldtStilling = melding.direktemeldtStilling
         val stillingsinfo = melding.stillingsinfo

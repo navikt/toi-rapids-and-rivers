@@ -16,9 +16,9 @@ import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBui
 import java.security.cert.X509Certificate
 
 class OpenSearchConfig(env: MutableMap<String, String>, private val objectMapper: ObjectMapper) {
-    private val url = env["OPEN_SEARCH_URI"]!!
-    private val username = env["OPEN_SEARCH_USERNAME"]!!
-    private val password = env["OPEN_SEARCH_PASSWORD"]!!
+    private val url = env.variable("OPEN_SEARCH_URI")
+    private val username = env.variable("OPEN_SEARCH_USERNAME")
+    private val password = env.variable("OPEN_SEARCH_PASSWORD")
 
     fun openSearchClient() : OpenSearchClient {
         val host = HttpHost.create(url)

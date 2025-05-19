@@ -7,7 +7,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.ZonedDateTime
 import java.util.*
 
-
 data class Melding(
     val stillingsId: String,
     val stillingsinfo: Stillingsinfo?,
@@ -62,8 +61,8 @@ data class DirektemeldtStillingKategori(
     val code: String?,
     val categoryType: String?,
     val name: String?,
-    val description: String?,
-    val parentId: Int?
+    val description: String? = null,
+    val parentId: Int? = null
 )
 
 data class DirektemeldtStillingAdministration(
@@ -115,8 +114,9 @@ data class Geografi(
     val address: String?,
     val postalCode: String?,
     val county: String?,
-    val municipal: String?,
     val municipalCode: String?,
+    val countyCode: String? = municipalCode?.substring(0,2),
+    val municipal: String?,
     val city: String?,
     val country: String?,
     val latitude: String?,

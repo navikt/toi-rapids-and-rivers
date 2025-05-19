@@ -12,9 +12,9 @@ import java.time.ZonedDateTime
 class AccessTokenClient(env: MutableMap<String, String>,
                         private val httpClient: HttpClient,
                         private val objectMapper: ObjectMapper) {
-    private val azureUrl = env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"]!!
-    private val clientId = env["AZURE_APP_CLIENT_ID"]!!
-    private val clientSecret = env["AZURE_APP_CLIENT_SECRET"]!!
+    private val azureUrl = env.variable("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
+    private val clientId = env.variable("AZURE_APP_CLIENT_ID")
+    private val clientSecret = env.variable("AZURE_APP_CLIENT_SECRET")
 
 
     companion object {

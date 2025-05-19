@@ -26,7 +26,7 @@ data class Stilling(
     val locations: List<Geografi> = ArrayList(),
     val reference: String?,
     val administration: DirektemeldtStillingAdministration?,
-    val properties: Map<String, String> = HashMap(),
+    val properties: Map<String, Any> = HashMap(),
     val contacts: List<Contact> = ArrayList(),
     val tittel: String,
 )

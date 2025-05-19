@@ -2,7 +2,7 @@ package no.nav.toi.stilling.indekser
 
 class OpenSearchService(private val client: IndexClient, private val env: MutableMap<String, String>) {
 
-    fun initialiserIndeksering() : Boolean {
+    fun initialiserIndeks() : Boolean {
         val indeks = hentNyesteIndeks()
 
         log.info("Initialiser indeksering på indeks $indeks")
@@ -17,8 +17,8 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
         return indeksBleOpprettet
     }
 
-    fun initialiserReindeksering() {
-        val nyIndeks = hentNyesteIndeks()
+    fun initialiserReindekserIndeks() {
+        val nyIndeks = hentReindekserIndeks()
         val gjeldendeIndeks = hentGjeldendeIndeks() ?: kanIkkeStarteReindeksering()
         if (!client.finnesIndeks(nyIndeks)) {
             client.opprettIndeks(nyIndeks)
@@ -47,17 +47,8 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
         return false
     }
 
-    fun skalReindeksere(): Boolean {
-        if (!client.finnesIndeks(stillingAlias)) return false
-        val gjeldendeVersjon = hentGjeldendeIndeksversjon() ?: return false // indeks finnes ikke enda
-        val nyIndeksVersjon = env["INDEKS_VERSJON"]?: throw NullPointerException("Miljøvariabel INDEKS_VERSJON")
-
-        return nyIndeksVersjon != gjeldendeVersjon
-    }
-
-    fun hentGjeldendeIndeksversjon(): String? {
-        val indeks = client.hentIndeksAliasPekerPå() ?: return null
-        return hentVersjon(indeks)
+    fun finnesIndeks(indeksnavn: String): Boolean {
+        return client.finnesIndeks(indeksnavn)
     }
 
     fun byttTilNyIndeks() {
@@ -69,23 +60,29 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
         return client.hentIndeksAliasPekerPå()
     }
 
-    private fun hentVersjon(indeksNavn: String): String {
-        return indeksNavn.split("_").last()
-    }
-
     fun hentNyesteIndeks(): String {
         return hentIndeksNavn(hentVersjonFraNaisConfig())
     }
 
-    private fun hentVersjonFraNaisConfig(): String {
-        return env["INDEKS_VERSJON"] ?: throw NullPointerException("Miljøvariabel INDEKS_VERSJON")
+    fun hentGjeldendeIndeksversjon(): String? {
+        val indeks = client.hentIndeksAliasPekerPå() ?: return null
+        return hentVersjon(indeks)
+    }
+
+    private fun hentReindekserIndeks(): String {
+        return "${stillingAlias}_${env.variable("REINDEKSER_INDEKS")}"
+    }
+
+    private fun hentVersjon(indeks: String): String {
+        return indeks.split("_").last()
+    }
+
+    fun hentVersjonFraNaisConfig(): String {
+        return env.variable("INDEKS_VERSJON")
     }
 
     private fun hentIndeksNavn(versjon: String): String {
         return "${stillingAlias}_$versjon"
     }
 
-    private fun kanIkkeStarteReindeksering(): Nothing {
-        throw Exception("Kan ikke starte reindeksering uten noen alias som peker på indeks")
-    }
 }

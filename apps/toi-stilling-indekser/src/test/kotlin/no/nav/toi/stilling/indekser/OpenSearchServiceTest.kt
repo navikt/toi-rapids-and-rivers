@@ -12,7 +12,6 @@ import io.mockk.runs
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.opensearch.client.opensearch.OpenSearchClient
-import java.net.http.HttpClient
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -46,6 +45,8 @@ class OpenSearchServiceTest {
         env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] = "enUrl2"
         env["AZURE_APP_CLIENT_ID"] = "client_id"
         env["AZURE_APP_CLIENT_SECRET"] = "secret"
+        env["REINDEKSER_ENABLED"] = "false"
+        env["REINDEKSER_INDEKS"] = "20250401"
 
         openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
         indexClient = IndexClient(openSearchClient, objectMapper)
@@ -79,9 +80,12 @@ class OpenSearchServiceTest {
     @Test
     fun `Alias 'stilling' skal peke på ny index etter reindeksering og bytte av alias`() {
         opprettIndeks()
-        env["INDEKS_VERSJON"] = "20250329"
+        env["REINDEKSER_ENABLED"] = "true"
+        env["REINDEKSER_INDEKS"] = "20250329"
 
-        openSearchService.initialiserReindeksering()
+        openSearchService.initialiserReindekserIndeks()
+
+        env["INDEKS_VERSJON"] = "20250329"
         openSearchService.byttTilNyIndeks()
 
         val gjeldendeIndeksMedAlias = indexClient.hentIndeksAliasPekerPå()
@@ -99,8 +103,9 @@ class OpenSearchServiceTest {
         assertThat(index1).isTrue()
         assertThat(indeks3).isFalse()
 
-        env["INDEKS_VERSJON"] = "20250330"
-        openSearchService.initialiserReindeksering()
+        env["REINDEKSER_ENABLED"] = "true"
+        env["REINDEKSER_INDEKS"] = "20250330"
+        openSearchService.initialiserReindekserIndeks()
 
         index1 = indexClient.finnesIndeks("stilling_20250328")
         indeks3 = indexClient.finnesIndeks("stilling_20250330")
@@ -111,7 +116,17 @@ class OpenSearchServiceTest {
 
     @Test
     fun `Skal legge inn melding fra rapid inn i OpenSearch`() {
-       opprettIndeks()
+        env["KAFKA_BROKERS"] = "localhost:9092"
+        env["KAFKA_SCHEMA_REGISTRY"]= "http://localhost:8081"
+        env["KAFKA_SCHEMA_REGISTRY_USER"] = "user"
+        env["KAFKA_SCHEMA_REGISTRY_PASSWORD"] = "pwd"
+        env["USER_INFO"] = ""
+        env["KAFKA_TRUSTSTORE_PATH"] = ""
+        env["KAFKA_CREDSTORE_PASSWORD"]= ""
+        env["KAFKA_KEYSTORE_PATH"] = ""
+        env["KAFKA_CREDSTORE_PASSWORD"] = ""
+
+        opprettIndeks()
 
         testProgramMedHendelse(env, melding) {
             assertThat(size).isEqualTo(0)
@@ -128,10 +143,10 @@ class OpenSearchServiceTest {
     }
 
     private fun opprettIndeks() {
-        startIndeksering(openSearchService, stillingApiClient)
+        startIndeksering(openSearchService, stillingApiClient, env)
     }
 
-    private val melding =             """
+    private val melding = """
             {
                 "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
                 "stillingsinfo": {
@@ -202,7 +217,7 @@ class OpenSearchServiceTest {
                     "sistEndretAv": "Testendrer",
                     "status": "ACTIVE"
                 },
-                "@event_name": "direktemeldtStillingRepubliser"
+                "@event_name": "indekserDirektemeldtStilling"
             }
             """.trimIndent()
 }
