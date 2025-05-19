@@ -45,9 +45,9 @@ spec:
     - name: INDEKS_VERSJON
       value: "{{ indeks }}"
     - name: REINDEKSER_ENABLED
-      value: "{{ reindexer_enabled }}"
-    - name: REINDEKSER_INDEX
-      value: "{{ reindexer_index }}"
+      value: "{{ reindekser_enabled }}"
+    - name: REINDEKSER_INDEKS
+      value: "{{ reindekser_indeks }}"
     - name: STILLING_API_URL
       value: {{ stilling_api_url }}
     - name: STILLING_API_SCOPE
