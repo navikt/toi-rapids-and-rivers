@@ -7,21 +7,23 @@ import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.pam.stilling.ext.avro.Classification
 import no.nav.pam.stilling.ext.avro.RemarkType
 import no.nav.toi.stilling.indekser.*
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
 fun konverterTilStilling(ad: Ad): Stilling {
     return Stilling(
-        UUID.fromString(ad.uuid),
-        ad.adnr.toLong(),
-        ad.status.name,
-        ad.privacy.name,
-        ZonedDateTime.parse(ad.published),
-        ad.publishedByAdmin,
-        ZonedDateTime.parse(ad.expires),
-        ZonedDateTime.parse(ad.created),
-        ZonedDateTime.parse(ad.updated),
-        ad.employer?.let {
+        uuid = UUID.fromString(ad.uuid),
+        annonsenr = ad.adnr.toLong(),
+        status = ad.status.name,
+        privacy = ad.privacy.name,
+        published = if(ad.published.isNullOrBlank()) null else konverterDato(ad.published),
+        publishedByAdmin = ad.publishedByAdmin,
+        expires = if(ad.expires.isNullOrBlank()) null else konverterDato(ad.expires),
+        created = konverterDato(ad.created),
+        updated = konverterDato(ad.updated),
+        employer = ad.employer?.let {
             DirektemeldtStillingArbeidsgiver(
                 name = it.name,
                 orgnr = it.orgnr,
@@ -30,11 +32,11 @@ fun konverterTilStilling(ad: Ad): Stilling {
                 orgform = it.orgform
             )
         },
-        ad.categories.map { DirektemeldtStillingKategori(code = it.styrkCode, name = it.name, categoryType = "STYRK08") },
-        ad.source,
-        ad.medium,
-        ad.businessName,
-        ad.locations.map {
+        categories = ad.categories.map { DirektemeldtStillingKategori(code = it.styrkCode, name = it.name, categoryType = "STYRK08") },
+        source = ad.source,
+        medium = ad.medium,
+        businessName = ad.businessName,
+        locations = ad.locations.map {
             Geografi(
                 address = it.address,
                 postalCode = it.postalCode,
@@ -48,8 +50,8 @@ fun konverterTilStilling(ad: Ad): Stilling {
                 country = it.country
             )
         },
-        ad.reference,
-        ad.administration?.let {
+        reference = ad.reference,
+        administration = ad.administration?.let {
             DirektemeldtStillingAdministration(
                 status = it.status.name,
                 remarks = it.remarks.map(RemarkType::name),
@@ -58,8 +60,8 @@ fun konverterTilStilling(ad: Ad): Stilling {
                 navIdent = it.navIdent
             )
         },
-        ad.properties.associate { it.key to (tilJson(it.value) ?: it.value) },
-        ad.contacts
+        properties = ad.properties.associate { it.key to (tilJson(it.value) ?: it.value) },
+        contacts = ad.contacts
             ?.map {
                 Contact(
                     it.name,
@@ -69,8 +71,16 @@ fun konverterTilStilling(ad: Ad): Stilling {
                     it.phone
                 )
             } ?: emptyList(),
-        if (ad.erDirektemeldt()) ad.tittelFraKategori() else ad.title
+        tittel = if (ad.erDirektemeldt()) ad.tittelFraKategori() else ad.title
     )
+}
+
+fun konverterDato(dato: String): ZonedDateTime {
+    return try {
+        LocalDateTime.parse(dato).atZone(ZoneId.of("Europe/Oslo"))
+    } catch (e: Exception) {
+        throw RuntimeException("Greide ikke konverte dato til zonedDateTime: $dato", e)
+    }
 }
 
 private fun Ad.tittelFraKategori() = tittelFraJanzz() ?: tittelFraStyrk()
