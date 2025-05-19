@@ -35,7 +35,7 @@ class StillingsinfoClient(env: MutableMap<String, String>,
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
 
         if(response.statusCode() != 200) {
-            log.error("Fikk ikke hentet stillingsinfo fra stilling-api. Statuskode: ${response.statusCode()}")
+            log.error("Fikk ikke hentet stillingsinfo fra stilling-api. Statuskode: ${response.statusCode()}, body: ${response.body()}")
             throw KunneIkkeHenteStillingsinsinfoException( "Kunne ikke hente stillingsinfo for stillinger." +
                     " HTTP-status=[${response.statusCode()}], responseBody=[${response.body()}]")
         }

@@ -51,6 +51,7 @@ class EksternStillingLytter(
         } catch (exception: WakeupException) {
             log.info("Fikk beskjed om å lukke consument med groupId ${consumer.groupMetadata().groupId()}")
         } catch (exception: Exception) {
+            log.error("Noe galt skjedde i konsument", exception)
            throw Exception("Noe galt skjedde i konsument", exception)
         } finally {
             consumer.close()
