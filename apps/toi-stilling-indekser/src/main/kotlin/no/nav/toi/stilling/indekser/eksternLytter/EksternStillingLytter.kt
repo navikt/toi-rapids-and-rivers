@@ -2,7 +2,9 @@ package no.nav.toi.stilling.indekser.eksternLytter
 
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.*
+import no.nav.toi.stilling.indekser.stillingsinfo.KunneIkkeHenteStillingsinsinfoException
 import no.nav.toi.stilling.indekser.stillingsinfo.StillingsinfoClient
+import org.apache.hc.core5.http.ConnectionClosedException
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
@@ -27,21 +29,8 @@ class EksternStillingLytter(
                         val records: ConsumerRecords<String, Ad> = it.poll(Duration.ofSeconds(5))
                         if(records.count() == 0) continue
 
-                        val stillinger: List<Stilling> = records.map { record -> konverterTilStilling(record.value()) }
-                        val stillingsinfoer: List<Stillingsinfo> = stillingsinfoClient.hentStillingsinfo(stillinger.map { stilling -> stilling.uuid.toString() })
-
-                        stillinger.forEach { stilling ->
-                            log.info("Mottok stilling for indeksering: ${stilling.uuid}")
-
-                            val rekrutteringsbistandStilling = RekrutteringsbistandStilling(
-                                stilling = stilling,
-                                stillingsinfo = stillingsinfoer.find { info -> info.stillingsid == stilling.uuid.toString() }
-                            )
-                            // Her skal det kun indekseres eksterne stillinger
-                            if(!rekrutteringsbistandStilling.stilling.source.equals("DIR")) {
-                                openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
-                            }
-                        }
+                        val ads = records.map { record -> record.value() }
+                        behandleStillingerMedRetry(ads, indeks)
                         it.commitSync()
                     } catch (e: RetriableException) {
                         log.warn("Fikk en retriable exception, prøver på nytt", e)
@@ -62,4 +51,40 @@ class EksternStillingLytter(
         // Vil kaste WakeupException i konsument slik at den stopper, thread-safe.
         consumer.wakeup()
     }
+
+    fun behandleStillingerMedRetry(stillinger: List<Ad>, indeks: String) {
+        try {
+            behandleStillinger(stillinger, indeks)
+        } catch (e: ConnectionClosedException) {
+            log.warn("Feil ved kall mot Open Search, prøver igjen", e)
+            behandleStillinger(stillinger, indeks)
+        } catch (e: KunneIkkeHenteStillingsinsinfoException) {
+            log.warn("Feil ved henting av stillingsinfo, prøver igjen", e)
+            behandleStillinger(stillinger, indeks)
+        }
+    }
+
+    private fun behandleStillinger(ads: List<Ad>, indeks: String) {
+        val alleMeldinger = ads.map { konverterTilStilling(it) }
+        val stillinger = beholdSisteMeldingPerStilling(alleMeldinger)
+        val stillingsinfo = stillingsinfoClient.hentStillingsinfo(stillinger.map { it.uuid.toString() })
+
+        stillinger.forEach { stilling ->
+            log.info("Mottok stilling for indeksering: ${stilling.uuid}")
+
+            throw RuntimeException("Test håndtering av exceptions :(")
+
+            val rekrutteringsbistandStilling = RekrutteringsbistandStilling(
+                stilling = stilling,
+                stillingsinfo = stillingsinfo.find { info -> info.stillingsid == stilling.uuid.toString() }
+            )
+            // Her skal det kun indekseres eksterne stillinger
+            if(!rekrutteringsbistandStilling.stilling.source.equals("DIR")) {
+                openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
+            }
+        }
+    }
+
+    private fun beholdSisteMeldingPerStilling(stillinger: List<Stilling>) =
+        stillinger.associateBy { it.uuid }.values.toList()
 }

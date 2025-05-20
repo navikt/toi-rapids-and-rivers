@@ -88,13 +88,21 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
 
                 IndekserStillingLytter(rapid, openSearchService, indeks)
-                thread { stillingConsumer.start(indeks) }
+
+                thread {
+                    Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
+                    stillingConsumer.start(indeks)
+                }
             }
         }.start()
-
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
     }
+}
+
+private fun uncaughtExceptionHandler(thread: Thread, err: Throwable) {
+    log.error("Uncaught exception in thread ${thread.name}: ${err.message}", err)
+    throw RuntimeException("Det skjedde en feil i tråden for ekstern lytter ${thread.name}", err)
 }
 
 fun startIndeksering(
