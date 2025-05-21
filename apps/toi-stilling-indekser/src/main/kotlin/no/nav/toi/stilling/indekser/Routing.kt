@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/isalive") {
+            log.info("IsAlive er kalt")
             if(Liveness.isAlive) call.respondText("ALIVE", status = HttpStatusCode.OK) else call.respond(HttpStatusCode.ServiceUnavailable)
         }
     }
