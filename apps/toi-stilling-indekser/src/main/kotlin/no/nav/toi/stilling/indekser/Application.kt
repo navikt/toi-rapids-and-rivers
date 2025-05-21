@@ -74,11 +74,17 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 val gammelStillingConsumer = EksternStillingLytter(gammelKafkaConsumer, openSearchService, stillingsinfoClient)
 
                 // Startet lytting på reindekseringsmeldinger fra rapid og les ekstern-topic fra start
-                thread { reindekserStillingConsumer.start(reindekserIndeks) }
+                thread(name = "reindekserStillingConsumer") {
+                    Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
+                    reindekserStillingConsumer.start(reindekserIndeks)
+                }
                 ReindekserStillingLytter(rapid, openSearchService, reindekserIndeks)
 
                 // opprettholder at oppdateringer blir indeksert i den gamle indeksen fra rapid og ekstern-topic
-                thread { gammelStillingConsumer.start(indeks) }
+                thread(name = "gammelStillingConsumer") {
+                    Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
+                    gammelStillingConsumer.start(indeks)
+                }
                 IndekserStillingLytter(rapid, openSearchService, indeks)
             } else {
                 // Initiell indeksering av stillinger, samt kontinuerlig lesing av oppdateringer på rapid og ekstern-topic
@@ -89,7 +95,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
                 IndekserStillingLytter(rapid, openSearchService, indeks)
 
-                thread {
+                thread(name = "indekserStillingConsumer" ) {
                     Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
                     stillingConsumer.start(indeks)
                 }
@@ -101,8 +107,8 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 }
 
 private fun uncaughtExceptionHandler(thread: Thread, err: Throwable) {
-    log.error("Uncaught exception in thread ${thread.name}: ${err.message}", err)
-    throw RuntimeException("Det skjedde en feil i tråden for ekstern lytter ${thread.name}", err)
+    log.error("Det skjedde en feil i tråden ${thread.name}: ${err.message}. Appen skal stoppe", err)
+    Liveness.kill("Det skjedde en feil i tråden ${thread.name}: ${err.message}", err)
 }
 
 fun startIndeksering(
