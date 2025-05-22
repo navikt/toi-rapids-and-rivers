@@ -72,8 +72,6 @@ class EksternStillingLytter(
         stillinger.forEach { stilling ->
             log.info("Mottok stilling for indeksering: ${stilling.uuid}")
 
-            throw RuntimeException("Test håndtering av exceptions :(")
-
             val rekrutteringsbistandStilling = RekrutteringsbistandStilling(
                 stilling = stilling,
                 stillingsinfo = stillingsinfo.find { info -> info.stillingsid == stilling.uuid.toString() }
@@ -83,6 +81,7 @@ class EksternStillingLytter(
                 openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
             }
         }
+        log.info("Indekserte ${stillinger.size} stillinger i indeks '$indeks'. UUIDer: ${stillinger.map { it.uuid }}")
     }
 
     private fun beholdSisteMeldingPerStilling(stillinger: List<Stilling>) =
