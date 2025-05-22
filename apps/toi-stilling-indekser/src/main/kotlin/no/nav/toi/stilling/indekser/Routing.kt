@@ -8,8 +8,10 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/isalive") {
-            log.info("IsAlive er kalt")
-            if(Liveness.isAlive) call.respondText("ALIVE", status = HttpStatusCode.OK) else call.respond(HttpStatusCode.ServiceUnavailable)
+            if((!Liveness.isAlive && !rapidIsAlive.invoke())) {
+                log.info("Appen skal starte på nytt, isalive er false")
+            }
+            if(Liveness.isAlive && rapidIsAlive.invoke()) call.respondText("ALIVE", status = HttpStatusCode.OK) else call.respond(HttpStatusCode.ServiceUnavailable)
         }
     }
 }

@@ -23,6 +23,8 @@ import kotlin.concurrent.thread
 
 private val log = noClassLogger()
 
+lateinit var rapidIsAlive: () -> Boolean
+
 fun main() {
     val env = System.getenv()
     log.info("Starter app.")
@@ -133,14 +135,18 @@ fun startIndeksering(
     }
 }
 
-fun rapidsConnection(env: MutableMap<String, String>) = RapidApplication.create(
-    env = env,
-    builder = {
-        withKtorModule {
-            configureRouting()
-        }
-    }
-)
+fun rapidsConnection(env: MutableMap<String, String>): RapidsConnection {
+    return RapidApplication.create(
+            env = env,
+            builder = {
+                withKtorModule {
+                    configureRouting()
+                }
+            },
+        configure = { _, kafkarapid -> rapidIsAlive = kafkarapid::isRunning }
+    )
+}
+
 
 fun kanIkkeStarteReindeksering(): Nothing {
     throw Exception("Kan ikke starte reindeksering uten noen alias som peker på indeks")
