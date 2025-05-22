@@ -56,6 +56,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     val indeks = openSearchService.hentNyesteIndeks()
 
+
     try {
         rapidsConnection.also { rapid ->
             rapid.register(object : RapidsConnection.StatusListener {
@@ -63,6 +64,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                     startIndeksering(openSearchService, stillingApiClient, env)
                 }
             })
+
 
             if (reindekserEnabled && reindekserIndeks != indeks) {
                 log.info("Reindeksering av alle stillinger starter på indeks $reindekserIndeks")
@@ -131,7 +133,14 @@ fun startIndeksering(
     }
 }
 
-fun rapidsConnection(env: MutableMap<String, String>) = RapidApplication.create(env)
+fun rapidsConnection(env: MutableMap<String, String>) = RapidApplication.create(
+    env = env,
+    builder = {
+        withKtorModule {
+            configureRouting()
+        }
+    }
+)
 
 fun kanIkkeStarteReindeksering(): Nothing {
     throw Exception("Kan ikke starte reindeksering uten noen alias som peker på indeks")
