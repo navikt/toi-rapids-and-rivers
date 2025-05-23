@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/isalive") {
+            log.info("iaalive kalt")
             if((!Liveness.isAlive && !rapidIsAlive.invoke())) {
                 log.info("Appen skal starte på nytt, isalive er false")
             }
