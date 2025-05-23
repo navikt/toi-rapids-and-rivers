@@ -58,16 +58,8 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     val indeks = openSearchService.hentNyesteIndeks()
 
-
     try {
         rapidsConnection.also { rapid ->
-            rapid.register(object : RapidsConnection.StatusListener {
-                override fun onStartup(rapidsConnection: RapidsConnection) {
-                    startIndeksering(openSearchService, stillingApiClient, env)
-                }
-            })
-
-
             if (reindekserEnabled && reindekserIndeks != indeks) {
                 log.info("Reindeksering av alle stillinger starter på indeks $reindekserIndeks")
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(reindekserIndeks, env))
@@ -104,6 +96,12 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                     stillingConsumer.start(indeks)
                 }
             }
+
+            rapid.register(object : RapidsConnection.StatusListener {
+                override fun onStartup(rapidsConnection: RapidsConnection) {
+                    startIndeksering(openSearchService, stillingApiClient, env)
+                }
+            })
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
