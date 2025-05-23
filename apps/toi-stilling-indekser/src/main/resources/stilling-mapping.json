@@ -9,6 +9,9 @@
         "eierNavn": {
           "type": "text"
         },
+        "eierNavKontorEnhetId": {
+            "type": "keyword"
+        },
         "stillingsid": {
           "type": "keyword"
         },

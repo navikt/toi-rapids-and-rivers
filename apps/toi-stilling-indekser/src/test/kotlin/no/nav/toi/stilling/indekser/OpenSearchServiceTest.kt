@@ -152,6 +152,7 @@ class OpenSearchServiceTest {
                 "stillingsinfo": {
                     "eierNavIdent": "T123456",
                     "eierNavn": "Tester",
+                    "eierNavKontorEnhetId": "1234",
                     "stillingsid": "123456",
                     "stillingsinfoid": "24553",
                     "stillingskategori": "STILLING"
