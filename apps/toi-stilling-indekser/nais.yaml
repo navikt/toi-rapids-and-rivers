@@ -27,6 +27,10 @@ spec:
       memory: 512Mi
   secureLogs:
     enabled: true
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   kafka:
     pool: {{ kafka_pool }}
   openSearch:
