@@ -6,6 +6,8 @@ metadata:
   labels:
     team: toi
 spec:
+  strategy:
+    type: Recreate
   image: {{ image }}
   port: 8080
   liveness:

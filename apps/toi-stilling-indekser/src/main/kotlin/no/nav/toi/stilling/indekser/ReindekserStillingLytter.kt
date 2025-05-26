@@ -15,8 +15,8 @@ class ReindekserStillingLytter(rapidsConnection: RapidsConnection,
         River(rapidsConnection).apply {
             precondition {
                 it.interestedIn("stillingsinfo")
+                it.requireAny("@event_name", listOf("reindekserDirektemeldtStilling", "indekserDirektemeldtStilling"))
                 it.requireKey("direktemeldtStilling")
-                it.requireValue("@event_name", "reindekserDirektemeldtStilling") // interested in? og interested i indekserStilling?
                 it.forbid("stilling") // Ikke les meldingen på nytt etter at den har vært innom stillingPopulator
             }
             validate { it.requireKey("stillingsId") }
