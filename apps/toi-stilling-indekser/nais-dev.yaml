@@ -1,8 +1,8 @@
 kafka_pool: nav-dev
 kafka_consumer_group_id: toi-stilling-indekser-rapidconsumer-1
 indeks: 20250401
-reindekser_indeks: 20250519
-reindekser_enabled: false
+reindekser_indeks: 20250527
+reindekser_enabled: true
 stilling_api_url: http://rekrutteringsbistand-stilling-api
 stilling_api_scope: api://dev-gcp.toi.rekrutteringsbistand-stilling-api/.default
 opensearch_plan: "startup-4"
