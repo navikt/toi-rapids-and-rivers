@@ -10,7 +10,7 @@ class StillingApiClient(env: MutableMap<String, String>,
                         private val accessTokenClient: AccessTokenClient
 ) {
 
-    private val stillingApiUrl = env.variable("STILLING_API_URL") +"/stillinger/reindekser"
+    private val stillingApiUrl = env.variable("STILLING_API_URL") +"/reindekser/stillinger"
     private val scope = env.variable("STILLING_API_SCOPE")
 
     fun triggSendingAvStillingerPåRapid() {
