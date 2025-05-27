@@ -19,7 +19,7 @@ class StillingApiClient(env: MutableMap<String, String>,
         val request = HttpRequest.newBuilder()
             .headers("Authorization", "Bearer $token")
             .uri(URI(stillingApiUrl))
-            .GET()
+            .POST(HttpRequest.BodyPublishers.noBody())
             .build()
 
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
