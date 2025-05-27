@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.ontologitjeneste
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions

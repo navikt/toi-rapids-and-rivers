@@ -39,6 +39,7 @@ class Evaluering(
     val erIkkeDoed: BooleanVerdi,
     val erIkkeKvp: BooleanVerdi,
     val harIkkeAdressebeskyttelse: BooleanVerdi,
+    val erArbeidssøker: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
     private val felterBortsettFraAdressebeskyttelse = listOf(
@@ -48,15 +49,18 @@ class Evaluering(
         maaIkkeBehandleTidligereCv,
         arenaIkkeFritattKandidatsøk,
         erUnderOppfoelging,
-        harRiktigFormidlingsgruppe,
+        //harRiktigFormidlingsgruppe, // ARBS skal ikke lenger være en del av evalueringen. Kommentert ut frem til vi er sikre på at det kan slettes helt
         erIkkeKode6eller7,
         erIkkeSperretAnsatt,
         erIkkeDoed,
-        erIkkeKvp
+        erIkkeKvp,
+        erArbeidssøker
     )
 
     private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
-    val harAltBortsettFraAdressebeskyttelse = felterBortsettFraAdressebeskyttelse.none { it == Missing }
+    val harAltBortsettFraAdressebeskyttelse =
+        (felterBortsettFraAdressebeskyttelse + harRiktigFormidlingsgruppe)
+            .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
     fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
@@ -72,7 +76,8 @@ class Evaluering(
         erUnderOppfoelging = erUnderOppfoelging.default(false),
         harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
         erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
-        erIkkeDoed = erIkkeDoed.default(false)
+        erIkkeDoed = erIkkeDoed.default(false),
+        erArbeidssøker = erArbeidssøker.default(false)
     )
 
 
@@ -111,8 +116,9 @@ data class EvalueringUtenDiskresjonskode(
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
-    val erIkkeDoed: Boolean
-) {
+    val erIkkeDoed: Boolean,
+    val erArbeidssøker: Boolean
+    ) {
     companion object {
         fun medAlleVerdierFalse() = EvalueringUtenDiskresjonskode(
             harAktivCv = false,
@@ -123,7 +129,8 @@ data class EvalueringUtenDiskresjonskode(
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
-            erIkkeDoed = false
+            erIkkeDoed = false,
+            erArbeidssøker = false
         )
     }
 }

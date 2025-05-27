@@ -23,22 +23,24 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
 }
 
-val stiTilApplicationClass =
-    File("${projectDir}/src/main/kotlin")
-        .walk()
-        .find { it.name == "Application.kt" }
-        ?.path?.removePrefix("${project.projectDir}/src/main/kotlin/")
-        ?.replace("/", ".")
-        ?.replace(".kt", "Kt") ?: throw Exception("Finner ingen Application.kt i prosjektet ${project.name}")
 
 tasks {
     named<Jar>("jar") {
-        archiveBaseName.set("app")
+        if (!projectDir.absoluteFile.toString().contains("technical-libs")) {
+            archiveBaseName.set("app")
 
-        manifest {
-            attributes["Main-Class"] = stiTilApplicationClass
-            attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-                it.name
+            manifest {
+                val stiTilApplicationClass = File("${projectDir}/src/main/kotlin")
+                    .walk()
+                    .find { it.name == "Application.kt" }
+                    ?.path?.removePrefix("${project.projectDir}/src/main/kotlin/")
+                    ?.replace("/", ".")
+                    ?.replace(".kt", "Kt")
+                    ?: throw Exception("Finner ingen Application.kt i prosjektet ${project.name}")
+                attributes["Main-Class"] = stiTilApplicationClass
+                attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
+                    it.name
+                }
             }
         }
 

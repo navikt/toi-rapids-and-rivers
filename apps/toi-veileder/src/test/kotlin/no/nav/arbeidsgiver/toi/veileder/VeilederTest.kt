@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.veileder
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.assertj.core.api.Assertions.assertThat

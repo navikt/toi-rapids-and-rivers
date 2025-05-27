@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +12,7 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
 import java.time.Duration
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class ArbeidssoekerperiodeLytter(
@@ -20,6 +22,11 @@ class ArbeidssoekerperiodeLytter(
 
     val arbeidssokerperioderTopic = "paw.arbeidssokerperioder-v1"
 
+    val loggbarePerioder = listOf(UUID.fromString("c097fde5-2138-4f59-8c27-d1cd2ee99bd4"),
+        UUID.fromString("78b5f7f1-e227-4527-8347-20306dab841a"),
+        UUID.fromString("8e508dc8-d7c6-4757-9b13-d9d2eee91b9e"),
+        UUID.fromString("e45e30f9-ea0d-4ab3-a7ca-eaae9092cf1c"),
+    )
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
@@ -45,12 +52,20 @@ class ArbeidssoekerperiodeLytter(
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
                             log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
-                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJson()}")
-                            rapidsConnection.publish(periode.identitetsnummer, periode.somJson())
+                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
+
+                            val melding = mapOf(
+                                "fodselsnummer" to periode.identitetsnummer,
+                                "arbeidssokerperiode" to periode.somJsonNode(),
+                                "@event_name" to "arbeidssokerperiode",
+                            )
+
+                            val nyPacket = JsonMessage.newMessage(melding)
+                            rapidsConnection.publish(periode.identitetsnummer, nyPacket.toJson())
                         }
                         consumer.commitSync()
                     } catch (e: RetriableException) {
-                        log.warn("Fikk en retriable exception, prøver på nytt", e)
+                        log.warn("Fikk en retriable exception, prøver på nytt. ${e.message}", e)
                     }
                 }
             }

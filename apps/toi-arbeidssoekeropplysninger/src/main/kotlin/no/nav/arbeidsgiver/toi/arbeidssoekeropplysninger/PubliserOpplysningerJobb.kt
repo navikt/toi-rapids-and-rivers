@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
@@ -38,10 +36,12 @@ class PubliserOpplysningerJobb(
                 // Her kunne vi sikkert brukt noe Job og corutine greier for at det skal passe med resten av arkitekture
                 // Stoler på at Joar tar den ballen ved behov
                 Thread.sleep(Duration.ofSeconds(5))
-                do {
-                    val n = behandleOpplysninger()
-                    log.info("Publiserte $n arbeidsøkerperioder")
-                } while (n > 0)
+                if (leaderElector.isLeader())
+                    do {
+                        val n = behandleOpplysninger()
+                        if (n > 0)
+                            log.info("Publiserte $n arbeidsøkerperioder")
+                    } while (n> 0)
             }
         }
     }
@@ -56,9 +56,7 @@ class PubliserOpplysningerJobb(
                     repository.behandlePeriodeOpplysning(opplysning.periodeId)
                     secure(log).info("""
                         Publiserte opplysning om ${opplysning.identitetsnummer} start: ${opplysning.periodeStartet}
-                        stopp ${opplysning.periodeAvsluttet} mottatt: ${opplysning.opplysningerMottattDato}
-                        helsetilstandHindrerArbeid: ${opplysning.helsetilstandHindrerArbeid}
-                        andreForholdHindrerArbeid: $opplysning.andreForholdHindrerArbeid
+                        stopp ${opplysning.periodeAvsluttet} 
                         """.trimIndent()
                     )
                 }
@@ -72,13 +70,14 @@ class PubliserOpplysningerJobb(
 
     fun publiserArbeidssøkeropplysning(opplysning: PeriodeOpplysninger) {
         val jsonNode = objectMapper.valueToTree<JsonNode>(opplysning)
-        (jsonNode as ObjectNode).put("@event_name", "arbeidssøkeropplysninger")
+        val melding = mapOf(
+            "fodselsnummer" to opplysning.identitetsnummer!!,
+            "aktørId" to opplysning.aktørId!!,
+            "arbeidssokeropplysninger" to jsonNode,
+            "@event_name" to "arbeidssokeropplysninger"
+        )
 
-        val message = JsonMessage(
-            objectMapper.writeValueAsString(jsonNode), MessageProblems("{}"),
-            metrics = meterRegistry
-        ).toJson()
-
-        rapidConnection.publish(opplysning.identitetsnummer!!, message)
+        val nyMelding = JsonMessage.newMessage(melding)
+        rapidConnection.publish(opplysning.aktørId, nyMelding.toJson())
     }
 }

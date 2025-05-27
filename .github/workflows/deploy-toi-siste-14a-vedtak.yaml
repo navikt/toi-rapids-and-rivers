@@ -7,6 +7,7 @@ on:
     - .github/workflows/deploy-toi-siste-14a-vedtak.yaml
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
+    - technical-libs/testrapid
 
 jobs:
   build-deploy:

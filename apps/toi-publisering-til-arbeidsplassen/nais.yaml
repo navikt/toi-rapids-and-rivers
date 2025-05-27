@@ -41,3 +41,9 @@ spec:
       rules:
         - application: pam-import-api
           namespace: teampam
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

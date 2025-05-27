@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -16,6 +17,7 @@ data class Kandidat(
     private val hjemmel: Synlighetsnode<Hjemmel>,
     private val måBehandleTidligereCv: Synlighetsnode<MåBehandleTidligereCv>,
     private val kvp: Synlighetsnode<Kvp>,
+    private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     val adressebeskyttelse: Synlighetsnode<String>,
 ) {
     private val erAAP: BooleanVerdi
@@ -40,9 +42,11 @@ data class Kandidat(
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
+        erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
+    private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
     private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
     private fun erIkkeArenaFritattKandidatsøk(it: ArenaFritattKandidatsøk) = !it.erFritattKandidatsøk
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
@@ -99,7 +103,8 @@ data class Kandidat(
 
     private fun beregningsgrunnlag() = listOf(
         arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse
+        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse,
+        arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
 
@@ -120,7 +125,8 @@ data class Kandidat(
                 hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
                 måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
-                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper)
+                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
+                arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
             )
         }
     }
@@ -157,6 +163,16 @@ data class Oppfølgingsperiode(
     val startDato: ZonedDateTime,
     val sluttDato: ZonedDateTime?
 )
+
+data class Arbeidssøkeropplysninger(
+    @JsonProperty("periode_startet")
+    val periodeStartet: ZonedDateTime? = null,
+    @JsonProperty("periode_avsluttet")
+    val periodeAvsluttet: ZonedDateTime? = null
+) {
+    fun erArbeidssøker() =
+        periodeStartet != null && periodeAvsluttet == null
+}
 
 data class Oppfølgingsinformasjon(
     val erDoed: Boolean,

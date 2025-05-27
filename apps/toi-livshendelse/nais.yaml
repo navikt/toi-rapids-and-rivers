@@ -31,12 +31,22 @@ spec:
     outbound:
       external:
         - host: {{ pdl_host }}
+    inbound:
+      rules:
+        - application: rekrutteringsbistand-kandidatsok-api
   kafka:
     pool: {{ kafka_pool }}
   azure:
     application:
       enabled: true
       allowAllUsers: false
+      claims:
+        extra:
+          - NAVident
+        groups:
+          - id: {{adGruppeJobbsøkerrettet}}
+          - id: {{adGruppeArbeidsgiverrettet}}
+          - id: {{adGruppeUtvikler}}
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
@@ -50,3 +60,9 @@ spec:
       value: {{ pdl_scope }}
     - name: PDL_URL
       value: {{ pdl_url }}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

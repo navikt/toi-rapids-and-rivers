@@ -35,6 +35,11 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true
   kafka:
     pool: {{ kafka_pool }}
   openSearch:

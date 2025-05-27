@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import TEST_ACCESS_TOKEN
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.assertj.core.api.Assertions

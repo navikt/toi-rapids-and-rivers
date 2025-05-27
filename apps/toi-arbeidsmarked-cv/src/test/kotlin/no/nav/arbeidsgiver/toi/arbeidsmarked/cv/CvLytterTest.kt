@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeid.cv.avro.*

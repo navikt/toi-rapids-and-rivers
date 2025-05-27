@@ -54,3 +54,9 @@ spec:
       value: {{publiser_til_rapid_enabled}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true
