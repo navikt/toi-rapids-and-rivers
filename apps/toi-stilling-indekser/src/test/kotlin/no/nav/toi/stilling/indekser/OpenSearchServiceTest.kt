@@ -158,7 +158,7 @@ class OpenSearchServiceTest {
                     "stillingskategori": "STILLING"
                 },
                 "direktemeldtStilling": {
-                    "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
+                    "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
                     "innhold": {
                         "title": "Teststilling",
                         "administration": {

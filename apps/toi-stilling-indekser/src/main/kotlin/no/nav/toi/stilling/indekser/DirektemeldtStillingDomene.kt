@@ -23,7 +23,7 @@ data class Melding(
 }
 
 data class DirektemeldtStilling(
-    val stillingsid: UUID,
+    val stillingsId: UUID,
     val annonseId: Long,
     val innhold: DirektemeldtStillingInnhold,
     val opprettet: ZonedDateTime,
@@ -34,7 +34,7 @@ data class DirektemeldtStilling(
 ) {
 
     fun tilStilling(): Stilling = Stilling(
-        uuid = stillingsid,
+        uuid = stillingsId,
         annonsenr = annonseId,
         created = opprettet,
         updated = sistEndret,
