@@ -39,7 +39,7 @@ spec:
         - application: rekrutteringsbistand
           cluster: {{cluster}}
         - application: rekrutteringsbistand-frontend
-          cluster: {{cluster}}          
+          cluster: {{cluster}}
   azure:
     application:
       enabled: true
@@ -57,3 +57,9 @@ spec:
       value: {{notifikasjon_api_scope}}
     - name: NOTIFIKASJON_API_HOST
       value: {{notifikasjon_api_host}}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

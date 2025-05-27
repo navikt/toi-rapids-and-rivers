@@ -42,3 +42,9 @@ spec:
       value: "earliest"
     - name: NORG2_URL
       value: {{ norg2_url }}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

@@ -60,3 +60,9 @@ spec:
       value: {{ pdl_scope }}
     - name: PDL_URL
       value: {{ pdl_url }}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

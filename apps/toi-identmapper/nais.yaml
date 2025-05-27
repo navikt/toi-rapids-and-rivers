@@ -67,3 +67,9 @@ spec:
       value: {{ pdl_kafka_group_id }}
   envFrom:
     - secret: toi-identmapper-servicebruker
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

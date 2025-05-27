@@ -42,3 +42,9 @@ spec:
       value: "earliest"
     - name: ONTOLOGI_URL
       value: {{ ontologi_url }}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true
