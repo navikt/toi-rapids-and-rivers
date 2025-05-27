@@ -70,7 +70,7 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
     }
 
     private fun hentReindekserIndeks(): String {
-        return "${stillingAlias}_${env.variable("REINDEKSER_INDEKS")}"
+        return env.variable("REINDEKSER_INDEKS")
     }
 
     private fun hentVersjon(indeks: String): String {
@@ -82,7 +82,7 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
     }
 
     private fun hentIndeksNavn(versjon: String): String {
-        return "${stillingAlias}_$versjon"
+        return versjon
     }
 
 }

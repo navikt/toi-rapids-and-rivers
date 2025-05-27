@@ -39,14 +39,14 @@ class OpenSearchServiceTest {
         env["OPEN_SEARCH_USERNAME"] = osContainer.container.username
         env["OPEN_SEARCH_PASSWORD"] = osContainer.container.password
 
-        env["INDEKS_VERSJON"] = "20250328"
+        env["INDEKS_VERSJON"] = "stilling_20250328"
         env["STILLING_API_URL"] = "enUrl"
         env["STILLING_API_SCOPE"] = "scope"
         env["AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"] = "enUrl2"
         env["AZURE_APP_CLIENT_ID"] = "client_id"
         env["AZURE_APP_CLIENT_SECRET"] = "secret"
         env["REINDEKSER_ENABLED"] = "false"
-        env["REINDEKSER_INDEKS"] = "20250401"
+        env["REINDEKSER_INDEKS"] = "stilling_20250401"
 
         openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
         indexClient = IndexClient(openSearchClient, objectMapper)
@@ -81,11 +81,11 @@ class OpenSearchServiceTest {
     fun `Alias 'stilling' skal peke på ny index etter reindeksering og bytte av alias`() {
         opprettIndeks()
         env["REINDEKSER_ENABLED"] = "true"
-        env["REINDEKSER_INDEKS"] = "20250329"
+        env["REINDEKSER_INDEKS"] = "stilling_20250329"
 
         openSearchService.initialiserReindekserIndeks()
 
-        env["INDEKS_VERSJON"] = "20250329"
+        env["INDEKS_VERSJON"] = "stilling_20250329"
         openSearchService.byttTilNyIndeks()
 
         val gjeldendeIndeksMedAlias = indexClient.hentIndeksAliasPekerPå()
@@ -104,7 +104,7 @@ class OpenSearchServiceTest {
         assertThat(indeks3).isFalse()
 
         env["REINDEKSER_ENABLED"] = "true"
-        env["REINDEKSER_INDEKS"] = "20250330"
+        env["REINDEKSER_INDEKS"] = "stilling_20250330"
         openSearchService.initialiserReindekserIndeks()
 
         index1 = indexClient.finnesIndeks("stilling_20250328")
@@ -204,7 +204,9 @@ class OpenSearchServiceTest {
                                 "parentId": null
                             }
                         ],
-                        "properties": {},
+                        "properties": {
+                            "externalref": "1005/18"
+                        },
                         "publishedByAdmin": "2023-01-01T12:00:00Z",
                         "businessName": "Testbedrift",
                         "firstPublished": true,
