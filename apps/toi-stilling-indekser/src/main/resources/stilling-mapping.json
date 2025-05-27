@@ -275,6 +275,9 @@
             },
             "tags": {
               "type": "keyword"
+            },
+            "externalref": {
+                "type": "keyword"
             }
           }
         }
