@@ -32,7 +32,7 @@ fun konverterTilStilling(ad: Ad): Stilling {
                 orgform = it.orgform
             )
         },
-        categories = ad.classifications.map { DirektemeldtStillingKategori(code = it.code, name = it.name, categoryType = it.categoryType) },
+        categories = if(ad.classifications == null) emptyList() else ad.classifications.map { DirektemeldtStillingKategori(code = it.code, name = it.name, categoryType = it.categoryType) },
         source = ad.source,
         medium = ad.medium,
         businessName = ad.businessName,
