@@ -8,7 +8,7 @@ import java.util.UUID
 class KonverterTilStillingTest {
 
     @Test
-    fun `Ad fra topic skal bli konvertert til riktig Stilling`() {
+    fun `Ad fra topic skal bli konvertert til riktig Stilling`() { // TOOD fiks så det sjekkes bedre
         val uuid = UUID.randomUUID().toString()
         val ad = ad(uuid)
         val konvertertStilling = konverterTilStilling(ad)
