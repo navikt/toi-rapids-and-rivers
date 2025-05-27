@@ -72,7 +72,7 @@ class EksternStillingLytter(
         val stillingsinfo = stillingsinfoClient.hentStillingsinfo(arbeidsplassenStillinger.map { it.uuid.toString() })
 
         arbeidsplassenStillinger.forEach { stilling ->
-            log.info("Mottok stilling for indeksering: ${stilling.uuid}")
+            log.info("Mottok ekstern stilling for indeksering: ${stilling.uuid}")
 
             val rekrutteringsbistandStilling = RekrutteringsbistandStilling(
                 stilling = stilling,
