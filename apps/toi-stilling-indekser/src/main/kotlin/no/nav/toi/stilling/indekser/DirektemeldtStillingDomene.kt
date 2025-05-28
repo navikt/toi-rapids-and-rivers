@@ -31,7 +31,11 @@ data class DirektemeldtStilling(
     val opprettetAv: String,
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
-    val status: String
+    val status: String,
+    val utløpsdato: ZonedDateTime?,
+    val publisert: ZonedDateTime? = null,
+    val publisertAvAdmin: String?,
+    val adminStatus: String?
 ) {
 
     fun tilStilling(): Stilling = Stilling(
@@ -41,19 +45,19 @@ data class DirektemeldtStilling(
         updated = sistEndret,
         status = status,
         tittel = innhold.title,
-        administration = innhold.administration,
+        administration = innhold.administration?.copy(status = adminStatus),
         contacts = innhold.contactList,
         privacy = innhold.privacy,
         source = innhold.source,
         medium = innhold.medium,
         reference = innhold.reference,
-        published = innhold.published,
-        expires = innhold.expires,
+        published = publisert,
+        expires = utløpsdato,
         employer = innhold.employer,
         locations = innhold.locationList,
         categories = innhold.categoryList,
         properties = innhold.properties.map { it.key to (tilJson(it.value) ?: it.value)}.toMap(),
-        publishedByAdmin = innhold.publishedByAdmin,
+        publishedByAdmin = publisertAvAdmin,
         businessName = innhold.businessName,
     )
 }
@@ -90,13 +94,10 @@ data class DirektemeldtStillingInnhold(
     val source: String?,
     val medium: String?,
     val reference: String?,
-    val published: ZonedDateTime?,
-    val expires: ZonedDateTime?,
     val employer: DirektemeldtStillingArbeidsgiver?,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
     val properties: Map<String, String> = HashMap(),
-    val publishedByAdmin: String?,
     val businessName: String?,
     val firstPublished: Boolean?,
     val deactivatedByExpiry: Boolean?,
