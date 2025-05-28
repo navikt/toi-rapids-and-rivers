@@ -71,17 +71,15 @@ class EksternStillingLytter(
         val arbeidsplassenStillinger = stillinger.filter { it.source != "DIR" }
         val stillingsinfo = stillingsinfoClient.hentStillingsinfo(arbeidsplassenStillinger.map { it.uuid.toString() })
 
-        arbeidsplassenStillinger.forEach { stilling ->
-            log.info("Mottok ekstern stilling for indeksering: ${stilling.uuid}")
-
-            val rekrutteringsbistandStilling = RekrutteringsbistandStilling(
+        val rekrutteringsbistandStilliner =  arbeidsplassenStillinger.map { stilling ->
+            RekrutteringsbistandStilling(
                 stilling = stilling,
                 stillingsinfo = stillingsinfo.find { info -> info.stillingsid == stilling.uuid.toString() }
             )
-            openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
-
         }
-        log.info("Indekserte ${arbeidsplassenStillinger.size} stillinger i indeks '$indeks'. UUIDer: ${arbeidsplassenStillinger.map { it.uuid }}")
+
+        openSearchService.indekser(stillinger = rekrutteringsbistandStilliner, indeks = indeks)
+        log.info("Indekserte ${arbeidsplassenStillinger.size} eksterne stillinger i indeks '$indeks'. UUIDer: ${arbeidsplassenStillinger.map { it.uuid }}")
     }
 
     private fun beholdSisteMeldingPerStilling(stillinger: List<Stilling>) =

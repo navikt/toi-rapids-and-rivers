@@ -26,12 +26,12 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
     fun indekser(stillinger: List<RekrutteringsbistandStilling>, indeks: String): BulkResponse {
         val bulkRequest = BulkRequest.Builder()
 
-        stillinger.forEach { stilling ->
+        stillinger.forEach { rekrutteringsbistandStilling ->
             val operation = BulkOperation.Builder()
                 .index { idx ->
                     idx.index(indeks)
-                        .id(stilling.stilling.uuid.toString())
-                        .document(stilling)
+                        .id(rekrutteringsbistandStilling.stilling.uuid.toString())
+                        .document(rekrutteringsbistandStilling)
                 }
                 .build()
 
