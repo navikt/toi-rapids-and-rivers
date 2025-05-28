@@ -83,28 +83,6 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
         lagAlias(indeksNavn)
         log.info("Oppdaterte alias $stillingAlias til å peke på $indeksNavn")
     }
-//
-//    fun oppdaterAlias(indeksNavn: String) {
-//        val request = UpdateAliasesRequest.Builder().actions { actions ->
-//            // Remove action
-//            actions.remove { remove ->
-//                remove.index("$stillingAlias*")
-//                    .alias(stillingAlias)
-//            }
-//            // Add action
-//            actions.add { add ->
-//                add.index(indeksNavn)
-//                    .alias(stillingAlias)
-//            }
-//        }.build()
-//
-//        val aliasOppdatert = client.indices().updateAliases(request).acknowledged()
-//
-//        if (!aliasOppdatert) {
-//            throw Exception("Klarte ikke oppdatere alias $stillingAlias til å peke på $indeksNavn")
-//        }
-//        log.info("Oppdatere alias $stillingAlias til å peke på $indeksNavn")
-//    }
 
     private fun fjernAlias() {
         val request = UpdateAliasesRequest.Builder().actions { actions ->

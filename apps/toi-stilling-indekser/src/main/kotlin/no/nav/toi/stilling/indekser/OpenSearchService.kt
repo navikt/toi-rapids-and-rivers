@@ -61,28 +61,19 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
     }
 
     fun hentNyesteIndeks(): String {
-        return hentIndeksNavn(hentVersjonFraNaisConfig())
+        return hentVersjonFraNaisConfig()
     }
 
     fun hentGjeldendeIndeksversjon(): String? {
         val indeks = client.hentIndeksAliasPekerPå() ?: return null
-        return hentVersjon(indeks)
+        return indeks
     }
 
     private fun hentReindekserIndeks(): String {
         return env.variable("REINDEKSER_INDEKS")
     }
 
-    private fun hentVersjon(indeks: String): String {
-        return indeks.split("_").last()
-    }
-
     fun hentVersjonFraNaisConfig(): String {
         return env.variable("INDEKS_VERSJON")
     }
-
-    private fun hentIndeksNavn(versjon: String): String {
-        return versjon
-    }
-
 }

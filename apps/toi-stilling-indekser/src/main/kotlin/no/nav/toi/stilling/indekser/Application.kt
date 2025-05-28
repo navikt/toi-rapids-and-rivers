@@ -61,6 +61,11 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     try {
         rapidsConnection.also { rapid ->
+            if(indeks != openSearchService.hentGjeldendeIndeks() && !reindekserEnabled) {
+                log.info("Skal bytte alias til å peke på indeks $indeks")
+                openSearchService.byttTilNyIndeks()
+            }
+
             if (reindekserEnabled && reindekserIndeks != indeks) {
                 log.info("Reindeksering av alle stillinger starter på indeks $reindekserIndeks")
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(reindekserIndeks, env))
