@@ -94,7 +94,7 @@ data class DirektemeldtStillingInnhold(
     val employer: DirektemeldtStillingArbeidsgiver?,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
-    val properties: Map<String, String> = HashMap(),
+    val properties: Map<String, Any> = HashMap(),
     val publishedByAdmin: String?,
     val businessName: String?,
     val firstPublished: Boolean?,
