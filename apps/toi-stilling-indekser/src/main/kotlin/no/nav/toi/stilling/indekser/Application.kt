@@ -61,7 +61,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     try {
         rapidsConnection.also { rapid ->
-            if(indeks != openSearchService.hentGjeldendeIndeks() && !reindekserEnabled) {
+            if(indeks != openSearchService.hentGjeldendeIndeks()) {
                 log.info("Skal bytte alias til å peke på indeks $indeks")
                 openSearchService.byttTilNyIndeks()
             }
