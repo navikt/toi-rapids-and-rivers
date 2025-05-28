@@ -40,7 +40,7 @@ data class DirektemeldtStilling(
 
     fun tilStilling(): Stilling = Stilling(
         uuid = stillingsId,
-        annonsenr = annonseId,
+        annonsenr = annonseId.toString(),
         created = opprettet,
         updated = sistEndret,
         status = status,

@@ -10,7 +10,7 @@ data class RekrutteringsbistandStilling(
 
 data class Stilling(
     val uuid: UUID,
-    val annonsenr: Long,
+    val annonsenr: String,
     val status: String,
     val privacy: String?,
     val published: ZonedDateTime?,

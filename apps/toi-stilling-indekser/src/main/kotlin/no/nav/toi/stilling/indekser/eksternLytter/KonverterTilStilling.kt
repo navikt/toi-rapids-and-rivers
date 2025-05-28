@@ -15,7 +15,7 @@ import java.util.*
 fun konverterTilStilling(ad: Ad): Stilling {
     return Stilling(
         uuid = UUID.fromString(ad.uuid),
-        annonsenr = ad.adnr.toLong(),
+        annonsenr = ad.adnr,
         status = ad.status.name,
         privacy = ad.privacy.name,
         published = if(ad.published.isNullOrBlank()) null else konverterDato(ad.published),
