@@ -213,7 +213,7 @@ class OpenSearchServiceTest {
                         "deactivatedByExpiry": false,
                         "activationOnPublishingDate": true
                     },
-                    "annonseId": 123456789,
+                    "annonsenr": "123456789",
                     "opprettet": "2023-01-01T12:00:00Z",
                     "opprettetAv": "Testoppretter",
                     "sistEndret": "2023-01-02T12:00:00Z",
