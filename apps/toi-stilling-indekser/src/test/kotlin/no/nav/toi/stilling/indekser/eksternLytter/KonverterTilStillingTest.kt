@@ -8,13 +8,13 @@ import java.util.UUID
 class KonverterTilStillingTest {
 
     @Test
-    fun `Ad fra topic skal bli konvertert til riktig Stilling`() { // TOOD fiks så det sjekkes bedre
+    fun `Ad fra topic skal bli konvertert til riktig Stilling`() { // TODO fiks så det sjekkes bedre
         val uuid = UUID.randomUUID().toString()
         val ad = ad(uuid)
         val konvertertStilling = konverterTilStilling(ad)
 
         assert(konvertertStilling.uuid.toString() == ad.uuid)
-        assert(konvertertStilling.annonsenr == ad.adnr.toLong())
+        assert(konvertertStilling.annonsenr == ad.adnr)
         assert(konvertertStilling.status == ad.status.name)
         assert(konvertertStilling.privacy == ad.privacy.name)
         assert(konvertertStilling.published != null)
