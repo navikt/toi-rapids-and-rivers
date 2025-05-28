@@ -1,10 +1,11 @@
 package no.nav.toi.stilling.indekser
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import no.nav.toi.stilling.indekser.eksternLytter.tilJson
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -56,10 +57,23 @@ data class DirektemeldtStilling(
         employer = innhold.employer,
         locations = innhold.locationList,
         categories = innhold.categoryList,
-        properties = innhold.properties.map { it.key to (tilJson(it.value) ?: it.value)}.toMap(),
+        properties = innhold.properties.map { it.key to (tilJson(key = it.key, value = it.value) ?: it.value)}.toMap(),
         publishedByAdmin = publisertAvAdmin,
         businessName = innhold.businessName,
     )
+
+    private fun tilJson(key: String, value: String?): JsonNode? {
+        if(value == null) {
+            log.info("Key: $key has null value, returning null")
+            return null
+        }
+        return try {
+            val json = jacksonObjectMapper().readTree(value)
+            json
+        } catch (exception: JsonProcessingException) {
+            null
+        }
+    }
 }
 
 data class DirektemeldtStillingKategori(
