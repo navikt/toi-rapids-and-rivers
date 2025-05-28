@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.toi.stilling.indekser.eksternLytter.tilJson
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -51,7 +52,7 @@ data class DirektemeldtStilling(
         employer = innhold.employer,
         locations = innhold.locationList,
         categories = innhold.categoryList,
-        properties = innhold.properties,
+        properties = innhold.properties.map { it.key to (tilJson(it.value) ?: it.value)}.toMap(),
         publishedByAdmin = innhold.publishedByAdmin,
         businessName = innhold.businessName,
     )
@@ -94,7 +95,7 @@ data class DirektemeldtStillingInnhold(
     val employer: DirektemeldtStillingArbeidsgiver?,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
-    val properties: Map<String, Any> = HashMap(),
+    val properties: Map<String, String> = HashMap(),
     val publishedByAdmin: String?,
     val businessName: String?,
     val firstPublished: Boolean?,

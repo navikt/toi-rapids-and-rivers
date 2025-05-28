@@ -44,6 +44,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     val httpClient: HttpClient = HttpClient.newBuilder()
         .followRedirects(HttpClient.Redirect.ALWAYS)
+        .version(HttpClient.Version.HTTP_1_1)
         .build()
 
     val openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
@@ -128,7 +129,6 @@ fun startIndeksering(
     } else {
         if(openSearchService.initialiserIndeks()) {
             stillingApiClient.triggSendingAvStillingerPåRapid() // Initiell last
-            // TODO Her må det startes en lytter som lytter på ekstern topic fra start
         }
     }
 }
