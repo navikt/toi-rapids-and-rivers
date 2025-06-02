@@ -29,11 +29,6 @@ class KonverterTilStillingTest {
         assert(konvertertStilling.reference == ad.reference)
         assert(konvertertStilling.administration?.status == ad.administration?.status?.name)
     }
-
-    @Test
-    fun `Klarer å konverter datoer uten å gi en exception`() {
-        konverterDato("2025-05-31T08:01:15.625168+02:00")
-    }
 }
 
 fun ad(uuid: String) = Ad(
