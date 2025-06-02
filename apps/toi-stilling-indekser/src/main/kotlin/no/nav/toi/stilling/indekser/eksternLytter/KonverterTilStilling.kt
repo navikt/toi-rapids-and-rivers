@@ -18,11 +18,11 @@ fun konverterTilStilling(ad: Ad): Stilling {
         annonsenr = ad.adnr,
         status = ad.status.name,
         privacy = ad.privacy.name,
-        published = if(ad.published.isNullOrBlank()) null else konverterDato(ad.published).toString(),
+        published = if(ad.published.isNullOrBlank()) null else konverterDato(ad.published),
         publishedByAdmin = ad.publishedByAdmin,
-        expires = if(ad.expires.isNullOrBlank()) null else konverterDato(ad.expires).toString(),
-        created = konverterDato(ad.created).toString(),
-        updated = konverterDato(ad.updated).toString(),
+        expires = if(ad.expires.isNullOrBlank()) null else konverterDato(ad.expires),
+        created = konverterDato(ad.created),
+        updated = konverterDato(ad.updated),
         employer = ad.employer?.let {
             DirektemeldtStillingArbeidsgiver(
                 name = it.name,
