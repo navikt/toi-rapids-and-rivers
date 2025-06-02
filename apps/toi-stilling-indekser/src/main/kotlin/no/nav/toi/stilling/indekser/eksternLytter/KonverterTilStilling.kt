@@ -77,9 +77,9 @@ fun konverterTilStilling(ad: Ad): Stilling {
 
 fun konverterDato(dato: String): ZonedDateTime {
     return try {
-        LocalDateTime.parse(dato).atZone(ZoneId.of("Europe/Oslo"))
+        ZonedDateTime.parse(dato)
     } catch (e: Exception) {
-        throw RuntimeException("Greide ikke konverte dato til zonedDateTime: $dato", e)
+        throw RuntimeException("Greide ikke konvertere dato til zonedDateTime: $dato", e)
     }
 }
 
