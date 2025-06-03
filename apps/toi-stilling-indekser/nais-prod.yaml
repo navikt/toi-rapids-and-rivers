@@ -1,6 +1,6 @@
 kafka_pool: nav-prod
 kafka_consumer_group_id: toi-stilling-indekser-rapidconsumer-1
-indeks: stilling_20250328
+indeks: stilling_20250603
 reindekser_indeks: stilling_20250410
 reindekser_enabled: false
 stilling_api_url: http://rekrutteringsbistand-stilling-api
