@@ -61,11 +61,15 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     try {
         rapidsConnection.also { rapid ->
-            rapid.register(object : RapidsConnection.StatusListener {
-                override fun onStartup(rapidsConnection: RapidsConnection) {
-                    startIndeksering(openSearchService, stillingApiClient, env)
+            if(reindekserEnabled && !openSearchService.finnesIndeks(reindekserIndeks)) {
+                //opprett indeks og trigg reindeksering
+                openSearchService.initialiserReindekserIndeks()
+                stillingApiClient.triggSendingAvStillingerPåRapid()
+            } else {
+                if(openSearchService.initialiserIndeks()) {
+                    stillingApiClient.triggSendingAvStillingerPåRapid() // Initiell last
                 }
-            })
+            }
 
             if(indeks != openSearchService.hentGjeldendeIndeks()) {
                 log.info("Skal bytte alias til å peke på indeks $indeks")
@@ -117,25 +121,6 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 private fun uncaughtExceptionHandler(thread: Thread, err: Throwable) {
     log.error("Det skjedde en feil i tråden ${thread.name}: ${err.message}. Appen skal stoppe", err)
     Liveness.kill("Det skjedde en feil i tråden ${thread.name}: ${err.message}", err)
-}
-
-fun startIndeksering(
-    openSearchService: OpenSearchService,
-    stillingApiClient: StillingApiClient,
-    env: MutableMap<String, String>
-) {
-    val reindekserEnabled = env.variable("REINDEKSER_ENABLED").toBooleanStrict()
-    val reindekserIndeks = env.variable("REINDEKSER_INDEKS")
-
-    if(reindekserEnabled && !openSearchService.finnesIndeks(reindekserIndeks)) {
-        //opprett indeks og trigg reindeksering
-        openSearchService.initialiserReindekserIndeks()
-        stillingApiClient.triggSendingAvStillingerPåRapid()
-    } else {
-        if(openSearchService.initialiserIndeks()) {
-            stillingApiClient.triggSendingAvStillingerPåRapid() // Initiell last
-        }
-    }
 }
 
 fun rapidsConnection(env: MutableMap<String, String>): RapidsConnection {
