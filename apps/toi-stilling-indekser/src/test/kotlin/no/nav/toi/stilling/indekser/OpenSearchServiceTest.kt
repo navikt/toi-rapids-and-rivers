@@ -143,8 +143,7 @@ class OpenSearchServiceTest {
     }
 
     private fun opprettIndeks() {
-        startIndeksering(openSearchService, stillingApiClient, env)
-    }
+        openSearchService.initialiserIndeks()    }
 
     private val melding = """
             {
