@@ -1,21 +1,158 @@
 package no.nav.toi.stilling.indekser
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
+import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.SecureLogLogger.Companion.secure
+import no.nav.toi.stilling.indekser.eksternLytter.EksternStillingLytter
+import no.nav.toi.stilling.indekser.eksternLytter.consumerConfig
+import no.nav.toi.stilling.indekser.stillingsinfo.StillingsinfoClient
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.http.HttpClient
+import java.util.*
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
+import kotlin.concurrent.thread
 
 private val log = noClassLogger()
 
+lateinit var rapidIsAlive: () -> Boolean
+
 fun main() {
+    val env = System.getenv()
     log.info("Starter app.")
     secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
-    RapidApplication.create(System.getenv()).also { rapidsConnection ->
-        DirektemeldtStillingLytter(rapidsConnection)
-    }.start()
+    startApp(rapidsConnection(env), env)
+}
+
+fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
+
+fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>) {
+    val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+
+    val httpClient: HttpClient = HttpClient.newBuilder()
+        .followRedirects(HttpClient.Redirect.ALWAYS)
+        .version(HttpClient.Version.HTTP_1_1)
+        .build()
+
+    val openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
+    val indexClient = IndexClient(openSearchClient, objectMapper)
+    val accessTokenClient = AccessTokenClient(env, httpClient, objectMapper)
+    val stillingApiClient = StillingApiClient(env, httpClient, accessTokenClient)
+    val openSearchService = OpenSearchService(indexClient, env)
+    val stillingsinfoClient = StillingsinfoClient(env, httpClient, accessTokenClient, objectMapper)
+
+    val reindekserEnabled = env.variable("REINDEKSER_ENABLED").toBooleanStrict()
+    val reindekserIndeks = env.variable("REINDEKSER_INDEKS")
+
+    val indeks = openSearchService.hentNyesteIndeks()
+
+    try {
+        rapidsConnection.also { rapid ->
+            if(indeks != openSearchService.hentGjeldendeIndeks()) {
+                log.info("Skal bytte alias til å peke på indeks $indeks")
+                openSearchService.byttTilNyIndeks()
+            }
+
+            if (reindekserEnabled && reindekserIndeks != indeks) {
+                log.info("Reindeksering av alle stillinger starter på indeks $reindekserIndeks")
+                val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(reindekserIndeks, env))
+                val reindekserStillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
+
+                val versjonTilGammelConsumer = openSearchService.hentGjeldendeIndeksversjon() ?: kanIkkeStarteReindeksering()
+                val gammelKafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilGammelConsumer, env))
+                val gammelStillingConsumer = EksternStillingLytter(gammelKafkaConsumer, openSearchService, stillingsinfoClient)
+
+                // Startet lytting på reindekseringsmeldinger fra rapid og les ekstern-topic fra start
+                thread(name = "reindekserStillingConsumer") {
+                    Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
+                    reindekserStillingConsumer.start(reindekserIndeks)
+                }
+                ReindekserStillingLytter(rapid, openSearchService, reindekserIndeks)
+
+                // opprettholder at oppdateringer blir indeksert i den gamle indeksen fra rapid og ekstern-topic
+                thread(name = "gammelStillingConsumer") {
+                    Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
+                    gammelStillingConsumer.start(indeks)
+                }
+                IndekserStillingLytter(rapid, openSearchService, indeks)
+            } else {
+                // Initiell indeksering av stillinger, samt kontinuerlig lesing av oppdateringer på rapid og ekstern-topic
+                log.info("Starter indeksering av stillinger på indeks $indeks")
+                val versjonTilStillingConsumer = openSearchService.hentVersjonFraNaisConfig()
+                val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilStillingConsumer, env))
+                val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
+
+                IndekserStillingLytter(rapid, openSearchService, indeks)
+
+                thread(name = "indekserStillingConsumer" ) {
+                    Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
+                    stillingConsumer.start(indeks)
+                }
+            }
+
+            rapid.register(object : RapidsConnection.StatusListener {
+                override fun onStartup(rapidsConnection: RapidsConnection) {
+                    startIndeksering(openSearchService, stillingApiClient, env)
+                }
+            })
+        }.start()
+    } catch (t: Throwable) {
+        LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
+    }
+}
+
+private fun uncaughtExceptionHandler(thread: Thread, err: Throwable) {
+    log.error("Det skjedde en feil i tråden ${thread.name}: ${err.message}. Appen skal stoppe", err)
+    Liveness.kill("Det skjedde en feil i tråden ${thread.name}: ${err.message}", err)
+}
+
+fun startIndeksering(
+    openSearchService: OpenSearchService,
+    stillingApiClient: StillingApiClient,
+    env: MutableMap<String, String>
+) {
+    val reindekserEnabled = env.variable("REINDEKSER_ENABLED").toBooleanStrict()
+    val reindekserIndeks = env.variable("REINDEKSER_INDEKS")
+
+    if(reindekserEnabled && !openSearchService.finnesIndeks(reindekserIndeks)) {
+        //opprett indeks og trigg reindeksering
+        openSearchService.initialiserReindekserIndeks()
+        stillingApiClient.triggSendingAvStillingerPåRapid()
+    } else {
+        if(openSearchService.initialiserIndeks()) {
+            stillingApiClient.triggSendingAvStillingerPåRapid() // Initiell last
+        }
+    }
+}
+
+fun rapidsConnection(env: MutableMap<String, String>): RapidsConnection {
+    return RapidApplication.create(
+            env = env,
+            builder = {
+                withKtorModule {
+                    configureRouting()
+                }
+            },
+        configure = { _, kafkarapid -> rapidIsAlive = kafkarapid::isRunning }
+    )
+}
+
+
+fun kanIkkeStarteReindeksering(): Nothing {
+    throw Exception("Kan ikke starte reindeksering uten noen alias som peker på indeks")
 }
 
 val Any.log: Logger

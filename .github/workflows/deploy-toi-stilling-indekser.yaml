@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/logback7
+      deploy_dev_branch: refs/heads/indeksering_i_opensearch
     secrets: inherit
     permissions:
       contents: read

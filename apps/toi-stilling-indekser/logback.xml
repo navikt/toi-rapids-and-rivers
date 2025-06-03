@@ -13,6 +13,10 @@
         </filter>
     </appender>
 
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.mdc.v1_0.OpenTelemetryAppender">
+        <appender-ref ref="appLog" />
+    </appender>
+
     <appender name="secureLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/secure-logs/secure.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -34,7 +38,7 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="appLog"/>
+        <appender-ref ref="OTEL"/>
         <appender-ref ref="secureLog"/>
     </root>
 </configuration>
