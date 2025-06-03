@@ -61,6 +61,12 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
     try {
         rapidsConnection.also { rapid ->
+            rapid.register(object : RapidsConnection.StatusListener {
+                override fun onStartup(rapidsConnection: RapidsConnection) {
+                    startIndeksering(openSearchService, stillingApiClient, env)
+                }
+            })
+
             if(indeks != openSearchService.hentGjeldendeIndeks()) {
                 log.info("Skal bytte alias til å peke på indeks $indeks")
                 openSearchService.byttTilNyIndeks()
@@ -102,12 +108,6 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                     stillingConsumer.start(indeks)
                 }
             }
-
-            rapid.register(object : RapidsConnection.StatusListener {
-                override fun onStartup(rapidsConnection: RapidsConnection) {
-                    startIndeksering(openSearchService, stillingApiClient, env)
-                }
-            })
         }.start()
     } catch (t: Throwable) {
         LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
