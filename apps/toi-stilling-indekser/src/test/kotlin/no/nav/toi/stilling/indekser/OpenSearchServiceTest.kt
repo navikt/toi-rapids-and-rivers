@@ -83,7 +83,7 @@ class OpenSearchServiceTest {
         env["REINDEKSER_ENABLED"] = "true"
         env["REINDEKSER_INDEKS"] = "stilling_20250329"
 
-        openSearchService.initialiserReindekserIndeks()
+        openSearchService.opprettReindekserIndeks()
 
         env["INDEKS_VERSJON"] = "stilling_20250329"
         openSearchService.byttTilNyIndeks()
@@ -105,7 +105,7 @@ class OpenSearchServiceTest {
 
         env["REINDEKSER_ENABLED"] = "true"
         env["REINDEKSER_INDEKS"] = "stilling_20250330"
-        openSearchService.initialiserReindekserIndeks()
+        openSearchService.opprettReindekserIndeks()
 
         index1 = indexClient.finnesIndeks("stilling_20250328")
         indeks3 = indexClient.finnesIndeks("stilling_20250330")
@@ -143,7 +143,7 @@ class OpenSearchServiceTest {
     }
 
     private fun opprettIndeks() {
-        openSearchService.initialiserIndeks()    }
+        openSearchService.opprettIndeks()    }
 
     private val melding = """
             {

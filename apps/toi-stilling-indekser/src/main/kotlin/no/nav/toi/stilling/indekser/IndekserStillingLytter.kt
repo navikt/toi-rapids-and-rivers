@@ -46,7 +46,7 @@ class IndekserStillingLytter(rapidsConnection: RapidsConnection,
             stillingsinfo = stillingsinfo
         )
 
-        log.info("Mottok intern stilling for indeksering: ${direktemeldtStilling.stillingsId} $direktemeldtStilling")
+        log.info("Mottok direktemeldt stilling for indeksering: ${direktemeldtStilling.stillingsId} $direktemeldtStilling")
 
         openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
     }

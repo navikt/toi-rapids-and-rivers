@@ -63,10 +63,10 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
         rapidsConnection.also { rapid ->
             if(reindekserEnabled && !openSearchService.finnesIndeks(reindekserIndeks)) {
                 //opprett indeks og trigg reindeksering
-                openSearchService.initialiserReindekserIndeks()
+                openSearchService.opprettReindekserIndeks()
                 stillingApiClient.triggSendingAvStillingerPåRapid()
             } else {
-                if(openSearchService.initialiserIndeks()) {
+                if(openSearchService.opprettIndeks()) {
                     stillingApiClient.triggSendingAvStillingerPåRapid() // Initiell last
                 }
             }

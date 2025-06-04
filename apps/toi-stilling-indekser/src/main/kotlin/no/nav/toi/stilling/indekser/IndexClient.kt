@@ -37,10 +37,16 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
 
             bulkRequest.operations(operation)
         }
-        val uuider = stillinger.map { it.stilling.uuid }
-        log.info("Indekserte ${uuider.size} stillinger i indeks '$indeks'. UUIDer: $uuider")
 
-        return client.bulk(bulkRequest.build())
+        val response = client.bulk(bulkRequest.build())
+        if(response.errors()) {
+            val feil = response.items().filter { it.error() != null }
+
+            feil.forEach {
+                log.error("Greide ikke å indeksere ekstern stilling med UUID ${it.id()}: ${it.error()?.reason()} i indeks $indeks")
+            }
+        }
+        return response
     }
 
     fun indekserStilling(stilling: RekrutteringsbistandStilling, indeks: String): IndexResponse {
@@ -53,7 +59,7 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
 
         val response = client.index(request)
 
-        log.info("Indeksert stilling med UUID $uuid i indeks '$indeks', response: ${response.result()}")
+        log.info("Indeksert direktemeldt stilling med UUID $uuid i indeks '$indeks', response: ${response.result()}")
         return response
     }
 
