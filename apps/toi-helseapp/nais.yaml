@@ -25,6 +25,8 @@ spec:
     requests:
       cpu: 100m
       memory: 512Mi
+  strategy:
+    type: Recreate
   kafka:
      pool: nav-prod
   env:
