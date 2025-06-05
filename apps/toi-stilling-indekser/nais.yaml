@@ -12,10 +12,10 @@ spec:
   port: 8080
   liveness:
     path: /isalive
-    initialDelay: 45
+    initialDelay: 50
   readiness:
     path: /isready
-    initialDelay: 45
+    initialDelay: 50
   prometheus:
     enabled: true
     path: /metrics
