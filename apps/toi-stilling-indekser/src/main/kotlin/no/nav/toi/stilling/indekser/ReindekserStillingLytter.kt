@@ -46,7 +46,7 @@ class ReindekserStillingLytter(rapidsConnection: RapidsConnection,
             stillingsinfo = stillingsinfo
         )
 
-        log.info("Mottok intern stilling for reindeksering: ${direktemeldtStilling.stillingsId} $direktemeldtStilling")
+        log.info("Mottok intern stilling for reindeksering: ${direktemeldtStilling.stillingsId}")
         openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
     }
 }
