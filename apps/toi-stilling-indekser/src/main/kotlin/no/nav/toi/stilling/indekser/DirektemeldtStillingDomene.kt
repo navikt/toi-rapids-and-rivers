@@ -46,7 +46,7 @@ data class DirektemeldtStilling(
         updated = sistEndret,
         status = status,
         tittel = innhold.title,
-        administration = innhold.administration?.copy(status = adminStatus),
+        administration = innhold.administration?.copy(status = konverterAdminStatus(adminStatus)),
         contacts = innhold.contactList,
         privacy = innhold.privacy,
         source = innhold.source,
@@ -61,6 +61,14 @@ data class DirektemeldtStilling(
         publishedByAdmin = publisertAvAdmin,
         businessName = innhold.businessName,
     )
+
+    private fun konverterAdminStatus(status: String?) : String {
+        return when (status) {
+            null, "RECEIVED" -> "RECEIVED"
+            "PENDING" -> "PENDING"
+            else -> "DONE"
+        }
+    }
 
     private fun tilJson(key: String, value: String?): JsonNode? {
         if(value == null) {

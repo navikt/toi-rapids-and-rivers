@@ -53,7 +53,7 @@ fun konverterTilStilling(ad: Ad): Stilling {
         reference = ad.reference,
         administration = ad.administration?.let {
             DirektemeldtStillingAdministration(
-                status = it.status.name,
+                status = konverterAdminStatus(it.status.name),
                 remarks = it.remarks.map(RemarkType::name),
                 comments = it.comments,
                 reportee = it.reportee,
@@ -80,6 +80,14 @@ fun konverterDato(dato: String): ZonedDateTime {
         LocalDateTime.parse(dato).atZone(ZoneId.of("Europe/Oslo"))
     } catch (e: Exception) {
         throw RuntimeException("Greide ikke konverte dato til zonedDateTime: $dato", e)
+    }
+}
+
+fun konverterAdminStatus(status: String?) : String {
+    return when (status) {
+        null, "RECEIVED" -> "RECEIVED"
+        "PENDING" -> "PENDING"
+        else -> "DONE"
     }
 }
 
