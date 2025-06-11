@@ -8,8 +8,6 @@ import no.nav.pam.stilling.ext.avro.Classification
 import no.nav.pam.stilling.ext.avro.RemarkType
 import no.nav.toi.stilling.indekser.*
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 
 fun konverterTilStilling(ad: Ad): Stilling {
@@ -75,9 +73,9 @@ fun konverterTilStilling(ad: Ad): Stilling {
     )
 }
 
-fun konverterDato(dato: String): ZonedDateTime {
+fun konverterDato(dato: String): LocalDateTime {
     return try {
-        LocalDateTime.parse(dato).atZone(ZoneId.of("Europe/Oslo"))
+        LocalDateTime.parse(dato)
     } catch (e: Exception) {
         throw RuntimeException("Greide ikke konverte dato til zonedDateTime: $dato", e)
     }
