@@ -1,6 +1,6 @@
 package no.nav.toi.stilling.indekser
 
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 import java.util.*
 
 data class RekrutteringsbistandStilling(
@@ -13,11 +13,11 @@ data class Stilling(
     val annonsenr: String,
     val status: String,
     val privacy: String?,
-    val published: ZonedDateTime?,
+    val published: LocalDateTime?,
     val publishedByAdmin: String?,
-    val expires: ZonedDateTime?,
-    val created: ZonedDateTime,
-    val updated: ZonedDateTime,
+    val expires: LocalDateTime?,
+    val created: LocalDateTime,
+    val updated: LocalDateTime,
     val employer: DirektemeldtStillingArbeidsgiver?,
     val categories: List<DirektemeldtStillingKategori> = ArrayList(),
     val source: String?,
