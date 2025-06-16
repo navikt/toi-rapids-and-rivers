@@ -69,6 +69,48 @@ class OntologiTest {
         wireMock.stubFor(
             get(urlEqualTo("/kompetanse/?kompetansenavn=FeilendeKall")).willReturn(aResponse().withStatus(500))
         )
+
+        wireMock.stubFor(
+            get(urlEqualTo("/kompetanse/?kompetansenavn=Collective%5Bi%5D")).willReturn(
+                aResponse().withBody(
+                    """
+                    {
+                    	"synonymer": [
+                    		"Collective[i]"
+                    	],
+                    	"merGenerell": [
+                    		"Collective i"
+                    	],
+                    	"relatert1": [
+                    	],
+                    	"relatert2": [
+                    	]
+                    }
+                """.trimIndent()
+                )
+            )
+        )
+
+        wireMock.stubFor(
+            get(urlEqualTo("/stilling/?stillingstittel=Collective%5Bi%5D")).willReturn(
+                aResponse().withBody(
+                    """
+                    {
+                    	"synonymer": [
+                    		"Collective[i]"
+                    	],
+                    	"merGenerell": [
+                    		"Collective i"
+                    	],
+                    	"relatert1": [
+                    	],
+                    	"relatert2": [
+                    	]
+                    }
+                """.trimIndent()
+                )
+            )
+        )
         wireMock.start()
     }
 
@@ -272,6 +314,40 @@ class OntologiTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun `urlencode kompetanser`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["ontologi"]""",
+                kompetanser = listOf("Collective[i]")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `urlencode stillingstitler`() {
+        val testRapid = TestRapid()
+        startApp("http://localhost:8082", testRapid)
+
+        testRapid.sendTestMessage(
+            behovsMelding(
+                behovListe = """["ontologi"]""",
+                stillingstitler = listOf("Collective[i]")
+            )
+        )
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
     }
 
     private fun behovsMelding(
