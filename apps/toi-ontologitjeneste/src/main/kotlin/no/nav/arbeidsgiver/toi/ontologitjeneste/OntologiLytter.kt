@@ -57,13 +57,21 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
 
     private fun ontologiRelasjoner(path: String): OntologiRelasjoner {
         val uuid = UUID.randomUUID()
-        val (_, _, result) = Fuel.get("$ontologiUrl$path")
-            .header("Nav-CallId", uuid)
-            .responseObject<OntologiRelasjoner>()
+        fun logFeil(e: FuelError): Nothing {
+            log.error("Feil ved kall til ontologi. response=${e.response}", e)
+            throw e
+        }
+
+        val (_, _, result) = try {
+            Fuel.get("$ontologiUrl$path")
+                .header("Nav-CallId", uuid)
+                .responseObject<OntologiRelasjoner>()
+        } catch (e: FuelError) {
+            logFeil(e)
+        }
         val (ontologiRelasjoner: OntologiRelasjoner?, error: FuelError?) = result
         if (error != null) {
-            log.error("Feil ved kall til ontologi. response=${error.response}", error)
-            throw error
+            logFeil(error)
         }
         if (ontologiRelasjoner == null) {
             val msg = "Ontologirelasjoner er null. Burde ikke gå an"
