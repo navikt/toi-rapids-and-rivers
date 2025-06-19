@@ -89,7 +89,7 @@ class EvalueringTest {
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
 
-    @Test
+    @Test // TODO bruk noe annet enn frkas til å flippe status
     fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
@@ -102,10 +102,7 @@ class EvalueringTest {
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
-                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
-                    fritattKandidatsøk = true,
-                    fnr = "12312312312"
-                )
+                arbeidssøkeropplysninger = Testdata.arbeidssøkeropplysninger(aktiv = true),
             )
         )
 
@@ -121,7 +118,7 @@ class EvalueringTest {
         val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
-            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erArbeidssøker = true))
     }
 
     @Test
@@ -137,10 +134,7 @@ class EvalueringTest {
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
-                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
-                    fritattKandidatsøk = true,
-                    fnr = "12312312312"
-                )
+                arbeidssøkeropplysninger = Testdata.arbeidssøkeropplysninger(aktiv = true),
             )
         )
 
@@ -155,7 +149,7 @@ class EvalueringTest {
         val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
-            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
 
     @Test
@@ -232,7 +226,6 @@ private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjon
     harJobbprofil = true,
     harSettHjemmel = true,
     maaIkkeBehandleTidligereCv = true,
-    erIkkeFritattKandidatsøk = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
     erIkkeSperretAnsatt = true,
@@ -246,7 +239,6 @@ private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjo
     harJobbprofil = false,
     harSettHjemmel = false,
     maaIkkeBehandleTidligereCv = false,
-    erIkkeFritattKandidatsøk = false,
     erUnderOppfoelging = false,
     harRiktigFormidlingsgruppe = false,
     erIkkeSperretAnsatt = false,
