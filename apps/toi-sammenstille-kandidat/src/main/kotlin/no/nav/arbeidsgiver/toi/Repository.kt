@@ -105,7 +105,6 @@ data class Kandidat(
     val oppfølgingsinformasjon: JsonNode? = null,
     val siste14avedtak: JsonNode? = null,
     val oppfølgingsperiode: JsonNode? = null,
-    val arenaFritattKandidatsøk: JsonNode? = null,
     val hjemmel: JsonNode? = null,
     val måBehandleTidligereCv: JsonNode? = null,
     val kvp: JsonNode? = null
@@ -120,7 +119,6 @@ data class Kandidat(
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
             siste14avedtak = json["siste14avedtak"],
             oppfølgingsperiode = json["oppfølgingsperiode"],
-            arenaFritattKandidatsøk = json["arenaFritattKandidatsøk"],
             hjemmel = json["hjemmel"],
             måBehandleTidligereCv = json["måBehandleTidligereCv"],
             kvp = json["kvp"]

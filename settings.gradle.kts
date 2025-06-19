@@ -17,7 +17,6 @@ include(
     "apps:toi-hull-i-cv",
     "apps:toi-ontologitjeneste",
     "apps:toi-arbeidsgiver-notifikasjon",
-    "apps:toi-arena-fritatt-kandidatsok",
     "apps:toi-kvp",
     "apps:toi-livshendelse",
     "apps:toi-evaluertdatalogger",

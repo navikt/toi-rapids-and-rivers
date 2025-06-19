@@ -30,7 +30,6 @@ class NeedSamleLytterTest {
                     "oppfølgingsinformasjon": "$oppfølgingsinformasjon",
                     "siste14avedtak": "$siste14avedtak",
                     "oppfølgingsperiode": "$oppfølgingsperiode",
-                    "arenaFritattKandidatsøk": "$arenaFritattKandidatsøk",
                     "hjemmel": "$hjemmel",
                     "måBehandleTidligereCv": "$måBehandleTidligereCv",
                     "kvp": "$kvp"
@@ -64,7 +63,6 @@ class NeedSamleLytterTest {
         val oppfølgingsinformasjon = "Gyldig oppfølgingsinformasjon-svar"
         val siste14avedtak = "Gyldig svar på siste 14 a-status"
         val oppfølgingsperiode = "Gyldig oppfølgingsperiode-svar"
-        val arenaFritattKandidatsøk = "Gyldif arena fritatt kandidatsøk-status"
         val hjemmel = "Gyldig hjemmel-svar"
         val måBehandleTidligereCv = "Gyldig status på må behandle tidligere cv"
         val kvp = "Gyldig kvp-status"
@@ -75,7 +73,6 @@ class NeedSamleLytterTest {
             Arguments.of("oppfølgingsinformasjon", oppfølgingsinformasjon),
             Arguments.of("siste14avedtak", siste14avedtak),
             Arguments.of("oppfølgingsperiode", oppfølgingsperiode),
-            Arguments.of("arenaFritattKandidatsøk", arenaFritattKandidatsøk),
             Arguments.of("hjemmel", hjemmel),
             Arguments.of("måBehandleTidligereCv", måBehandleTidligereCv),
             Arguments.of("kvp", kvp)

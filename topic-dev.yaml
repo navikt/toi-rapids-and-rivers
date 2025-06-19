@@ -42,9 +42,6 @@ spec:
       application: toi-identmapper
       access: readwrite
     - team: toi
-      application: toi-fritatt-kandidatsok
-      access: readwrite
-    - team: toi
       application: toi-synlighetsmotor
       access: readwrite
     - team: toi
@@ -85,9 +82,6 @@ spec:
       access: read
     - team: toi
       application: toi-arbeidsgiver-notifikasjon
-      access: readwrite
-    - team: toi
-      application: toi-arena-fritatt-kandidatsok
       access: readwrite
     - team: toi
       application: toi-kvp

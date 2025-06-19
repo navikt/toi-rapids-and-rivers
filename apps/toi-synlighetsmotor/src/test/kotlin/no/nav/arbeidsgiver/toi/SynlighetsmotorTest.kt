@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
-import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
@@ -51,7 +50,6 @@ class SynlighetsmotorTest {
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
                 false
             ), "123456789", null
         )
@@ -71,7 +69,6 @@ class SynlighetsmotorTest {
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(harSettHjemmel.default(false)).isEqualTo(true)
             assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
-            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -102,7 +99,6 @@ class SynlighetsmotorTest {
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(harSettHjemmel.default(false)).isEqualTo(true)
             assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
-            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -222,14 +218,6 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person har kode 7 skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(diskresjonskode = "7")),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
-    )
-
-    @Test
-    fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(
-            fritattKandidatsøk=true,
-            fnr="12312312312")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 

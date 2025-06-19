@@ -53,7 +53,6 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "oppfølgingsinformasjon",
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsperiode",
-            "arenaFritattKandidatsøk",
             "hjemmel",
             "måBehandleTidligereCv",
             "kvp",
@@ -75,7 +74,6 @@ class Testdata {
             arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
-            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(fnr = "12312312312"),
             hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             veileder: String? = veileder("123456789"),
@@ -92,7 +90,6 @@ class Testdata {
                 arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
-                arenaFritattKandidatsøk = arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
                 hjemmel = hjemmel,
                 participatingService = participatingService,
                 måBehandleTidligereCv = måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
@@ -119,7 +116,6 @@ class Testdata {
             arbeidssøkeropplysninger: String? = null,
             oppfølgingsinformasjon: String? = null,
             arbeidsmarkedCv: String? = null,
-            arenaFritattKandidatsøk: String? = null,
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
@@ -138,7 +134,6 @@ class Testdata {
                 arbeidssøkerperiode,
                 arbeidssøkeropplysninger,
                 oppfølgingsperiode,
-                arenaFritattKandidatsøk,
                 hjemmel,
                 participatingService,
                 måBehandleTidligereCv,
@@ -158,7 +153,6 @@ class Testdata {
             arbeidssøkeropplysninger: String? = nullVerdiForKey("arbeidssokeropplysninger"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
-            arenaFritattKandidatsøk: String? = nullVerdiForKey("arenaFritattKandidatsøk"),
             hjemmel: String? = nullVerdiForKey("hjemmel"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = nullVerdiForKey("måBehandleTidligereCv"),
@@ -175,7 +169,6 @@ class Testdata {
                 arbeidsmarkedCv ?: nullVerdiForKey("arbeidsmarkedCv"),
                 oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
-                arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
                 hjemmel ?: nullVerdiForKey("hjemmel"),
                 participatingService,
                 måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
@@ -302,21 +295,6 @@ class Testdata {
                 "meldingstype": "${CvMeldingstype.OPPRETT}",
                 "opprettJobbprofil": {},
                 "endreJobbprofil": null
-            }
-        """.trimIndent()
-
-        fun fritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
-            """
-            "fritattKandidatsøk" : {
-                "fritattKandidatsok" : $fritattKandidatsøk
-            }
-        """.trimIndent()
-
-        fun arenaFritattKandidatsøk(fritattKandidatsøk: Boolean = false, fnr: String?) =
-            """
-            "arenaFritattKandidatsøk" : {
-                "erFritattKandidatsøk" : $fritattKandidatsøk,
-                "fnr" : ${fnr?.let { """"$it"""" }}
             }
         """.trimIndent()
 
