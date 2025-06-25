@@ -1,16 +1,16 @@
-name: Deploy rapid-topic to prod
+name: Deploy dir-stilling-ekstern-topic to prod
 
 on:
   push:
     branches:
       - main
     paths:
-      - .github/workflows/deploy-topic-to-prod.yaml
-      - topic-prod.yaml
+      - deploy-topic-dir-stilling-ekstern-to-prod.yaml
+      - topics/dir-stilling-ekstern-topic-prod.yaml
 
 jobs:
-  deploy-rapid-to-prod:
-    name: Deploy rapid-topic to prod
+  deploy-dir-stilling-ekstern-topic-to-prod:
+    name: Deploy dir-stilling-ekstern-topic to prod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -18,7 +18,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: topic-prod.yaml
+          RESOURCE: topics/dir-stilling-ekstern-topic-prod.yaml
     permissions:
       contents: read
       id-token: write

@@ -1,0 +1,25 @@
+name: Deploy rapid-topic to prod
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - deploy-topic-rapid-to-prod.yaml
+      - topics/rapid-topic-prod.yaml
+
+jobs:
+  deploy-rapid-to-prod:
+    name: Deploy rapid-topic to prod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: nais/deploy/actions/deploy@master
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: topics/rapid-topic-prod.yaml
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
