@@ -32,7 +32,6 @@ spec:
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
-    - name:
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
     - name: PUBLISERING_TOPIC
