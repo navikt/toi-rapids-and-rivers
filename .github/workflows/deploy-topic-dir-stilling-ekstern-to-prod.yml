@@ -1,0 +1,25 @@
+name: Deploy dir-stilling-ekstern-topic to prod
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - deploy-topic-dir-stilling-ekstern-to-prod.yaml
+      - topics/dir-stilling-ekstern-topic-prod.yaml
+
+jobs:
+  deploy-dir-stilling-ekstern-topic-to-prod:
+    name: Deploy dir-stilling-ekstern-topic to prod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: nais/deploy/actions/deploy@master
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: topics/dir-stilling-ekstern-topic-prod.yaml
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write

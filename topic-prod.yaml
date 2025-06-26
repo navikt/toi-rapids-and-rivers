@@ -116,3 +116,6 @@ spec:
     - team: toi
       application: toi-publisering-til-arbeidsplassen
       access: readwrite
+    - team: toi
+      application: toi-publiser-dir-stillinger
+      access: readwrite

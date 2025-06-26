@@ -1,4 +1,4 @@
-name: Deploy rapid-topic to dev
+name: Deploy dir-stilling-ekstern-topic to dev
 
 on:
   push:
@@ -6,12 +6,12 @@ on:
       - main
       - legg_til_nytt_topic_for_stillinger_til_eksterne
     paths:
-      - .github/workflows/deploy-topic-to-dev.yaml
-      - topic-dev.yaml
+      - deploy-topic-dir-stilling-ekstern-to-dev.yaml
+      - topics/dir-stilling-ekstern-topic-dev.yaml
 
 jobs:
-  deploy-rapid-to-dev:
-    name: Deploy rapid-topic to dev
+  deploy-dir-stilling-ekstern-topic-to-dev:
+    name: Deploy dir-stilling-ekstern-topic to dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -19,7 +19,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: topic-dev.yaml
+          RESOURCE: topics/dir-stilling-ekstern-topic-dev.yaml
     permissions:
       contents: read
       id-token: write
