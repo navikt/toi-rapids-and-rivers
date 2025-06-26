@@ -48,6 +48,15 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
         val stilling = direktemeldtStilling.konverterTilStilling()
         val melding = ProducerRecord(publiseringTopic, stilling.uuid.toString(), objectMapper.writeValueAsString(stilling))
 
-        dirStillingProducer.send(melding)
+        dirStillingProducer.send(melding) { _, exception ->
+            if (exception == null) {
+                log.info("Publisert stilling med stillingsId ${direktemeldtStilling.stillingsId} på topic $publiseringTopic")
+            } else {
+                log.error(
+                    "Greide ikke å publisere stilling med stillingsId ${direktemeldtStilling.stillingsId} på topic $publiseringTopic",
+                    exception
+                )
+            }
+        }
     }
 }

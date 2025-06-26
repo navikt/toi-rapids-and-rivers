@@ -53,7 +53,6 @@ data class DirektemeldtStilling(
         businessName = innhold.businessName,
         adnr = annonseId.toString()
     )
-
 }
 
 data class DirektemeldtStillingKategori(
