@@ -21,7 +21,7 @@ fun main() {
 
 fun startApp(rapid: RapidsConnection, env: Map<String, String>) = rapid.also {
     val dirstillingProducer = KafkaProducer<String, String>(producerConfig)
-    val publiseringTopic = env["TOI_PUBLISERING_TOPIC"] ?: throw IllegalArgumentException("TOI_PUBLISERING_TOPIC finnes ikke i miljøvariabler")
+    val publiseringTopic = env["PUBLISERING_TOPIC"] ?: throw IllegalArgumentException("PUBLISERING_TOPIC finnes ikke i miljøvariabler")
     PubliserStillingLytter(rapid, dirstillingProducer, publiseringTopic)
 }.start()
 
