@@ -26,3 +26,6 @@ spec:
     - team: toi
       application: toi-kafkamanager
       access: readwrite
+    - team: toi
+      application: toi-publiser-dir-stillinger
+      access: readwrite
