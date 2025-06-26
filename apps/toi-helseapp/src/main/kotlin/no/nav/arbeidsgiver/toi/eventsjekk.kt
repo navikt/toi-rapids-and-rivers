@@ -22,7 +22,7 @@ private val uinteressanteHendelser = listOf(
     "reindekserDirektemeldtStilling"
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
-private val hendelserSomIkkeSendesLenger = listOf<String>("arbeidssokeropplysninger")
+private val hendelserSomIkkeSendesLenger = listOf<String>("arena-fritatt-kandidatsøk")
 private val objectMapper = jacksonObjectMapper()
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
