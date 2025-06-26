@@ -1,4 +1,0 @@
-kafka_pool: nav-prod
-kafka_consumer_group_id: toi-arena-fritatt-kandidatsok-3
-gcp_db_tier: db-custom-1-3840
-gcp_disk_autoresize: true

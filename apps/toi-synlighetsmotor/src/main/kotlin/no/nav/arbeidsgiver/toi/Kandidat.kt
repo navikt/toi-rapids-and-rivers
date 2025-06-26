@@ -13,7 +13,6 @@ data class Kandidat(
     private val arbeidsmarkedCv: Synlighetsnode<CvMelding>,
     private val oppfølgingsinformasjon: Synlighetsnode<Oppfølgingsinformasjon>,
     private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
-    private val arenaFritattKandidatsøk: Synlighetsnode<ArenaFritattKandidatsøk>,
     private val hjemmel: Synlighetsnode<Hjemmel>,
     private val måBehandleTidligereCv: Synlighetsnode<MåBehandleTidligereCv>,
     private val kvp: Synlighetsnode<Kvp>,
@@ -34,7 +33,6 @@ data class Kandidat(
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
         harSettHjemmel = hjemmel.hvisIkkeNullOg(::harSettHjemmel),
         maaIkkeBehandleTidligereCv = måBehandleTidligereCv.hvisNullEller(::maaIkkeBehandleTidligereCv),
-        arenaIkkeFritattKandidatsøk = arenaFritattKandidatsøk.hvisNullEller(::erIkkeArenaFritattKandidatsøk),
         erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
@@ -48,7 +46,6 @@ data class Kandidat(
 
     private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
     private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
-    private fun erIkkeArenaFritattKandidatsøk(it: ArenaFritattKandidatsøk) = !it.erFritattKandidatsøk
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
     private fun erIkkeSperretAnsatt(it: Oppfølgingsinformasjon) = !it.sperretAnsatt
     private fun erIkkeDød(it: Oppfølgingsinformasjon) = !it.erDoed
@@ -86,11 +83,6 @@ data class Kandidat(
             log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
             secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
-        if (kandidat.arenaFritattKandidatsøk.hvisIkkeNullOg { it.erFritattKandidatsøk }
-                .default(false) && (!kandidat.erAAP).default(false)) {
-            log.info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
-            secureLog.info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, fnr: ${kandidat.fødselsNummer()}, hovedmål: ${kandidat.oppfølgingsinformasjon} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon}, rettighetsgruppe: ${kandidat.oppfølgingsinformasjon}")
-        }
     }
 
     private fun erIkkeKode6EllerKode7(oppfølgingsinformasjon: Oppfølgingsinformasjon): Boolean =
@@ -103,7 +95,7 @@ data class Kandidat(
 
     private fun beregningsgrunnlag() = listOf(
         arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse,
+        hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse,
         arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
@@ -121,7 +113,6 @@ data class Kandidat(
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
-                arenaFritattKandidatsøk = Synlighetsnode.fromJsonNode(json.path("arenaFritattKandidatsøk"), mapper),
                 hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
                 måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
@@ -134,7 +125,7 @@ data class Kandidat(
     fun fødselsNummer() =
         arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
             ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer ?: hjemmel.verdiEllerNull()?.fnr
-            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer ?: arenaFritattKandidatsøk.verdiEllerNull()?.fnr
+            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer
 }
 
 data class CvMelding(
@@ -192,11 +183,6 @@ typealias Diskresjonskode = String
 enum class Formidlingsgruppe {
     ARBS
 }
-
-data class ArenaFritattKandidatsøk(
-    val erFritattKandidatsøk: Boolean,
-    val fnr: String? // TODO: ta bort nullable når kilde hos oss er oppdatert og ferdigkjørt
-)
 
 data class Hjemmel(
     val ressurs: Samtykkeressurs?,

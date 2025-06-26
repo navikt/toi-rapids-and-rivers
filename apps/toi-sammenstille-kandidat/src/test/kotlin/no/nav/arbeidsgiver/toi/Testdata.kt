@@ -131,16 +131,6 @@ fun oppfølgingsperiodeMelding(aktørId: String) = """
     """.trimIndent()
 
 
-fun arenaFritattKandidatsøkMelding(aktørId: String, erFritattKandidatsøk: Boolean) = """
-        {
-            "aktørId": "$aktørId",
-            "fnr": "1234",
-            "@event_name": "arena-fritatt-kandidatsøk",
-            "arenaFritattKandidatsøk": {
-                "erFritattKandidatsøk": $erFritattKandidatsøk
-            }
-        }
-    """.trimIndent()
 
 fun kvp(aktørId: String) = """
         {
