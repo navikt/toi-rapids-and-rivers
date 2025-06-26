@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - main
-      - legg_til_nytt_topic_for_stillinger_til_eksterne
+      - ny_app_for_publisering_til_dir_topic
     paths:
-      - deploy-topic-dir-stilling-ekstern-to-dev.yaml
-      - topics/dir-stilling-ekstern-topic-dev.yaml
+      - .github/workflows/deploy-topic-dir-stilling-ekstern-to-dev.yaml
+      - apps/toi-publiser-dir-stillinger/dir-stilling-ekstern-topic-dev.yaml
 
 jobs:
   deploy-dir-stilling-ekstern-topic-to-dev:
@@ -19,7 +19,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: topics/dir-stilling-ekstern-topic-dev.yaml
+          RESOURCE: apps/toi-publiser-dir-stillinger/dir-stilling-ekstern-topic-dev.yaml
     permissions:
       contents: read
       id-token: write

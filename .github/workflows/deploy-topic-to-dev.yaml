@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - legg_til_nytt_topic_for_stillinger_til_eksterne
+      - ny_app_for_publisering_til_dir_topic
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
