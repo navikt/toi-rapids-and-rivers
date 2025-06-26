@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - ny_app_for_publisering_til_dir_topic
+      - testbranch
     paths:
       - .github/workflows/deploy-topic-dir-stilling-ekstern-to-dev.yaml
       - apps/toi-publiser-dir-stillinger/dir-stilling-ekstern-topic-dev.yaml
