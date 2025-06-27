@@ -8,6 +8,7 @@ import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.arbeidsgiver.toi.livshendelser.opprettJavalinMedTilgangskontroll
+import no.nav.arbeidsgiver.toi.livshendelser.stub404
 import no.nav.arbeidsgiver.toi.livshendelser.stubPdl
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
@@ -74,6 +75,21 @@ class HarAdressebeskyttelseTest {
 
         assertThat(response.statusCode).isEqualTo(200)
         assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":true}""")
+    }
+
+    @Test
+    fun `Returner at person ikke har adressebeskyttelse for person som ikke finnes`() {
+        val fnr = "12345678912"
+        wiremock.stub404(ident = fnr, token = null)
+        val token = hentToken(mockOAuth2Server).serialize()
+        startApp(pdlKlient, testRapid)
+        val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
+            .body("""{"fnr": "$fnr"}""")
+            .authentication().bearer(token)
+            .response().second
+
+        assertThat(response.statusCode).isEqualTo(200)
+        assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":false}""")
     }
 
     @Test

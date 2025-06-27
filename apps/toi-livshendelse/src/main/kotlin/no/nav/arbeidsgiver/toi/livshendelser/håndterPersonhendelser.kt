@@ -23,29 +23,37 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
                 it.personidenter?.firstOrNull()
             }
             .flatMap{ it -> pdlKlient.diskresjonsHendelseForIdent(it) }
-            .forEach(::publiserHendelse)
+            .forEach{ it.publiserTilRapids(rapidsConnection::publish) }
 
         if(personHendelser.isEmpty()) {
             Thread.sleep(1000)
         }
     }
 
-    fun publiserHendelse(diskresjonsHendelse: DiskresjonsHendelse) {
-        rapidsConnection.publish(diskresjonsHendelse.ident, diskresjonsHendelse.toJson())
-    }
-
     fun graderingFor(ident: String) = pdlKlient.hentGraderingPerAktørId(ident)[ident]
 }
 
-class DiskresjonsHendelse(val ident: String, val gradering: String) {
-    fun toJson(): String {
+class DiskresjonsHendelse(private val ident: String, gradering: String) {
+    private val gradering = Gradering.valueOf(gradering)
+    fun harAdressebeskyttelse() = gradering.harAdressebeskyttelse
+
+    fun publiserTilRapids(publish: (String, String) -> Unit) {
+        publish(ident, toJson())
+    }
+    private fun toJson(): String {
         return """
             {
                 "@event_name": "adressebeskyttelse",
-                "adressebeskyttelse": "$gradering",
+                "adressebeskyttelse": "${gradering.name}",
                 "aktørId": "$ident"
             }
         """.trimIndent()
     }
-
+    private enum class Gradering(val harAdressebeskyttelse: Boolean) {
+        STRENGT_FORTROLIG_UTLAND(true),
+        STRENGT_FORTROLIG(true),
+        FORTROLIG(true),
+        UGRADERT(false),
+        UKJENT(false)
+    }
 }
