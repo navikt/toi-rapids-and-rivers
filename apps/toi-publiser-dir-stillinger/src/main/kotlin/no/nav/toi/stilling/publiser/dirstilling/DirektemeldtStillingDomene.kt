@@ -62,7 +62,7 @@ data class DirektemeldtStilling(
     )
 
     private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
-        return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneOffset.UTC), ZoneId.of("Europe/Oslo"))
+        return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneId.of("Europe/Oslo")), ZoneId.of("Europe/Oslo"))
             .toLocalDateTime()
     }
     private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
