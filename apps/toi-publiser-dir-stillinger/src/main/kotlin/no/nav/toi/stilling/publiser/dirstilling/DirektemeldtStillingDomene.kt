@@ -5,6 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.ZonedDateTime
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 
 data class RapidHendelse(
@@ -37,8 +40,8 @@ data class DirektemeldtStilling(
 ) {
     fun konverterTilStilling(): Stilling = Stilling(
         uuid = stillingsId,
-        created = opprettet.toLocalDateTime(),
-        updated = sistEndret.toLocalDateTime(),
+        created = konverterDato(opprettet),
+        updated = konverterDato(sistEndret),
         status = status,
         title = innhold.title,
         administration = innhold.administration?.copy(status = adminStatus),
@@ -47,8 +50,8 @@ data class DirektemeldtStilling(
         source = innhold.source,
         medium = innhold.medium,
         reference = innhold.reference,
-        published = publisert?.toLocalDateTime(),
-        expires = utløpsdato?.toLocalDateTime(),
+        published = konverterDato(publisert),
+        expires = konverterDato(utløpsdato),
         employer = innhold.employer,
         locations = innhold.locationList,
         categoryList = innhold.categoryList,
@@ -57,6 +60,15 @@ data class DirektemeldtStilling(
         businessName = innhold.businessName,
         adnr = annonsenr.toString()
     )
+
+    fun konverterDato(dato: ZonedDateTime): LocalDateTime {
+        return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneOffset.UTC), ZoneId.of("Europe/Oslo"))
+            .toLocalDateTime()
+    }
+    fun konverterDato(dato: ZonedDateTime?): LocalDateTime? {
+        if (dato == null) return null
+        return konverterDato(dato)
+    }
 }
 
 data class DirektemeldtStillingKategori(
