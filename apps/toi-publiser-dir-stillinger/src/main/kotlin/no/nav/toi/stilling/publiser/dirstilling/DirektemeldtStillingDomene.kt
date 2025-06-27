@@ -29,7 +29,7 @@ data class DirektemeldtStilling(
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
     val status: String,
-    val annonseId: Long?
+    val annonsenr: Long?
 ) {
     fun konverterTilStilling(): Stilling = Stilling(
         uuid = stillingsId,
@@ -51,7 +51,7 @@ data class DirektemeldtStilling(
         properties = innhold.properties,
         publishedByAdmin = innhold.publishedByAdmin,
         businessName = innhold.businessName,
-        adnr = annonseId.toString()
+        adnr = annonsenr.toString()
     )
 }
 

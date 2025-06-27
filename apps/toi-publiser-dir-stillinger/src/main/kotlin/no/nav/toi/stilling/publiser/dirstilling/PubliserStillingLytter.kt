@@ -30,7 +30,7 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
         }.register(this)
     }
 
-    val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+    private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
