@@ -50,8 +50,8 @@ data class DirektemeldtStilling(
         source = innhold.source,
         medium = innhold.medium,
         reference = innhold.reference,
-        published = konverterDato(publisert),
-        expires = konverterDato(utløpsdato),
+        published = konverterDatoOptional(publisert),
+        expires = konverterDatoOptional(utløpsdato),
         employer = innhold.employer,
         locations = innhold.locationList,
         categoryList = innhold.categoryList,
@@ -61,11 +61,11 @@ data class DirektemeldtStilling(
         adnr = annonsenr.toString()
     )
 
-    fun konverterDato(dato: ZonedDateTime): LocalDateTime {
+    private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
         return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneOffset.UTC), ZoneId.of("Europe/Oslo"))
             .toLocalDateTime()
     }
-    fun konverterDato(dato: ZonedDateTime?): LocalDateTime? {
+    private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
         if (dato == null) return null
         return konverterDato(dato)
     }
