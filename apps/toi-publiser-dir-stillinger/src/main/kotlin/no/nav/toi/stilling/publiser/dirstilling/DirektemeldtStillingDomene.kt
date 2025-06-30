@@ -56,7 +56,7 @@ data class DirektemeldtStilling(
         locations = innhold.locationList,
         categoryList = innhold.categoryList,
         properties = innhold.properties,
-        publishedByAdmin = publisertAvAdmin,
+        publishedByAdmin = parseLocalDateTime(publisertAvAdmin),
         businessName = innhold.businessName,
         adnr = annonsenr.toString()
     )
@@ -68,6 +68,18 @@ data class DirektemeldtStilling(
     private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
         if (dato == null) return null
         return konverterDato(dato)
+    }
+
+    private fun parseLocalDateTime(dateTime: String?): LocalDateTime? {
+        if (dateTime == null) return null
+        return try {
+            LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME)
+                .atZone(ZoneId.of("Europe/Oslo"))
+                .toLocalDateTime()
+        } catch (e: Exception) {
+            log.info("Kunne ikke parse dato $dateTime til LocalDateTime: ${e.message} $stillingsId")
+            return null
+        }
     }
 }
 

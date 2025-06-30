@@ -9,7 +9,7 @@ data class Stilling(
     val status: String,
     val privacy: String?,
     val published: LocalDateTime?,
-    val publishedByAdmin: String?,
+    val publishedByAdmin: LocalDateTime?,
     val expires: LocalDateTime?,
     val created: LocalDateTime,
     val updated: LocalDateTime,
