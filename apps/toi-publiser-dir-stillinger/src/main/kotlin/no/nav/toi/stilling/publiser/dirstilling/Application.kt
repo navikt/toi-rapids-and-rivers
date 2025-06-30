@@ -8,12 +8,14 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
+import java.util.TimeZone
 
 private val log = noClassLogger()
 
 fun main() {
     log.info("Starter app.")
     secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+    log.info("Tidssone: ${TimeZone.getDefault().id}")
 
     val env = System.getenv()
     startApp(rapidsConnection(env), env)
