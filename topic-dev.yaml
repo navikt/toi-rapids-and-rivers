@@ -107,3 +107,6 @@ spec:
     - team: toi
       application: rekrutteringsbistand-aktivitetskort
       access: readwrite
+    - team: toi
+      application: toi-publiser-dir-stillinger
+      access: readwrite
