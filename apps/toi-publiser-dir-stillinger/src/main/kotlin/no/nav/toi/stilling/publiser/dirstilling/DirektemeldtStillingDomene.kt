@@ -32,7 +32,7 @@ data class DirektemeldtStilling(
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
     val status: String,
-    val annonsenr: Long?,
+    val annonsenr: String?,
     val adminStatus: String?,
     val utløpsdato: ZonedDateTime? = null,
     val publisert: ZonedDateTime? = null,
