@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - legg_til_ny_app_til_topic
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
