@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 
 class UsynligKandidatfeedLytter(
     rapidsConnection: RapidsConnection,
-    private val producer: Producer<String, String>
+    private val esClient: ESClient
 ) :
     River.PacketListener {
 
@@ -42,7 +42,8 @@ class UsynligKandidatfeedLytter(
         val packetUtenMetadata = packet.fjernMetadataOgKonverter()
         val melding = ProducerRecord(topicName, aktørId, packetUtenMetadata.toString())
 
-        producer.send(melding) { _, exception ->
+        TODO()
+        /*producer.send(melding) { _, exception ->
             if (exception == null) {
                 log.info("Sendte kandidat med aktørId (se securelog), synlighet er false")
                 secureLog.info("Sendte kandidat med aktørId $aktørId, synlighet er false")
@@ -52,7 +53,7 @@ class UsynligKandidatfeedLytter(
             }
             packet["@slutt_av_hendelseskjede"] = true
             context.publish(packet.toJson())
-        }
+        }*/
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

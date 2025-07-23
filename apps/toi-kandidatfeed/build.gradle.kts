@@ -2,5 +2,14 @@ plugins {
     id("toi.rapids-and-rivers")
 }
 
+val testContainerVerison = "1.21.3"
 dependencies {
+    testImplementation("org.testcontainers:elasticsearch:$testContainerVerison")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainerVerison")
+    testImplementation("org.testcontainers:testcontainers:$testContainerVerison")
+    implementation("org.opensearch.client:opensearch-java:3.2.0")
+}
+
+tasks.test {
+    environment("JAVA_TOOL_OPTIONS", "-XX:UseSVE=0")
 }

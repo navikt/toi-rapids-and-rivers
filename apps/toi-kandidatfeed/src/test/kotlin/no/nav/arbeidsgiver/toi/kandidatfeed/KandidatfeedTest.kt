@@ -1,26 +1,66 @@
 package no.nav.arbeidsgiver.toi.kandidatfeed
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.toi.TestRapid
+import org.apache.hc.core5.http.HttpHost
+import org.apache.hc.core5.ssl.SSLContextBuilder
+import org.apache.hc.core5.ssl.TrustStrategy
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.opensearch.client.opensearch.OpenSearchClient
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
+import org.testcontainers.elasticsearch.ElasticsearchContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
+import java.security.cert.X509Certificate
 
+
+@Testcontainers
 class KandidatfeedTest {
+    companion object {
+        @Container
+        private var elasticsearch: ElasticsearchContainer =
+            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.18.3")
+                .withExposedPorts(9200)
+                .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
+                .withEnv("discovery.type", "single-node")
+                .withEnv("xpack.security.enabled", "false")
+        private val testEsClient = ESClient("dummy", "kandidatfeed", "kandidat", "kandidat")
+    }
     @Test
     fun `Melding med kun CV og aktørId ikke produsere melding på kandidat-topic`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
 
         val testrapid = TestRapid()
-        val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
+        val esClient = ESClient(
+            elasticsearch.httpHostAddress,
+            "kandidatfeed",
+            "kandidat",
+            "kandidat"
+        )
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, esClient)
+        UsynligKandidatfeedLytter(testrapid, esClient)
         testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
 
-        assertThat(producer.history().size).isEqualTo(0)
+        val sslcontext = SSLContextBuilder
+            .create()
+            .loadTrustMaterial(null, TrustStrategy { chains: Array<X509Certificate?>?, authType: String? -> true })
+            .build()
+
+        val transport = ApacheHttpClient5TransportBuilder.builder(
+            HttpHost.create(elasticsearch.httpHostAddress)
+        )/*.setHttpClientConfigCallback { httpClientBuilder ->
+            ClientTlsStrategyBuilder.create().setSslContext(sslcontext)
+        }*/
+            .build()
+        val client = OpenSearchClient(transport)
+
+        assertThat(client.count().count()).isEqualTo(0)
     }
 
     @Test
@@ -30,8 +70,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingSynlig)
 
@@ -45,8 +85,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingUsynlig)
 
@@ -72,8 +112,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingSynlig)
         testrapid.sendTestMessage(meldingUsynlig)
@@ -98,8 +138,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
         testrapid.sendTestMessage(meldingSynlig)
 
         assertThat(producer.history().size).isEqualTo(0)
@@ -112,8 +152,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(rapidMelding)
 
@@ -146,8 +186,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingUsynlig)
 
@@ -162,8 +202,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(rapidMelding)
 
@@ -178,8 +218,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingUsynlig)
 
@@ -195,8 +235,8 @@ class KandidatfeedTest {
         val testrapid = TestRapid()
         val producer = MockProducer(true, null, StringSerializer(), StringSerializer())
 
-        SynligKandidatfeedLytter(testrapid, producer)
-        UsynligKandidatfeedLytter(testrapid, producer)
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(rapidMelding)
 

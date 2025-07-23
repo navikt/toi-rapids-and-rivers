@@ -16,8 +16,9 @@ fun main() {
 
     RapidApplication.create(System.getenv()).also { rapidsConnection ->
         val kandidatfeedProducer = KafkaProducer<String, String>(producerConfig)
-        SynligKandidatfeedLytter(rapidsConnection, kandidatfeedProducer)
-        UsynligKandidatfeedLytter(rapidsConnection, kandidatfeedProducer)
+        val esClient = ESClient("", "", "", "")
+        SynligKandidatfeedLytter(rapidsConnection, esClient)
+        UsynligKandidatfeedLytter(rapidsConnection, esClient)
         UferdigKandidatLytter(rapidsConnection)
     }.start()
 }

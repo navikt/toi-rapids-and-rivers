@@ -17,7 +17,7 @@ const val topicName = "toi.kandidat-3"
 
 class SynligKandidatfeedLytter(
     rapidsConnection: RapidsConnection,
-    private val producer: Producer<String, String>
+    private val esClient: ESClient
 ) :
     River.PacketListener {
 
@@ -55,7 +55,8 @@ class SynligKandidatfeedLytter(
         val aktørId = objectNode["aktørId"].asText()
         val melding = ProducerRecord(topicName, aktørId, objectNode.toString())
 
-        producer.send(melding) { _, exception ->
+        TODO()
+        /*producer.send(melding) { _, exception ->
             if (exception == null) {
                 log.info("Sendte kandidat med aktørId (se securelog), synlighet er true")
                 secureLog.info("Sendte kandidat med aktørId $aktørId, synlighet er true")
@@ -65,7 +66,7 @@ class SynligKandidatfeedLytter(
             }
             packet["@slutt_av_hendelseskjede"] = true
             context.publish(packet.toJson())
-        }
+        }*/
     }
 
     private fun konverterTilObjectNode(packet: JsonMessage) =
