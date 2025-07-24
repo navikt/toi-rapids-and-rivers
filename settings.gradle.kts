@@ -26,4 +26,5 @@ include(
     "apps:toi-publisering-til-arbeidsplassen",
     "apps:toi-stilling-indekser",
     "technical-libs:testrapid",
+    "apps:toi-kandidat-indekser",
 )
