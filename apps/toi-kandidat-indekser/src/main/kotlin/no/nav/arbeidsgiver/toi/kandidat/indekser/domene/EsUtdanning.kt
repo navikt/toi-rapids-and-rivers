@@ -9,15 +9,15 @@ class EsUtdanning(
     private val fraDato: Date,
     private val tilDato: Date,
     private val utdannelsessted: String,
-    private val nusKode: String,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val nusKodeGrad: String,
+    private val nusKode: String?,
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val nusKodeGrad: String?,
     private val alternativGrad: String,
     private val yrkestatus: String?,
     private val beskrivelse: String?
 ) {
     constructor(
-        fraDato: Date, tilDato: Date, utdannelsessted: String, nusKode: String,
-        nusKodeGrad: String, alternativGrad: String
+        fraDato: Date, tilDato: Date, utdannelsessted: String, nusKode: String?,
+        nusKodeGrad: String?, alternativGrad: String
     ): this(
         fraDato,
         tilDato,

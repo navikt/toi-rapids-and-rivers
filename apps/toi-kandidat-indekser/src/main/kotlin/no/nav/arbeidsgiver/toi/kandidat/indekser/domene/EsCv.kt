@@ -38,12 +38,12 @@ class EsCv(
 
     private val doed: Boolean,
     private val frKode: String?,
-    private val kvalifiseringsgruppekode: String,
+    private val kvalifiseringsgruppekode: String?,
     private val hovedmaalkode: String?,
     private val hovedmal: String?,
     private val innsatsgruppe: String?,
-    private val navkontor: String,
-    private val orgenhet: String,
+    private val navkontor: String?,
+    private val orgenhet: String?,
 
     private val fritattKandidatsok: Boolean,
     private val fritattAgKandidatsok: Boolean,
@@ -55,8 +55,8 @@ class EsCv(
     veilederIdent: String,
     private val veilederVisningsnavn: String,
     private val veilederEpost: String,
-    private val fylkeNavn: String,
-    private val kommuneNavn: String,
+    private val fylkeNavn: String?,
+    private val kommuneNavn: String?,
 
     private val utdanning: List<EsUtdanning>,
     private val fagdokumentasjon: List<EsFagdokumentasjon>,
@@ -76,7 +76,7 @@ class EsCv(
     private val arbeidsdagerJobbonskerObj: List<EsArbeidsdagerJobbonsker>,
     private val arbeidstidJobbonskerObj: List<EsArbeidstidJobbonsker>,
     private val godkjenninger: List<EsGodkjenning>,
-    private val perioderMedInaktivitet: EsPerioderMedInaktivitet
+    private val perioderMedInaktivitet: EsPerioderMedInaktivitet?
 ) {
     private val fritekst: String? = null
     private val isHarKontaktinformasjon: Boolean = listOfNotNull(epostadresse, mobiltelefon, telefon).any(String::isNotBlank)

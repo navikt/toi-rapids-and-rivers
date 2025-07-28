@@ -10,7 +10,7 @@ class EsSertifikat(
     private val tilDato: Date?,
     private val sertifikatKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val sertifikatKodeNavn: String,
-    private val alternativtNavn: String,
+    private val alternativtNavn: String?,
     private val utsteder: String
 ): EnAvFlereSamledeKompetaser {
 

@@ -7,7 +7,7 @@ import java.util.*
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsYrkeserfaring(
     private val fraDato: Date,
-    private val tilDato: Date,
+    private val tilDato: Date?,
     private val arbeidsgiver: String,
     private val styrkKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val stillingstittel: String,
@@ -27,7 +27,7 @@ class EsYrkeserfaring(
 
     constructor(
         fraDato: Date,
-        tilDato: Date,
+        tilDato: Date?,
         arbeidsgiver: String,
         styrkKode: String,
         kodeverkStillingstittel: String,
@@ -52,7 +52,7 @@ class EsYrkeserfaring(
     )
     constructor(
         fraDato: Date,
-        tilDato: Date,
+        tilDato: Date?,
         arbeidsgiver: String,
         styrkKode: String?,
         stillingstittel: String,

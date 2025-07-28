@@ -5,16 +5,20 @@ import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidstid
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidstidsordning
 import no.nav.arbeid.pam.kodeverk.ansettelse.Omfang
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsAnnenErfaring
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsAnsettelsesformJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsArbeidsdagerJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsArbeidstidJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsArbeidstidsordningJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsFagdokumentasjon
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsForerkort
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsGeografiJobbonsker
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsGodkjenning
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsKompetanse
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsKurs
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsOmfangJobbonsker
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsPerioderMedInaktivitet
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSertifikat
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSprak
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsUtdanning
@@ -358,7 +362,7 @@ object EsCvObjectMother {
             arbeidsdagerJobbonskerList,
             arbeidstidJobbonskerList,
             emptyList(),
-            emptyList()
+            null
         )
     }
 
@@ -670,7 +674,7 @@ object EsCvObjectMother {
             emptyList(),
             emptyList(),
             emptyList(),
-            emptyList()
+            null
         )
     }
 
@@ -680,207 +684,184 @@ object EsCvObjectMother {
             "Norges Naturvitenskapelige Universitet", "456375", "Sosiologi", "Sosiologi"
         )
 
-        val utdanningListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningListe.add(esUtdanning)
+        val utdanningListe = listOf(esUtdanning)
         val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-02-01"),
             "Butikken i nærheten",
             "1010.01",
             "Butikkmedarbeider",
-            Set.< E > of < E ? > ("Butikkmedarbeider"),
+            setOf("Butikkmedarbeider"),
             "Butikkmedarbeider i Førde",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"), fraIsoDato("2003-02-01"),
             "Butikken i nærheten", "1010.01", "Butikkmedarbeider(dagligvarer)",
-            Set.< E > of < E ? > ("Butikkmedarbeider(dagligvarer)", "Butikkmedarbeider"
-        ), "Butikkmedarbeider(dagligvarer)", "YRKE_ORGNR", "YRKE_NACEKODE", false, kotlin.collections.mutableListOf<T?>(), "Oslo")
+            setOf("Butikkmedarbeider(dagligvarer)", "Butikkmedarbeider")
+            , "Butikkmedarbeider(dagligvarer)", "YRKE_ORGNR", "YRKE_NACEKODE", false, emptyList(), "Oslo")
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Butikken langt unna",
             "1010.01",
             "Butikkmedarbeider(trevare)",
-            Set.< E > of < E ? > ("Butikkmedarbeider(trevare)"),
+            setOf("Butikkmedarbeider(trevare)"),
             "Butikkmedarbeider(trevare)",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Butikken",
             "4561.03",
             "Butikkmedarbeider(elektronikk)",
-            Set.< E > of < E ? > ("Butikkmedarbeider(elektronikk)"),
+            setOf("Butikkmedarbeider(elektronikk)"),
             "Butikkmedarbeider(elektronikk)",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring =
+        val yrkeserfaring5 =
             EsYrkeserfaring(
                 fraIsoDato("2016-06-01"),
                 fraIsoDato("2016-07-01"),
                 "Tvkanalen TV?",
                 "5684.05",
                 "Presentør",
-                Set.< E > of < E ? > ("Presentør"),
+                setOf("Presentør"),
                 "Presentør",
                 "YRKE_ORGNR",
                 "YRKE_NACEKODE",
                 false,
-                kotlin.collections.mutableListOf<T?>(),
+                emptyList(),
                 "Oslo"
             )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             null,
             "NLI  Grenland",
             "5684.05",
             "Nyhetsanker",
-            Set.< E > of < E ? > ("Nyhetsanker"),
+            setOf("Nyhetsanker"),
             "Nyhetsanker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringListe.add(yrkeserfaring1)
-        yrkeserfaringListe.add(yrkeserfaring2)
-        yrkeserfaringListe.add(yrkeserfaring3)
-        yrkeserfaringListe.add(yrkeserfaring4)
-        yrkeserfaringListe.add(yrkeserfaring5)
-        yrkeserfaringListe.add(yrkeserfaring6)
+        val yrkeserfaringListe = listOf(
+            yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6
+        )
 
-        val kompetanse1: EsKompetanse =
+        val kompetanse1 =
             EsKompetanse(
                 fraIsoDato("2016-03-14"),
                 "152424",
                 "Presentør",
                 null,
                 null,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val kompetanse2: EsKompetanse =
+        val kompetanse2 =
             EsKompetanse(
                 fraIsoDato("2016-03-14"),
                 "152424",
                 "Nyhetsanker",
                 "Nyhetsanker",
                 null,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "566895", "Butikkmedarbeider",
-            "Butikkmedarbeider", null, kotlin.collections.mutableListOf<T?>()
+            "Butikkmedarbeider", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "566895",
-            "Butikkmedarbeider(trevare)", "Butikkmedarbeider(trevare)", null, kotlin.collections.mutableListOf<T?>()
+            "Butikkmedarbeider(trevare)", "Butikkmedarbeider(trevare)", null, emptyList()
         )
 
-        val kompetanseListe: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseListe.add(kompetanse1)
-        kompetanseListe.add(kompetanse2)
-        kompetanseListe.add(kompetanse3)
-        kompetanseListe.add(kompetanse4)
+        val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-
-        val EsSertifikat1: EsSertifikat = EsSertifikat(
+        val EsSertifikat1 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Truckførerbevis", "Truckførerbevis", ""
         )
-        val EsSertifikat2: EsSertifikat = EsSertifikat(
+        val EsSertifikat2 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3: EsSertifikat = EsSertifikat(
+        val EsSertifikat3 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat4: EsSertifikat = EsSertifikat(
+        val EsSertifikat4 = EsSertifikat(
             fraIsoDato("1999-01-01"), null, "L2.7000",
             "Truckførerbevis T1 Lavtløftende plukktruck, palletruck m/perm. førerplass",
             "Truckførerbevis T1 Lavtløftende plukktruck, palletruck m/perm. førerplass", ""
         )
 
-        val esSertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        esSertifikatListe.add(EsSertifikat1)
-        esSertifikatListe.add(EsSertifikat2)
-        esSertifikatListe.add(EsSertifikat3)
-        esSertifikatListe.add(EsSertifikat4)
+        val esSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3, EsSertifikat4)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "T - Traktor", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
-        forerkortListe.add(forerkort3)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-
-        val sprak: EsSprak =
+        val sprak =
             EsSprak(fraIsoDato("2012-12-01"), "87392", "Engelsk", "English", "Flytende")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak)
+        val sprakListe = listOf(sprak)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs4()
+        val kurs2 = esKurs4()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val verv: EsVerv =
+        val verv =
             EsVerv(
                 fraIsoDato("2000-01-15"),
                 fraIsoDato("2001-01-15"),
@@ -888,48 +869,40 @@ object EsCvObjectMother {
                 "verv tittel"
             )
 
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
+        val vervListe = listOf(verv)
 
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
+        val geografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
 
-        val geografiJobbonsker1: EsGeografiJobbonsker =
+        val geografiJobbonsker1 =
             EsGeografiJobbonsker("Bergen", "NO12.1201")
 
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1)
 
-        val yrkeJobbonsker: EsYrkeJobbonsker =
-            EsYrkeJobbonsker("Yrke jobb ønskeStyrk Kode", "Ordfører", true, kotlin.collections.mutableListOf<T?>())
+        val yrkeJobbonsker =
+            EsYrkeJobbonsker("Yrke jobb ønskeStyrk Kode", "Ordfører", true, emptyList())
 
-        val yrkeJobbonsker1: EsYrkeJobbonsker =
+        val yrkeJobbonsker1 =
             EsYrkeJobbonsker(
                 "Yrke jobb ønskeStyrk Kode",
                 "Barnehageassistent",
                 true,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val yrkeJobbonsker2: EsYrkeJobbonsker =
-            EsYrkeJobbonsker("Yrke jobb ønskeStyrk Kode", "Tester", true, kotlin.collections.mutableListOf<T?>())
+        val yrkeJobbonsker2 =
+            EsYrkeJobbonsker("Yrke jobb ønskeStyrk Kode", "Tester", true, emptyList())
 
-        val yrkeJobbonsker3: EsYrkeJobbonsker =
+        val yrkeJobbonsker3 =
             EsYrkeJobbonsker(
                 "Yrke jobb ønskeStyrk Kode",
                 "Konsulent (data)",
                 true,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
-        yrkeJobbonskerListe.add(yrkeJobbonsker1)
-        yrkeJobbonskerListe.add(yrkeJobbonsker2)
-        yrkeJobbonskerListe.add(yrkeJobbonsker3)
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker, yrkeJobbonsker1, yrkeJobbonsker2, yrkeJobbonsker3)
 
-        val esCv: EsCv = EsCv(
+        return  EsCv(
             nteAktorId(3),
             "04265983651",
             "HANS",
@@ -973,19 +946,27 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             "Viken",
-            "Drammen"
+            "Drammen",
+            utdanningListe,
+            emptyList(),
+            yrkeserfaringListe,
+            kompetanseListe,
+            emptyList(),
+            esSertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            null
         )
-        esCv.addUtdanning(utdanningListe)
-        esCv.addYrkeserfaring(yrkeserfaringListe)
-        esCv.addKompetanse(kompetanseListe)
-        esCv.addSertifikat(esSertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeEsCv4(): EsCv {
@@ -995,204 +976,181 @@ object EsCvObjectMother {
             "Bygg og anlegg"
         )
 
-        val utdanningListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningListe.add(EsUtdanning)
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val utdanningListe = listOf(EsUtdanning)
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2002-01-01"),
             "Jokah",
             "1010.01",
             "Butikkmedarbeider",
-            Set.< E > of < E ? > ("Butikkmedarbeider"),
+            setOf("Butikkmedarbeider"),
             "Butikkmedarbeider",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-04-01"),
             "Nærbutikkern",
             "1010.01",
             "Butikkmedarbeider(klesbutikk)",
-            Set.< E > of < E ? > ("Butikkmedarbeider(klesbutikk)"),
+            setOf("Butikkmedarbeider(klesbutikk)"),
             "Butikkmedarbeider(klebutikk)",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring =
+        val yrkeserfaring3 =
             EsYrkeserfaring(
                 fraIsoDato("2003-04-01"),
                 fraIsoDato("2003-07-01"),
                 "Tv tv tv",
                 "5684.05",
                 "Nyhetspresentør",
-                Set.< E > of < E ? > ("Nyhetspresentør"),
+                setOf("Nyhetspresentør"),
                 "Nyhetspresentør",
                 "YRKE_ORGNR",
                 "YRKE_NACEKODE",
                 false,
-                kotlin.collections.mutableListOf<T?>(),
+                emptyList(),
                 "Oslo"
             )
 
-        val yrkeserfaring4: EsYrkeserfaring =
+        val yrkeserfaring4 =
             EsYrkeserfaring(
                 fraIsoDato("2005-08-01"),
                 fraIsoDato("2016-07-01"),
                 "Vard Group,avd.Brevik",
                 "5684.05",
                 "Hallovert",
-                Set.< E > of < E ? > ("Hallovert"),
+                setOf("Hallovert"),
                 "Hallovert",
                 "YRKE_ORGNR",
                 "YRKE_NACEKODE",
                 false,
-                kotlin.collections.mutableListOf<T?>(),
+                emptyList(),
                 "Oslo"
             )
 
-        val yrkeserfaring5: EsYrkeserfaring =
+        val yrkeserfaring5 =
             EsYrkeserfaring(
                 fraIsoDato("2016-06-01"),
                 fraIsoDato("2017-04-01"),
                 "DN teater",
                 "5124.46",
                 "Skuespiller",
-                Set.< E > of < E ? > ("Skuespiller"),
+                setOf("Skuespiller"),
                 "Skuespiller",
                 "YRKE_ORGNR",
                 "YRKE_NACEKODE",
                 false,
-                kotlin.collections.mutableListOf<T?>(),
+                emptyList(),
                 "Oslo"
             )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             null,
             "Dukketeateret Rena",
             "5124.46",
             "Skuespiller(dukketeater)",
-            Set.< E > of < E ? > ("Skuespiller(dukketeater)"),
+            setOf("Skuespiller(dukketeater)"),
             "Skuespiller(dukketeater)",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringListe.add(yrkeserfaring1)
-        yrkeserfaringListe.add(yrkeserfaring2)
-        yrkeserfaringListe.add(yrkeserfaring3)
-        yrkeserfaringListe.add(yrkeserfaring4)
-        yrkeserfaringListe.add(yrkeserfaring5)
-        yrkeserfaringListe.add(yrkeserfaring6)
+        val yrkeserfaringListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse =
+        val kompetanse1 =
             EsKompetanse(
                 fraIsoDato("2016-03-14"),
                 "152424",
                 "Hallovert",
                 null,
                 null,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "566895", "Butikkmedarbeider",
-            "Butikkmedarbeider", null, kotlin.collections.mutableListOf<T?>()
+            "Butikkmedarbeider", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"),
             "564646",
             "Butikkmedarbeider(klesbutikk)",
             "Butikkmedarbeider(klesbutikk)",
             null,
-            kotlin.collections.mutableListOf<T?>()
+            emptyList()
         )
 
-        val kompetanse4: EsKompetanse =
+        val kompetanse4 =
             EsKompetanse(
                 fraIsoDato("2016-03-14"),
                 "506",
                 "Skuespiller",
                 "Skuespiller",
                 null,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val kompetanseListe: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseListe.add(kompetanse1)
-        kompetanseListe.add(kompetanse2)
-        kompetanseListe.add(kompetanse3)
-        kompetanseListe.add(kompetanse4)
+        val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-
-        val EsSertifikat1: EsSertifikat = EsSertifikat(
+        val EsSertifikat1 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2: EsSertifikat = EsSertifikat(
+        val EsSertifikat2 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3: EsSertifikat = EsSertifikat(
+        val EsSertifikat3 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val EsSertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        EsSertifikatListe.add(EsSertifikat1)
-        EsSertifikatListe.add(EsSertifikat2)
-        EsSertifikatListe.add(EsSertifikat3)
+        val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkort5: EsForerkort = EsForerkort(
+        val forerkort5 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "S - Snøscooter", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort4)
-        forerkortListe.add(forerkort5)
+        val forerkortListe = listOf(forerkort4, forerkort5)
 
+        val sprak = EsSprak(fraIsoDato("2012-12-01"), "78985", "Tysk", "German", "Begynner")
 
-        val sprak: EsSprak = EsSprak(fraIsoDato("2012-12-01"), "78985", "Tysk", "German", "Begynner")
+        val sprakListe = listOf(sprak)
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak)
+        val kurs1 = esKurs1()
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs2 = esKurs4()
 
-        val kurs2: EsKurs = esKurs4()
+        val kurs3 = esKurs3()
 
-        val kurs3: EsKurs = esKurs3()
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
-
-        val verv: EsVerv =
+        val verv =
             EsVerv(
                 fraIsoDato("2000-01-15"),
                 fraIsoDato("2001-01-15"),
@@ -1200,34 +1158,32 @@ object EsCvObjectMother {
                 "verv tittel"
             )
 
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
+        val vervListe = listOf(verv)
 
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Oslo", "NO03.0301")
+        val geografiJobbonsker = EsGeografiJobbonsker("Oslo", "NO03.0301")
 
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Akershus", "NO02")
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Akershus", "NO02")
 
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Bærum", "NO02.1219")
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Bærum", "NO02.1219")
 
-        val geografiJobbonsker3: EsGeografiJobbonsker = EsGeografiJobbonsker("Norge", "NO")
+        val geografiJobbonsker3 = EsGeografiJobbonsker("Norge", "NO")
 
-        val geografiJobbonsker4: EsGeografiJobbonsker = EsGeografiJobbonsker("Karasjok", "NO02.2021")
+        val geografiJobbonsker4 = EsGeografiJobbonsker("Karasjok", "NO02.2021")
 
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-        geografiJobbonskerListe.add(geografiJobbonsker3)
-        geografiJobbonskerListe.add(geografiJobbonsker4)
+        val geografiJobbonskerListe = listOf(
+            geografiJobbonsker,
+            geografiJobbonsker1,
+            geografiJobbonsker2,
+            geografiJobbonsker3,
+            geografiJobbonsker4
+        )
 
-        val yrkeJobbonsker: EsYrkeJobbonsker =
+        val yrkeJobbonsker =
             EsYrkeJobbonsker(
                 "Yrke jobb ønskeStyrk Kode",
                 "Butikkmedarbeider",
                 true,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
         val yrkeJobbonsker1: EsYrkeJobbonsker =
@@ -1235,14 +1191,12 @@ object EsCvObjectMother {
                 "Yrke jobb ønskeStyrk Kode",
                 "Butikkmedarbeider",
                 true,
-                kotlin.collections.mutableListOf<T?>()
+                emptyList()
             )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
-        yrkeJobbonskerListe.add(yrkeJobbonsker1)
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker, yrkeJobbonsker1)
 
-        val esCv: EsCv = EsCv(
+        return EsCv(
             nteAktorId(4),
             "09568410230",
             "HANNE",
@@ -1286,84 +1240,91 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             "Viken",
-            "Oslo"
+            "Oslo",
+            utdanningListe,
+            emptyList(),
+            yrkeserfaringListe,
+            kompetanseListe,
+            emptyList(),
+            EsSertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            null
         )
-        esCv.addUtdanning(utdanningListe)
-        esCv.addYrkeserfaring(yrkeserfaringListe)
-        esCv.addKompetanse(kompetanseListe)
-        esCv.addSertifikat(EsSertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeEsCv5(): EsCv {
-        val utdanningListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
+        val utdanningListe = emptyList<EsUtdanning>()
 
-
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-02-01"),
             "Bankhvelvet BBL",
             "4865.75",
             "Bankhvelvoperatør",
-            Set.< E > of < E ? > ("Bankhvelvoperatør"),
+            setOf("Bankhvelvoperatør"),
             "Bankhvelvoperatør",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring =
+        val yrkeserfaring2 =
             EsYrkeserfaring(
                 fraIsoDato("2003-01-01"),
                 fraIsoDato("2003-02-01"),
                 "Proggehula",
                 "5746.07",
                 "Progger",
-                Set.< E > of < E ? > ("Progger"),
+                setOf("Progger"),
                 "Progger",
                 "YRKE_ORGNR",
                 "YRKE_NACEKODE",
                 false,
-                kotlin.collections.mutableListOf<T?>(),
+                emptyList(),
                 "Oslo"
             )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Test a.a.s",
             "6859.02",
             "Tester",
-            Set.< E > of < E ? > ("Tester"),
+            setOf("Tester"),
             "Tester",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring =
+        val yrkeserfaring4 =
             EsYrkeserfaring(
                 fraIsoDato("2005-08-01"),
                 fraIsoDato("2005-09-01"),
                 "K.O. kranservice",
                 "8342.01",
                 "Kranoperatør",
-                Set.< E > of < E ? > ("Kranoperatør"),
+                setOf("Kranoperatør"),
                 "Kranoperatør",
                 "YRKE_ORGNR",
                 "YRKE_NACEKODE",
                 false,
-                java.util.List.< E > of < E ? > ("Operatør av kran"),
+                listOf("Operatør av kran"),
                 "Oslo"
             )
 
@@ -1373,12 +1334,12 @@ object EsCvObjectMother {
             "Lang transport A.S.",
             "8332.03",
             "Lastebil- \"Lastebil- og trailersjåførog trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- \"Lastebil- og trailersjåførog trailersjåfør"),
+            setOf("Lastebil- \"Lastebil- og trailersjåførog trailersjåfør"),
             "Sjåfør kl. 3",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
@@ -1388,170 +1349,133 @@ object EsCvObjectMother {
             "Mekken mekk",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringListe.add(yrkeserfaring1)
-        yrkeserfaringListe.add(yrkeserfaring2)
-        yrkeserfaringListe.add(yrkeserfaring3)
-        yrkeserfaringListe.add(yrkeserfaring4)
-        yrkeserfaringListe.add(yrkeserfaring5)
-        yrkeserfaringListe.add(yrkeserfaring6)
+        val yrkeserfaringListe =
+            listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid(type 2 kran)", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid(type 2 kran)", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid spesielt", "Mekanisk arbeid spesielt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid spesielt", "Mekanisk arbeid spesielt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3220201",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseListe: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseListe.add(kompetanse1)
-        kompetanseListe.add(kompetanse2)
-        kompetanseListe.add(kompetanse3)
-        kompetanseListe.add(kompetanse4)
+        val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-
-        val EsSertifikat1: EsSertifikat = EsSertifikat(
+        val EsSertifikat1 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2: EsSertifikat = EsSertifikat(
+        val EsSertifikat2 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3: EsSertifikat = EsSertifikat(
+        val EsSertifikat3 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val EsSertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        EsSertifikatListe.add(EsSertifikat1)
-        EsSertifikatListe.add(EsSertifikat2)
-        EsSertifikatListe.add(EsSertifikat3)
+        val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort4)
 
-
-        val sprak: EsSprak =
+        val sprak =
             EsSprak(fraIsoDato("2012-12-01"), "78983", "Dansk", "Danish", "Uforståelig")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak)
+        val sprakListe = listOf(sprak)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs =
-            esKurs5()
+        val kurs2 = esKurs5()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "EsVerv organisasjon",
+            "verv tittel"
+        )
 
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "EsVerv organisasjon",
-                "verv tittel"
-            )
+        val vervListe = listOf(verv)
 
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
+        val geografiJobbonsker = EsGeografiJobbonsker("Harstad", "NO19.1903")
 
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Harstad", "NO19.1903")
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Sunnhordaland", "NO12.2200")
 
-        val geografiJobbonsker1: EsGeografiJobbonsker = EsGeografiJobbonsker("Sunnhordaland", "NO12.2200")
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Tromsø", "NO19.1902")
 
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Tromsø", "NO19.1902")
+        val geografiJobbonsker3 = EsGeografiJobbonsker("Jessheim", "NO02.0219")
 
-        val geografiJobbonsker3: EsGeografiJobbonsker = EsGeografiJobbonsker("Jessheim", "NO02.0219")
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2, geografiJobbonsker3)
 
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-        geografiJobbonskerListe.add(geografiJobbonsker3)
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Industrimekaniker",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Industrimekaniker",
-                true,
-                kotlin.collections.mutableListOf<T?>()
-            )
+        val yrkeJobbonsker1 = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Lastebilsjåfør",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker1: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Lastebilsjåfør",
-                true,
-                kotlin.collections.mutableListOf<T?>("Trailersjåffis")
-            )
+        val yrkeJobbonsker2 = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Butikkmedarbeider",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker2: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Butikkmedarbeider",
-                true,
-                kotlin.collections.mutableListOf<T?>()
-            )
+        val yrkeJobbonsker3 = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Konsulent (bank)",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker3: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Konsulent (bank)",
-                true,
-                kotlin.collections.mutableListOf<T?>()
-            )
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker, yrkeJobbonsker1, yrkeJobbonsker2, yrkeJobbonsker3)
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
-        yrkeJobbonskerListe.add(yrkeJobbonsker1)
-        yrkeJobbonskerListe.add(yrkeJobbonsker2)
-        yrkeJobbonskerListe.add(yrkeJobbonsker3)
-
-        val esCv: EsCv = EsCv(
+        return EsCv(
             nteAktorId(5),
             "03050316895",
             "BOB",
@@ -1595,230 +1519,206 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningListe,
+            emptyList(),
+            yrkeserfaringListe,
+            kompetanseListe,
+            emptyList(),
+            EsSertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningListe)
-        esCv.addYrkeserfaring(yrkeserfaringListe)
-        esCv.addKompetanse(kompetanseListe)
-        esCv.addSertifikat(EsSertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeCvUtenKompetanse(): EsCv {
-        val utdanningListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
+        val utdanningListe = emptyList<EsUtdanning>()
 
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-02-01"),
             "Bankhvelvet BBL",
             "4865.75",
             "Bankhvelvoperatør",
-            Set.< E > of < E ? > ("Bankhvelvoperatør"),
+            setOf("Bankhvelvoperatør"),
             "Bankhvelvoperatør",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring =
-            EsYrkeserfaring(
-                fraIsoDato("2003-01-01"),
-                fraIsoDato("2003-02-01"),
-                "Proggehula",
-                "5746.07",
-                "Progger",
-                Set.< E > of < E ? > ("Progger"),
-                "Progger",
-                "YRKE_ORGNR",
-                "YRKE_NACEKODE",
-                false,
-                kotlin.collections.mutableListOf<T?>(),
-                "Oslo"
-            )
+        val yrkeserfaring2 = EsYrkeserfaring(
+            fraIsoDato("2003-01-01"),
+            fraIsoDato("2003-02-01"),
+            "Proggehula",
+            "5746.07",
+            "Progger",
+            setOf("Progger"),
+            "Progger",
+            "YRKE_ORGNR",
+            "YRKE_NACEKODE",
+            false,
+            emptyList(),
+            "Oslo"
+        )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Test a.a.s",
             "6859.02",
             "Tester",
-            Set.< E > of < E ? > ("Tester"),
+            setOf("Tester"),
             "Tester",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring =
-            EsYrkeserfaring(
-                fraIsoDato("2005-08-01"),
-                fraIsoDato("2005-09-01"),
-                "K.O. kranservice",
-                "8342.01",
-                "Kranoperatør",
-                Set.< E > of < E ? > ("Kranoperatør"),
-                "Kranoperatør",
-                "YRKE_ORGNR",
-                "YRKE_NACEKODE",
-                false,
-                kotlin.collections.mutableListOf<T?>(),
-                "Oslo"
-            )
+        val yrkeserfaring4 = EsYrkeserfaring(
+            fraIsoDato("2005-08-01"),
+            fraIsoDato("2005-09-01"),
+            "K.O. kranservice",
+            "8342.01",
+            "Kranoperatør",
+            setOf("Kranoperatør"),
+            "Kranoperatør",
+            "YRKE_ORGNR",
+            "YRKE_NACEKODE",
+            false,
+            emptyList(),
+            "Oslo"
+        )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-06-02"),
             "Lang transport A.S.",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 3",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-11-01"),
             "Mekken mekk",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringListe.add(yrkeserfaring1)
-        yrkeserfaringListe.add(yrkeserfaring2)
-        yrkeserfaringListe.add(yrkeserfaring3)
-        yrkeserfaringListe.add(yrkeserfaring4)
-        yrkeserfaringListe.add(yrkeserfaring5)
-        yrkeserfaringListe.add(yrkeserfaring6)
+        val yrkeserfaringListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanseListe: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
+        val kompetanseListe = emptyList<EsKompetanse>()
 
-
-        val EsSertifikat1: EsSertifikat = EsSertifikat(
+        val EsSertifikat1 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2: EsSertifikat = EsSertifikat(
+        val EsSertifikat2 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3: EsSertifikat = EsSertifikat(
+        val EsSertifikat3 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val EsSertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        EsSertifikatListe.add(EsSertifikat1)
-        EsSertifikatListe.add(EsSertifikat2)
-        EsSertifikatListe.add(EsSertifikat3)
+        val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort3)
+        val forerkortListe = listOf(forerkort3)
 
-
-        val sprak: EsSprak =
+        val sprak =
             EsSprak(fraIsoDato("2012-12-01"), "78983", "Dansk", "Danish", "Uforståelig")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak)
+        val sprakListe = listOf(sprak)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs =
-            esKurs5()
+        val kurs2 = esKurs5()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "EsVerv organisasjon",
+            "verv tittel"
+        )
 
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "EsVerv organisasjon",
-                "verv tittel"
-            )
+        val vervListe = listOf(verv)
 
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
+        val geografiJobbonsker = EsGeografiJobbonsker("Harstad", "NO19.1903")
 
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Harstad", "NO19.1903")
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Nordland", "NO18")
 
-        val geografiJobbonsker1: EsGeografiJobbonsker = EsGeografiJobbonsker("Nordland", "NO18")
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Tromsø", "NO19.1902")
 
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Tromsø", "NO19.1902")
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
 
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Industrimekaniker",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Industrimekaniker",
-                true,
-                kotlin.collections.mutableListOf<T?>()
-            )
+        val yrkeJobbonsker1 = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Lastebilsjåfør",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker1: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Lastebilsjåfør",
-                true,
-                kotlin.collections.mutableListOf<T?>()
-            )
+        val yrkeJobbonsker2 = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Butikkmedarbeider",
+            true,
+            emptyList()
+        )
 
-        val yrkeJobbonsker2: EsYrkeJobbonsker =
-            EsYrkeJobbonsker(
-                "Yrke jobb ønskeStyrk Kode",
-                "Butikkmedarbeider",
-                true,
-                kotlin.collections.mutableListOf<T?>()
-            )
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker, yrkeJobbonsker1, yrkeJobbonsker2)
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
-        yrkeJobbonskerListe.add(yrkeJobbonsker1)
-        yrkeJobbonskerListe.add(yrkeJobbonsker2)
-
-        val esCv: EsCv = EsCv(
+        return EsCv(
             nteAktorId(5),
             "03050316895",
             "BOB",
@@ -1862,252 +1762,228 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             "Viken",
-            "Lier"
+            "Lier",
+            utdanningListe,
+            emptyList(),
+            yrkeserfaringListe,
+            kompetanseListe,
+            emptyList(),
+            EsSertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            null
         )
-        esCv.addUtdanning(utdanningListe)
-        esCv.addYrkeserfaring(yrkeserfaringListe)
-        esCv.addKompetanse(kompetanseListe)
-        esCv.addSertifikat(EsSertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeEsCvMedFeil(): EsCv {
-        val utdanning: EsUtdanning = EsUtdanning(
+        val utdanning = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "Otta vgs. Otta",
             "355211", "Mekaniske fag, grunnkurs", "GK maskin/mekaniker"
         )
 
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"),
             "Høyskolen i Gjøvik", null, null, "Master i sikkerhet"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning)
-        utdanningsListe.add(utdanning2)
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val utdanningsListe = listOf(utdanning, utdanning2)
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
+        val forerkortListe = listOf(forerkort1, forerkort2)
 
-
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
-
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
-
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
-
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
-
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
-
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-
-        val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
-            "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "Verv organisasjon",
+            "verv tittel"
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val vervListe = listOf(verv)
 
-        val esCv: EsCv = EsCv(
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+
+        val geografiJobbonsker1 =
+            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Hedmark", "NO04")
+
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
+
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
+        )
+
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
+
+        return EsCv(
             nteAktorId(1),
             "02016012345",
             "OLA",
@@ -2151,220 +2027,206 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
 
     fun giveMeEsCv6(): EsCv {
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning2)
+        val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            listOf(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4: EsSertifikat = EsSertifikat(
+        val sertifikat4 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5: EsSertifikat = EsSertifikat(
+        val sertifikat5 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
-        sertifikatListe.add(sertifikat4)
-        sertifikatListe.add(sertifikat5)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
+        val forerkortListe = listOf(forerkort1)
 
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val verv: EsVerv =
+        val verv =
             EsVerv(
                 fraIsoDato("2000-01-15"),
                 fraIsoDato("2001-01-15"),
@@ -2372,31 +2234,24 @@ object EsCvObjectMother {
                 "verv tittel"
             )
 
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
+        val vervListe = listOf(verv)
 
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Lillehammer", "NO05.0501")
 
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Voss", "NO12.2001")
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Voss", "NO12.2001")
 
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
 
-        val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
+        val yrkeJobbonsker = EsYrkeJobbonsker(
             "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
 
-        val esCv: EsCv = EsCv(
+        return EsCv(
             nteAktorId(6),
             "01016034215",
             "OLA",
@@ -2440,270 +2295,243 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeCvForDoedPerson(): EsCv {
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning2)
+        val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4: EsSertifikat = EsSertifikat(
+        val sertifikat4 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5: EsSertifikat = EsSertifikat(
+        val sertifikat5 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
-        sertifikatListe.add(sertifikat4)
-        sertifikatListe.add(sertifikat5)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
-        forerkortListe.add(forerkort3)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "Verv organisasjon",
+            "verv tittel"
+        )
 
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
+        val vervListe = listOf(verv)
 
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Lillehammer", "NO05.0501")
 
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Hedmark", "NO04")
 
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
-
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
 
         val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
             "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
 
-        val esCv: EsCv = EsCv(
+        return EsCv(
             nteAktorId(7),
             "01016034215",
             "OLA",
@@ -2747,270 +2575,244 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeCvForKode6(): EsCv {
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning2)
+        val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4: EsSertifikat = EsSertifikat(
+        val sertifikat4 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5: EsSertifikat = EsSertifikat(
+        val sertifikat5 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
-        sertifikatListe.add(sertifikat4)
-        sertifikatListe.add(sertifikat5)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
-        forerkortListe.add(forerkort3)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
-
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
-
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
-
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
-
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
-
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-
-        val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
-            "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "Verv organisasjon",
+            "verv tittel"
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val vervListe = listOf(verv)
 
-        val esCv: EsCv = EsCv(
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+
+        val geografiJobbonsker1 =
+            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Hedmark", "NO04")
+
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
+
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
+        )
+
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
+
+        return EsCv(
             nteAktorId(8),
             "01016034215",
             "OLA",
@@ -3054,270 +2856,243 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeCvForKode7(): EsCv {
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning2)
+        val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industri'mekaniker"),
+            setOf("Industri'mekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4: EsSertifikat = EsSertifikat(
+        val sertifikat4 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5: EsSertifikat = EsSertifikat(
+        val sertifikat5 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
-        sertifikatListe.add(sertifikat4)
-        sertifikatListe.add(sertifikat5)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
-        forerkortListe.add(forerkort3)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
-
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
-
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
-
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
-
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
-
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-
-        val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
-            "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "Verv organisasjon",
+            "verv tittel"
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val vervListe = listOf(verv)
 
-        val esCv: EsCv = EsCv(
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Hedmark", "NO04")
+
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
+
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
+        )
+
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
+
+        return EsCv(
             nteAktorId(9),
             "01016034215",
             "OLA",
@@ -3361,270 +3136,243 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeCvFritattForKandidatsok(): EsCv {
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning2)
+        val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4: EsSertifikat = EsSertifikat(
+        val sertifikat4 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5: EsSertifikat = EsSertifikat(
+        val sertifikat5 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
-        sertifikatListe.add(sertifikat4)
-        sertifikatListe.add(sertifikat5)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
-        forerkortListe.add(forerkort3)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
-
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
-
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
-
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
-
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
-
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-
-        val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
-            "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "Verv organisasjon",
+            "verv tittel"
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val vervListe = listOf(verv)
 
-        val esCv: EsCv = EsCv(
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Hedmark", "NO04")
+
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
+
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
+        )
+
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
+
+        return EsCv(
             nteAktorId(10),
             "01016034215",
             "OLA",
@@ -3668,270 +3416,243 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
     fun giveMeCvFritattForAgKandidatsok(): EsCv {
-        val utdanning2: EsUtdanning = EsUtdanning(
+        val utdanning2 = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
 
 
-        val utdanningsListe: java.util.ArrayList<EsUtdanning?> = java.util.ArrayList<EsUtdanning?>()
-        utdanningsListe.add(utdanning2)
+        val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1 = EsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
             "8341.01",
             "",
-            kotlin.collections.mutableSetOf<E?>(),
+            emptySet(),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring2: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring2 = EsYrkeserfaring(
             nåMinusÅr(11),
             nåMinusÅr(6),
             "AF-Pihl, Hammerfest",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring3: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring3 = EsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
             "8342.01",
             anleggsmaskinfører,
-            Set.< E > of < E ? > (anleggsmaskinfører),
+            setOf(anleggsmaskinfører),
             "maskinkjører og maskintransport",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring4: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring4 = EsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5 = EsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
             "8332.03",
             "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
+            setOf("Lastebil- og trailersjåfør"),
             "Sjåfør kl. 2",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6 = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
             "7233.03",
             "Industrimekaniker",
-            Set.< E > of < E ? > ("Industrimekaniker"),
+            setOf("Industrimekaniker"),
             "Industrimekaniker",
             "YRKE_ORGNR",
             "YRKE_NACEKODE",
             false,
-            kotlin.collections.mutableListOf<T?>(),
+            emptyList(),
             "Oslo"
         )
 
-        val yrkeserfaringsListe: java.util.ArrayList<EsYrkeserfaring?> = java.util.ArrayList<EsYrkeserfaring?>()
-        yrkeserfaringsListe.add(yrkeserfaring1)
-        yrkeserfaringsListe.add(yrkeserfaring2)
-        yrkeserfaringsListe.add(yrkeserfaring3)
-        yrkeserfaringsListe.add(yrkeserfaring4)
-        yrkeserfaringsListe.add(yrkeserfaring5)
-        yrkeserfaringsListe.add(yrkeserfaring6)
+        val yrkeserfaringsListe = listOf(yrkeserfaring1, yrkeserfaring2, yrkeserfaring3, yrkeserfaring4, yrkeserfaring5, yrkeserfaring6)
 
-        val kompetanse1: EsKompetanse = EsKompetanse(
+        val kompetanse1 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3020813",
-            "Maskin- og kranførerarbeid", null, null, kotlin.collections.mutableListOf<T?>()
+            "Maskin- og kranførerarbeid", null, null, emptyList()
         )
 
-        val kompetanse2: EsKompetanse = EsKompetanse(
+        val kompetanse2 = EsKompetanse(
             fraIsoDato("2016-03-14"), "3281301",
-            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk arbeid generelt", "Mekanisk arbeid generelt", null, emptyList()
         )
 
-        val kompetanse3: EsKompetanse = EsKompetanse(
+        val kompetanse3 = EsKompetanse(
             fraIsoDato("2016-03-14"), "506",
-            "Landtransport generelt", "Landtransport generelt", null, kotlin.collections.mutableListOf<T?>()
+            "Landtransport generelt", "Landtransport generelt", null, emptyList()
         )
 
-        val kompetanse4: EsKompetanse = EsKompetanse(
+        val kompetanse4 = EsKompetanse(
             fraIsoDato("2016-03-14"), "212", "Industri (bransje)",
-            "Mekanisk industri (bransje)", null, kotlin.collections.mutableListOf<T?>()
+            "Mekanisk industri (bransje)", null, emptyList()
         )
 
-        val kompetanseList: java.util.ArrayList<EsKompetanse?> = java.util.ArrayList<EsKompetanse?>()
-        kompetanseList.add(kompetanse1)
-        kompetanseList.add(kompetanse2)
-        kompetanseList.add(kompetanse3)
-        kompetanseList.add(kompetanse4)
+        val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1: EsSertifikat = EsSertifikat(
+        val sertifikat1 = EsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2: EsSertifikat = EsSertifikat(
+        val sertifikat2 = EsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3: EsSertifikat = EsSertifikat(
+        val sertifikat3 = EsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4: EsSertifikat = EsSertifikat(
+        val sertifikat4 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5: EsSertifikat = EsSertifikat(
+        val sertifikat5 = EsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
 
-        val sertifikatListe: java.util.ArrayList<EsSertifikat?> = java.util.ArrayList<EsSertifikat?>()
-        sertifikatListe.add(sertifikat1)
-        sertifikatListe.add(sertifikat2)
-        sertifikatListe.add(sertifikat3)
-        sertifikatListe.add(sertifikat4)
-        sertifikatListe.add(sertifikat5)
+        val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1: EsForerkort = EsForerkort(
+        val forerkort1 = EsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2: EsForerkort = EsForerkort(
+        val forerkort2 = EsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3: EsForerkort = EsForerkort(
+        val forerkort3 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4: EsForerkort = EsForerkort(
+        val forerkort4 = EsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkortListe: java.util.ArrayList<EsForerkort?> = java.util.ArrayList<EsForerkort?>()
-        forerkortListe.add(forerkort1)
-        forerkortListe.add(forerkort2)
-        forerkortListe.add(forerkort3)
-        forerkortListe.add(forerkort4)
+        val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-
-        val sprak1: EsSprak =
+        val sprak1 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
 
-        val sprak2: EsSprak =
+        val sprak2 =
             EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
 
-        val sprakListe: java.util.ArrayList<EsSprak?> = java.util.ArrayList<EsSprak?>()
-        sprakListe.add(sprak1)
-        sprakListe.add(sprak2)
+        val sprakListe = listOf(sprak1, sprak2)
 
-        val kurs1: EsKurs = esKurs1()
+        val kurs1 = esKurs1()
 
-        val kurs2: EsKurs = esKurs2()
+        val kurs2 = esKurs2()
 
-        val kurs3: EsKurs = esKurs3()
+        val kurs3 = esKurs3()
 
+        val kursListe = listOf(kurs1, kurs2, kurs3)
 
-        val kursListe: java.util.ArrayList<EsKurs?> = java.util.ArrayList<EsKurs?>()
-        kursListe.add(kurs1)
-        kursListe.add(kurs2)
-        kursListe.add(kurs3)
-
-        val verv: EsVerv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe: java.util.ArrayList<EsVerv?> = java.util.ArrayList<EsVerv?>()
-        vervListe.add(verv)
-
-        val geografiJobbonsker: EsGeografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
-
-        val geografiJobbonsker1: EsGeografiJobbonsker =
-            EsGeografiJobbonsker("Lillehammer", "NO05.0501")
-
-        val geografiJobbonsker2: EsGeografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
-
-        val geografiJobbonskerListe: java.util.ArrayList<EsGeografiJobbonsker?> =
-            java.util.ArrayList<EsGeografiJobbonsker?>()
-        geografiJobbonskerListe.add(geografiJobbonsker)
-        geografiJobbonskerListe.add(geografiJobbonsker1)
-        geografiJobbonskerListe.add(geografiJobbonsker2)
-
-        val yrkeJobbonsker: EsYrkeJobbonsker = EsYrkeJobbonsker(
-            "Yrke jobb ønskeStyrk Kode",
-            "Yrke jobb ønske Styrk beskrivelse", true, kotlin.collections.mutableListOf<T?>()
+        val verv = EsVerv(
+            fraIsoDato("2000-01-15"),
+            fraIsoDato("2001-01-15"),
+            "Verv organisasjon",
+            "verv tittel"
         )
 
-        val yrkeJobbonskerListe: java.util.ArrayList<EsYrkeJobbonsker?> = java.util.ArrayList<EsYrkeJobbonsker?>()
-        yrkeJobbonskerListe.add(yrkeJobbonsker)
+        val vervListe = listOf(verv)
 
-        val esCv: EsCv = EsCv(
+        val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
+
+        val geografiJobbonsker1 = EsGeografiJobbonsker("Lillehammer", "NO05.0501")
+
+        val geografiJobbonsker2 = EsGeografiJobbonsker("Hedmark", "NO04")
+
+        val geografiJobbonskerListe = listOf(geografiJobbonsker, geografiJobbonsker1, geografiJobbonsker2)
+
+        val yrkeJobbonsker = EsYrkeJobbonsker(
+            "Yrke jobb ønskeStyrk Kode",
+            "Yrke jobb ønske Styrk beskrivelse", true, emptyList()
+        )
+
+        val yrkeJobbonskerListe = listOf(yrkeJobbonsker)
+
+        return EsCv(
             nteAktorId(11),
             "01016034215",
             "OLA",
@@ -3975,76 +3696,71 @@ object EsCvObjectMother {
             "Olle Svenske",
             "olle@svenske.se",
             null,
+            null,
+            utdanningsListe,
+            emptyList(),
+            yrkeserfaringsListe,
+            kompetanseList,
+            emptyList(),
+            sertifikatListe,
+            forerkortListe,
+            sprakListe,
+            kursListe,
+            vervListe,
+            geografiJobbonskerListe,
+            yrkeJobbonskerListe,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
             null
         )
-        esCv.addUtdanning(utdanningsListe)
-        esCv.addYrkeserfaring(yrkeserfaringsListe)
-        esCv.addKompetanse(kompetanseList)
-        esCv.addSertifikat(sertifikatListe)
-        esCv.addForerkort(forerkortListe)
-        esCv.addSprak(sprakListe)
-        esCv.addKurs(kursListe)
-        esCv.addVerv(vervListe)
-        esCv.addGeografiJobbonske(geografiJobbonskerListe)
-        esCv.addYrkeJobbonske(yrkeJobbonskerListe)
-        return esCv
     }
 
-    fun giveMeYrkeserfaring(): EsYrkeserfaring {
-        return EsYrkeserfaring(
-            fraIsoDato("2016-06-01"),
-            fraIsoDato("2016-07-01"),
-            "MTM anlegg",
-            "8332.03",
-            "Lastebil- og trailersjåfør",
-            Set.< E > of < E ? > ("Lastebil- og trailersjåfør"),
-            "Sjåfør kl. 2",
-            "YRKE_ORGNR",
-            "YRKE_NACEKODE",
-            false,
-            kotlin.collections.mutableListOf<T?>(),
-            "Oslo"
-        )
-    }
+    fun giveMeYrkeserfaring() = EsYrkeserfaring(
+        fraIsoDato("2016-06-01"),
+        fraIsoDato("2016-07-01"),
+        "MTM anlegg",
+        "8332.03",
+        "Lastebil- og trailersjåfør",
+        setOf("Lastebil- og trailersjåfør"),
+        "Sjåfør kl. 2",
+        "YRKE_ORGNR",
+        "YRKE_NACEKODE",
+        false,
+        emptyList(),
+        "Oslo"
+    )
 
-    fun giveMeUtdanning(): EsUtdanning {
-        return EsUtdanning(
-            fraIsoDato("1988-08-20"),
-            fraIsoDato("1989-06-20"),
-            "UiO",
-            "838838",
-            "Sosialantropologiske fag",
-            "Sosialantropologi gr. fag"
-        )
-    }
+    fun giveMeUtdanning() = EsUtdanning(
+        fraIsoDato("1988-08-20"),
+        fraIsoDato("1989-06-20"),
+        "UiO",
+        "838838",
+        "Sosialantropologiske fag",
+        "Sosialantropologi gr. fag"
+    )
 
-    fun giveMeFørerkort(): EsForerkort {
-        return EsForerkort(fraIsoDato("1994-08-01"), null, "V1.6050", "A - Tung motorsykkel", null, "")
-    }
+    fun giveMeFørerkort() =
+        EsForerkort(fraIsoDato("1994-08-01"), null, "V1.6050", "A - Tung motorsykkel", null, "")
 
-    fun giveMeKurs(): EsKurs {
-        return esKurs1()
-    }
+    fun giveMeKurs() = esKurs1()
 
-    fun giveMeFagdokumentasjon(): EsFagdokumentasjon {
-        return EsFagdokumentasjon("anyType", "anyTittel", "anyBeskrivelse")
-    }
+    fun giveMeFagdokumentasjon() = EsFagdokumentasjon("anyType", "anyTittel", "anyBeskrivelse")
 
-    fun giveMeAnnenErfaring(): EsAnnenErfaring {
-        return EsAnnenErfaring(
-            fraIsoDato("2005-01-01"),
-            fraIsoDato("2010-12-31"),
-            "anyBeskrivelse"
-        )
-    }
+    fun giveMeAnnenErfaring() = EsAnnenErfaring(
+        fraIsoDato("2005-01-01"),
+        fraIsoDato("2010-12-31"),
+        "anyBeskrivelse"
+    )
 
-    fun giveMeGodkjenning(): EsGodkjenning {
-        return EsGodkjenning(
-            "anyTittel",
-            "anyUtsteder",
-            fraIsoDato("2020-06-01"),
-            fraIsoDato("2050-01-01"),
-            "anyKonseptId"
-        )
-    }
+    fun giveMeGodkjenning() = EsGodkjenning(
+        "anyTittel",
+        "anyUtsteder",
+        fraIsoDato("2020-06-01"),
+        fraIsoDato("2050-01-01"),
+        "anyKonseptId"
+    )
 }

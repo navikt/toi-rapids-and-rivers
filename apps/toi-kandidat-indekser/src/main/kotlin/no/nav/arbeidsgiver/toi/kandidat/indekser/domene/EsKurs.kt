@@ -7,8 +7,8 @@ import java.util.*
 class EsKurs(
     private val tittel: String,
     private val arrangor: String,
-    private val omfangEnhet: String,
-    private val omfangVerdi: Int,
+    private val omfangEnhet: String?,
+    private val omfangVerdi: Int?,
     private val tilDato: Date
 ) {
     override fun equals(other: Any?) = other is EsKurs && tilDato == other.tilDato
