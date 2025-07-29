@@ -65,7 +65,7 @@ object EsCvObjectMother {
         return c.getTime()
     }
 
-    fun giveMeEsCv(): EsCv {
+    fun giveMeEsCv(kandidatnr: String = "1L"): EsCv {
         val utdanning = EsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "Otta vgs. Otta",
             "355211", "Mekaniske fag, grunnkurs", "GK maskin/mekaniker"
@@ -311,7 +311,7 @@ object EsCvObjectMother {
             "(+47) 22334455",
             "12345678",
             "NO",
-            "1L",
+            kandidatnr,
             "hererjeg",
             "N",
             fraIsoDato("2016-05-30"),

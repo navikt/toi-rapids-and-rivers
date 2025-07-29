@@ -165,4 +165,6 @@ class EsCv(
             .add("perioderMedInaktivitet=" + perioderMedInaktivitet)
             .toString()
     }
+
+    fun indekseringsnøkkel() = kandidatnr
 }

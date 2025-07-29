@@ -10,6 +10,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:$testContainerVerison")
     testImplementation("org.testcontainers:testcontainers:$testContainerVerison")
     implementation("org.opensearch.client:opensearch-java:3.2.0")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
     testImplementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelseskodeverkVersion")
 }
 
