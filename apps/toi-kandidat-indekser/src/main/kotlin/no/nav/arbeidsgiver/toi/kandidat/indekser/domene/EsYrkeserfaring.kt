@@ -2,12 +2,15 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.util.*
+import java.time.OffsetDateTime
+import java.time.OffsetDateTime.now
+import java.time.temporal.ChronoUnit
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsYrkeserfaring(
-    private val fraDato: Date,
-    private val tilDato: Date?,
+    private val fraDato: OffsetDateTime,
+    private val tilDato: OffsetDateTime?,
     private val arbeidsgiver: String,
     private val styrkKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val stillingstittel: String,
@@ -26,8 +29,8 @@ class EsYrkeserfaring(
     private val yrkeserfaringManeder = toYrkeserfaringManeder(fraDato, tilDato)
 
     constructor(
-        fraDato: Date,
-        tilDato: Date?,
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime?,
         arbeidsgiver: String,
         styrkKode: String,
         kodeverkStillingstittel: String,
@@ -51,8 +54,8 @@ class EsYrkeserfaring(
         sted, beskrivelse
     )
     constructor(
-        fraDato: Date,
-        tilDato: Date?,
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime?,
         arbeidsgiver: String,
         styrkKode: String?,
         stillingstittel: String,
@@ -109,17 +112,8 @@ class EsYrkeserfaring(
             + ", utelukketForFremtiden='" + utelukketForFremtiden + '\'' + '}')
 
     companion object {
-        private fun toYrkeserfaringManeder(fraDato: Date, tilDato: Date?): Int {
-            val fraCalendar: Calendar = GregorianCalendar()
-            fraCalendar.setTime(fraDato)
-
-            // If tilDato is nullr, it is set to the current date
-            val tilCalendar: Calendar = GregorianCalendar()
-            tilCalendar.setTime(tilDato ?: Date())
-
-            val diffYear = tilCalendar.get(Calendar.YEAR) - fraCalendar.get(Calendar.YEAR)
-            return diffYear * 12 + tilCalendar.get(Calendar.MONTH) - fraCalendar.get(Calendar.MONTH)
-        }
+        private fun toYrkeserfaringManeder(fraDato: OffsetDateTime, tilDato: OffsetDateTime?) =
+            ChronoUnit.MONTHS.between(fraDato, tilDato?: now()).toInt()
         fun List<EsYrkeserfaring>.totalYrkeserfaringIManeder() = this.sumOf(EsYrkeserfaring::yrkeserfaringManeder)
     }
 }

@@ -2,18 +2,19 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsForerkort(
-    private val fraDato: Date,
-    private val tilDato: Date?,
+    private val fraDato: OffsetDateTime,
+    private val tilDato: OffsetDateTime?,
     private val forerkortKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val forerkortKodeKlasse: String,
     private val alternativKlasse: String?,
     private val utsteder: String?
 ) {
-    constructor(fraDato: Date, tilDato: Date, klasse: String, klassebeskrivelse: String) : this(
+    constructor(fraDato: OffsetDateTime, tilDato: OffsetDateTime, klasse: String, klassebeskrivelse: String) : this(
         fraDato,
         tilDato,
         null,  // Det finnes to formater på førerkort, så vi må håndtere begge

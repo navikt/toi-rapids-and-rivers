@@ -1,8 +1,26 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring.Companion.totalYrkeserfaringIManeder
+import java.time.Instant
+import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.*
+
+private const val jobbskifter = "JOBBS"
+private const val ingenAnonymitet = "G"
+private const val tomAdresse = ""
+private val ingenMobiltelefon: String? = null
+private val ingenNasjonalitet: String? = null
+private val ingenLandkode: String? = null
+private val ingenDisponererBil: Boolean? = null
+private const val erIkkeDød = false
+private const val defaultFrKode = "0"
+private const val harIkkeGjeldende14aVedtak = "HAR_IKKE_GJELDENDE_14A_VEDTAK"
+private val fritattAgKandidatsokerDeprikert: Boolean? = null
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsCv(
@@ -10,19 +28,19 @@ class EsCv(
     private val fodselsnummer: String,
     private val fornavn: String,
     private val etternavn: String,
-    private val fodselsdato: String,
+    private val fodselsdato: LocalDate,
 
     private val fodselsdatoErDnr: Boolean,
     private val formidlingsgruppekode: String,
     private val epostadresse: String,
-    private val mobiltelefon: String,
+    private val mobiltelefon: String?,
     private val telefon: String,
 
-    private val statsborgerskap: String,
+    private val statsborgerskap: String?,
     private val kandidatnr: String,
     private val beskrivelse: String,
     private val samtykkeStatus: String,
-    private val samtykkeDato: Date,
+    private val samtykkeDato: OffsetDateTime,
 
     private val adresselinje1: String,
     private val adresselinje2: String,
@@ -30,10 +48,10 @@ class EsCv(
     private val postnummer: String,
     private val poststed: String,
 
-    private val landkode: String,
+    private val landkode: String?,
     private val kommunenummer: Int,
-    private val disponererBil: Boolean,
-    private val tidsstempel: Date,  // TODO Dårlig/vagt navn, bør hete sistEndret, slik at det stemmer med CV AVRO-modellen
+    private val disponererBil: Boolean?,
+    private val tidsstempel: OffsetDateTime,  // TODO Dårlig/vagt navn, bør hete sistEndret, slik at det stemmer med CV AVRO-modellen
     private val kommunenummerkw: Int,
 
     private val doed: Boolean,
@@ -45,8 +63,8 @@ class EsCv(
     private val navkontor: String?,
     private val orgenhet: String?,
 
-    private val fritattKandidatsok: Boolean,
-    private val fritattAgKandidatsok: Boolean,
+    private val fritattKandidatsok: Boolean?,
+    private val fritattAgKandidatsok: Boolean?,
     private val synligForArbeidsgiverSok: Boolean,
     private val synligForVeilederSok: Boolean,
     private val oppstartKode: String?,
@@ -167,4 +185,83 @@ class EsCv(
     }
 
     fun indekseringsnøkkel() = kandidatnr
+
+    companion object {
+        private fun JsonNode.yyyymmddToLocalDate(): LocalDate {
+            val (year, month, day) = map { it.asInt() }
+            return LocalDate.of(year, month, day)
+        }
+
+        fun fraMelding(packet: JsonMessage): EsCv {
+            val arbeidsmarkedCv = packet["arbeidsmarkedCv"]
+            val cvNode = (arbeidsmarkedCv["slettCv"] ?: arbeidsmarkedCv["endreCv"] ?: arbeidsmarkedCv["opprettCv"] ?: throw IllegalArgumentException("ArbeidsmarkedCv mangler slettCv, endreCv eller opprettCv"))["cv"]
+            val jobbProfilNode = (arbeidsmarkedCv["slettJobbprofil"] ?: arbeidsmarkedCv["endreJobbprofil"] ?: arbeidsmarkedCv["opprettJobbprofil"] ?: throw IllegalArgumentException("ArbeidsmarkedCv mangler slettJobbprofil, endreJobbprofil eller opprettJobbprofil")).get("jobbprofil")
+
+            return EsCv(
+                aktorId = packet["aktørId"].asText(null),
+                fodselsnummer = cvNode["fodselsnummer"].asText(null),
+                fornavn = cvNode["fornavn"].asText(null),
+                etternavn = cvNode["etternavn"].asText(null),
+                fodselsdato = cvNode["foedselsdato"].yyyymmddToLocalDate(),
+                fodselsdatoErDnr = cvNode["fodselsnummer"].asText(null).first() >= '4',
+                formidlingsgruppekode = packet["oppfølgingsinformasjon.formidlingsgruppe"].asText(jobbskifter),
+                epostadresse = cvNode["epost"].asText(null),
+                mobiltelefon = ingenMobiltelefon,
+                telefon = cvNode["telefon"].asText(null),
+                statsborgerskap = ingenNasjonalitet,
+                kandidatnr = cvNode["arenaKandidatnr"].asText(null),
+                beskrivelse = cvNode["sammendrag"].asText(null),
+                samtykkeStatus = ingenAnonymitet,
+                samtykkeDato = OffsetDateTime.from(Instant.ofEpochMilli((cvNode["opprettet"].asDouble() * 1000).toLong())), // samtykkeDato, XXX hvorfor heter ikke feltet opprettetDato i EsCV ?
+                adresselinje1 = cvNode["gateadresse"].asText(null),
+                adresselinje2 = tomAdresse,
+                adresselinje3 = tomAdresse,
+                postnummer = cvNode["postnummer"].asText(null),
+                poststed = cvNode["poststed"].asText(null),
+                landkode = ingenLandkode,
+                kommunenummer = TODO(),
+                disponererBil = ingenDisponererBil,
+                tidsstempel = OffsetDateTime.from(Instant.ofEpochMilli((cvNode["sistEndret"].asDouble() * 1000).toLong())),
+                kommunenummerkw = TODO(),
+                doed = erIkkeDød,
+                frKode = defaultFrKode,
+                kvalifiseringsgruppekode = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asText(""),
+                hovedmaalkode = packet["oppfølgingsinformasjon.hovedmaal"].asText(""),
+                hovedmal = packet["siste14avedtak.hovedmaal"].asText(harIkkeGjeldende14aVedtak),
+                innsatsgruppe = packet["siste14avedtak.innsatsgruppe"].asText(harIkkeGjeldende14aVedtak),
+                navkontor = packet["organisasjonsenhetsnavn"].asText(null),
+                orgenhet = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText(""),
+                fritattKandidatsok = packet["fritattKandidatsøk.fritattKandidatsok"].let { if(it.isMissingOrNull()) null else it.asBoolean() },
+                fritattAgKandidatsok = fritattAgKandidatsokerDeprikert,
+                synligForArbeidsgiverSok = cvNode["synligForArbeidsgiver"].asBoolean(),
+                synligForVeilederSok = cvNode["synligForVeileder"].asBoolean(),
+                oppstartKode = jobbProfilNode.asText(""),
+                kommunenummerstring = TODO(),
+                veilederIdent = packet["veileder.veilederId"].asText(null),
+                veilederVisningsnavn = packet["veileder.veilederinformasjon.visningsNavn"].asText(null),
+                veilederEpost = packet["veileder.veilederinformasjon.epost"].asText(null),
+                fylkeNavn = TODO(),
+                kommuneNavn = TODO(),
+                utdanning = TODO(),
+                fagdokumentasjon = TODO(),
+                yrkeserfaring = TODO(),
+                kompetanseObj = TODO(),
+                annenerfaringObj = TODO(),
+                sertifikatObj = TODO(),
+                forerkort = TODO(),
+                sprak = TODO(),
+                kursObj = TODO(),
+                vervObj = TODO(),
+                geografiJobbonsker = TODO(),
+                yrkeJobbonskerObj = TODO(),
+                omfangJobbonskerObj = TODO(),
+                ansettelsesformJobbonskerObj = TODO(),
+                arbeidstidsordningJobbonskerObj = TODO(),
+                arbeidsdagerJobbonskerObj = TODO(),
+                arbeidstidJobbonskerObj = TODO(),
+                godkjenninger = TODO(),
+                perioderMedInaktivitet = TODO()
+            )
+        }
+    }
 }

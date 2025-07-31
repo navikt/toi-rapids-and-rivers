@@ -2,11 +2,12 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsSprak(
-    private val fraDato: Date?,
+    private val fraDato: OffsetDateTime?,
     private val sprakKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private val sprakKodeTekst: String,
@@ -15,7 +16,7 @@ class EsSprak(
     private val ferdighetMuntlig: String?,
     private val ferdighetSkriftlig: String?
 ) {
-    constructor(fraDato: Date?, sprakKode: String?, sprakKodeTekst: String, alternativTekst: String, beskrivelse: String): this(
+    constructor(fraDato: OffsetDateTime?, sprakKode: String?, sprakKodeTekst: String, alternativTekst: String, beskrivelse: String): this(
         fraDato,
         sprakKode,
         sprakKodeTekst,

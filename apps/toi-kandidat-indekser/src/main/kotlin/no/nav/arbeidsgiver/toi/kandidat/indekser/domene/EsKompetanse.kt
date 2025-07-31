@@ -2,11 +2,12 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsKompetanse(
-    private val fraDato: Date?,
+    private val fraDato: OffsetDateTime?,
     private val kompKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val kompKodeNavn: String,
     private val alternativtNavn: String?,

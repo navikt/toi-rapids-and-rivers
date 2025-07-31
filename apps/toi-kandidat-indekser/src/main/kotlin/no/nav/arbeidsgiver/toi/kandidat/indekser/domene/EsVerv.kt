@@ -1,12 +1,13 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsVerv(
-    private val fraDato: Date,
-    private val tilDato: Date,
+    private val fraDato: OffsetDateTime,
+    private val tilDato: OffsetDateTime,
     private val organisasjon: String,
     private val tittel: String
 ) {

@@ -1,7 +1,8 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsKurs(
@@ -9,7 +10,7 @@ class EsKurs(
     private val arrangor: String,
     private val omfangEnhet: String?,
     private val omfangVerdi: Int?,
-    private val tilDato: Date
+    private val tilDato: OffsetDateTime
 ) {
     override fun equals(other: Any?) = other is EsKurs && tilDato == other.tilDato
             && tittel == other.tittel && arrangor == other.arrangor

@@ -1,12 +1,13 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 class EsGodkjenning(
     private val tittel: String,
     private val utsteder: String,
-    private val gjennomfoert: Date,
-    private val utloeper: Date,
+    private val gjennomfoert: OffsetDateTime,
+    private val utloeper: OffsetDateTime,
     private val konseptId: String
 ): EnAvFlereSamledeKompetaser {
 

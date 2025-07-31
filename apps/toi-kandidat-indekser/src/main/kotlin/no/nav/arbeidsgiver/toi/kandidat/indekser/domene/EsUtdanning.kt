@@ -2,12 +2,13 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.util.*
+import java.time.OffsetDateTime
+import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsUtdanning(
-    private val fraDato: Date,
-    private val tilDato: Date,
+    private val fraDato: OffsetDateTime,
+    private val tilDato: OffsetDateTime,
     private val utdannelsessted: String,
     private val nusKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val nusKodeGrad: String?,
@@ -16,7 +17,7 @@ class EsUtdanning(
     private val beskrivelse: String?
 ) {
     constructor(
-        fraDato: Date, tilDato: Date, utdannelsessted: String, nusKode: String?,
+        fraDato: OffsetDateTime, tilDato: OffsetDateTime, utdannelsessted: String, nusKode: String?,
         nusKodeGrad: String?, alternativGrad: String
     ): this(
         fraDato,
