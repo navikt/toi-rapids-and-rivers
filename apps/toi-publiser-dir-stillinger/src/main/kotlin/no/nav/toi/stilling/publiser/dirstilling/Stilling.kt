@@ -18,10 +18,10 @@ data class Stilling(
     val source: String?,
     val medium: String?,
     val businessName: String?,
-    val locations: List<Geografi> = ArrayList(),
+    val locationList: List<Geografi> = ArrayList(),
     val reference: String?,
     val administration: DirektemeldtStillingAdministration?,
     val properties: Map<String, String> = HashMap(),
-    val contacts: List<Contact> = ArrayList(),
+    val contactList: List<Contact> = ArrayList(),
     val title: String,
 )
