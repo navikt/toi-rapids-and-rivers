@@ -25,5 +25,6 @@ include(
     "apps:toi-arbeidssoekerperiode",
     "apps:toi-publisering-til-arbeidsplassen",
     "apps:toi-stilling-indekser",
+    "apps:toi-publiser-dir-stillinger",
     "technical-libs:testrapid",
 )

@@ -1,10 +1,13 @@
-package no.nav.toi.stilling.publiser.arbeidsplassen
+package no.nav.toi.stilling.publiser.dirstilling
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.ZonedDateTime
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 
 data class RapidHendelse(
@@ -29,8 +32,56 @@ data class DirektemeldtStilling(
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
     val status: String,
-    val annonsenr: Long?
-)
+    val annonsenr: String?,
+    val adminStatus: String?,
+    val utløpsdato: ZonedDateTime? = null,
+    val publisert: ZonedDateTime? = null,
+    val publisertAvAdmin: String?,
+) {
+    fun konverterTilStilling(): Stilling = Stilling(
+        uuid = stillingsId,
+        created = konverterDato(opprettet),
+        updated = konverterDato(sistEndret),
+        status = status,
+        title = innhold.title,
+        administration = innhold.administration?.copy(status = adminStatus),
+        contactList = innhold.contactList,
+        privacy = innhold.privacy,
+        source = innhold.source,
+        medium = innhold.medium,
+        reference = innhold.reference,
+        published = konverterDatoOptional(publisert),
+        expires = konverterDatoOptional(utløpsdato),
+        employer = innhold.employer,
+        locationList = innhold.locationList,
+        categoryList = innhold.categoryList,
+        properties = innhold.properties,
+        publishedByAdmin = parseLocalDateTime(publisertAvAdmin),
+        businessName = innhold.businessName,
+        adnr = annonsenr.toString()
+    )
+
+    private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
+        return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneId.of("Europe/Oslo")), ZoneId.of("Europe/Oslo"))
+            .toLocalDateTime()
+    }
+    private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
+        if (dato == null) return null
+        return konverterDato(dato)
+    }
+
+    private fun parseLocalDateTime(dateTime: String?): LocalDateTime? {
+        if (dateTime == null) return null
+        return try {
+            LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME)
+                .atZone(ZoneId.of("Europe/Oslo"))
+                .toLocalDateTime()
+        } catch (e: Exception) {
+            log.info("Kunne ikke parse dato $dateTime til LocalDateTime: ${e.message} $stillingsId")
+            return null
+        }
+    }
+}
 
 data class DirektemeldtStillingKategori(
     val code: String?,
@@ -71,14 +122,11 @@ data class DirektemeldtStillingInnhold(
     val source: String?,
     val medium: String?,
     val reference: String?,
-    val published: ZonedDateTime?,
-    val expires: ZonedDateTime?,
     val employer: DirektemeldtStillingArbeidsgiver?,
     val location: Geografi?,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
     val properties: Map<String, String> = HashMap(),
-    val publishedByAdmin: String?,
     val businessName: String?,
     val firstPublished: Boolean?,
     val deactivatedByExpiry: Boolean?,
