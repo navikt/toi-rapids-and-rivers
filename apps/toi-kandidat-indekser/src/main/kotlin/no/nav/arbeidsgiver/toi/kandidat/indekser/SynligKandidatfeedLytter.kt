@@ -34,8 +34,9 @@ class SynligKandidatfeedLytter(
                 behovsListe.forEach(it::requireKey)
             }
             validate {
-
-                it.requireKey("oppfølgingsinformasjon")
+                it.requireKey("arbeidsmarkedCv")
+                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "veileder.veilederId")
+                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmaal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost")
             }
         }.register(this)
     }

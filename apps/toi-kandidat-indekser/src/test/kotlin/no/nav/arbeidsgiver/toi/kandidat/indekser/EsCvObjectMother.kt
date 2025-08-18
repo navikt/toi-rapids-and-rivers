@@ -29,7 +29,9 @@ import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
@@ -46,24 +48,13 @@ object EsCvObjectMother {
 
     fun nteAktorId(n: Int) = (900000000000L + n * 1000L).toString()
 
-    private fun fraIsoDato(string: String?) = sdf.parse(string)/*try {
-        if (string == null) null else sdf.parse(string)
-    } catch (e: java.text.ParseException) {
-        LOGGER.error("Feilet å parse $string", e)
-        null
-    }*/
+    private fun fraIsoDato(string: String) = LocalDate.parse(string).atStartOfDay().atOffset(ZoneOffset.UTC)
 
-    fun antallDagerTilbakeFraNow(antallDager: Int) =
-        Date.from(LocalDateTime.now().minusDays(antallDager.toLong()).atZone(ZoneId.systemDefault()).toInstant())
+    fun antallDagerTilbakeFraNow(antallDager: Int) = OffsetDateTime.now(ZoneOffset.UTC).minusDays(antallDager.toLong())
 
-    private fun fodselsdatoForAlder(alder: Int) =
-        LocalDate.now().minusYears(alder.toLong()).format(formatter)
+    private fun fodselsdatoForAlder(alder: Int) = LocalDate.now().minusYears(alder.toLong())
 
-    private fun nåMinusÅr(antallÅr: Int): Date {
-        val c = Calendar.getInstance()
-        c.add(Calendar.YEAR, -antallÅr)
-        return c.getTime()
-    }
+    private fun nåMinusÅr(antallÅr: Int) = OffsetDateTime.now().minusYears(antallÅr.toLong())
 
     fun giveMeEsCv(kandidatnr: String = "1L"): EsCv {
         val utdanning = EsUtdanning(
@@ -304,7 +295,7 @@ object EsCvObjectMother {
             "01016012345",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "JOBBS",
             "unnasluntrer@mailinator.com",
@@ -907,7 +898,7 @@ object EsCvObjectMother {
             "04265983651",
             "HANS",
             "NORDMANN",
-            "1955-11-04",
+            LocalDate.parse("1955-11-04"),
             false,
             "RARBS",
             "alltidmed@mailinator.com",
@@ -1201,7 +1192,7 @@ object EsCvObjectMother {
             "09568410230",
             "HANNE",
             "NORDMANN",
-            "2002-06-04",
+            LocalDate.parse("2002-06-04"),
             false,
             "ARBS",
             "erjegmed@mailinator.com",
@@ -1345,7 +1336,7 @@ object EsCvObjectMother {
 
         val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
             fraIsoDato("2017-10-01"),
-            fraIsoDato(null),
+            null,
             "Mekken mekk",
             "7233.03",
             "Industrimekaniker",
@@ -1480,7 +1471,7 @@ object EsCvObjectMother {
             "03050316895",
             "BOB",
             "NORDMANN",
-            "1964-09-01",
+            LocalDate.parse("1964-09-01"),
             false,
             "ARBS",
             "bobob@mailinator.com",
@@ -1723,7 +1714,7 @@ object EsCvObjectMother {
             "03050316895",
             "BOB",
             "NORDMANN",
-            "1964-09-01",
+            LocalDate.parse("1964-09-01"),
             false,
             "ARBS",
             "bobob@mailinator.com",
@@ -1742,7 +1733,7 @@ object EsCvObjectMother {
             "NO",
             301,
             false,
-            Date(),
+            OffsetDateTime.now(),
             301,
             java.lang.Boolean.FALSE,
             null,
@@ -1988,7 +1979,7 @@ object EsCvObjectMother {
             "02016012345",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "unnasluntrer@mailinator.com",
@@ -2007,7 +1998,7 @@ object EsCvObjectMother {
             "NO",
             301,
             false,
-            Date(),
+            OffsetDateTime.now(),
             301,
             java.lang.Boolean.FALSE,
             null,
@@ -2256,7 +2247,7 @@ object EsCvObjectMother {
             "01016034215",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "22339155@mailinator.com",
@@ -2536,7 +2527,7 @@ object EsCvObjectMother {
             "01016034215",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "22339155@mailinator.com",
@@ -2555,7 +2546,7 @@ object EsCvObjectMother {
             "NO",
             301,
             false,
-            Date(),
+            OffsetDateTime.now(),
             301,
             java.lang.Boolean.TRUE,
             null,
@@ -2817,7 +2808,7 @@ object EsCvObjectMother {
             "01016034215",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "22339155@mailinator.com",
@@ -2836,7 +2827,7 @@ object EsCvObjectMother {
             "NO",
             301,
             false,
-            Date(),
+            OffsetDateTime.now(),
             301,
             java.lang.Boolean.FALSE,
             "6",
@@ -3097,7 +3088,7 @@ object EsCvObjectMother {
             "01016034215",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "22339155@mailinator.com",
@@ -3116,7 +3107,7 @@ object EsCvObjectMother {
             "NO",
             301,
             false,
-            Date(),
+            OffsetDateTime.now(),
             301,
             java.lang.Boolean.FALSE,
             "7",
@@ -3377,7 +3368,7 @@ object EsCvObjectMother {
             "01016034215",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "22339155@mailinator.com",
@@ -3396,7 +3387,7 @@ object EsCvObjectMother {
             "NO",
             301,
             false,
-            Date(),
+            OffsetDateTime.now(),
             301,
             java.lang.Boolean.FALSE,
             null,
@@ -3657,7 +3648,7 @@ object EsCvObjectMother {
             "01016034215",
             "OLA",
             "NORDMANN",
-            "1960-01-01",
+            LocalDate.parse("1960-01-01"),
             false,
             "ARBS",
             "22339155@mailinator.com",

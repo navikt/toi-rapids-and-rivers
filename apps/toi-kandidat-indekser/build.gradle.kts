@@ -11,6 +11,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:$testContainerVerison")
     implementation("org.opensearch.client:opensearch-java:3.2.0")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+    implementation("no.nav.pam.geography:pam-geography:2.13")
     testImplementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelseskodeverkVersion")
 }
 
