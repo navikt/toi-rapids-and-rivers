@@ -62,11 +62,11 @@ fun konverterTilStilling(ad: Ad): Stilling {
         contacts = ad.contacts
             ?.map {
                 Contact(
-                    it.name,
-                    it.role,
-                    it.title,
-                    it.email,
-                    it.phone
+                    name = it.name,
+                    role = it.role,
+                    title = it.title,
+                    email = it.email,
+                    phone = it.phone
                 )
             } ?: emptyList(),
         tittel = if (ad.erDirektemeldt()) ad.tittelFraKategori() else ad.title
