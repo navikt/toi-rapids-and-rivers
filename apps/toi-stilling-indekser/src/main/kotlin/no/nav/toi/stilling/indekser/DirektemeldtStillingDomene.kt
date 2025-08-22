@@ -54,8 +54,8 @@ data class DirektemeldtStilling(
         source = innhold.source,
         medium = innhold.medium,
         reference = innhold.reference,
-        published = konverterDato(publisert),
-        expires = konverterDato(utløpsdato),
+        published = konverterDatoOptional(publisert),
+        expires = konverterDatoOptional(utløpsdato),
         employer = innhold.employer,
         locations = innhold.locationList,
         categories = innhold.categoryList,
@@ -69,7 +69,7 @@ data class DirektemeldtStilling(
             .toLocalDateTime()
     }
 
-    private fun konverterDato(dato: ZonedDateTime?): LocalDateTime? {
+    private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
         if (dato == null) return null
         return konverterDato(dato)
     }
