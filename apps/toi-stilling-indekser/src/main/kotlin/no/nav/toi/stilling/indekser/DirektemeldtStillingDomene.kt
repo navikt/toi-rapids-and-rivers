@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -42,8 +44,8 @@ data class DirektemeldtStilling(
     fun tilStilling(): Stilling = Stilling(
         uuid = stillingsId,
         annonsenr = annonsenr,
-        created = opprettet.toLocalDateTime(),
-        updated = sistEndret.toLocalDateTime(),
+        created = konverterDato(opprettet),
+        updated = konverterDato(sistEndret),
         status = status,
         tittel = innhold.title,
         administration = innhold.administration?.copy(status = konverterAdminStatus(adminStatus)),
@@ -52,8 +54,8 @@ data class DirektemeldtStilling(
         source = innhold.source,
         medium = innhold.medium,
         reference = innhold.reference,
-        published = publisert?.toLocalDateTime(),
-        expires = utløpsdato?.toLocalDateTime(),
+        published = konverterDatoOptional(publisert),
+        expires = konverterDatoOptional(utløpsdato),
         employer = innhold.employer,
         locations = innhold.locationList,
         categories = innhold.categoryList,
@@ -61,6 +63,16 @@ data class DirektemeldtStilling(
         publishedByAdmin = publisertAvAdmin,
         businessName = innhold.businessName,
     )
+
+    private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
+        return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneId.of("Europe/Oslo")), ZoneId.of("Europe/Oslo"))
+            .toLocalDateTime()
+    }
+
+    private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
+        if (dato == null) return null
+        return konverterDato(dato)
+    }
 
     private fun konverterAdminStatus(status: String?) : String {
         return when (status) {
