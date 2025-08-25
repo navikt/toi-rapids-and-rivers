@@ -74,6 +74,12 @@ class NotifikasjonKlient(
             return
         }
 
+        val gyldigeEpostadresser = mottakerEpostadresser.filter { it.isNotBlank() }
+        if (gyldigeEpostadresser.isEmpty()) {
+            log.info("Ingen gyldige epostadresser")
+            return
+        }
+
         val epostBody = lagEpostBody(
             tittel = stillingstittel,
             tekst = meldingTilArbeidsgiver,
@@ -87,7 +93,7 @@ class NotifikasjonKlient(
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
                 tidspunktForVarsel = tidspunktForHendelse,
-                mottakerEpostAdresser = mottakerEpostadresser,
+                mottakerEpostAdresser = gyldigeEpostadresser,
             )
 
         val erLokal: Boolean = System.getenv()["NAIS_CLUSTER_NAME"] == null
