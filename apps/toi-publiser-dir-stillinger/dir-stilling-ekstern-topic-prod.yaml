@@ -20,6 +20,9 @@ spec:
     - team: teampam
       application: pam-stilling-dvh-bridge
       access: read
+    - team: teampam
+      application: pam-stilling-stilling-ekstern
+      access: read
     - team: team-dialog
       application: sf-stilling
       access: read
