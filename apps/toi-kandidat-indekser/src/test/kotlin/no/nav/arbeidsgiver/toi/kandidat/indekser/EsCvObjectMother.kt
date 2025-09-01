@@ -18,24 +18,21 @@ import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsGodkjenning
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsKompetanse
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsKurs
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsOmfangJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsPerioderMedInaktivitet
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSertifikat
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSprak
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsUtdanning
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsVerv
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import java.time.ZoneId
+import java.time.Year
+import java.time.YearMonth
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
-import java.util.Set
 
 const val anleggsmaskinfører = "Anleggsmaskinfører"
 const val ikval = "IKVAL"
@@ -57,12 +54,12 @@ object EsCvObjectMother {
     private fun nåMinusÅr(antallÅr: Int) = OffsetDateTime.now().minusYears(antallÅr.toLong())
 
     fun giveMeEsCv(kandidatnr: String = "1L"): EsCv {
-        val utdanning = EsUtdanning(
+        val utdanning = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "Otta vgs. Otta",
             "355211", "Mekaniske fag, grunnkurs", "GK maskin/mekaniker"
         )
 
-        val utdanning1 = EsUtdanning(
+        val utdanning1 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"),
             "Høyskolen i Gjøvik", "786595", "Master i sikkerhet", "Master i sikkerhet"
         )
@@ -357,6 +354,26 @@ object EsCvObjectMother {
         )
     }
 
+    private fun lagEsUtdanning(
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime,
+        utdannelsessted: String,
+        nusKode: String?,
+        nuskodeGrad: String?,
+        alternativgrad: String,
+    ) = EsUtdanning(YearMonth.from(fraDato), YearMonth.from(tilDato), utdannelsessted, nusKode, alternativgrad)
+
+    private fun lagEsUtdanning(
+        fraDato: YearMonth,
+        tilDato: YearMonth,
+        utdannelsessted: String,
+        nusKode: String,
+        nuskodeGrad: String,
+        alternativgrad: String,
+        yrkestatus: UtdannelseYrkestatus,
+        beskrivelse: String
+    ) = EsUtdanning(YearMonth.from(fraDato), YearMonth.from(tilDato), utdannelsessted, nusKode, alternativgrad, yrkestatus, beskrivelse)
+
     private fun esKurs1() = EsKurs(
         "Akseloppretting", "Easy-Laser", null,
         null, fraIsoDato("2012-12-01")
@@ -382,7 +399,7 @@ object EsCvObjectMother {
 
     fun giveMeEsCv2(): EsCv {
         val EsUtdanning =
-            EsUtdanning(
+            lagEsUtdanning(
                 fraIsoDato("1999-08-20"),
                 fraIsoDato("2002-06-20"),
                 "Hamar Katedralskole",
@@ -670,7 +687,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeEsCv3(): EsCv {
-        val esUtdanning: EsUtdanning = EsUtdanning(
+        val esUtdanning: EsUtdanning = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"),
             "Norges Naturvitenskapelige Universitet", "456375", "Sosiologi", "Sosiologi"
         )
@@ -961,7 +978,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeEsCv4(): EsCv {
-        val EsUtdanning: EsUtdanning = EsUtdanning(
+        val EsUtdanning: EsUtdanning = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"),
             "Norges Naturvitenskapelige Universitet", "456375", "Bygg og anlegg",
             "Bygg og anlegg"
@@ -1777,12 +1794,12 @@ object EsCvObjectMother {
     }
 
     fun giveMeEsCvMedFeil(): EsCv {
-        val utdanning = EsUtdanning(
+        val utdanning = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "Otta vgs. Otta",
             "355211", "Mekaniske fag, grunnkurs", "GK maskin/mekaniker"
         )
 
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"),
             "Høyskolen i Gjøvik", null, null, "Master i sikkerhet"
         )
@@ -2043,7 +2060,7 @@ object EsCvObjectMother {
 
 
     fun giveMeEsCv6(): EsCv {
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
@@ -2310,7 +2327,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeCvForDoedPerson(): EsCv {
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
@@ -2590,7 +2607,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeCvForKode6(): EsCv {
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
@@ -2871,7 +2888,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeCvForKode7(): EsCv {
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
@@ -3151,7 +3168,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeCvFritattForKandidatsok(): EsCv {
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
@@ -3431,7 +3448,7 @@ object EsCvObjectMother {
     }
 
     fun giveMeCvFritattForAgKandidatsok(): EsCv {
-        val utdanning2 = EsUtdanning(
+        val utdanning2 = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "UiO", "838838",
             "Sosialantropologiske fag", "Sosialantropologi gr. fag"
         )
@@ -3725,7 +3742,7 @@ object EsCvObjectMother {
         "Oslo"
     )
 
-    fun giveMeUtdanning() = EsUtdanning(
+    fun giveMeUtdanning() = lagEsUtdanning(
         fraIsoDato("1988-08-20"),
         fraIsoDato("1989-06-20"),
         "UiO",

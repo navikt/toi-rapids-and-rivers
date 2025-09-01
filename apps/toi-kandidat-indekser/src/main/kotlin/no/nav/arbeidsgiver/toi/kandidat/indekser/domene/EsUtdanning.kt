@@ -2,29 +2,29 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.JsonNode
 import java.time.OffsetDateTime
+import java.time.YearMonth
 import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsUtdanning(
-    private val fraDato: OffsetDateTime,
-    private val tilDato: OffsetDateTime,
+    private val fraDato: YearMonth,
+    private val tilDato: YearMonth,
     private val utdannelsessted: String,
     private val nusKode: String?,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val nusKodeGrad: String?,
     private val alternativGrad: String,
-    private val yrkestatus: String?,
+    private val yrkestatus: UtdannelseYrkestatus?,
     private val beskrivelse: String?
 ) {
     constructor(
-        fraDato: OffsetDateTime, tilDato: OffsetDateTime, utdannelsessted: String, nusKode: String?,
-        nusKodeGrad: String?, alternativGrad: String
+        fraDato: YearMonth, tilDato: YearMonth, utdannelsessted: String, nusKode: String?,
+        alternativGrad: String
     ): this(
         fraDato,
         tilDato,
         utdannelsessted,
         nusKode,
-        nusKodeGrad,
         alternativGrad,
         null,
         null
@@ -32,14 +32,34 @@ class EsUtdanning(
 
     override fun equals(other: Any?) = other is EsUtdanning && fraDato == other.fraDato && tilDato == other.tilDato
             && utdannelsessted == other.utdannelsessted
-            && nusKode == other.nusKode && nusKodeGrad == other.nusKodeGrad
+            && nusKode == other.nusKode
             && alternativGrad == other.alternativGrad
             && beskrivelse == other.beskrivelse
 
     override fun hashCode() =
-        Objects.hash(fraDato, tilDato, utdannelsessted, nusKode, nusKodeGrad, alternativGrad, beskrivelse)
+        Objects.hash(fraDato, tilDato, utdannelsessted, nusKode, alternativGrad, beskrivelse)
 
     override fun toString() = ("EsUtdanning{" + "fraDato=" + fraDato + ", tilDato=" + tilDato + ", utdannelsessted='"
-            + utdannelsessted + '\'' + ", nusKode='" + nusKode + '\'' + ", nusKodeGrad='" + nusKodeGrad
-            + '\'' + ", alternativGrad='" + alternativGrad + '\'' + ", beskrivelse='" + beskrivelse + '\'' + '}')
+            + utdannelsessted + '\'' + ", nusKode='" + nusKode + '\'' + ", alternativGrad='" + alternativGrad + '\''
+            + ", beskrivelse='" + beskrivelse + '\'' + '}')
+
+    companion object {
+        fun fraMelding(cvNode: JsonNode): List<EsUtdanning> {
+            return cvNode["utdannelse"].map { utdannelseNode ->
+                EsUtdanning(
+                    fraDato = YearMonth.parse(utdannelseNode["fraTidspunkt"].asText()),
+                    tilDato = YearMonth.parse(utdannelseNode["tilTidspunkt"].asText()),
+                    utdannelsessted = utdannelseNode["laerested"].asText(),
+                    nusKode = utdannelseNode["nuskodeGrad"].asText(),
+                    alternativGrad = utdannelseNode["utdanningsretning"].asText(),
+                    beskrivelse = utdannelseNode["beskrivelse"].asText(""),
+                    yrkestatus = utdannelseNode["utdannelseYrkestatus"].asText()?.let(UtdannelseYrkestatus::valueOf) ?: UtdannelseYrkestatus.INGEN
+                )
+            }
+        }
+    }
+}
+
+enum class UtdannelseYrkestatus {
+    SVENNEBREV_FAGBREV, MESTERBREV, INGEN;
 }

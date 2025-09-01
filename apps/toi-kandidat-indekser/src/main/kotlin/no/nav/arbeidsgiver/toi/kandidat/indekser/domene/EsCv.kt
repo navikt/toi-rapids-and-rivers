@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.contains
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring.Companion.totalYrkeserfaringIManeder
@@ -252,7 +251,7 @@ class EsCv(
                 veilederEpost = packet["veileder.veilederinformasjon.epost"].asText(null),
                 fylkeNavn = fylkeNavn,
                 kommuneNavn = kommuneNavn,
-                utdanning = TODO(),
+                utdanning = EsUtdanning.fraMelding(cvNode),
                 fagdokumentasjon = TODO(),
                 yrkeserfaring = TODO(),
                 kompetanseObj = TODO(),
