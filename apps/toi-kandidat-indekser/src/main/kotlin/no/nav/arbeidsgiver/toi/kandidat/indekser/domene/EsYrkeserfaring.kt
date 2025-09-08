@@ -2,15 +2,18 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsYrkeserfaring(
-    private val fraDato: OffsetDateTime,
-    private val tilDato: OffsetDateTime?,
+    private val fraDato: YearMonth,
+    private val tilDato: YearMonth?,
     private val arbeidsgiver: String,
     private val styrkKode: String?,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) private val stillingstittel: String,
@@ -29,8 +32,8 @@ class EsYrkeserfaring(
     private val yrkeserfaringManeder = toYrkeserfaringManeder(fraDato, tilDato)
 
     constructor(
-        fraDato: OffsetDateTime,
-        tilDato: OffsetDateTime?,
+        fraDato: YearMonth,
+        tilDato: YearMonth?,
         arbeidsgiver: String,
         styrkKode: String,
         kodeverkStillingstittel: String,
@@ -54,8 +57,8 @@ class EsYrkeserfaring(
         sted, beskrivelse
     )
     constructor(
-        fraDato: OffsetDateTime,
-        tilDato: OffsetDateTime?,
+        fraDato: YearMonth,
+        tilDato: YearMonth?,
         arbeidsgiver: String,
         styrkKode: String?,
         stillingstittel: String,
@@ -112,8 +115,23 @@ class EsYrkeserfaring(
             + ", utelukketForFremtiden='" + utelukketForFremtiden + '\'' + '}')
 
     companion object {
-        private fun toYrkeserfaringManeder(fraDato: OffsetDateTime, tilDato: OffsetDateTime?) =
+        private fun toYrkeserfaringManeder(fraDato: YearMonth, tilDato: YearMonth?) =
             ChronoUnit.MONTHS.between(fraDato, tilDato?: now()).toInt()
         fun List<EsYrkeserfaring>.totalYrkeserfaringIManeder() = this.sumOf(EsYrkeserfaring::yrkeserfaringManeder)
+        fun fraMelding(packet: JsonMessage, cvNode: JsonNode): List<EsYrkeserfaring> = cvNode["arbeidserfaring"].map { arbeidserfaringNode ->
+            val stillingstittel = arbeidserfaringNode["stillingstittel"].asText()
+            EsYrkeserfaring(
+                fraDato = arbeidserfaringNode["fraTidspunkt"].asText(null).let(YearMonth::parse),
+                tilDato = arbeidserfaringNode["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
+                arbeidsgiver = arbeidserfaringNode["arbeidsgiver"].asText(),
+                styrkKode = arbeidserfaringNode["styrkkode"].asText(),
+                kodeverkStillingstittel = stillingstittel,
+                stillingstitlerForTypeahead = TODO(),
+                alternativStillingstittel = arbeidserfaringNode["stillingstittelFritekst"].asText("").let { if(it=="") stillingstittel else it },
+                beskrivelse = arbeidserfaringNode["beskrivelse"].asText(null),
+                sokeTitler = TODO(),
+                sted = arbeidserfaringNode["sted"].asText("")
+            )
+        }
     }
 }

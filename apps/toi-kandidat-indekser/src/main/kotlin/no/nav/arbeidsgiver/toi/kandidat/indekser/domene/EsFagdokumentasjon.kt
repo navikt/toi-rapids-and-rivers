@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,7 +15,7 @@ class EsFagdokumentasjon(
 
     // TODO dette feltet er ikke lenger i bruk - bør fjernes
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private var beskrivelse: String
+    private var beskrivelse: String?
 ): EnAvFlereSamledeKompetaser {
     override fun equals(other: Any?): Boolean {
         return other is EsFagdokumentasjon && type == other.type
@@ -31,6 +32,14 @@ class EsFagdokumentasjon(
             "MESTERBREV" -> "Mesterbrev"
             "AUTORISASJON" -> "Autorisasjon"
             else -> fagdokumentType
+        }
+
+        fun fraMelding(cvNode: JsonNode): List<EsFagdokumentasjon> = cvNode["fagdokumentasjon"].map { fagdokumentasjonNode ->
+            EsFagdokumentasjon(
+                type = fagdokumentasjonNode["type"].asText(null),
+                tittel = fagdokumentasjonNode["tittel"].asText(null),
+                beskrivelse = fagdokumentasjonNode["beskrivelse"].asText(null),
+            )
         }
     }
 }

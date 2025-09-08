@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
+import java.time.LocalDate
+
 fun synlighet(erSynlig: Boolean = true, ferdigBeregnet: Boolean = true) = """
         "synlighet": {
             "erSynlig": $erSynlig,
@@ -14,36 +16,52 @@ fun rapidMelding(
     hullICv: String? = null,
     ontologi: String? = null,
     sluttAvHendelseskjede: Boolean? = null,
-    kandidatnr: String = "CG133309"
+    kandidatnr: String = "CG133309",
+    aktørId: String = "123",
+    oppfølgingsenhet: String = "1234",
+    meldingstype: String = "ENDRE",
+    endretAv: String = "SYSTEMBRUKER",
+    opprettetCv: String = "1578319832.314",
+    fødselsnummer: String = "10108000398",
+    fødselsdato: LocalDate = LocalDate.of(1980, 10, 10),
+    fornavn: String = "Aremark M.",
+    etternavn: String = "Testfamilien",
+    epostadresse: String = "julenissen@nordpolen.no",
+    telefonnummer: String = "12345678",
+    gateadresse: String = "Rådhuset 5",
+    postnummer: String = "1798",
+    poststed: String = "AREMARK",
+    kommunenr: String = "3012",
+    sammendrag: String = "Jeg er en dyktig hjernekirurg som kan skrive sykt gode journaler i word.",
 ): String = """
         {
           "@event_name": "arbeidsmarked-cv",
-          "aktørId": "123",
+          "aktørId": "$aktørId",
           "oppfølgingsinformasjon": {
-                "oppfolgingsenhet":"1234"
+                "oppfolgingsenhet":"$oppfølgingsenhet"
           },
           "arbeidsmarkedCv": {
-            "meldingstype": "ENDRE",
-            "endretAv": "SYSTEMBRUKER",
+            "meldingstype": "$meldingstype",
+            "endretAv": "$endretAv",
             "opprettCv": null,
             "endreCv": {
               "cv": {
-                "opprettet": 1578319832.314,
-                "fodselsnummer": "10108000398",
+                "opprettet": $opprettetCv,
+                "fodselsnummer": "$fødselsnummer",
                 "foedselsdato": [
-                  1980,
-                  10,
-                  10
+                  ${fødselsdato.year},
+                  ${fødselsdato.monthValue},
+                    ${fødselsdato.dayOfMonth}
                 ],
-                "fornavn": "Aremark M.",
-                "etternavn": "Testfamilien",
-                "epost": "julenissen@nordpolen.no",
-                "telefon": "12345678",
-                "gateadresse": "Rådhuset 5",
-                "postnummer": "1798",
-                "poststed": "AREMARK",
-                "kommunenr": "3012",
-                "sammendrag": "Jeg er en dyktig hjernekirurg som kan skrive sykt gode journaler i word.",
+                "fornavn": "$fornavn",
+                "etternavn": "$etternavn",
+                "epost": "$epostadresse",
+                "telefon": "$telefonnummer",
+                "gateadresse": "$gateadresse",
+                "postnummer": "$postnummer",
+                "poststed": "$poststed",
+                "kommunenr": "$kommunenr",
+                "sammendrag": "$sammendrag",
                 "foererkort": {
                   "klasse": [
                     {

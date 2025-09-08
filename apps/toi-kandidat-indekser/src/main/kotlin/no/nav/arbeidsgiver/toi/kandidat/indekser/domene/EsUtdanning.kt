@@ -10,7 +10,7 @@ import java.util.Objects
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsUtdanning(
     private val fraDato: YearMonth,
-    private val tilDato: YearMonth,
+    private val tilDato: YearMonth?,
     private val utdannelsessted: String,
     private val nusKode: String?,
     private val alternativGrad: String,
@@ -18,7 +18,7 @@ class EsUtdanning(
     private val beskrivelse: String?
 ) {
     constructor(
-        fraDato: YearMonth, tilDato: YearMonth, utdannelsessted: String, nusKode: String?,
+        fraDato: YearMonth, tilDato: YearMonth?, utdannelsessted: String, nusKode: String?,
         alternativGrad: String
     ): this(
         fraDato,
@@ -44,18 +44,16 @@ class EsUtdanning(
             + ", beskrivelse='" + beskrivelse + '\'' + '}')
 
     companion object {
-        fun fraMelding(cvNode: JsonNode): List<EsUtdanning> {
-            return cvNode["utdannelse"].map { utdannelseNode ->
-                EsUtdanning(
-                    fraDato = YearMonth.parse(utdannelseNode["fraTidspunkt"].asText()),
-                    tilDato = YearMonth.parse(utdannelseNode["tilTidspunkt"].asText()),
-                    utdannelsessted = utdannelseNode["laerested"].asText(),
-                    nusKode = utdannelseNode["nuskodeGrad"].asText(),
-                    alternativGrad = utdannelseNode["utdanningsretning"].asText(),
-                    beskrivelse = utdannelseNode["beskrivelse"].asText(""),
-                    yrkestatus = utdannelseNode["utdannelseYrkestatus"].asText()?.let(UtdannelseYrkestatus::valueOf) ?: UtdannelseYrkestatus.INGEN
-                )
-            }
+        fun fraMelding(cvNode: JsonNode) = cvNode["utdannelse"].map { utdannelseNode ->
+            EsUtdanning(
+                fraDato = YearMonth.parse(utdannelseNode["fraTidspunkt"].asText()),
+                tilDato = utdannelseNode["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
+                utdannelsessted = utdannelseNode["laerested"].asText(),
+                nusKode = utdannelseNode["nuskodeGrad"].asText(),
+                alternativGrad = utdannelseNode["utdanningsretning"].asText(),
+                beskrivelse = utdannelseNode["beskrivelse"].asText(""),
+                yrkestatus = utdannelseNode["utdannelseYrkestatus"].asText(null)?.let(UtdannelseYrkestatus::valueOf) ?: UtdannelseYrkestatus.INGEN
+            )
         }
     }
 }

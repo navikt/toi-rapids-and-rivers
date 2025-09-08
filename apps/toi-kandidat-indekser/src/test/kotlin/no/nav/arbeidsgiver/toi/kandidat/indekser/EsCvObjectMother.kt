@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.time.Year
 import java.time.YearMonth
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -68,13 +67,13 @@ object EsCvObjectMother {
         val utdanningsListe = mutableListOf<EsUtdanning>()
         utdanningsListe.add(utdanning)
         utdanningsListe.add(utdanning1)
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"), fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø", "8341.01", "Anleggsmaskindrifter",
             setOf("Anleggsmaskindrifter", "Anleggsmaskinoperatør"), "maskinkjører og maskintransport", "YRKE_ORGNR",
             "YRKE_NACEKODE", false, listOf(), "Oslo")
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             nåMinusÅr(20),
             nåMinusÅr(9),
             "AF-Pihl, Hammerfest",
@@ -89,7 +88,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -104,7 +103,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -119,7 +118,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -134,7 +133,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -354,6 +353,21 @@ object EsCvObjectMother {
         )
     }
 
+    private fun lagEsYrkeserfaring(
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime?,
+        arbeidsgiver: String,
+        styrkKode: String,
+        stillingstittel: String,
+        stillingstitlerForTypeahead: Set<String>,
+        alternativStillingstittel: String,
+        organisasjonsnummer: String,
+        naceKode: String,
+        utelukketForFremtiden: Boolean,
+        sokeTitler: List<String>,
+        sted: String
+    ) = EsYrkeserfaring(YearMonth.from(fraDato), tilDato?.let(YearMonth::from), arbeidsgiver, styrkKode, stillingstittel, stillingstitlerForTypeahead, alternativStillingstittel, organisasjonsnummer, naceKode, utelukketForFremtiden, sokeTitler, sted)
+
     private fun lagEsUtdanning(
         fraDato: OffsetDateTime,
         tilDato: OffsetDateTime,
@@ -409,7 +423,7 @@ object EsCvObjectMother {
             )
 
         val utdanningListe = listOf(EsUtdanning)
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2002-01-01"),
             "Kodesentralen Vardø",
@@ -424,13 +438,13 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"), fraIsoDato("2003-07-01"),
             "Programvarefabrikken Førde", "5746.07", "Systemutvikler",
             setOf("Systemutvikler", "Java-utvikler"),
             "Utvikling av nytt kandidatsøk", "YRKE_ORGNR", "YRKE_NACEKODE", false, emptyList(), "Oslo")
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Tjenestetest Norge",
@@ -445,7 +459,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2006-07-01"),
             "lagerarbeiderne L. H.",
@@ -460,7 +474,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2017-04-01"),
             "lagerarbeiderne L. H.",
@@ -475,7 +489,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
                 fraIsoDato("2017-10-01"),
                 fraIsoDato("2019-09-26"),
                 "Awesome coders AS",
@@ -693,7 +707,7 @@ object EsCvObjectMother {
         )
 
         val utdanningListe = listOf(esUtdanning)
-        val yrkeserfaring1: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring1: EsYrkeserfaring = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-02-01"),
             "Butikken i nærheten",
@@ -708,13 +722,13 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"), fraIsoDato("2003-02-01"),
             "Butikken i nærheten", "1010.01", "Butikkmedarbeider(dagligvarer)",
             setOf("Butikkmedarbeider(dagligvarer)", "Butikkmedarbeider")
             , "Butikkmedarbeider(dagligvarer)", "YRKE_ORGNR", "YRKE_NACEKODE", false, emptyList(), "Oslo")
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Butikken langt unna",
@@ -729,7 +743,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Butikken",
@@ -745,7 +759,7 @@ object EsCvObjectMother {
         )
 
         val yrkeserfaring5 =
-            EsYrkeserfaring(
+            lagEsYrkeserfaring(
                 fraIsoDato("2016-06-01"),
                 fraIsoDato("2016-07-01"),
                 "Tvkanalen TV?",
@@ -760,7 +774,7 @@ object EsCvObjectMother {
                 "Oslo"
             )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             null,
             "NLI  Grenland",
@@ -985,7 +999,7 @@ object EsCvObjectMother {
         )
 
         val utdanningListe = listOf(EsUtdanning)
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2002-01-01"),
             "Jokah",
@@ -1000,7 +1014,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-04-01"),
             "Nærbutikkern",
@@ -1016,7 +1030,7 @@ object EsCvObjectMother {
         )
 
         val yrkeserfaring3 =
-            EsYrkeserfaring(
+            lagEsYrkeserfaring(
                 fraIsoDato("2003-04-01"),
                 fraIsoDato("2003-07-01"),
                 "Tv tv tv",
@@ -1032,7 +1046,7 @@ object EsCvObjectMother {
             )
 
         val yrkeserfaring4 =
-            EsYrkeserfaring(
+            lagEsYrkeserfaring(
                 fraIsoDato("2005-08-01"),
                 fraIsoDato("2016-07-01"),
                 "Vard Group,avd.Brevik",
@@ -1048,7 +1062,7 @@ object EsCvObjectMother {
             )
 
         val yrkeserfaring5 =
-            EsYrkeserfaring(
+            lagEsYrkeserfaring(
                 fraIsoDato("2016-06-01"),
                 fraIsoDato("2017-04-01"),
                 "DN teater",
@@ -1063,7 +1077,7 @@ object EsCvObjectMother {
                 "Oslo"
             )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             null,
             "Dukketeateret Rena",
@@ -1274,7 +1288,7 @@ object EsCvObjectMother {
     fun giveMeEsCv5(): EsCv {
         val utdanningListe = emptyList<EsUtdanning>()
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-02-01"),
             "Bankhvelvet BBL",
@@ -1290,7 +1304,7 @@ object EsCvObjectMother {
         )
 
         val yrkeserfaring2 =
-            EsYrkeserfaring(
+            lagEsYrkeserfaring(
                 fraIsoDato("2003-01-01"),
                 fraIsoDato("2003-02-01"),
                 "Proggehula",
@@ -1305,7 +1319,7 @@ object EsCvObjectMother {
                 "Oslo"
             )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Test a.a.s",
@@ -1321,7 +1335,7 @@ object EsCvObjectMother {
         )
 
         val yrkeserfaring4 =
-            EsYrkeserfaring(
+            lagEsYrkeserfaring(
                 fraIsoDato("2005-08-01"),
                 fraIsoDato("2005-09-01"),
                 "K.O. kranservice",
@@ -1336,7 +1350,7 @@ object EsCvObjectMother {
                 "Oslo"
             )
 
-        val yrkeserfaring5: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring5: EsYrkeserfaring = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-06-02"),
             "Lang transport A.S.",
@@ -1351,7 +1365,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6: EsYrkeserfaring = EsYrkeserfaring(
+        val yrkeserfaring6: EsYrkeserfaring = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             null,
             "Mekken mekk",
@@ -1554,7 +1568,7 @@ object EsCvObjectMother {
         val utdanningListe = emptyList<EsUtdanning>()
 
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-02-01"),
             "Bankhvelvet BBL",
@@ -1569,7 +1583,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "Proggehula",
@@ -1584,7 +1598,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "Test a.a.s",
@@ -1599,7 +1613,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "K.O. kranservice",
@@ -1614,7 +1628,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-06-02"),
             "Lang transport A.S.",
@@ -1629,7 +1643,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-11-01"),
             "Mekken mekk",
@@ -1806,7 +1820,7 @@ object EsCvObjectMother {
 
 
         val utdanningsListe = listOf(utdanning, utdanning2)
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -1821,7 +1835,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
@@ -1836,7 +1850,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -1851,7 +1865,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -1866,7 +1880,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -1881,7 +1895,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -2068,7 +2082,7 @@ object EsCvObjectMother {
 
         val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -2083,7 +2097,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
@@ -2098,7 +2112,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -2113,7 +2127,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -2128,7 +2142,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -2143,7 +2157,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -2335,7 +2349,7 @@ object EsCvObjectMother {
 
         val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -2350,7 +2364,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
@@ -2365,7 +2379,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -2380,7 +2394,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -2395,7 +2409,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -2410,7 +2424,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -2615,7 +2629,7 @@ object EsCvObjectMother {
 
         val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -2630,7 +2644,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
@@ -2645,7 +2659,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -2660,7 +2674,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -2675,7 +2689,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -2690,7 +2704,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -2896,7 +2910,7 @@ object EsCvObjectMother {
 
         val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -2911,7 +2925,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
@@ -2926,7 +2940,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -2941,7 +2955,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -2956,7 +2970,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -2971,7 +2985,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -3176,7 +3190,7 @@ object EsCvObjectMother {
 
         val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -3191,7 +3205,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             fraIsoDato("2003-01-01"),
             fraIsoDato("2003-02-01"),
             "AF-Pihl, Hammerfest",
@@ -3206,7 +3220,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -3221,7 +3235,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -3236,7 +3250,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -3251,7 +3265,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -3456,7 +3470,7 @@ object EsCvObjectMother {
 
         val utdanningsListe = listOf(utdanning2)
 
-        val yrkeserfaring1 = EsYrkeserfaring(
+        val yrkeserfaring1 = lagEsYrkeserfaring(
             fraIsoDato("2000-01-01"),
             fraIsoDato("2000-01-10"),
             "Stentransport, Kragerø",
@@ -3471,7 +3485,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring2 = EsYrkeserfaring(
+        val yrkeserfaring2 = lagEsYrkeserfaring(
             nåMinusÅr(11),
             nåMinusÅr(6),
             "AF-Pihl, Hammerfest",
@@ -3486,7 +3500,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring3 = EsYrkeserfaring(
+        val yrkeserfaring3 = lagEsYrkeserfaring(
             fraIsoDato("2003-04-01"),
             fraIsoDato("2003-05-01"),
             "O.K. Hagalia, Slependen",
@@ -3501,7 +3515,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring4 = EsYrkeserfaring(
+        val yrkeserfaring4 = lagEsYrkeserfaring(
             fraIsoDato("2005-08-01"),
             fraIsoDato("2005-09-01"),
             "Vard Group,avd.Brevik",
@@ -3516,7 +3530,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring5 = EsYrkeserfaring(
+        val yrkeserfaring5 = lagEsYrkeserfaring(
             fraIsoDato("2016-06-01"),
             fraIsoDato("2016-07-01"),
             "MTM anlegg",
@@ -3531,7 +3545,7 @@ object EsCvObjectMother {
             "Oslo"
         )
 
-        val yrkeserfaring6 = EsYrkeserfaring(
+        val yrkeserfaring6 = lagEsYrkeserfaring(
             fraIsoDato("2017-10-01"),
             fraIsoDato("2017-12-01"),
             "NLI  Grenland",
@@ -3727,7 +3741,7 @@ object EsCvObjectMother {
         )
     }
 
-    fun giveMeYrkeserfaring() = EsYrkeserfaring(
+    fun giveMeYrkeserfaring() = lagEsYrkeserfaring(
         fraIsoDato("2016-06-01"),
         fraIsoDato("2016-07-01"),
         "MTM anlegg",
