@@ -244,7 +244,7 @@ class EsCv(
                 fritattAgKandidatsok = fritattAgKandidatsokerDeprikert,
                 synligForArbeidsgiverSok = cvNode["synligForArbeidsgiver"].asBoolean(),
                 synligForVeilederSok = cvNode["synligForVeileder"].asBoolean(),
-                oppstartKode = jobbProfilNode.asText(""),
+                oppstartKode = jobbProfilNode["oppstartKode"].asText(""),
                 kommunenummerstring = kommunenummer,
                 veilederIdent = packet["veileder.veilederId"].asText(null),
                 veilederVisningsnavn = packet["veileder.veilederinformasjon.visningsNavn"].asText(null),

@@ -34,6 +34,7 @@ import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBui
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.YearMonth
@@ -241,7 +242,6 @@ class KandidatfeedTest {
         val expectedPoststed = "Oslo"
         val expectedLandkode = "NO"
         val expectedKommunenummer = 1234
-        val expectedDisponererBil = true
         val expectedTidsstempel = OffsetDateTime.now()
         val expectedDoed = false
         val expectedFrKode = "FR1234"
@@ -285,21 +285,18 @@ class KandidatfeedTest {
         val expectedYrkeserfaringSokeTitler = "Javautvikler"
         val expectedYrkeserfaringSted = "Oslo"
         val expectedYrkeserfaringBeskrivelse = "Dette er en yrkeserfaring"
-        val expectedKompetanseFraDato = LocalDate.of(2020, 1, 1)
-        val expectedKompetanseKompKode = "123456"
-        val expectedKompetanseKompKodeNavn = "Java"
-        val expectedKompetanseAlternativtNavn = "Java programmering"
-        val expectedKompetanseBeskrivelse = "Dette er en kompetanse"
+        val expectedKompetanser = listOf("Utvikling", "Kaffedrikking")
         val expectedAnnenErfaringFraDato = LocalDate.of(2020, 1, 1)
         val expectedAnnenErfaringTilDato = LocalDate.of(2021, 1, 1)
         val expectedAnnenErfaringBeskrivelse = "Dette er en annen erfaring"
         val expectedAnnenErfaringRolle = "Rolle"
-        val expectedSertifikatFraDato = LocalDate.of(2020, 1, 1)
-        val expectedSertifikatTilDato = LocalDate.of(2025, 1, 1)
-        val expectedSertifikatKode = "B"
-        val expectedSertifikatKodeNavn = "Bil"
-        val expectedSertifikatAlternativtNavn = "Bil sertifikat"
+        val expectedSertifikatTittel = "Organisasjon"
+        val expectedSertifikatNavn = "Førerkort klasse B"
+        val expectedSertifikatnavnFritekst = "Førerkort klasse B fritekst"
+        val expectedSertifikatKonseptId = "K123"
         val expectedSertifikatUtsteder = "Statens vegvesen"
+        val expectedSertifikatGjennomfoert = LocalDate.of(2020, 1, 1)
+        val expectedSertifikatUtloeper = LocalDate.of(2025, 1, 1)
         val expectedForerkortFraDato = OffsetDateTime.now().minusYears(1)
         val expectedForerkortTilDato = OffsetDateTime.now().plusYears(4)
         val expectedForerkortKode = "B"
@@ -348,13 +345,100 @@ class KandidatfeedTest {
 
         val melding = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             hullICv = tomJson,
             ontologi = tomJson,
             kandidatnr = expectedKandidatnr,
             aktørId = expectedAktorId,
             fødselsnummer = expectedFodselsnummer,
-
+            fornavn = expectedFornavn,
+            etternavn = expectedEtternavn,
+            fødselsdato = expectedFodselsdato,
+            formidlingsgruppe = expectedFormidlingsgruppekode,
+            epostadresse = expectedEpostadresse,
+            telefonnummer = expectedTelefon,
+            sammendrag = expectedBeskrivelse,
+            opprettetCv = Instant.from(expectedSamtykkeDato).toEpochMilli().let { "${it/1000}.${it%1000}" },
+            gateadresse = expectedAdresselinje1,
+            postnummer = expectedPostnummer,
+            poststed = expectedPoststed,
+            kommunenr = expectedKommunenummer.toString(),
+            sistendret = Instant.from(expectedTidsstempel).toEpochMilli().let { "${it/1000}.${it%1000}" },
+            kvalifiseringsgruppe = expectedKvalifiseringsgruppekode,
+            oppfølgingsinformasjonHovedmaal = expectedHovedmaalkode,
+            siste14AvedtakHovedmaal = expectedHovedmal,
+            siste14AInnsatsgruppe = expectedInnsatsgruppe,
+            organisasjonsenhetsnavn = expectedNavkontor,
+            orgenhet = expectedOrgenhet,
+            fritattKandidatsok = expectedFritattKandidatsok,
+            synligForArbeidsgiver = expectedSynligForArbeidsgiverSok,
+            synligForVeileder = expectedSynligForVeilederSok,
+            oppstartKode = expectedOppstartKode,
+            veilederNavIdent = expectedVeilederIdent,
+            veilederVisningsnavn = expectedVeilederVisningsnavn,
+            veilederEpost = expectedVeilederEpost,
+            utdanning = listOf(
+                TestUtdanning(
+                    fraTidspunkt = expectedUtdanningFraDato.toString(),
+                    tilTidspunkt = expectedUtdanningTilDato.toString(),
+                    laerested = expectedUtdanningUtdannelsessted,
+                    nuskodeGrad = expectedUtdanningNusKode,
+                    utdanningsretning = expectedUtdanningAlternativGrad,
+                    utdannelseYrkestatus = expectedUtdanningYrkestatus,
+                    beskrivelse = expectedUtdanningBeskrivelse,
+                    autorisasjon = true
+                )
+            ),
+            fagdokumentasjon = listOf(
+                TestFagdokumentasjon(
+                    type = expectedFagdokumentasjonType,
+                    tittel = expectedFagdokumentasjonTittel,
+                    beskrivelse = expectedFagdokumentasjonBeskrivelse
+                )
+            ),
+            yrkeserfaring = listOf(
+                TestYrkeserfaring(
+                    fraTidspunkt = expectedYrkeserfaringFraDato.toString(),
+                    tilTidspunkt = expectedYrkeserfaringTilDato.toString(),
+                    arbeidsgiver = expectedYrkeserfaringArbeidsgiver,
+                    styrkkode = expectedYrkeserfaringStyrkKode,
+                    stillingstittel = expectedYrkeserfaringStillingstittel,
+                    stillingstittelFritekst = expectedYrkeserfaringAlternativStillingstittel,
+                    ikkeAktueltForFremtiden = expectedYrkeserfaringUtelukketForFremtiden,
+                    sted = expectedYrkeserfaringSted,
+                    beskrivelse = expectedYrkeserfaringBeskrivelse,
+                    janzzKonseptid = "Ikke brukt"
+                )
+            ),
+            kompetanse = expectedKompetanser,
+            annenErfaring = listOf(
+                TestAnnenErfaring(
+                    fraTidspunkt = expectedAnnenErfaringFraDato.toString(),
+                    tilTidspunkt = expectedAnnenErfaringTilDato.toString(),
+                    beskrivelse = expectedAnnenErfaringBeskrivelse,
+                    rolle = expectedAnnenErfaringRolle
+                )
+            ),
+            sertifikat = listOf(
+                TestSertifikat(
+                    tittel = expectedSertifikatTittel,
+                    sertifikatnavn = expectedSertifikatNavn,
+                    sertifikatnavnFritekst = expectedSertifikatnavnFritekst,
+                    konseptId = expectedSertifikatKonseptId,
+                    utsteder = expectedSertifikatUtsteder,
+                    gjennomfoert = expectedSertifikatGjennomfoert,
+                    utloeper = expectedSertifikatUtloeper
+                )
+            ),
+            forerkort = listOf(
+                TestForerkort(
+                    fraTidspunkt = expectedForerkortFraDato.toString(),
+                    tilTidspunkt = expectedForerkortTilDato.toString(),
+                    klasse = expectedForerkortKode,
+                    klasseBeskrivelse = expectedForerkortKodeKlasse,
+                    klasseFritekst = expectedForerkortAlternativKlasse,
+                    utsteder = expectedForerkortUtsteder
+                )
+            ),
         )
 
         val testrapid = TestRapid()
@@ -393,7 +477,6 @@ class KandidatfeedTest {
         assertThat(cvJson["poststed"].asText()).isEqualTo(expectedPoststed)
         assertThat(cvJson["landkode"].asText()).isEqualTo(expectedLandkode)
         assertThat(cvJson["kommunenummer"].asInt()).isEqualTo(expectedKommunenummer)
-        assertThat(cvJson["disponererBil"].asBoolean()).isEqualTo(expectedDisponererBil)
         assertThat(cvJson["tidsstempel"].asText()).isEqualTo(expectedTidsstempel.toString())
         assertThat(cvJson["kommunenummerkw"].asInt()).isEqualTo(expectedKommunenummer)
         assertThat(cvJson["doed"].asBoolean()).isEqualTo(expectedDoed)
@@ -438,24 +521,26 @@ class KandidatfeedTest {
         assertThat(cvJson["yrkeserfaring"][0]["sokeTitler"][0].asText()).isEqualTo(expectedYrkeserfaringSokeTitler)
         assertThat(cvJson["yrkeserfaring"][0]["sted"].asText()).isEqualTo(expectedYrkeserfaringSted)
         assertThat(cvJson["yrkeserfaring"][0]["beskrivelse"].asText()).isEqualTo(expectedYrkeserfaringBeskrivelse)
-        assertThat(cvJson["kompetanse"][0]["fraDato"].asText()).isEqualTo(expectedKompetanseFraDato.toString())
-        assertThat(cvJson["kompetanse"][0]["kompKode"].asText()).isEqualTo(expectedKompetanseKompKode)
-        assertThat(cvJson["kompetanse"][0]["kompKodeNavn"].asText()).isEqualTo(expectedKompetanseKompKodeNavn)
-        assertThat(cvJson["kompetanse"][0]["alternativtNavn"].asText()).isEqualTo(expectedKompetanseAlternativtNavn)
-        assertThat(cvJson["kompetanse"][0]["beskrivelse"].asText()).isEqualTo(expectedKompetanseBeskrivelse)
-        assertThat(cvJson["kompetanse"][0]["annenerfaring"][0]["fraDato"].asText()).isEqualTo(expectedAnnenErfaringFraDato.toString())
-        assertThat(cvJson["kompetanse"][0]["annenerfaring"][0]["tilDato"].asText()).isEqualTo(expectedAnnenErfaringTilDato.toString())
-        assertThat(cvJson["kompetanse"][0]["annenerfaring"][0]["beskrivelse"].asText()).isEqualTo(expectedAnnenErfaringBeskrivelse)
-        assertThat(cvJson["kompetanse"][0]["annenerfaring"][0]["rolle"].asText()).isEqualTo(expectedAnnenErfaringRolle)
-        assertThat(cvJson["sertifikat"][0]["fraDato"].asText()).isEqualTo(expectedSertifikatFraDato.toString())
-        assertThat(cvJson["sertifikat"][0]["tilDato"].asText()).isEqualTo(expectedSertifikatTilDato.toString())
-        assertThat(cvJson["sertifikat"][0]["sertifikatKode"].asText()).isEqualTo(expectedSertifikatKode)
-        assertThat(cvJson["sertifikat"][0]["sertifikatKodeNavn"].asText()).isEqualTo(expectedSertifikatKodeNavn)
-        assertThat(cvJson["sertifikat"][0]["alternativtNavn"].asText()).isEqualTo(expectedSertifikatAlternativtNavn)
+        assertThat(cvJson["kompetanse"][0]["fraDato"].isNull).isTrue
+        assertThat(cvJson["kompetanse"][0]["kompKode"].isNull).isTrue
+        assertThat(cvJson["kompetanse"][0]["kompKodeNavn"].asText()).isEqualTo(expectedKompetanser)
+        assertThat(cvJson["kompetanse"][0]["alternativtNavn"].asText()).isEqualTo(expectedKompetanser)
+        assertThat(cvJson["kompetanse"][0]["beskrivelse"].asText()).isEqualTo("")
+        assertThat(cvJson["kompetanse"][0]["sokeTitler"].asText()).isEqualTo(listOf(""))
+        assertThat(cvJson["annenErfaring"][0]["fraDato"].asText()).isEqualTo(expectedAnnenErfaringFraDato.toString())
+        assertThat(cvJson["annenErfaring"][0]["tilDato"].asText()).isEqualTo(expectedAnnenErfaringTilDato.toString())
+        assertThat(cvJson["annenErfaring"][0]["beskrivelse"].asText()).isEqualTo(expectedAnnenErfaringBeskrivelse)
+        assertThat(cvJson["annenErfaring"][0]["rolle"].asText()).isEqualTo(expectedAnnenErfaringRolle)
+        assertThat(cvJson["sertifikat"][0]["tittel"].asText()).isEqualTo(expectedSertifikatTittel)
+        assertThat(cvJson["sertifikat"][0]["sertifikatnavn"].asText()).isEqualTo(expectedSertifikatNavn)
+        assertThat(cvJson["sertifikat"][0]["sertifikatnavnFritekst"].asText()).isEqualTo(expectedSertifikatnavnFritekst)
+        assertThat(cvJson["sertifikat"][0]["konseptId"].asText()).isEqualTo(expectedSertifikatKonseptId)
         assertThat(cvJson["sertifikat"][0]["utsteder"].asText()).isEqualTo(expectedSertifikatUtsteder)
+        assertThat(cvJson["sertifikat"][0]["gjennomfoert"].asText()).isEqualTo(expectedSertifikatGjennomfoert.toString())
+        assertThat(cvJson["sertifikat"][0]["utloeper"].asText()).isEqualTo(expectedSertifikatUtloeper.toString())
         assertThat(cvJson["forerkort"][0]["fraDato"].asText()).isEqualTo(expectedForerkortFraDato.toString())
         assertThat(cvJson["forerkort"][0]["tilDato"].asText()).isEqualTo(expectedForerkortTilDato.toString())
-        assertThat(cvJson["forerkort"][0]["forerkortKode"].asText()).isEqualTo(expectedForerkortKode)
+        assertThat(cvJson["forerkort"][0]["forerkortKode"].isNull).isTrue
         assertThat(cvJson["forerkort"][0]["forerkortKodeKlasse"].asText()).isEqualTo(expectedForerkortKodeKlasse)
         assertThat(cvJson["forerkort"][0]["alternativKlasse"].asText()).isEqualTo(expectedForerkortAlternativKlasse)
         assertThat(cvJson["forerkort"][0]["utsteder"].asText()).isEqualTo(expectedForerkortUtsteder)
