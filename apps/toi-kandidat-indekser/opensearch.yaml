@@ -1,0 +1,27 @@
+apiVersion: aiven.io/v1alpha1
+kind: OpenSearch
+metadata:
+  labels:
+    team: toi
+  name: opensearch-toi-toi-kandidat
+  namespace: toi
+spec:
+  plan: {{ opensearch_plan }}
+  project: {{ opensearch_project }}
+  userConfig:
+    opensearch:
+      indices_query_bool_max_clause_count: 4096
+
+---
+apiVersion: aiven.io/v1alpha1
+kind: ServiceIntegration
+metadata:
+  labels:
+    team: toi
+  name: opensearch-toi-toi-kandidat
+  namespace: toi
+spec:
+  project: {{ opensearch_project }}
+  integrationType: prometheus
+  destinationEndpointId: {{ opensearch_endpoint_id }}
+  sourceServiceName: opensearch-toi-toi-kandidat

@@ -1,12 +1,11 @@
-name: Deploy Opensearch stilling dev
+name: Deploy Opensearch kandidat dev
 on:
   push:
     branches:
       - main
-      - endre_max_bool_clause_count
     paths:
-      - apps/toi-stilling-indekser/opensearch.yaml
-      - .github/workflows/deploy-opensearch-stilling-dev.yml
+      - apps/toi-kandidat-indekser/opensearch.yaml
+      - .github/workflows/deploy-opensearch-kandidat-dev.yml
 jobs:
   deploy-opensearch:
     name: Deploy Opensearch instance to cluster
@@ -20,5 +19,5 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: apps/toi-stilling-indekser/opensearch.yaml
-          VARS: apps/toi-stilling-indekser/nais-dev.yaml
+          RESOURCE: apps/toi-kandidat-indekser/opensearch.yaml
+          VARS: apps/toi-kandidat-indekser/nais-dev.yaml

@@ -30,7 +30,7 @@ spec:
   kafka:
     pool: {{ kafka_pool }}
   openSearch:
-    instance: kandidat
+    instance: toi-kandidat
     access: readwrite
   env:
     - name: KAFKA_RAPID_TOPIC
