@@ -38,6 +38,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.YearMonth
+import java.time.ZoneId
 
 
 @Testcontainers
@@ -118,14 +119,14 @@ class KandidatfeedTest {
             synlighet(erSynlig = true, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
             hullICv = tomJson,
-            ontologi = tomJson,
+            ontologi = ontologiDel(),
             kandidatnr = expectedKandidatnr
         )
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
             hullICv = tomJson,
-            ontologi = tomJson,
+            ontologi = ontologiDel(),
             kandidatnr = expectedKandidatnr
         )
 
@@ -201,7 +202,7 @@ class KandidatfeedTest {
     @Test
     fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
         val rapidMelding =
-            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = "{}")
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = ontologiDel())
 
         val testrapid = TestRapid()
 
@@ -297,12 +298,9 @@ class KandidatfeedTest {
         val expectedSertifikatUtsteder = "Statens vegvesen"
         val expectedSertifikatGjennomfoert = LocalDate.of(2020, 1, 1)
         val expectedSertifikatUtloeper = LocalDate.of(2025, 1, 1)
-        val expectedForerkortFraDato = OffsetDateTime.now().minusYears(1)
-        val expectedForerkortTilDato = OffsetDateTime.now().plusYears(4)
-        val expectedForerkortKode = "B"
+        val expectedForerkortFraDato = LocalDate.now().minusYears(1)
+        val expectedForerkortTilDato = LocalDate.now().plusYears(4)
         val expectedForerkortKodeKlasse = "B - Bil"
-        val expectedForerkortAlternativKlasse = "Bil klasse"
-        val expectedForerkortUtsteder = "Statens vegvesen"
         val expectedSprakFraDato = LocalDate.of(2020, 2, 1)
         val expectedSprakKode = "B"
         val expectedSprakKodeTekst = "Bokmål"
@@ -321,12 +319,9 @@ class KandidatfeedTest {
         val expectedVervTittel = "Tittel på verv"
         val expectedGeografiJobbonskerGeografiKode = "0301"
         val expectedGeografiJobbonskerGeografiKodeTekst = "Oslo"
-        val expectedYrkeJobbonskerStyrkKode = "1111"
         val expectedYrkeJobbonskerStyrkBeskrivelse = "Javautvikler"
-        val expectedYrkeJobbonskerPrimaertJobbonske = true
-        val expectedYrkeJobbonskerSokeTitler = "Javautvikler"
-        val expectedOmfangJobbonskerOmfangKode = "100"
-        val expectedOmfangJobbonskerOmfangKodeTekst = "100 %"
+        val expectedOmfangJobbonskerOmfangKode = "HELTID"
+        val expectedOmfangJobbonskerOmfangKodeTekst = "Heltid"
         val expectedAnsettelsesformJobbonskerAnsettelsesformKode = "FAST"
         val expectedAnsettelsesformJobbonskerAnsettelsesformKodeTekst = "Fast"
         val expectedArbeidstidsordningJobbonskerArbeidstidsordningKode = "DAG"
@@ -346,7 +341,14 @@ class KandidatfeedTest {
         val melding = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
             hullICv = tomJson,
-            ontologi = tomJson,
+            ontologi = ontologiDel(
+                stillingstittel = mapOf(
+                    expectedYrkeserfaringStillingstittel to (listOf(expectedYrkeserfaringStillingstitlerForTypeahead) to listOf(expectedYrkeserfaringSokeTitler))
+                ),
+                kompetansenavn = mapOf(
+                    *expectedKompetanser.map { it to (listOf("TODO") to listOf("TODO 2")) }.toTypedArray()
+                )
+            ),
             kandidatnr = expectedKandidatnr,
             aktørId = expectedAktorId,
             fødselsnummer = expectedFodselsnummer,
@@ -357,7 +359,7 @@ class KandidatfeedTest {
             epostadresse = expectedEpostadresse,
             telefonnummer = expectedTelefon,
             sammendrag = expectedBeskrivelse,
-            opprettetCv = Instant.from(expectedSamtykkeDato).toEpochMilli().let { "${it/1000}.${it%1000}" },
+            opprettetCv = Instant.from(expectedSamtykkeDato.atStartOfDay(ZoneId.systemDefault())).toEpochMilli().let { "${it/1000}.${it%1000}" },
             gateadresse = expectedAdresselinje1,
             postnummer = expectedPostnummer,
             poststed = expectedPoststed,
@@ -431,14 +433,33 @@ class KandidatfeedTest {
             ),
             forerkort = listOf(
                 TestForerkort(
-                    fraTidspunkt = expectedForerkortFraDato.toString(),
-                    tilTidspunkt = expectedForerkortTilDato.toString(),
-                    klasse = expectedForerkortKode,
+                    fraTidspunkt = expectedForerkortFraDato,
+                    utloeper = expectedForerkortTilDato,
+                    klasse = expectedForerkortKodeKlasse,
                     klasseBeskrivelse = expectedForerkortKodeKlasse,
-                    klasseFritekst = expectedForerkortAlternativKlasse,
-                    utsteder = expectedForerkortUtsteder
                 )
             ),
+            kurs = listOf(
+                TestKurs(
+                    tittel = expectedKursTittel,
+                    utsteder = expectedKursArrangor,
+                    varighetEnhet = expectedKursOmfangEnhet,
+                    varighet = expectedKursOmfangVerdi,
+                    tidspunkt = expectedKursTilDato
+                )
+            ),
+            geografiJobbonsker = listOf(
+                TestGeografiJobbonsker(
+                    kode = expectedGeografiJobbonskerGeografiKode,
+                    sted = expectedGeografiJobbonskerGeografiKodeTekst
+                )
+            ),
+            jobbProfilstillinger = listOf(expectedYrkeJobbonskerStyrkBeskrivelse, "Ekstra yrkebeskrivelse"),
+            omfangJobbonsker = listOf(expectedOmfangJobbonskerOmfangKode),
+            ansettelsesformJobbonsker = listOf(expectedAnsettelsesformJobbonskerAnsettelsesformKode),
+            arbeidstidsordningJobbonsker = listOf(expectedArbeidstidsordningJobbonskerArbeidstidsordningKode),
+            arbeidsdagerJobbonsker = listOf(expectedArbeidsdagerJobbonskerArbeidsdagerKode),
+            arbeidstidJobbonsker = listOf(expectedArbeidstidJobbonskerArbeidstidKode),
         )
 
         val testrapid = TestRapid()
@@ -542,8 +563,8 @@ class KandidatfeedTest {
         assertThat(cvJson["forerkort"][0]["tilDato"].asText()).isEqualTo(expectedForerkortTilDato.toString())
         assertThat(cvJson["forerkort"][0]["forerkortKode"].isNull).isTrue
         assertThat(cvJson["forerkort"][0]["forerkortKodeKlasse"].asText()).isEqualTo(expectedForerkortKodeKlasse)
-        assertThat(cvJson["forerkort"][0]["alternativKlasse"].asText()).isEqualTo(expectedForerkortAlternativKlasse)
-        assertThat(cvJson["forerkort"][0]["utsteder"].asText()).isEqualTo(expectedForerkortUtsteder)
+        assertThat(cvJson["forerkort"][0]["alternativKlasse"].isNull).isTrue
+        assertThat(cvJson["forerkort"][0]["utsteder"].isNull).isTrue
         assertThat(cvJson["sprak"][0]["fraDato"].asText()).isEqualTo(expectedSprakFraDato.toString())
         assertThat(cvJson["sprak"][0]["sprakKode"].asText()).isEqualTo(expectedSprakKode)
         assertThat(cvJson["sprak"][0]["sprakKodeTekst"].asText()).isEqualTo(expectedSprakKodeTekst)
@@ -562,10 +583,10 @@ class KandidatfeedTest {
         assertThat(cvJson["verv"][0]["tittel"].asText()).isEqualTo(expectedVervTittel)
         assertThat(cvJson["geografiJobbonsker"][0]["geografiKode"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiKode)
         assertThat(cvJson["geografiJobbonsker"][0]["geografiKodeTekst"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiKodeTekst)
-        assertThat(cvJson["yrkeJobbonsker"][0]["styrkKode"].asText()).isEqualTo(expectedYrkeJobbonskerStyrkKode)
+        assertThat(cvJson["yrkeJobbonsker"][0]["styrkKode"].isNull).isTrue
         assertThat(cvJson["yrkeJobbonsker"][0]["styrkBeskrivelse"].asText()).isEqualTo(expectedYrkeJobbonskerStyrkBeskrivelse)
-        assertThat(cvJson["yrkeJobbonsker"][0]["primaertJobbonske"].asBoolean()).isEqualTo(expectedYrkeJobbonskerPrimaertJobbonske)
-        assertThat(cvJson["yrkeJobbonsker"][0]["sokeTitler"][0].asText()).isEqualTo(expectedYrkeJobbonskerSokeTitler)
+        assertThat(cvJson["yrkeJobbonsker"][0]["primaertJobbonske"].asBoolean()).isFalse
+        assertThat(cvJson["yrkeJobbonsker"][0]["sokeTitler"][0].asText()).isEqualTo("")
         assertThat(cvJson["omfangJobbonsker"][0]["omfangKode"].asText()).isEqualTo(expectedOmfangJobbonskerOmfangKode)
         assertThat(cvJson["omfangJobbonsker"][0]["omfangKodeTekst"].asText()).isEqualTo(expectedOmfangJobbonskerOmfangKodeTekst)
         assertThat(cvJson["ansettelsesformJobbonsker"][0]["ansettelsesformKode"].asText()).isEqualTo(expectedAnsettelsesformJobbonskerAnsettelsesformKode)

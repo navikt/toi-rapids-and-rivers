@@ -72,6 +72,44 @@ data class TestGeografiJobbonsker(
     val sted: String,
     val kode: String
 )
+fun ontologiDel(
+    kompetansenavn: Map<String, Pair<List<String>, List<String>>> = emptyMap(),
+    stillingstittel: Map<String, Pair<List<String>, List<String>>> = emptyMap()
+) = """
+    {
+        "ontologi": {
+            "kompetansenavn": {
+                ${kompetansenavn.entries.joinToString { (k,v) -> v.let { (synonymer, merGenerell) ->
+                   """
+                    "$k": {
+                        "synonymer": [
+                            ${synonymer.joinToString { "\"${it.trim()}\"" }}
+                        ],
+                        "merGenerell": [
+                            ${merGenerell.joinToString { "\"${it.trim()}\"" }}
+                        ]
+                    }
+                   """.trimIndent()
+                }}
+                }
+            },
+            "stillingstittel": {
+                ${stillingstittel.entries.joinToString { (k,v) -> v.let { (synonymer, merGenerell) ->
+                   """
+                    "$k": {
+                        "synonymer": [
+                            ${synonymer.joinToString { "\"${it.trim()}\"" }}
+                        ],
+                        "merGenerell": [
+                            ${merGenerell.joinToString { "\"${it.trim()}\"" }}
+                        ]
+                    }
+                   """.trimIndent()
+                }}
+            }
+        }
+    }
+""".trimIndent()
 fun rapidMelding(
     synlighetJson: String?,
     behovsListe: List<String>? = null,

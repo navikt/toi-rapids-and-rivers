@@ -120,17 +120,19 @@ class EsYrkeserfaring(
         fun List<EsYrkeserfaring>.totalYrkeserfaringIManeder() = this.sumOf(EsYrkeserfaring::yrkeserfaringManeder)
         fun fraMelding(packet: JsonMessage, cvNode: JsonNode): List<EsYrkeserfaring> = cvNode["arbeidserfaring"].map { arbeidserfaringNode ->
             val stillingstittel = arbeidserfaringNode["stillingstittel"].asText()
+            val ontologiRelasjoner = packet["ontologi"]["stillingstittel"][stillingstittel]
+            val typeahead = ontologiRelasjoner["synonymer"].map(JsonNode::asText)
             EsYrkeserfaring(
                 fraDato = arbeidserfaringNode["fraTidspunkt"].asText(null).let(YearMonth::parse),
                 tilDato = arbeidserfaringNode["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
                 arbeidsgiver = arbeidserfaringNode["arbeidsgiver"].asText(),
                 styrkKode = arbeidserfaringNode["styrkkode"].asText(),
                 kodeverkStillingstittel = stillingstittel,
-                stillingstitlerForTypeahead = TODO(),
+                stillingstitlerForTypeahead = typeahead.toSet(),
                 alternativStillingstittel = arbeidserfaringNode["stillingstittelFritekst"].asText("").let { if(it=="") stillingstittel else it },
                 beskrivelse = arbeidserfaringNode["beskrivelse"].asText(null),
-                sokeTitler = TODO(),
-                sted = arbeidserfaringNode["sted"].asText("")
+                sokeTitler = typeahead + ontologiRelasjoner["merGenerell"].map(JsonNode::asText),
+                sted = arbeidserfaringNode["sted"]?.asText("") ?: ""
             )
         }
     }
