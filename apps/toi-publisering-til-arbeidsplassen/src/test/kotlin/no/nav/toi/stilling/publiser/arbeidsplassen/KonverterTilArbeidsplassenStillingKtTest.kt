@@ -63,7 +63,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
                      "adtext" to "<p>Jobb som utvikler</p>",
                  ),
              ),
-             annonseId = 123,
+             annonsenr = "R123",
              opprettet = ZonedDateTime.of(LocalDateTime.of(2025, 1, 25, 14, 0), ZoneId.of("UTC")),
              opprettetAv = "pam-rekrutteringsbistand",
              sistEndret = ZonedDateTime.of(LocalDateTime.of(2025, 2, 25, 14, 0), ZoneId.of("UTC")),
