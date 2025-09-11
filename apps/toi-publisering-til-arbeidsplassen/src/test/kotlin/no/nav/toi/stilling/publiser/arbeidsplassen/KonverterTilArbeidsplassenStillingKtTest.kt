@@ -24,8 +24,6 @@ class KonverterTilArbeidsplassenStillingKtTest {
              stillingsId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
              innhold  = DirektemeldtStillingInnhold(
                  title = "Tittel",
-                 published = ZonedDateTime.of(LocalDateTime.of(2025, 3, 25, 14, 0), ZoneId.of("UTC")),
-                 expires = ZonedDateTime.of(LocalDateTime.of(2025, 4, 25, 14, 0), ZoneId.of("UTC")),
                  locationList = listOf(
                      Geografi(
                          address = "Adresse",
@@ -69,6 +67,8 @@ class KonverterTilArbeidsplassenStillingKtTest {
              sistEndret = ZonedDateTime.of(LocalDateTime.of(2025, 2, 25, 14, 0), ZoneId.of("UTC")),
              sistEndretAv = "pam-rekrutteringsbistand",
              status = "ACTIVE",
+             publisert = ZonedDateTime.of(LocalDateTime.of(2025, 3, 25, 14, 0), ZoneId.of("UTC")),
+             utløpsdato = ZonedDateTime.of(LocalDateTime.of(2025, 4, 25, 14, 0), ZoneId.of("UTC")),
         )
 
         val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(direktemeldtStilling)

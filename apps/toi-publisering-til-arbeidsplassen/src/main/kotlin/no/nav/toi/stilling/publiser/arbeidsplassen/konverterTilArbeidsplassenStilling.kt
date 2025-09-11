@@ -20,8 +20,8 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
         positions = properties["positioncount"]?.toInt() ?: 1,
         title = innhold.title,
         adText = properties["adtext"] ?: "",
-        published = innhold.published?.toIsoDateTimeString() ?: LocalDateTime.now().toIsoDateTimeString(),
-        expires = innhold.expires?.toIsoDateTimeString(),
+        published = direktemeldtStilling.publisert?.toIsoDateTimeString() ?: LocalDateTime.now().toIsoDateTimeString(),
+        expires = direktemeldtStilling.utløpsdato?.toIsoDateTimeString(),
         privacy = PrivacyType.fromString(innhold.privacy ?: ""),
         contactList = innhold.contactList.filter { it.name != null }.map {
             ContactArbeidsplassen(

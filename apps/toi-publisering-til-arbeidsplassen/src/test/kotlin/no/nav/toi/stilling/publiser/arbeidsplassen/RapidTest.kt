@@ -1,16 +1,34 @@
 package no.nav.toi.stilling.publiser.arbeidsplassen
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.toi.TestRapid
+import no.nav.toi.stilling.publiser.arbeidsplassen.dto.RapidHendelse
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class RapidTest {
 
+    private val jacksonMapper = jacksonObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+        .registerModule(JavaTimeModule())
+
+
     @Test
     fun `Melding blir sendt på rapid`() {
-
         testProgramMedHendelse(rapidHendelse) {
             assertThat(size).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `Melding blir korrekt parset`() {
+        jacksonMapper.readValue(rapidHendelse, RapidHendelse::class.java).also {
+            assertEquals("123e4567-e89b-12d3-a456-426614174000", it.stillingsId)
+            assertEquals("2025-04-23T00:00Z", it.direktemeldtStilling.utløpsdato.toString())
         }
     }
 
@@ -53,7 +71,6 @@ class RapidTest {
                         "medium": "DIR",
                         "reference": "123e4567-e89b-12d3-a456-426614174000",
                         "published": "2025-03-20T13:34:41.173316565Z",
-                        "expires": "2025-04-23T00:00:00Z",
                         "employer": {
                             "name": "Testarbeidsgiver AS",
                             "orgnr": "123456789",
@@ -119,6 +136,7 @@ class RapidTest {
                         "activationOnPublishingDate": true
                     },
                     "annonsenr": "R123456789",
+                    "utløpsdato": "2025-04-23T00:00:00Z",
                     "opprettet": "2023-01-01T12:00:00Z",
                     "opprettetAv": "pam-rekrutteringsbistand",
                     "sistEndret": "2023-01-02T12:00:00Z",

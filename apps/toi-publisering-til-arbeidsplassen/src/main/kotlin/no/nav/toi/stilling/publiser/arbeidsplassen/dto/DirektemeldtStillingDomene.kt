@@ -29,7 +29,12 @@ data class DirektemeldtStilling(
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
     val status: String,
-    val annonsenr: String
+    val annonsenr: String,
+    val versjon: String? = null,
+    val utløpsdato: ZonedDateTime?,
+    val publisert: ZonedDateTime?,
+    val publisertAvAdmin: String? = null,
+    val adminStatus: String? = null,
 )
 
 data class DirektemeldtStillingKategori(
@@ -41,7 +46,6 @@ data class DirektemeldtStillingKategori(
 )
 
 data class DirektemeldtStillingAdministration(
-    val status: String?,
     val comments: String?,
     val reportee: String?,
     val remarks: List<String> = ArrayList(),
@@ -71,14 +75,11 @@ data class DirektemeldtStillingInnhold(
     val source: String? = null,
     val medium: String? = null,
     val reference: String? = null,
-    val published: ZonedDateTime? = null,
-    val expires: ZonedDateTime? = null,
     val employer: DirektemeldtStillingArbeidsgiver,
     val location: Geografi? = null,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
     val properties: Map<String, String> = HashMap(),
-    val publishedByAdmin: String? = null,
     val businessName: String? = null,
     val firstPublished: Boolean? = null,
     val deactivatedByExpiry: Boolean? = null,
