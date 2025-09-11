@@ -125,7 +125,7 @@ class RapidTest {
                     "sistEndretAv": "pam-rekrutteringsbistand",
                     "status": "ACTIVE"
                 },
-                "@event_name": "publiserTilArbeidsplassen"
+                "@event_name": "publiserEllerAvpubliserTilArbeidsplassen"
             }
             """.trimIndent()
 
