@@ -13,7 +13,7 @@ class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : Rive
             precondition {
                 it.requireKey("direktemeldtStilling")
                 it.requireKey("stillingsId")
-                it.requireValue("@event_name", "publiserTilArbeidsplassen")
+                it.requireValue("@event_name", "publiserEllerAvpubliserTilArbeidsplassen")
             }
         }.register(this)
     }

@@ -118,14 +118,14 @@ class RapidTest {
                         "deactivatedByExpiry": false,
                         "activationOnPublishingDate": true
                     },
-                    "annonsenr": 123456789,
+                    "annonsenr": "R123456789",
                     "opprettet": "2023-01-01T12:00:00Z",
                     "opprettetAv": "pam-rekrutteringsbistand",
                     "sistEndret": "2023-01-02T12:00:00Z",
                     "sistEndretAv": "pam-rekrutteringsbistand",
                     "status": "ACTIVE"
                 },
-                "@event_name": "publiserTilArbeidsplassen"
+                "@event_name": "publiserEllerAvpubliserTilArbeidsplassen"
             }
             """.trimIndent()
 
