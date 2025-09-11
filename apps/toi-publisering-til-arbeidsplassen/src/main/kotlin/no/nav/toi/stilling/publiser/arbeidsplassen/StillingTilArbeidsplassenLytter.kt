@@ -30,7 +30,7 @@ class StillingTilArbeidsplassenLytter(
     ) {
         log.info("Mottok stilling ${packet.toJson()}")
         val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
-        log.info("Mottok stilling med stillingsId ${stilling.stillingsid}")
+        log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
         val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(stilling)
         arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
     }
