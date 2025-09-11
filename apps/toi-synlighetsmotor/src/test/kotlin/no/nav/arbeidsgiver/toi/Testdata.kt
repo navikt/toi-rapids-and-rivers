@@ -1,10 +1,10 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
 import no.nav.security.token.support.core.configuration.IssuerProperties
+import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions
 import java.net.URI
 import java.time.ZonedDateTime
@@ -53,10 +53,10 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "oppfølgingsinformasjon",
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsperiode",
-            "arenaFritattKandidatsøk",
             "hjemmel",
             "måBehandleTidligereCv",
-            "kvp"
+            "kvp",
+            "arbeidssokeropplysninger"
         ))
     }
 
@@ -71,9 +71,9 @@ class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode: String = aktivOppfølgingsperiode(),
+            arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
-            arenaFritattKandidatsøk: String? = arenaFritattKandidatsøk(fnr = "12312312312"),
             hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             veileder: String? = veileder("123456789"),
@@ -87,9 +87,9 @@ class Testdata {
         ) =
             hendelseEtterBehovsHenting(
                 oppfølgingsperiode = oppfølgingsperiode,
+                arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
-                arenaFritattKandidatsøk = arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
                 hjemmel = hjemmel,
                 participatingService = participatingService,
                 måBehandleTidligereCv = måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
@@ -112,9 +112,10 @@ class Testdata {
 
         fun hendelseFørBehovsHenting(
             oppfølgingsperiode: String? = null,
+            arbeidssøkerperiode: String? = null,
+            arbeidssøkeropplysninger: String? = null,
             oppfølgingsinformasjon: String? = null,
             arbeidsmarkedCv: String? = null,
-            arenaFritattKandidatsøk: String? = null,
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = null,
@@ -130,8 +131,9 @@ class Testdata {
                 """"@event_name": "hendelse"""",
                 arbeidsmarkedCv,
                 oppfølgingsinformasjon,
+                arbeidssøkerperiode,
+                arbeidssøkeropplysninger,
                 oppfølgingsperiode,
-                arenaFritattKandidatsøk,
                 hjemmel,
                 participatingService,
                 måBehandleTidligereCv,
@@ -147,9 +149,10 @@ class Testdata {
 
         fun hendelseEtterBehovsHenting(
             oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
+            arbeidssøkerperiode: String? = nullVerdiForKey("arbeidssokerperiode"),
+            arbeidssøkeropplysninger: String? = nullVerdiForKey("arbeidssokeropplysninger"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
-            arenaFritattKandidatsøk: String? = nullVerdiForKey("arenaFritattKandidatsøk"),
             hjemmel: String? = nullVerdiForKey("hjemmel"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             måBehandleTidligereCv: String? = nullVerdiForKey("måBehandleTidligereCv"),
@@ -166,7 +169,6 @@ class Testdata {
                 arbeidsmarkedCv ?: nullVerdiForKey("arbeidsmarkedCv"),
                 oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
-                arenaFritattKandidatsøk ?: nullVerdiForKey("arenaFritattKandidatsøk"),
                 hjemmel ?: nullVerdiForKey("hjemmel"),
                 participatingService,
                 måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
@@ -174,7 +176,9 @@ class Testdata {
                 kvp ?: nullVerdiForKey("kvp"),
                 veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
-                adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse")
+                adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse"),
+                arbeidssøkerperiode ?: nullVerdiForKey("arbeidssokerperiode"),
+                arbeidssøkeropplysninger ?: nullVerdiForKey("arbeidssokeropplysninger")
             ).joinToString()
         }
             }
@@ -220,6 +224,18 @@ class Testdata {
                 "sluttDato": null
             }
         """.trimIndent()
+
+        fun arbeidssøkeropplysninger(aktiv: Boolean = true) :String {
+            val avsluttet = if (aktiv) "null" else "\"2020-10-31T14:15:38+01:00\""
+            return """
+                "arbeidssokeropplysninger": {
+                    "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
+                    "identitetsnummer": "01010012345",
+                    "periode_startet": "2020-10-30T14:15:38+01:00",
+                    "periode_avsluttet": $avsluttet
+                }
+            """.trimIndent()
+        }
 
         fun avsluttetOppfølgingsperiode() =
             """
@@ -279,21 +295,6 @@ class Testdata {
                 "meldingstype": "${CvMeldingstype.OPPRETT}",
                 "opprettJobbprofil": {},
                 "endreJobbprofil": null
-            }
-        """.trimIndent()
-
-        fun fritattKandidatsøk(fritattKandidatsøk: Boolean = false) =
-            """
-            "fritattKandidatsøk" : {
-                "fritattKandidatsok" : $fritattKandidatsøk
-            }
-        """.trimIndent()
-
-        fun arenaFritattKandidatsøk(fritattKandidatsøk: Boolean = false, fnr: String?) =
-            """
-            "arenaFritattKandidatsøk" : {
-                "erFritattKandidatsøk" : $fritattKandidatsøk,
-                "fnr" : ${fnr?.let { """"$it"""" }}
             }
         """.trimIndent()
 

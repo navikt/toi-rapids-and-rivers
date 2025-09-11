@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - lag_ny_opensearch
+      - endre_max_bool_clause_count
     paths:
       - apps/toi-stilling-indekser/opensearch.yaml
       - .github/workflows/deploy-opensearch-stilling-dev.yml

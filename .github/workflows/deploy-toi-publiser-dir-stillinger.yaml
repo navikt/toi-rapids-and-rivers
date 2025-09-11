@@ -1,0 +1,22 @@
+name: toi-publiser-dir-stillinger
+
+on:
+  push:
+    paths:
+      - apps/toi-publiser-dir-stillinger/**
+      - .github/workflows/deploy-toi-publiser-dir-stillinger.yaml
+      - .github/workflows/deploy-toi-template.yaml
+      - buildSrc/**
+      - technical-libs/testrapid
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/deploy-toi-template.yaml
+    with:
+      app_name: ${{ github.workflow }}
+      deploy_dev_branch: refs/heads/ny_app_for_publisering_til_dir_topic
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write

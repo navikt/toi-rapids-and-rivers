@@ -31,7 +31,6 @@ class Evaluering(
     val harJobbprofil: BooleanVerdi,
     val harSettHjemmel: BooleanVerdi,
     val maaIkkeBehandleTidligereCv: BooleanVerdi,
-    val arenaIkkeFritattKandidatsøk: BooleanVerdi,
     val erUnderOppfoelging: BooleanVerdi,
     val harRiktigFormidlingsgruppe: BooleanVerdi,
     val erIkkeKode6eller7: BooleanVerdi,
@@ -39,6 +38,7 @@ class Evaluering(
     val erIkkeDoed: BooleanVerdi,
     val erIkkeKvp: BooleanVerdi,
     val harIkkeAdressebeskyttelse: BooleanVerdi,
+    val erArbeidssøker: BooleanVerdi,
     komplettBeregningsgrunnlag: Boolean
 ) {
     private val felterBortsettFraAdressebeskyttelse = listOf(
@@ -46,17 +46,19 @@ class Evaluering(
         harJobbprofil,
         harSettHjemmel,
         maaIkkeBehandleTidligereCv,
-        arenaIkkeFritattKandidatsøk,
         erUnderOppfoelging,
-        harRiktigFormidlingsgruppe,
+        //harRiktigFormidlingsgruppe, // ARBS skal ikke lenger være en del av evalueringen. Kommentert ut frem til vi er sikre på at det kan slettes helt
         erIkkeKode6eller7,
         erIkkeSperretAnsatt,
         erIkkeDoed,
-        erIkkeKvp
+        erIkkeKvp,
+        erArbeidssøker
     )
 
     private val minstEtFeltErUsynlig = felterBortsettFraAdressebeskyttelse.any { it == False }
-    val harAltBortsettFraAdressebeskyttelse = felterBortsettFraAdressebeskyttelse.none { it == Missing }
+    val harAltBortsettFraAdressebeskyttelse =
+        (felterBortsettFraAdressebeskyttelse + harRiktigFormidlingsgruppe)
+            .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
     fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
@@ -68,11 +70,11 @@ class Evaluering(
         harJobbprofil = harJobbprofil.default(false),
         harSettHjemmel = harSettHjemmel.default(false),
         maaIkkeBehandleTidligereCv = maaIkkeBehandleTidligereCv.default(false),
-        arenaIkkeFritattKandidatsøk = arenaIkkeFritattKandidatsøk.default(false),
         erUnderOppfoelging = erUnderOppfoelging.default(false),
         harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
         erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
-        erIkkeDoed = erIkkeDoed.default(false)
+        erIkkeDoed = erIkkeDoed.default(false),
+        erArbeidssøker = erArbeidssøker.default(false)
     )
 
 
@@ -107,23 +109,23 @@ data class EvalueringUtenDiskresjonskode(
     val harJobbprofil: Boolean,
     val harSettHjemmel: Boolean,
     val maaIkkeBehandleTidligereCv: Boolean,
-    val arenaIkkeFritattKandidatsøk: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
-    val erIkkeDoed: Boolean
-) {
+    val erIkkeDoed: Boolean,
+    val erArbeidssøker: Boolean
+    ) {
     companion object {
         fun medAlleVerdierFalse() = EvalueringUtenDiskresjonskode(
             harAktivCv = false,
             harJobbprofil = false,
             harSettHjemmel = false,
             maaIkkeBehandleTidligereCv = false,
-            arenaIkkeFritattKandidatsøk = false,
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
-            erIkkeDoed = false
+            erIkkeDoed = false,
+            erArbeidssøker = false
         )
     }
 }

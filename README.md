@@ -24,6 +24,10 @@ Vi har ikke noen kjøring av [Trivy security scan](https://sikkerhet.nav.no/docs
 - buildSrc/**
 ```
 
+## Kode generert av GitHub Copilot
+
+Dette repoet bruker GitHub Copilot til å generere kode.
+
 # Henvendelser
 
 ## For Nav-ansatte

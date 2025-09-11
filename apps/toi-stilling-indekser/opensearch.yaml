@@ -8,6 +8,9 @@ metadata:
 spec:
   plan: {{ opensearch_plan }}
   project: {{ opensearch_project }}
+  userConfig:
+    opensearch:
+      indices_query_bool_max_clause_count: 4096
 
 ---
 apiVersion: aiven.io/v1alpha1

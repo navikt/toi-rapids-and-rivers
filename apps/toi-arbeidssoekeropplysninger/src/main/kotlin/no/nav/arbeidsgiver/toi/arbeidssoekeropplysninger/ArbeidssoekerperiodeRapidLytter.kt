@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
@@ -9,7 +11,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import org.slf4j.LoggerFactory
 
 /**
  * Lytter på rapiden etter arbeidssøkerperioder publisert av toi.arbeidssoekerperiode
@@ -18,17 +19,20 @@ import org.slf4j.LoggerFactory
  */
 class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) : River.PacketListener {
     companion object {
-        private val secureLog = LoggerFactory.getLogger("secureLog")
+        private val jacksonMapper = jacksonObjectMapper()
+            .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(JavaTimeModule())
     }
 
     init {
         River(rapidsConnection).apply {
             precondition{
-                it.requireKey("id")
-                it.requireKey("identitetsnummer")
-                it.requireKey("startet")
-                it.interestedIn("avsluttet")
-                it.interestedIn("sistEndretDato") // Ikke interessert i denne hvor kom den fra?
+                it.requireKey("arbeidssokerperiode")
+                it.requireKey("fodselsnummer")
+                it.requireKey("aktørId")
+                it.interestedIn("@id")
+                it.interestedIn("sistEndretDato")
                 it.requireValue("@event_name", "arbeidssokerperiode")
             }
         }.register(this)
@@ -40,16 +44,15 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok oppfølgingsperiodemelding ${packet["id"]}")
-        repository.lagreOppfølgingsperiodemelding(packet.fjernMetadataOgKonverter());
-        secureLog.info("Mottok og lagret oppfølgingsperiodemelding med id ${packet["id"]} for fnr ${packet["identitetsnummer"]}")
+        log.info("Mottok arbeidssøkerperiodemelding ${packet["@id"]}")
+        repository.lagreArbeidssøkerperiodemelding(packet.fjernMetadataOgKonverter());
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter =
-            listOf("system_read_count", "system_participating_services", "@event_name", "@id", "@opprettet")
-        jsonNode.remove(metadataFelter)
-        return jsonNode
+        val jsonNode = jacksonMapper.readTree(this.toJson()) as ObjectNode
+        val periodeNode = jsonNode["arbeidssokerperiode"] as ObjectNode
+        val aktørId = jsonNode["aktørId"]
+        periodeNode.putIfAbsent("aktørId", aktørId)
+        return periodeNode
     }
 }

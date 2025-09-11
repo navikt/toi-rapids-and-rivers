@@ -6,18 +6,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import no.nav.arbeid.cv.avro.Melding
+import no.nav.arbeidsgiver.toi.arbeidsmarked.cv.SecureLogLogger.Companion.secure
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
-import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.RetriableException
-import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
-class CvLytter(private val consumer: () -> Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
+class CvLytter(
+    private val consumer: () -> Consumer<String, Melding>, private val behandleCv: (Melding) -> ArbeidsmarkedCv
 ) : CoroutineScope, RapidsConnection.StatusListener {
-
-    private val secureLog = LoggerFactory.getLogger("secureLog")
 
     val cvTopic = "teampam.cv-endret-ekstern-v2"
 
@@ -45,7 +43,7 @@ class CvLytter(private val consumer: () -> Consumer<String, Melding>, private va
 
                         cvMeldinger.forEach {
                             log.info("Publiserer arbeidsmarkedCv for aktør på rapid, se securelog for aktørid")
-                            secureLog.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
+                            secure(log).info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
                             rapidsConnection.publish(it.aktørId, it.somJson())
                         }
                         it.commitSync()

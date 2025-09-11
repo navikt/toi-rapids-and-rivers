@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
-import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -15,7 +14,6 @@ class NotifikasjonKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
 
@@ -76,6 +74,12 @@ class NotifikasjonKlient(
             return
         }
 
+        val gyldigeEpostadresser = mottakerEpostadresser.filter { it.isNotBlank() }
+        if (gyldigeEpostadresser.isEmpty()) {
+            log.info("Ingen gyldige epostadresser")
+            return
+        }
+
         val epostBody = lagEpostBody(
             tittel = stillingstittel,
             tekst = meldingTilArbeidsgiver,
@@ -89,7 +93,7 @@ class NotifikasjonKlient(
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
                 tidspunktForVarsel = tidspunktForHendelse,
-                mottakerEpostAdresser = mottakerEpostadresser,
+                mottakerEpostAdresser = gyldigeEpostadresser,
             )
 
         val erLokal: Boolean = System.getenv()["NAIS_CLUSTER_NAME"] == null

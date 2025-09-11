@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -16,7 +16,6 @@ class SammenstillTest {
         "oppfølgingsinformasjon",
         "siste14avedtak",
         "oppfølgingsperiode",
-        "arenaFritattKandidatsøk",
         "hjemmel",
         "måBehandleTidligereCv",
         "kvp"

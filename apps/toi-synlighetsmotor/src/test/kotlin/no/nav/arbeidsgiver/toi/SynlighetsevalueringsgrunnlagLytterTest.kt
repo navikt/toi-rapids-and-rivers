@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.toi.CvMeldingstype.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.adressebeskyttelse
 import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
-import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
@@ -22,16 +22,16 @@ class SynlighetsevalueringsgrunnlagLytterTest {
     companion object {
         private val aktørId = "1234"
         @JvmStatic
-        private fun felter() = Felt.entries.map { Arguments.of(it) }.stream()
+        private fun felter() = Felt.entries.filterNot { it.navn == "arbeidssokeropplysninger"}.map { Arguments.of(it) }.stream()
     }
     enum class Felt(val navn: String, val skalGiSynligTrue: String, val skalGiSynligFalse: String) {
         ARBEIDSMARKED_CV("arbeidsmarkedCv", arbeidsmarkedCv(OPPRETT), arbeidsmarkedCv(SLETT)),
         OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
         OPPFØLGINGSPERIODE("oppfølgingsperiode", aktivOppfølgingsperiode(), avsluttetOppfølgingsperiode()),
-        ARENAFRITATTKANDIDATSØK("arenaFritattKandidatsøk", arenaFritattKandidatsøk(fnr = null), arenaFritattKandidatsøk(fritattKandidatsøk = true, fnr = null)),
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
         MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
+        ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
     }
 
     private val adressebeskyttelseFeltNavn = "adressebeskyttelse"
@@ -329,6 +329,20 @@ class SynlighetsevalueringsgrunnlagLytterTest {
             val melding = message(0)
             assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
+        })
+    }
+
+    @Test
+    fun `om man får en melding med alle felter untatt arbeidssøkeropplysninger utfylt så skal synlighetsmotor vente til man har fått svar på arbeidssøkeropplysninger også`() {
+        val alleFelterSattTilÅGiSynligTrue = (Felt.entries - Felt.ARBEIDSSOKEROPPLYSNINGER).map(Felt::skalGiSynligTrue).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
         })
     }
 }

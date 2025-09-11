@@ -62,7 +62,7 @@ spec:
         - application: rekrutteringsbistand
           cluster: {{ cluster }}
         - application: rekrutteringsbistand-frontend
-          cluster: {{ cluster }}          
+          cluster: {{ cluster }}
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
@@ -70,3 +70,9 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

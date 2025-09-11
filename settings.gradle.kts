@@ -17,7 +17,6 @@ include(
     "apps:toi-hull-i-cv",
     "apps:toi-ontologitjeneste",
     "apps:toi-arbeidsgiver-notifikasjon",
-    "apps:toi-arena-fritatt-kandidatsok",
     "apps:toi-kvp",
     "apps:toi-livshendelse",
     "apps:toi-evaluertdatalogger",
@@ -25,5 +24,7 @@ include(
     "apps:toi-arbeidssoekeropplysninger",
     "apps:toi-arbeidssoekerperiode",
     "apps:toi-publisering-til-arbeidsplassen",
-    "apps:toi-stilling-indekser"
+    "apps:toi-stilling-indekser",
+    "apps:toi-publiser-dir-stillinger",
+    "technical-libs:testrapid",
 )

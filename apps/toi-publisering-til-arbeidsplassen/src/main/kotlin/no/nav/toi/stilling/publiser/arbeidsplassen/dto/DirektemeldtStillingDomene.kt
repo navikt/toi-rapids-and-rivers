@@ -29,7 +29,7 @@ data class DirektemeldtStilling(
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
     val status: String,
-    val annonseId: Long?
+    val annonsenr: String
 )
 
 data class DirektemeldtStillingKategori(

@@ -6,12 +6,16 @@ metadata:
   labels:
     team: toi
 spec:
+  strategy:
+    type: Recreate
   image: {{ image }}
   port: 8080
   liveness:
     path: /isalive
+    initialDelay: 50
   readiness:
     path: /isready
+    initialDelay: 50
   prometheus:
     enabled: true
     path: /metrics
@@ -27,14 +31,41 @@ spec:
       memory: 512Mi
   secureLogs:
     enabled: true
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true
   kafka:
     pool: {{ kafka_pool }}
+  openSearch:
+    access: admin
+    instance: toi-stilling
+  azure:
+    application:
+      enabled: true
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
-    - name: KAFKA_EXTRA_TOPIC
-      value: toi.rekrutteringsbistand-stilling-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: INDEKS_VERSJON
+      value: "{{ indeks }}"
+    - name: REINDEKSER_ENABLED
+      value: "{{ reindekser_enabled }}"
+    - name: REINDEKSER_INDEKS
+      value: "{{ reindekser_indeks }}"
+    - name: STILLING_API_URL
+      value: {{ stilling_api_url }}
+    - name: STILLING_API_SCOPE
+      value: {{ stilling_api_scope }}
+  accessPolicy:
+    outbound:
+      rules:
+        - application: rekrutteringsbistand-stilling-api

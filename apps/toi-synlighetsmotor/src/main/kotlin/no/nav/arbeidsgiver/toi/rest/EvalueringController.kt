@@ -44,11 +44,11 @@ private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDis
     harJobbprofil = harJobbprofil.default(false),
     harSettHjemmel = harSettHjemmel.default(false),
     maaIkkeBehandleTidligereCv = maaIkkeBehandleTidligereCv.default(false),
-    erIkkeFritattKandidatsøk = arenaIkkeFritattKandidatsøk.default(false),
     erUnderOppfoelging = erUnderOppfoelging.default(false),
     harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
     erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
     erIkkeDoed = erIkkeDoed.default(false),
+    erArbeidssøker = erArbeidssøker.default(false),
     erFerdigBeregnet = erFerdigBeregnet
 )
 
@@ -57,11 +57,11 @@ data class EvalueringUtenDiskresjonskodeDTO(
     val harJobbprofil: Boolean,
     val harSettHjemmel: Boolean,
     val maaIkkeBehandleTidligereCv: Boolean,
-    val erIkkeFritattKandidatsøk: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
     val erIkkeDoed: Boolean,
+    val erArbeidssøker: Boolean,
     val erFerdigBeregnet: Boolean
 ) {
     companion object {
@@ -70,11 +70,11 @@ data class EvalueringUtenDiskresjonskodeDTO(
             harJobbprofil = false,
             harSettHjemmel = false,
             maaIkkeBehandleTidligereCv = false,
-            erIkkeFritattKandidatsøk = false,
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
             erIkkeDoed = false,
+            erArbeidssøker = false,
             erFerdigBeregnet = false
         )
     }

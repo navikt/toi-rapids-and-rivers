@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeid.cv.avro.*
@@ -31,7 +31,7 @@ class CvLytterTest {
         produserCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(300)
+        Thread.sleep(800)
         val inspektør = rapid.inspektør
         Assertions.assertThat(inspektør.size).isEqualTo(1)
 

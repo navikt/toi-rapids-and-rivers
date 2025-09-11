@@ -15,13 +15,13 @@ class Repository(private val dataSource: DataSource) {
     private val harJobbprofilkolonne = "har_jobbprofil"
     private val harSettHjemmelKolonne = "har_sett_hjemmel"
     private val måIkkeBehandleTidligereCvKolonne = "maa_ikke_behandle_tidligere_cv"
-    private val arenaIkkeFritattKandidatsøkKolonne = "arena_ikke_fritatt_kandidatsok"
     private val erIkkeUnderOppfølgingKolonne = "er_under_oppfolging"
     private val harRiktigFormidlingsgruppeKolonne = "har_riktig_formidlingsgruppe"
     private val erIkkeKode6Eller7Kolonne = "er_ikke_kode6_eller_kode7"
     private val erIkkeSperretAnsattKolonne = "er_ikke_sperret_ansatt"
     private val erIkkeDødKolonne = "er_ikke_doed"
     private val erIkkeKvpKolonne = "er_ikke_kvp"
+    private val erArbeidssøkerKolonne = "er_arbeidssoker"
     private val erFerdigBeregnetKolonne = "er_ferdig_beregnet"
 
     fun lagre(evaluering: Evaluering, aktørId: String, fødselsnummer: String?) {
@@ -103,7 +103,6 @@ class Repository(private val dataSource: DataSource) {
         harJobbprofil = resultset.getBoolean(harJobbprofilkolonne).tilBooleanVerdi(), // TODO
         harSettHjemmel = resultset.getBoolean(harSettHjemmelKolonne).tilBooleanVerdi(), // TODO
         maaIkkeBehandleTidligereCv = resultset.getBoolean(måIkkeBehandleTidligereCvKolonne).tilBooleanVerdi(), // TODO
-        arenaIkkeFritattKandidatsøk = resultset.getBoolean(arenaIkkeFritattKandidatsøkKolonne).tilBooleanVerdi(), // TODO
         erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne).tilBooleanVerdi(), // TODO
         harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne).tilBooleanVerdi(), // TODO
         erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne).tilBooleanVerdi(), // TODO
@@ -111,8 +110,8 @@ class Repository(private val dataSource: DataSource) {
         erIkkeDoed = resultset.getBoolean(erIkkeDødKolonne).tilBooleanVerdi(), // TODO
         erIkkeKvp = resultset.getBoolean(erIkkeKvpKolonne).tilBooleanVerdi(), // TODO
         harIkkeAdressebeskyttelse = BooleanVerdi.missing, // TODO denne har vi ikke i databasen ennå
+        erArbeidssøker = resultset.getBoolean(erArbeidssøkerKolonne).tilBooleanVerdi(),
         komplettBeregningsgrunnlag = resultset.getBoolean(erFerdigBeregnetKolonne)
-
     )
 
     private fun kolonneString(kolonner: List<String>) =
@@ -129,14 +128,13 @@ class Repository(private val dataSource: DataSource) {
             harJobbprofilkolonne to harJobbprofil.default(true),     //TODO
             harSettHjemmelKolonne to harSettHjemmel.default(true),     //TODO
             måIkkeBehandleTidligereCvKolonne to maaIkkeBehandleTidligereCv.default(true),     //TODO
-            arenaIkkeFritattKandidatsøkKolonne to (arenaIkkeFritattKandidatsøk.default(true)
-                    && harIkkeAdressebeskyttelse.default(true)),     //TODO
             erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(true),     //TODO
             harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(true),     //TODO
             erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(true),     //TODO
             erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(true),     //TODO
             erIkkeDødKolonne to erIkkeDoed.default(true),     //TODO
             erIkkeKvpKolonne to erIkkeKvp.default(true),     //TODO
+            erArbeidssøkerKolonne to erArbeidssøker.default(false), //???
             erFerdigBeregnetKolonne to erFerdigBeregnet
         )
     }

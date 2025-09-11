@@ -20,11 +20,11 @@ spec:
     max: 1
   resources:
     limits:
-      cpu: 1000m
-      memory: 3072Mi
+      cpu: 500m
+      memory: 1024Mi
     requests:
-      cpu: 200m
-      memory: 1536Mi
+      cpu: 100m
+      memory: 512Mi
   secureLogs:
     enabled: true
   kafka:
@@ -38,3 +38,9 @@ spec:
       value: {{arbeidssoker_periode_kafka_group_id}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
@@ -30,17 +30,10 @@ class PubliserOpplysningerJobbTest {
         val meldingJson = inspektør.message(0)
 
         assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "id",
             "@event_name",
-            "periode_id",
-            "identitetsnummer",
-            "periode_startet",
-            "periode_avsluttet",
-            "periode_mottatt",
-            "opplysninger_mottatt",
-            "behandlet_dato",
-            "helsetilstand_hindrer_arbeid",
-            "andre_forhold_hindrer_arbeid",
+            "arbeidssokeropplysninger",
+            "fodselsnummer",
+            "aktørId",
             "@id",
             "@opprettet",
             "system_read_count",
@@ -54,10 +47,8 @@ class PubliserOpplysningerJobbTest {
             id=1,
             periodeId = UUID.randomUUID(),
             identitetsnummer = "01010012345",
+            aktørId = "1234566789",
             periodeStartet = ZonedDateTime.now().minusMonths(2),
-            periodeMottattDato = ZonedDateTime.now(),
-            opplysningerMottattDato = ZonedDateTime.now(),
-            helsetilstandHindrerArbeid = true,
-            andreForholdHindrerArbeid = false
+            periodeMottattDato = ZonedDateTime.now()
         )
 }

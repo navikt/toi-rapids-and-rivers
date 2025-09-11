@@ -1,6 +1,6 @@
 package no.nav.toi.stilling.publiser.arbeidsplassen
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -118,14 +118,14 @@ class RapidTest {
                         "deactivatedByExpiry": false,
                         "activationOnPublishingDate": true
                     },
-                    "annonseId": 123456789,
+                    "annonsenr": "R123456789",
                     "opprettet": "2023-01-01T12:00:00Z",
                     "opprettetAv": "pam-rekrutteringsbistand",
                     "sistEndret": "2023-01-02T12:00:00Z",
                     "sistEndretAv": "pam-rekrutteringsbistand",
                     "status": "ACTIVE"
                 },
-                "@event_name": "publiserTilArbeidsplassen"
+                "@event_name": "publiserEllerAvpubliserTilArbeidsplassen"
             }
             """.trimIndent()
 

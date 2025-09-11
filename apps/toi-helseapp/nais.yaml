@@ -25,6 +25,8 @@ spec:
     requests:
       cpu: 100m
       memory: 512Mi
+  strategy:
+    type: Recreate
   kafka:
      pool: nav-prod
   env:
@@ -32,3 +34,9 @@ spec:
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: toi-helseapp-rapidconsumer-1
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

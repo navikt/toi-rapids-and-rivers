@@ -53,3 +53,9 @@ spec:
       value: {{nom_api_scope}}
     - name: NOM_API_HOST
       value: {{nom_api_host}}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

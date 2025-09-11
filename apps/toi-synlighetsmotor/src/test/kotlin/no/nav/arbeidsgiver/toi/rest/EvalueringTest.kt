@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
@@ -47,7 +47,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -71,7 +71,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -89,12 +89,12 @@ class EvalueringTest {
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
 
-    @Test
+    @Test // TODO bruk noe annet enn frkas til å flippe status
     fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -102,10 +102,7 @@ class EvalueringTest {
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
-                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
-                    fritattKandidatsøk = true,
-                    fnr = "12312312312"
-                )
+                arbeidssøkeropplysninger = Testdata.arbeidssøkeropplysninger(aktiv = true),
             )
         )
 
@@ -121,7 +118,7 @@ class EvalueringTest {
         val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
-            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erArbeidssøker = true))
     }
 
     @Test
@@ -129,7 +126,7 @@ class EvalueringTest {
         val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
         val repository = Repository(TestDatabase().dataSource)
         val token = hentToken(mockOAuth2Server)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
 
         startApp(repository, rapid)
 
@@ -137,10 +134,7 @@ class EvalueringTest {
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
-                arenaFritattKandidatsøk = Testdata.arenaFritattKandidatsøk(
-                    fritattKandidatsøk = true,
-                    fnr = "12312312312"
-                )
+                arbeidssøkeropplysninger = Testdata.arbeidssøkeropplysninger(aktiv = true),
             )
         )
 
@@ -155,13 +149,13 @@ class EvalueringTest {
         val responseJson = response.body().asString("application/json; charset=UTF-8")
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
-            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erIkkeFritattKandidatsøk = false))
+            .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
 
     @Test
     fun `POST mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
         val token = hentToken(mockOAuth2Server)
 
         startApp(repository, rapid)
@@ -184,7 +178,7 @@ class EvalueringTest {
     @Test
     fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 men med evaluering der alle verdier er false for fødselsnummer som ikke finnes i databasen`() {
         val repository = Repository(TestDatabase().dataSource)
-        val rapid = TestRapid()
+        val rapid = no.nav.toi.TestRapid()
         val token = hentToken(mockOAuth2Server)
 
         startApp(repository, rapid)
@@ -205,7 +199,7 @@ class EvalueringTest {
 
     private fun startApp(
         repository: Repository,
-        rapid: TestRapid
+        rapid: no.nav.toi.TestRapid
     ) {
         no.nav.arbeidsgiver.toi.startApp(repository, javalin, rapid, mapOf(Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
             URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
@@ -232,11 +226,11 @@ private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjon
     harJobbprofil = true,
     harSettHjemmel = true,
     maaIkkeBehandleTidligereCv = true,
-    erIkkeFritattKandidatsøk = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
     erIkkeSperretAnsatt = true,
     erIkkeDoed = true,
+    erArbeidssøker = true,
     erFerdigBeregnet = true
 )
 
@@ -245,10 +239,10 @@ private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjo
     harJobbprofil = false,
     harSettHjemmel = false,
     maaIkkeBehandleTidligereCv = false,
-    erIkkeFritattKandidatsøk = false,
     erUnderOppfoelging = false,
     harRiktigFormidlingsgruppe = false,
     erIkkeSperretAnsatt = false,
     erIkkeDoed = false,
+    erArbeidssøker = false,
     erFerdigBeregnet = false
 )

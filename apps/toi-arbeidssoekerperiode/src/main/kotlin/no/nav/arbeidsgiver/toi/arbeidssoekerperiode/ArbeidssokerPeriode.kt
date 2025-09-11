@@ -3,8 +3,10 @@ package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
@@ -26,16 +28,19 @@ class ArbeidssokerPeriode(@JsonIgnore private val melding: Periode,
             .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
     }
 
-    @JsonProperty("@event_name")
-    private val event_name = "arbeidssokerperiode"
+    //@JsonProperty("@event_name")
+    //private val event_name = "arbeidssokerperiode"
 
     // ID er meldingsid. Denne id'en for å koble brukeren mot ArbeidssoekerOpplysninger
     // Kan også brukes til å koble sammen opplysninger om arbeidssøkeren som kommer inn på andre topic
-    val id: UUID = melding.id
+    @JsonProperty("periode_id")
+    val periodeId: UUID = melding.id
     // FNR/DNR - merk at hvis noen endrer dnr/fnr, så kommer det en ny melding på nytt nummer.
     val identitetsnummer: String = melding.identitetsnummer
     val startet: ZonedDateTime = melding.startet.tidspunkt.atZone(ZoneId.of("Europe/Oslo"))
     val avsluttet: ZonedDateTime? = melding.avsluttet?.tidspunkt?.atZone(ZoneId.of("Europe/Oslo"))
 
-    fun somJson() = JsonMessage(objectMapper.writeValueAsString(this), MessageProblems("{}"), metrics = meterRegistry).toJson()
+
+    fun somJsonNode() =
+        objectMapper.valueToTree<JsonNode>(this)
 }

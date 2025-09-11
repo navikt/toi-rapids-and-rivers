@@ -9,6 +9,7 @@ on:
     - apps/toi-helseapp/**
     - .github/workflows/deploy-toi-helseapp.yaml
     - buildSrc/**
+    - technical-libs/testrapid
 
 permissions:
   contents: read

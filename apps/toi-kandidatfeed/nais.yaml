@@ -29,6 +29,9 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
+  openSearch:
+    instance: kandidat
+    access: readwrite
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
@@ -36,3 +39,9 @@ spec:
       value: {{kafka_consumer_group_id}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true

@@ -1,0 +1,12 @@
+<configuration>
+    <!-- Log detailed information about the Logback initialization process at application startup. -->
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <appender name="appLog" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="appLog"/>
+    </root>
+</configuration>

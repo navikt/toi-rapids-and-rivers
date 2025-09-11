@@ -9,7 +9,7 @@ spec:
   groups:
     - name: toi-arbeidssoekerperiode
       rules:
-        - alert: toi-oppfolgingsperiode
+        - alert: toi-arbeidssoekerperiode
           expr: kube_deployment_status_replicas_available{deployment="toi-arbeidssoekerperiode"} == 0
           for: 2m
           annotations:

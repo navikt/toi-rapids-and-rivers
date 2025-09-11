@@ -6,13 +6,12 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.ktor.http.encodeURLPathPart
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.helse.rapids_rivers.*
 import java.util.*
 
 class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsConnection) :
@@ -23,8 +22,8 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
 
     init {
         val cacheHjelper = CacheHjelper()
-        kompetanseCache = cacheHjelper.lagCache { ontologiRelasjoner("/kompetanse/?kompetansenavn=$it") }
-        stillingstittelCache = cacheHjelper.lagCache { ontologiRelasjoner("/stilling/?stillingstittel=$it") }
+        kompetanseCache = cacheHjelper.lagCache { ontologiRelasjoner("/kompetanse/?kompetansenavn=${it.encodeURLPathPart()}") }
+        stillingstittelCache = cacheHjelper.lagCache { ontologiRelasjoner("/stilling/?stillingstittel=${it.encodeURLPathPart()}") }
         River(rapidsConnection).apply {
             precondition{
                 it.demandAtFørstkommendeUløsteBehovEr("ontologi")
@@ -57,13 +56,21 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
 
     private fun ontologiRelasjoner(path: String): OntologiRelasjoner {
         val uuid = UUID.randomUUID()
-        val (_, _, result) = Fuel.get("$ontologiUrl$path")
-            .header("Nav-CallId", uuid)
-            .responseObject<OntologiRelasjoner>()
+        fun logFeil(e: FuelError): Nothing {
+            log.error("Feil ved kall til ontologi. response=${e.response}", e)
+            throw e
+        }
+
+        val (_, _, result) = try {
+            Fuel.get("$ontologiUrl$path")
+                .header("Nav-CallId", uuid)
+                .responseObject<OntologiRelasjoner>()
+        } catch (e: FuelError) {
+            logFeil(e)
+        }
         val (ontologiRelasjoner: OntologiRelasjoner?, error: FuelError?) = result
         if (error != null) {
-            log.error("Feil ved kall til ontologi. response=${error.response}", error)
-            throw error
+            logFeil(error)
         }
         if (ontologiRelasjoner == null) {
             val msg = "Ontologirelasjoner er null. Burde ikke gå an"

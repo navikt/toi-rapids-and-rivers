@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi
 
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
-import no.nav.arbeidsgiver.toi.Testdata.Companion.arenaFritattKandidatsøk
+import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
@@ -20,6 +20,7 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -68,13 +69,13 @@ class SynlighetsmotorTest {
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(harSettHjemmel.default(false)).isEqualTo(true)
             assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
-            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
             assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
             assertThat(erIkkeDoed.default(false)).isEqualTo(true)
             assertThat(erIkkeKvp.default(false)).isEqualTo(true)
+            assertThat(erArbeidssøker.default(false)).isEqualTo(true)
             //assertThat(harIkkeAdressebeskyttelse).isEqualTo(true) TODO: denne har vi ikke i databasen ennå
             assertThat(erFerdigBeregnet).isEqualTo(true)
         } ?: Assertions.fail("Fant ikke evaluering i databasen")
@@ -98,7 +99,6 @@ class SynlighetsmotorTest {
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(harSettHjemmel.default(false)).isEqualTo(true)
             assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
-            assertThat(arenaIkkeFritattKandidatsøk.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -182,19 +182,27 @@ class SynlighetsmotorTest {
 
 
 
+    @Test
+    fun `om Person ikke er aktiv i arbeidssøkerregisteret skal synlighet være false`() = testProgramMedHendelse(
+        komplettHendelseSomFørerTilSynlighetTrue(arbeidssøkeropplysninger = arbeidssøkeropplysninger(aktiv = false)),
+        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
+    )
 
+    @Disabled("Testen kan slettes når vi er klare for å slette bruk av ARBS")
     @Test
     fun `formidlingsgruppe ARBS skal også anses som gyldig formidlingsgruppe`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "ARBS")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(true, true)
     )
 
+    @Disabled("Testen kan slettes når vi er klare for å slette bruk av ARBS")
     @Test
     fun `om Person har formidlingsgruppe IARBS skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IARBS")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 
+    @Disabled("Testen kan slettes når vi er klare for å slette bruk av ARBS")
     @Test
     fun `om Person har feil formidlingsgruppe skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(formidlingsgruppe = "IKKEARBSELLERIARBS")),
@@ -210,14 +218,6 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person har kode 7 skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(oppfølgingsinformasjon = oppfølgingsinformasjon(diskresjonskode = "7")),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
-    )
-
-    @Test
-    fun `om Person er fritatt fra kandidatsøk skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(arenaFritattKandidatsøk = arenaFritattKandidatsøk(
-            fritattKandidatsøk=true,
-            fnr="12312312312")),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
 

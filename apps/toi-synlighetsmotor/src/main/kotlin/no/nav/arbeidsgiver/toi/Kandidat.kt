@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -12,10 +13,10 @@ data class Kandidat(
     private val arbeidsmarkedCv: Synlighetsnode<CvMelding>,
     private val oppfølgingsinformasjon: Synlighetsnode<Oppfølgingsinformasjon>,
     private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
-    private val arenaFritattKandidatsøk: Synlighetsnode<ArenaFritattKandidatsøk>,
     private val hjemmel: Synlighetsnode<Hjemmel>,
     private val måBehandleTidligereCv: Synlighetsnode<MåBehandleTidligereCv>,
     private val kvp: Synlighetsnode<Kvp>,
+    private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     val adressebeskyttelse: Synlighetsnode<String>,
 ) {
     private val erAAP: BooleanVerdi
@@ -32,7 +33,6 @@ data class Kandidat(
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
         harSettHjemmel = hjemmel.hvisIkkeNullOg(::harSettHjemmel),
         maaIkkeBehandleTidligereCv = måBehandleTidligereCv.hvisNullEller(::maaIkkeBehandleTidligereCv),
-        arenaIkkeFritattKandidatsøk = arenaFritattKandidatsøk.hvisNullEller(::erIkkeArenaFritattKandidatsøk),
         erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
@@ -40,22 +40,27 @@ data class Kandidat(
         erIkkeDoed = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeDød),
         erIkkeKvp = !erKvp,
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
+        erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     )
 
+    private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
     private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
-    private fun erIkkeArenaFritattKandidatsøk(it: ArenaFritattKandidatsøk) = !it.erFritattKandidatsøk
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
     private fun erIkkeSperretAnsatt(it: Oppfølgingsinformasjon) = !it.sperretAnsatt
     private fun erIkkeDød(it: Oppfølgingsinformasjon) = !it.erDoed
     private fun harAktivCv(arbeidsmarkedCv: CvMelding) = arbeidsmarkedCv.meldingstype.let {
         listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
     }
-    private fun harJobbprofil(cvMelding: CvMelding) = cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
+
+    private fun harJobbprofil(cvMelding: CvMelding) =
+        cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
+
     private fun harSettHjemmel(hjemmel: Hjemmel) =
         hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL &&
                 hjemmel.opprettetDato != null &&
                 hjemmel.slettetDato == null
+
     private fun erUnderOppfølging(oppfølgingsperiode: Oppfølgingsperiode): Boolean {
         val now = Instant.now()
         val startDato = oppfølgingsperiode.startDato.toInstant()
@@ -71,16 +76,12 @@ data class Kandidat(
         sluttDatoOppfølging: Instant?
     ) {
         if (startDatoOppfølging.isAfter(now)) {
-            log("erUnderOppfølging").error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
+            log.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
             secureLog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
         if (sluttDatoOppfølging?.isAfter(now) == true) {
-            log("erUnderOppfølging").error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
+            log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
             secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
-        }
-        if(kandidat.arenaFritattKandidatsøk.hvisIkkeNullOg { it.erFritattKandidatsøk  }.default(false) && (!kandidat.erAAP).default(false)) {
-            log("erUnderOppfølging").info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: se securelog")
-            secureLog.info("kandidat er fritatt for kandidatsøk, men har ikke aap Aktørid: ${kandidat.aktørId}, fnr: ${kandidat.fødselsNummer()}, hovedmål: ${kandidat.oppfølgingsinformasjon} formidlingsgruppe: ${kandidat.oppfølgingsinformasjon}, rettighetsgruppe: ${kandidat.oppfølgingsinformasjon}")
         }
     }
 
@@ -88,11 +89,15 @@ data class Kandidat(
         (oppfølgingsinformasjon.diskresjonskode == null
                 || oppfølgingsinformasjon.diskresjonskode !in listOf("6", "7"))
 
-    private fun harIkkeAdressebeskyttelse(adressebeskyttelse: String) = adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT"
+    private fun harIkkeAdressebeskyttelse(adressebeskyttelse: String) =
+        adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT"
 
 
-    private fun beregningsgrunnlag() = listOf(arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        arenaFritattKandidatsøk, hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse).all { it.svarPåDetteFeltetLiggerPåHendelse() }
+    private fun beregningsgrunnlag() = listOf(
+        arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
+        hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse,
+        arbeidssøkeropplysninger
+    ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
 
     companion object {
@@ -108,21 +113,19 @@ data class Kandidat(
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
-                arenaFritattKandidatsøk = Synlighetsnode.fromJsonNode(json.path("arenaFritattKandidatsøk"), mapper),
                 hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
                 måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
-                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper)
+                adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
+                arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
             )
         }
     }
 
     fun fødselsNummer() =
-        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer ?:
-        arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer ?:
-        hjemmel.verdiEllerNull()?.fnr ?:
-        oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer ?:
-        arenaFritattKandidatsøk.verdiEllerNull()?.fnr
+        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
+            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer ?: hjemmel.verdiEllerNull()?.fnr
+            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer
 }
 
 data class CvMelding(
@@ -152,6 +155,16 @@ data class Oppfølgingsperiode(
     val sluttDato: ZonedDateTime?
 )
 
+data class Arbeidssøkeropplysninger(
+    @JsonProperty("periode_startet")
+    val periodeStartet: ZonedDateTime? = null,
+    @JsonProperty("periode_avsluttet")
+    val periodeAvsluttet: ZonedDateTime? = null
+) {
+    fun erArbeidssøker() =
+        periodeStartet != null && periodeAvsluttet == null
+}
+
 data class Oppfølgingsinformasjon(
     val erDoed: Boolean,
     val sperretAnsatt: Boolean,
@@ -170,11 +183,6 @@ typealias Diskresjonskode = String
 enum class Formidlingsgruppe {
     ARBS
 }
-
-data class ArenaFritattKandidatsøk(
-    val erFritattKandidatsøk: Boolean,
-    val fnr: String? // TODO: ta bort nullable når kilde hos oss er oppdatert og ferdigkjørt
-)
 
 data class Hjemmel(
     val ressurs: Samtykkeressurs?,

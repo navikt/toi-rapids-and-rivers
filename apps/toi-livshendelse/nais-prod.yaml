@@ -4,4 +4,8 @@ pdl_scope: api://prod-fss.pdl.pdl-api/.default
 pdl_host: pdl-api.prod-fss-pub.nais.io
 pdl_url: https://pdl-api.prod-fss-pub.nais.io/graphql
 pdl_kafka_group_id: toi-livshendelse-2
+min_replicas: 2
 max_replicas: 5
+adGruppeJobbsøkerrettet: 66b70a6a-3d05-47b3-8b5a-47c681dcd1d5
+adGruppeArbeidsgiverrettet: 46c8e3b2-0469-4740-983f-d8cd2b6e4fee
+adGruppeUtvikler: 41080368-439f-4128-858a-afbef876431e
