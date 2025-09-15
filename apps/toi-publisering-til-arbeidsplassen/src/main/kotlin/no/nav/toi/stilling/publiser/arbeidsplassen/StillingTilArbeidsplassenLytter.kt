@@ -32,7 +32,7 @@ class StillingTilArbeidsplassenLytter(
         val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
         log.info("Mottok stilling med stillingsId ${stilling.stillingsId} status: ${stilling.status}")
         val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(stilling)
-        if (stilling.status.uppercase() == "AKTIV") {
+        if (stilling.status.uppercase() == "ACTIVE") {
             arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
         } else {
             arbeidsplassenRestKlient.avpubliserStilling(arbeidsplassenStilling)
