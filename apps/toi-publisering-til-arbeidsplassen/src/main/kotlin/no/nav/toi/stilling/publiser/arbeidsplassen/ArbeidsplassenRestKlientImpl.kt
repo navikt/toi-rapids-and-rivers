@@ -10,6 +10,7 @@ import java.time.Duration
 
 interface ArbeidsplassenRestKlient {
     fun publiserStilling(stilling: ArbeidsplassenStilling)
+    fun avpubliserStilling(stilling: ArbeidsplassenStilling)
 }
 
 class ArbeidsplassenRestKlientImpl(
@@ -54,5 +55,29 @@ class ArbeidsplassenRestKlientImpl(
             error(feilmeldingVedPublisering)
         }
         log.info("Publiserte stilling til Arbeidsplassen OK: $arbeidsplassenResultat")
+    }
+
+    override fun avpubliserStilling(stilling: ArbeidsplassenStilling) {
+        val url = URI.create("$baseUrl/stillingsimport/api/v1/transfers/$PROVIDER_ID/${stilling.reference}")
+        log.info("Avpubliserer stilling url: $url")
+        val request = HttpRequest.newBuilder()
+            .uri(url)
+            .header("Accept", "application/x-json-stream")
+            .header("Cache-Control", "no-cache")
+            .header("Content-type", "application/x-json-stream")
+            .header("Authorization", "Bearer $autorizationToken")
+            .DELETE()
+            .timeout(Duration.ofSeconds(30))
+            .build()
+
+        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        val statusCode = response.statusCode()
+        if (statusCode != 200) {
+            val feilmelding = "Klarte ikke å avpublisere stilling til Arbeidsplassen $statusCode"
+            log.error(feilmelding)
+            error(feilmelding)
+        }
+
+        log.info("Avpubliserte stilling til Arbeidsplassen OK")
     }
 }

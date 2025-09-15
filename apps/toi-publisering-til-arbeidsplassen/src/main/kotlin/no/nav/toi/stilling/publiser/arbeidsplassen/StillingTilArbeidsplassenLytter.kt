@@ -30,8 +30,12 @@ class StillingTilArbeidsplassenLytter(
     ) {
         log.info("Mottok stilling ${packet.toJson()}")
         val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
-        log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
+        log.info("Mottok stilling med stillingsId ${stilling.stillingsId} status: ${stilling.status}")
         val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(stilling)
-        arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
+        if (stilling.status.uppercase() == "AKTIV") {
+            arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
+        } else {
+            arbeidsplassenRestKlient.avpubliserStilling(arbeidsplassenStilling)
+        }
     }
 }
