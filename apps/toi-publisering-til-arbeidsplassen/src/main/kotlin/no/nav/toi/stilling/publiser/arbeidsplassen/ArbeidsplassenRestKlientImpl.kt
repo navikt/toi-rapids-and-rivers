@@ -72,12 +72,12 @@ class ArbeidsplassenRestKlientImpl(
 
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         val statusCode = response.statusCode()
-        if (statusCode != 200) {
+        if (statusCode != 200 && statusCode != 404) {
             val feilmelding = "Klarte ikke å avpublisere stilling til Arbeidsplassen $statusCode"
             log.error(feilmelding)
             error(feilmelding)
         }
 
-        log.info("Avpubliserte stilling til Arbeidsplassen OK")
+        log.info("Avpubliserte stilling til Arbeidsplassen OK - statuskode $statusCode")
     }
 }
