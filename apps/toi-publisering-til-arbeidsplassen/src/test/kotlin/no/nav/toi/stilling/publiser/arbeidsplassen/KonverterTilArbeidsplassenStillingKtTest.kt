@@ -59,6 +59,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
                      "workday" to "[\"Ukedager\"]",
                      "positioncount" to "1",
                      "adtext" to "<p>Jobb som utvikler</p>",
+                     "employerdescription" to "<p>Om arbeidsgiver</p>",
                  ),
              ),
              annonsenr = "R123",
@@ -96,5 +97,6 @@ class KonverterTilArbeidsplassenStillingKtTest {
         assertEquals("[\"Ukedager\"]", arbeidsplassenStilling.properties[PropertyName.workday])
         assertEquals("Fast", arbeidsplassenStilling.properties[PropertyName.engagementtype])
         assertEquals("08.04.2025", arbeidsplassenStilling.properties[PropertyName.starttime])
+        assertEquals("<p>Om arbeidsgiver</p>", arbeidsplassenStilling.properties[PropertyName.employerdescription])
     }
 }
