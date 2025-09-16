@@ -28,7 +28,15 @@ class RapidTest {
     fun `Melding blir korrekt parset`() {
         jacksonMapper.readValue(rapidHendelse, RapidHendelse::class.java).also {
             assertEquals("123e4567-e89b-12d3-a456-426614174000", it.stillingsId)
-            assertEquals("2025-04-23T00:00Z", it.direktemeldtStilling.utløpsdato.toString())
+            assertEquals("2025-10-15T00:00:00+02:00", it.direktemeldtStilling.utløpsdato)
+        }
+    }
+
+    @Test
+    fun `Melding blir korrekt parset med konverterTilArbeidsplassenStilling`() {
+        konverterTilArbeidsplassenStilling(jacksonMapper.readValue(rapidHendelse, RapidHendelse::class.java).direktemeldtStilling).also {
+            assertEquals("123e4567-e89b-12d3-a456-426614174000", it.reference)
+            assertEquals("2025-04-23T00:00:00", it.expires)
         }
     }
 
@@ -136,7 +144,7 @@ class RapidTest {
                         "activationOnPublishingDate": true
                     },
                     "annonsenr": "R123456789",
-                    "utløpsdato": "2025-04-23T00:00:00Z",
+                    "utløpsdato": "2025-10-15T00:00:00+02:00",
                     "opprettet": "2023-01-01T12:00:00Z",
                     "opprettetAv": "pam-rekrutteringsbistand",
                     "sistEndret": "2023-01-02T12:00:00Z",

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import java.time.ZonedDateTime
 import java.util.*
 
 data class RapidHendelse(
@@ -24,15 +23,15 @@ data class RapidHendelse(
 data class DirektemeldtStilling(
     val stillingsId: UUID,
     val innhold: DirektemeldtStillingInnhold,
-    val opprettet: ZonedDateTime,
+    val opprettet: String,
     val opprettetAv: String,
-    val sistEndret: ZonedDateTime,
+    val sistEndret: String,
     val sistEndretAv: String,
     val status: String,
     val annonsenr: String,
     val versjon: String? = null,
-    val utløpsdato: ZonedDateTime?,
-    val publisert: ZonedDateTime?,
+    val utløpsdato: String?,
+    val publisert: String?,
     val publisertAvAdmin: String? = null,
     val adminStatus: String? = null,
 )

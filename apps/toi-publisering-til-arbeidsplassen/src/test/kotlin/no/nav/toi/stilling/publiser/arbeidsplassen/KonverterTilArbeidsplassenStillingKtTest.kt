@@ -62,13 +62,13 @@ class KonverterTilArbeidsplassenStillingKtTest {
                  ),
              ),
              annonsenr = "R123",
-             opprettet = ZonedDateTime.of(LocalDateTime.of(2025, 1, 25, 14, 0), ZoneId.of("UTC")),
+             opprettet = ZonedDateTime.of(LocalDateTime.of(2025, 1, 25, 14, 0), ZoneId.of("UTC")).toIsoDateTimeString(),
              opprettetAv = "pam-rekrutteringsbistand",
-             sistEndret = ZonedDateTime.of(LocalDateTime.of(2025, 2, 25, 14, 0), ZoneId.of("UTC")),
+             sistEndret = ZonedDateTime.of(LocalDateTime.of(2025, 2, 25, 14, 0), ZoneId.of("UTC")).toIsoDateTimeString(),
              sistEndretAv = "pam-rekrutteringsbistand",
              status = "ACTIVE",
-             publisert = ZonedDateTime.of(LocalDateTime.of(2025, 3, 25, 14, 0), ZoneId.of("UTC")),
-             utløpsdato = ZonedDateTime.of(LocalDateTime.of(2025, 4, 25, 14, 0), ZoneId.of("UTC")),
+             publisert = ZonedDateTime.of(LocalDateTime.of(2025, 3, 25, 14, 0), ZoneId.of("UTC")).toIsoDateTimeString(),
+             utløpsdato = ZonedDateTime.of(LocalDateTime.of(2025, 4, 25, 14, 0), ZoneId.of("UTC")).toIsoDateTimeString(),
         )
 
         val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(direktemeldtStilling)

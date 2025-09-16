@@ -20,8 +20,8 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
         positions = properties["positioncount"]?.toInt() ?: 1,
         title = innhold.title,
         adText = properties["adtext"] ?: "",
-        published = direktemeldtStilling.publisert?.toIsoDateTimeString() ?: LocalDateTime.now().toIsoDateTimeString(),
-        expires = direktemeldtStilling.utløpsdato?.toIsoDateTimeString(),
+        published = fjernTidssoneOmAngitt(direktemeldtStilling.publisert) ?: LocalDateTime.now().toIsoDateTimeString(),
+        expires = fjernTidssoneOmAngitt(direktemeldtStilling.utløpsdato),
         privacy = PrivacyType.fromString(innhold.privacy ?: ""),
         contactList = innhold.contactList.filter { it.name != null }.map {
             ContactArbeidsplassen(
@@ -66,4 +66,13 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
         )
     )
     return arbeidsplassenStilling
+}
+
+/** Datoene vi får inn er på norsk tid når man tar bort tidssonen. Import api'et støtter ikke tidssone */
+fun fjernTidssoneOmAngitt(dato: String?): String? {
+    if (dato == null) return null
+    return dato
+        .replace("+00:00", "")
+        .replace("+01:00", "")
+        .replace("+02:00", "")
 }
