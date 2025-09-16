@@ -21,7 +21,6 @@ import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsOmfangJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSertifikat
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSprak
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsUtdanning
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsVerv
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
@@ -175,17 +174,17 @@ object EsCvObjectMother {
             kompetanse1, kompetanse2, kompetanse3, kompetanse4
         )
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -193,22 +192,22 @@ object EsCvObjectMother {
 
         val sertifikatListe= listOf(sertifikat1, sertifikat2, sertifikat3)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -229,15 +228,6 @@ object EsCvObjectMother {
 
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe= listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Oslo", "NO03")
 
@@ -340,7 +330,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             omfangJobbonskerList,
@@ -377,38 +366,68 @@ object EsCvObjectMother {
         alternativgrad: String,
     ) = EsUtdanning(YearMonth.from(fraDato), YearMonth.from(tilDato), utdannelsessted, nusKode, alternativgrad)
 
-    private fun lagEsUtdanning(
-        fraDato: YearMonth,
-        tilDato: YearMonth,
-        utdannelsessted: String,
-        nusKode: String,
-        nuskodeGrad: String,
-        alternativgrad: String,
-        yrkestatus: UtdannelseYrkestatus,
-        beskrivelse: String
-    ) = EsUtdanning(YearMonth.from(fraDato), YearMonth.from(tilDato), utdannelsessted, nusKode, alternativgrad, yrkestatus, beskrivelse)
+    fun lagEsAnnenErfaring(
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime,
+        beskrivelse: String,
+        rolle: String? = null
+    ) = EsAnnenErfaring(YearMonth.from(fraDato), YearMonth.from(tilDato), beskrivelse, rolle)
 
-    private fun esKurs1() = EsKurs(
+    fun lagEsSertifikat(
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime?,
+        konseptId: String,
+        tittel: String,
+        beskrivelse: String?,
+        utsteder: String
+    ) = EsSertifikat(LocalDate.from(fraDato), tilDato?.let(LocalDate::from), konseptId, tittel, beskrivelse, utsteder)
+
+    fun lagEsForerkort(
+        fraDato: OffsetDateTime,
+        tilDato: OffsetDateTime?,
+        konseptId: String,
+        tittel: String,
+        beskrivelse: String?,
+        utsteder: String
+    ) = EsForerkort(LocalDate.from(fraDato), tilDato?.let(LocalDate::from), konseptId, tittel, beskrivelse, utsteder)
+
+    fun lagEsKurs(
+        tittel: String,
+        utsteder: String,
+        gyldighetsperiodeEnhet: String?,
+        gyldighetsperiodeLengde: Int?,
+        gjennomfoertDato: OffsetDateTime
+    ) = EsKurs(tittel, utsteder, gyldighetsperiodeEnhet, gyldighetsperiodeLengde, LocalDate.from(gjennomfoertDato))
+
+    fun lagEsGodkjenning(
+        tittel: String,
+        utsteder: String,
+        gjennomfoert: OffsetDateTime,
+        utloeper: OffsetDateTime?,
+        konseptId: String
+    ) = EsGodkjenning(tittel, utsteder, LocalDate.from(gjennomfoert), LocalDate.from(utloeper), konseptId)
+
+    private fun esKurs1() = lagEsKurs(
         "Akseloppretting", "Easy-Laser", null,
         null, fraIsoDato("2012-12-01")
     )
 
-    private fun esKurs2() = EsKurs(
+    private fun esKurs2() = lagEsKurs(
         "Varme arbeider Sertifikat",
         "Norsk brannvernforening", "ÅR", 5, fraIsoDato("2015-06-01")
     )
 
-    private fun esKurs3() = EsKurs(
+    private fun esKurs3() = lagEsKurs(
         "Flensarbeid for Norsk Olje og Gass",
         "Torqlite Europa a/s", "ÅR", 4, fraIsoDato("2016-02-01")
     )
 
-    private fun esKurs4() = EsKurs(
+    private fun esKurs4() = lagEsKurs(
         "Varme arbeider EsSertifikat",
         "Norsk brannvernforening", "ÅR", 5, fraIsoDato("2015-06-01")
     )
 
-    private fun esKurs5() = EsKurs("Spring Boot", "Spring-folkene", "ÅR", 5, fraIsoDato("2015-06-01"))
+    private fun esKurs5() = lagEsKurs("Spring Boot", "Spring-folkene", "ÅR", 5, fraIsoDato("2015-06-01"))
 
 
     fun giveMeEsCv2(): EsCv {
@@ -540,17 +559,17 @@ object EsCvObjectMother {
 
         val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val EsSertifikat1 = EsSertifikat(
+        val EsSertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2 = EsSertifikat(
+        val EsSertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3 = EsSertifikat(
+        val EsSertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -558,22 +577,22 @@ object EsCvObjectMother {
 
         val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -592,15 +611,6 @@ object EsCvObjectMother {
 
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "EsVerv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
 
@@ -687,7 +697,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -825,21 +834,21 @@ object EsCvObjectMother {
 
         val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val EsSertifikat1 = EsSertifikat(
+        val EsSertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Truckførerbevis", "Truckførerbevis", ""
         )
-        val EsSertifikat2 = EsSertifikat(
+        val EsSertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3 = EsSertifikat(
+        val EsSertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat4 = EsSertifikat(
+        val EsSertifikat4 = lagEsSertifikat(
             fraIsoDato("1999-01-01"), null, "L2.7000",
             "Truckførerbevis T1 Lavtløftende plukktruck, palletruck m/perm. førerplass",
             "Truckførerbevis T1 Lavtløftende plukktruck, palletruck m/perm. førerplass", ""
@@ -847,22 +856,22 @@ object EsCvObjectMother {
 
         val esSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3, EsSertifikat4)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "T - Traktor", null, ""
         )
@@ -882,16 +891,6 @@ object EsCvObjectMother {
 
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "EsVerv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hedmark", "NO04")
 
@@ -978,7 +977,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -1130,17 +1128,17 @@ object EsCvObjectMother {
 
         val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val EsSertifikat1 = EsSertifikat(
+        val EsSertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2 = EsSertifikat(
+        val EsSertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3 = EsSertifikat(
+        val EsSertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -1148,12 +1146,12 @@ object EsCvObjectMother {
 
         val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
 
-        val forerkort5 = EsForerkort(
+        val forerkort5 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "S - Snøscooter", null, ""
         )
@@ -1171,16 +1169,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "EsVerv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Oslo", "NO03.0301")
 
@@ -1272,7 +1260,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -1405,17 +1392,17 @@ object EsCvObjectMother {
 
         val kompetanseListe = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val EsSertifikat1 = EsSertifikat(
+        val EsSertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2 = EsSertifikat(
+        val EsSertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3 = EsSertifikat(
+        val EsSertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -1423,12 +1410,12 @@ object EsCvObjectMother {
 
         val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -1447,15 +1434,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "EsVerv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Harstad", "NO19.1903")
 
@@ -1551,7 +1529,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -1662,17 +1639,17 @@ object EsCvObjectMother {
 
         val kompetanseListe = emptyList<EsKompetanse>()
 
-        val EsSertifikat1 = EsSertifikat(
+        val EsSertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat2 = EsSertifikat(
+        val EsSertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val EsSertifikat3 = EsSertifikat(
+        val EsSertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -1680,7 +1657,7 @@ object EsCvObjectMother {
 
         val EsSertifikatListe = listOf(EsSertifikat1, EsSertifikat2, EsSertifikat3)
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
@@ -1699,15 +1676,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "EsVerv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Harstad", "NO19.1903")
 
@@ -1794,7 +1762,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -1934,17 +1901,17 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -1952,12 +1919,12 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
@@ -1979,15 +1946,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "Verv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -2059,7 +2017,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -2196,27 +2153,27 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4 = EsSertifikat(
+        val sertifikat4 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5 = EsSertifikat(
+        val sertifikat5 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -2224,7 +2181,7 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
@@ -2247,16 +2204,6 @@ object EsCvObjectMother {
 
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv =
-            EsVerv(
-                fraIsoDato("2000-01-15"),
-                fraIsoDato("2001-01-15"),
-                "Verv organisasjon",
-                "verv tittel"
-            )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -2327,7 +2274,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -2463,27 +2409,27 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4 = EsSertifikat(
+        val sertifikat4 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5 = EsSertifikat(
+        val sertifikat5 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -2491,22 +2437,22 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -2528,15 +2474,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "Verv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -2607,7 +2544,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -2743,27 +2679,27 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4 = EsSertifikat(
+        val sertifikat4 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5 = EsSertifikat(
+        val sertifikat5 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -2771,22 +2707,22 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -2808,15 +2744,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "Verv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -2888,7 +2815,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -3024,27 +2950,27 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4 = EsSertifikat(
+        val sertifikat4 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5 = EsSertifikat(
+        val sertifikat5 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -3052,22 +2978,22 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -3089,15 +3015,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "Verv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -3168,7 +3085,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -3304,27 +3220,27 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4 = EsSertifikat(
+        val sertifikat4 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5 = EsSertifikat(
+        val sertifikat5 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -3332,22 +3248,22 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -3369,15 +3285,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "Verv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -3448,7 +3355,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -3584,27 +3490,27 @@ object EsCvObjectMother {
 
         val kompetanseList = listOf(kompetanse1, kompetanse2, kompetanse3, kompetanse4)
 
-        val sertifikat1 = EsSertifikat(
+        val sertifikat1 = lagEsSertifikat(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val sertifikat2 = EsSertifikat(
+        val sertifikat2 = lagEsSertifikat(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val sertifikat3 = EsSertifikat(
+        val sertifikat3 = lagEsSertifikat(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 12 tonn", ""
         )
-        val sertifikat4 = EsSertifikat(
+        val sertifikat4 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
         )
-        val sertifikat5 = EsSertifikat(
+        val sertifikat5 = lagEsSertifikat(
             fraIsoDato("1995-01-01"), null, "A1.6820",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn",
             "Yrkesbevis anleggsmaskinførere: Arb.klar maskin over 6 tonn", ""
@@ -3612,22 +3518,22 @@ object EsCvObjectMother {
 
         val sertifikatListe = listOf(sertifikat1, sertifikat2, sertifikat3, sertifikat4, sertifikat5)
 
-        val forerkort1 = EsForerkort(
+        val forerkort1 = lagEsForerkort(
             fraIsoDato("1994-08-01"), null, "V1.6050",
             "A - Tung motorsykkel", null, ""
         )
 
-        val forerkort2 = EsForerkort(
+        val forerkort2 = lagEsForerkort(
             fraIsoDato("1991-01-01"), null, "V1.6070",
             "BE - Personbil med tilhenger", null, ""
         )
 
-        val forerkort3 = EsForerkort(
+        val forerkort3 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6110",
             "CE - Lastebil med tilhenger", null, ""
         )
 
-        val forerkort4 = EsForerkort(
+        val forerkort4 = lagEsForerkort(
             fraIsoDato("1996-02-01"), fraIsoDato("2020-12-01"), "V1.6145",
             "DE - Buss med tilhenger", null, ""
         )
@@ -3649,15 +3555,6 @@ object EsCvObjectMother {
         val kurs3 = esKurs3()
 
         val kursListe = listOf(kurs1, kurs2, kurs3)
-
-        val verv = EsVerv(
-            fraIsoDato("2000-01-15"),
-            fraIsoDato("2001-01-15"),
-            "Verv organisasjon",
-            "verv tittel"
-        )
-
-        val vervListe = listOf(verv)
 
         val geografiJobbonsker = EsGeografiJobbonsker("Hamar", "NO04.0403")
 
@@ -3728,7 +3625,6 @@ object EsCvObjectMother {
             forerkortListe,
             sprakListe,
             kursListe,
-            vervListe,
             geografiJobbonskerListe,
             yrkeJobbonskerListe,
             emptyList(),
@@ -3766,19 +3662,19 @@ object EsCvObjectMother {
     )
 
     fun giveMeFørerkort() =
-        EsForerkort(fraIsoDato("1994-08-01"), null, "V1.6050", "A - Tung motorsykkel", null, "")
+        lagEsForerkort(fraIsoDato("1994-08-01"), null, "V1.6050", "A - Tung motorsykkel", null, "")
 
     fun giveMeKurs() = esKurs1()
 
     fun giveMeFagdokumentasjon() = EsFagdokumentasjon("anyType", "anyTittel", "anyBeskrivelse")
 
-    fun giveMeAnnenErfaring() = EsAnnenErfaring(
+    fun giveMeAnnenErfaring() = lagEsAnnenErfaring(
         fraIsoDato("2005-01-01"),
         fraIsoDato("2010-12-31"),
         "anyBeskrivelse"
     )
 
-    fun giveMeGodkjenning() = EsGodkjenning(
+    fun giveMeGodkjenning() = lagEsGodkjenning(
         "anyTittel",
         "anyUtsteder",
         fraIsoDato("2020-06-01"),

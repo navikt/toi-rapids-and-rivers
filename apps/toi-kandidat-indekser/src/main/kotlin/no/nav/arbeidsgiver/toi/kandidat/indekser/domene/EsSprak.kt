@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.JsonNode
 import java.time.OffsetDateTime
 import java.util.Objects
 
@@ -59,4 +60,14 @@ class EsSprak(
             + ", sprakKodeTekst='" + sprakKodeTekst + '\'' + ", alternativTekst='" + alternativTekst
             + '\'' + ", beskrivelse='" + beskrivelse + '\''
             + ", ferdighetMuntlig='" + ferdighetMuntlig + '\'' + ", ferdighetSkriftlig='" + ferdighetSkriftlig + '\'' + '}')
+
+    companion object {
+        fun fraMelding(cvNode: JsonNode) = cvNode["spraakferdigheter"].map { spraakferdigheter ->
+            EsSprak(
+                spraaknavn = spraakferdigheter["spraaknavn"].asText(),
+                ferdighetMuntlig = spraakferdigheter["ferdighetMuntlig"]?.asText(null),
+                ferdighetSkriftlig = spraakferdigheter["ferdighetSkriftlig"]?.asText(null)
+            )
+        }
+    }
 }

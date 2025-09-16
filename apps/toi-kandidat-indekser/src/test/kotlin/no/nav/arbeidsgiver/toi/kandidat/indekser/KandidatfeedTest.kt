@@ -20,7 +20,6 @@ import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsPerioderMedInaktivitet
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSertifikat
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSprak
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsUtdanning
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsVerv
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
@@ -113,19 +112,16 @@ class KandidatfeedTest {
     @Test
     fun `Meldinger der synlighet er ferdig beregnet og har dekte behov skal kandidat legges til i ES`() {
         assertIngenIIndekser()
-        val tomJson = """{}"""
         val expectedKandidatnr = "CG133310"
         val meldingSynlig = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
-            hullICv = tomJson,
             ontologi = ontologiDel(),
             kandidatnr = expectedKandidatnr
         )
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
-            hullICv = tomJson,
             ontologi = ontologiDel(),
             kandidatnr = expectedKandidatnr
         )
@@ -202,7 +198,7 @@ class KandidatfeedTest {
     @Test
     fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
         val rapidMelding =
-            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = ontologiDel())
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", ontologi = ontologiDel())
 
         val testrapid = TestRapid()
 
@@ -263,8 +259,8 @@ class KandidatfeedTest {
         val expectedVeilederEpost = "veilder@nav.no"
         val expectedFylkeNavn = "Viken"
         val expectedKommuneNavn = "Asker"
-        val expectedUtdanningFraDato = LocalDate.of(2010, 1, 1)
-        val expectedUtdanningTilDato = LocalDate.of(2014, 1, 1)
+        val expectedUtdanningFraDato = YearMonth.of(2010, 1)
+        val expectedUtdanningTilDato = YearMonth.of(2014, 1)
         val expectedUtdanningUtdannelsessted = "Universitetet i Oslo"
         val expectedUtdanningNusKode = "123456"
         val expectedUtdanningAlternativGrad = "Master"
@@ -273,8 +269,8 @@ class KandidatfeedTest {
         val expectedFagdokumentasjonType = "VITNEMAL"
         val expectedFagdokumentasjonTittel = "Tittel på fagdokumentasjon"
         val expectedFagdokumentasjonBeskrivelse = "Dette er en fagdokumentasjon"
-        val expectedYrkeserfaringFraDato = LocalDate.of(2015, 1, 1)
-        val expectedYrkeserfaringTilDato = LocalDate.of(2020, 1, 1)
+        val expectedYrkeserfaringFraDato = YearMonth.of(2015, 1)
+        val expectedYrkeserfaringTilDato = YearMonth.of(2020, 1)
         val expectedYrkeserfaringArbeidsgiver = "Arbeidsgiver AS"
         val expectedYrkeserfaringStyrkKode = "1111"
         val expectedYrkeserfaringStillingstittel = "Javautvikler"
@@ -287,8 +283,8 @@ class KandidatfeedTest {
         val expectedYrkeserfaringSted = "Oslo"
         val expectedYrkeserfaringBeskrivelse = "Dette er en yrkeserfaring"
         val expectedKompetanser = listOf("Utvikling", "Kaffedrikking")
-        val expectedAnnenErfaringFraDato = LocalDate.of(2020, 1, 1)
-        val expectedAnnenErfaringTilDato = LocalDate.of(2021, 1, 1)
+        val expectedAnnenErfaringFraDato = YearMonth.of(2020, 1)
+        val expectedAnnenErfaringTilDato = YearMonth.of(2021, 1)
         val expectedAnnenErfaringBeskrivelse = "Dette er en annen erfaring"
         val expectedAnnenErfaringRolle = "Rolle"
         val expectedSertifikatTittel = "Organisasjon"
@@ -340,7 +336,6 @@ class KandidatfeedTest {
 
         val melding = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            hullICv = tomJson,
             ontologi = ontologiDel(
                 stillingstittel = mapOf(
                     expectedYrkeserfaringStillingstittel to (listOf(expectedYrkeserfaringStillingstitlerForTypeahead) to listOf(expectedYrkeserfaringSokeTitler))

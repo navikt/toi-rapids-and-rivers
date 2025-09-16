@@ -1,13 +1,16 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
+import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.YearMonth
 import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsAnnenErfaring(
-    private val fraDato: OffsetDateTime,
-    private val tilDato: OffsetDateTime,
+    private val fraDato: YearMonth,
+    private val tilDato: YearMonth,
     private val beskrivelse: String,
     private val rolle: String? = null
 ) {
@@ -18,4 +21,15 @@ class EsAnnenErfaring(
 
     override fun toString() = ("EsAnnenErfaring{" + "fraDato=" + fraDato + ", tilDato=" + tilDato + ", beskrivelse='"
             + beskrivelse + '\'' + ", rolle='" + rolle + '\'' + '}')
+
+    companion object {
+        fun fraMelding(cvNode: JsonNode) = cvNode["annenErfaring"].map { annenErfaring ->
+            EsAnnenErfaring(
+                fraDato = annenErfaring["fraTidspunkt"].asText().let(YearMonth::parse),
+                tilDato = annenErfaring["tilTidspunkt"].asText().let(YearMonth::parse),
+                beskrivelse = annenErfaring["beskrivelse"].asText(),
+                rolle = annenErfaring["rolle"].asText()
+            )
+        }
+    }
 }

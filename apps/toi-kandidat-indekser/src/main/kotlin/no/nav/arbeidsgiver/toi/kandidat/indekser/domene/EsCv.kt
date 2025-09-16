@@ -87,7 +87,6 @@ class EsCv(
     private val forerkort: List<EsForerkort>,
     private val sprak: List<EsSprak>,
     private val kursObj: List<EsKurs>,
-    private val vervObj: List<EsVerv>,
     private val geografiJobbonsker: List<EsGeografiJobbonsker>,
     private val yrkeJobbonskerObj: List<EsYrkeJobbonsker>,
     private val omfangJobbonskerObj: List<EsOmfangJobbonsker>,
@@ -164,7 +163,6 @@ class EsCv(
             .add("forerkort=" + forerkort)
             .add("sprak=" + sprak)
             .add("kursObj=" + kursObj)
-            .add("vervObj=" + vervObj)
             .add("geografiJobbonsker=" + geografiJobbonsker)
             .add("yrkeJobbonskerObj=" + yrkeJobbonskerObj)
             .add("omfangJobbonskerObj=" + omfangJobbonskerObj)
@@ -254,23 +252,24 @@ class EsCv(
                 utdanning = EsUtdanning.fraMelding(cvNode),
                 fagdokumentasjon = EsFagdokumentasjon.fraMelding(cvNode),
                 yrkeserfaring = EsYrkeserfaring.fraMelding(packet, cvNode),
-                kompetanseObj = TODO(),
-                annenerfaringObj = TODO(),
-                sertifikatObj = TODO(),
-                forerkort = TODO(),
-                sprak = TODO(),
-                kursObj = TODO(),
-                vervObj = TODO(),
-                geografiJobbonsker = TODO(),
-                yrkeJobbonskerObj = TODO(),
-                omfangJobbonskerObj = TODO(),
-                ansettelsesformJobbonskerObj = TODO(),
-                arbeidstidsordningJobbonskerObj = TODO(),
-                arbeidsdagerJobbonskerObj = TODO(),
-                arbeidstidJobbonskerObj = TODO(),
-                godkjenninger = TODO(),
-                perioderMedInaktivitet = TODO()
+                kompetanseObj = EsKompetanse.fraMelding(jobbProfilNode, packet),
+                annenerfaringObj = EsAnnenErfaring.fraMelding(cvNode),
+                sertifikatObj = EsSertifikat.fraMelding(cvNode),
+                forerkort = EsForerkort.fraMelding(cvNode),
+                sprak = EsSprak.fraMelding(cvNode),
+                kursObj = EsKurs.fraMelding(cvNode),
+                geografiJobbonsker = EsGeografiJobbonsker.fraMelding(jobbProfilNode),
+                yrkeJobbonskerObj = EsYrkeJobbonsker.fraMelding(jobbProfilNode, packet),
+                omfangJobbonskerObj = EsOmfangJobbonsker.fraMelding(jobbProfilNode),
+                ansettelsesformJobbonskerObj = EsAnsettelsesformJobbonsker.fraMelding(jobbProfilNode),
+                arbeidstidsordningJobbonskerObj = EsArbeidstidsordningJobbonsker.fraMelding(jobbProfilNode),
+                arbeidsdagerJobbonskerObj = EsArbeidsdagerJobbonsker.fraMelding(jobbProfilNode),
+                arbeidstidJobbonskerObj = EsArbeidstidJobbonsker.fraMelding(jobbProfilNode),
+                godkjenninger = EsGodkjenning.fraMelding(cvNode),
+                perioderMedInaktivitet = EsPerioderMedInaktivitet.fraMelding(packet)
             )
         }
     }
 }
+
+fun JsonNode.yyyyMMddTilLocalDate() = LocalDate.of(this[0].asInt(), this[1].asInt(), this[2].asInt())

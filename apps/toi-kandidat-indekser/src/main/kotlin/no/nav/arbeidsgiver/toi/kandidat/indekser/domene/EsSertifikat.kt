@@ -2,20 +2,22 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.JsonNode
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsSertifikat(
-    private val fraDato: OffsetDateTime,
-    private val tilDato: OffsetDateTime?,
+    private val fraDato: LocalDate,
+    private val tilDato: LocalDate?,
     private val sertifikatKode: String?,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val sertifikatKodeNavn: String,
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val sertifikatKodeNavn: String?,
     private val alternativtNavn: String?,
     private val utsteder: String
 ): EnAvFlereSamledeKompetaser {
 
-    constructor(fraDato: OffsetDateTime, tilDato: OffsetDateTime, tittel: String, utsteder: String) : this(
+    constructor(fraDato: LocalDate, tilDato: LocalDate?, tittel: String, utsteder: String) : this(
         fraDato,
         tilDato,
         null,
@@ -39,5 +41,18 @@ class EsSertifikat(
             + sertifikatKode + '\'' + ", sertifikatKodeNavn='" + sertifikatKodeNavn + '\''
             + ", alternativtNavn='" + alternativtNavn + '\'' + ", utsteder='" + utsteder + '\'' + '}')
 
-    override fun tilSamletKompetanse() = listOf(EsSamletKompetanse(sertifikatKodeNavn))
+    override fun tilSamletKompetanse() = sertifikatKodeNavn?.let { listOf(EsSamletKompetanse(it)) } ?: emptyList()
+
+    companion object {
+        fun fraMelding(cvNode: JsonNode) = cvNode["sertifikat"].map { sertifikatNode ->
+            EsSertifikat(
+                fraDato = sertifikatNode["gjennomfoert"].yyyyMMddTilLocalDate(),
+                tilDato = sertifikatNode["utloeper"]?.let(JsonNode::yyyyMMddTilLocalDate),
+                sertifikatKode = sertifikatNode["konseptId"].asText(null),
+                sertifikatKodeNavn = sertifikatNode["sertifikatnavn"].asText(null),
+                alternativtNavn = sertifikatNode["sertifikatnavnFritekst"].asText(null),
+                utsteder = sertifikatNode["utsteder"].asText(),
+            )
+        }
+    }
 }

@@ -73,11 +73,23 @@ data class TestGeografiJobbonsker(
     val kode: String
 )
 fun ontologiDel(
-    kompetansenavn: Map<String, Pair<List<String>, List<String>>> = emptyMap(),
-    stillingstittel: Map<String, Pair<List<String>, List<String>>> = emptyMap()
+    kompetansenavn: Map<String, Pair<List<String>, List<String>>> = mapOf(
+        "Sirkusestetikk" to (listOf("Sirkuskunst", "Sirkuskunstner", "Sirkusforestillinger") to listOf("Kunst")),
+        "Sirkusvokabular" to (listOf("Sirkusordforråd", "Sirkus terminologi") to listOf("Kommunikasjon")),
+        "Definere riggebehov for sirkuskunster" to (listOf("Planlegge rigging for sirkusforestillinger") to listOf("Planlegging")),
+        "Kontrollere sirkusrigging før fremføring" to (listOf("Sjekke sirkusrigging") to listOf("Kvalitetssikring")),
+        "Servicearbeid" to (listOf("Kundeservice", "Kundebehandling") to listOf("Service"))
+    ),
+    stillingstittel: Map<String, Pair<List<String>, List<String>>> = mapOf(
+        "Lege" to (listOf("Medisiner", "Allmennlege") to listOf("Helsepersonell")),
+        "Pianolærer" to (listOf("Piano-instruktør") to listOf("Musikklærer")),
+        "Baker" to (listOf("Konditor") to listOf("Matfagarbeider")),
+        "Sjåfør" to (listOf("Bilfører", "Lastebilsjåfør", "Busssjåfør") to listOf("Transport")),
+        "Sirkustekniker" to (listOf("Sirkusarbeider", "Sirkusmedarbeider") to listOf("Underholdning")),
+        "Produktsjef kjøretøy" to (listOf("Produktleder kjøretøy", "Produktansvarlig kjøretøy") to listOf("Produktledelse"))
+    )
 ) = """
-    {
-        "ontologi": {
+        {
             "kompetansenavn": {
                 ${kompetansenavn.entries.joinToString { (k,v) -> v.let { (synonymer, merGenerell) ->
                    """
@@ -106,15 +118,19 @@ fun ontologiDel(
                     }
                    """.trimIndent()
                 }}
-            }
+            }}
         }
-    }
 """.trimIndent()
 fun rapidMelding(
     synlighetJson: String?,
     behovsListe: List<String>? = null,
     organisasjonsenhetsnavn: String? = null,
-    hullICv: String? = null,
+    hullICv: String? = """
+        {
+            "førsteDagIInneværendeInaktivePeriode": "2022-05-10",
+            "sluttdatoerForInaktivePerioder": ["2020-01-01", "2018-03-15"]
+        }
+    """.trimIndent(),
     ontologi: String? = null,
     sluttAvHendelseskjede: Boolean? = null,
     kandidatnr: String = "CG133309",
@@ -615,8 +631,8 @@ fun rapidMelding(
     },"""
 }
           ${organisasjonsenhetsnavn?.let { """"organisasjonsenhetsnavn": "$it",""" } ?: ""}
-          ${hullICv?.let { """"hullICv": "$it",""" } ?: ""}
-          ${ontologi?.let { """"ontologi": "$it",""" } ?: ""}
+          ${hullICv?.let { """"hullICv": $it,""" } ?: ""}
+          ${ontologi?.let { """"ontologi": $it,""" } ?: ""}
           "system_read_count": 1,
           "system_participating_services": [
             {
