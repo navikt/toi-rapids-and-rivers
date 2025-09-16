@@ -36,7 +36,7 @@ class RapidTest {
     fun `Melding blir korrekt parset med konverterTilArbeidsplassenStilling`() {
         konverterTilArbeidsplassenStilling(jacksonMapper.readValue(rapidHendelse, RapidHendelse::class.java).direktemeldtStilling).also {
             assertEquals("123e4567-e89b-12d3-a456-426614174000", it.reference)
-            assertEquals("2025-04-23T00:00:00", it.expires)
+            assertEquals("2025-10-15T00:00:00", it.expires)
         }
     }
 
