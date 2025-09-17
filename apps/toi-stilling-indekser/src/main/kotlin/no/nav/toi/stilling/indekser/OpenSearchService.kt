@@ -32,6 +32,10 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
         client.indekser(stillinger, indeks)
     }
 
+    fun oppdaterStillingsinfo(stillingsId: String, stillingsinfo: Stillingsinfo, indeks: String) {
+        client.oppdaterStillingsinfo(stillingsId = stillingsId, stillingsinfo = stillingsinfo, indeks = indeks)
+    }
+
     fun indekserStilling(stilling: RekrutteringsbistandStilling, indeks: String) {
         client.indekserStilling(stilling, indeks)
     }
