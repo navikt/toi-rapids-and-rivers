@@ -1,10 +1,9 @@
-package no.nav.toi.stilling.publiser.arbeidsplassen
+package no.nav.toi.stilling.publiser.arbeidsplassen.dto
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import java.time.ZonedDateTime
 import java.util.*
 
 data class RapidHendelse(
@@ -24,12 +23,17 @@ data class RapidHendelse(
 data class DirektemeldtStilling(
     val stillingsId: UUID,
     val innhold: DirektemeldtStillingInnhold,
-    val opprettet: ZonedDateTime,
+    val opprettet: String,
     val opprettetAv: String,
-    val sistEndret: ZonedDateTime,
+    val sistEndret: String,
     val sistEndretAv: String,
     val status: String,
-    val annonsenr: String
+    val annonsenr: String,
+    val versjon: String? = null,
+    val utløpsdato: String?,
+    val publisert: String?,
+    val publisertAvAdmin: String? = null,
+    val adminStatus: String? = null,
 )
 
 data class DirektemeldtStillingKategori(
@@ -41,7 +45,6 @@ data class DirektemeldtStillingKategori(
 )
 
 data class DirektemeldtStillingAdministration(
-    val status: String?,
     val comments: String?,
     val reportee: String?,
     val remarks: List<String> = ArrayList(),
@@ -51,61 +54,58 @@ data class DirektemeldtStillingAdministration(
 data class DirektemeldtStillingArbeidsgiver(
     val mediaList: List<Media> = ArrayList(),
     val contactList: List<Contact> = ArrayList(),
-    val location: Geografi?,
+    val location: Geografi? = null,
     val locationList: List<Geografi> = ArrayList(),
     val properties: Map<String, String> = HashMap(),
-    val name: String?,
-    val orgnr: String?,
-    val parentOrgnr: String?,
-    val publicName: String?,
-    val orgform: String?,
-    val employees: Int?
+    val name: String? = null,
+    val orgnr: String? = null,
+    val parentOrgnr: String? = null,
+    val publicName: String? = null,
+    val orgform: String? = null,
+    val employees: Int? = null,
 )
 
 data class DirektemeldtStillingInnhold(
     val title: String,
-    val administration: DirektemeldtStillingAdministration?,
+    val administration: DirektemeldtStillingAdministration? = null,
     val mediaList: List<Media> = ArrayList(),
     val contactList: List<Contact> = ArrayList(),
-    val privacy: String?,
-    val source: String?,
-    val medium: String?,
-    val reference: String?,
-    val published: ZonedDateTime?,
-    val expires: ZonedDateTime?,
-    val employer: DirektemeldtStillingArbeidsgiver?,
-    val location: Geografi?,
+    val privacy: String? = null,
+    val source: String? = null,
+    val medium: String? = null,
+    val reference: String? = null,
+    val employer: DirektemeldtStillingArbeidsgiver,
+    val location: Geografi? = null,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
     val properties: Map<String, String> = HashMap(),
-    val publishedByAdmin: String?,
-    val businessName: String?,
-    val firstPublished: Boolean?,
-    val deactivatedByExpiry: Boolean?,
-    val activationOnPublishingDate: Boolean?
+    val businessName: String? = null,
+    val firstPublished: Boolean? = null,
+    val deactivatedByExpiry: Boolean? = null,
+    val activationOnPublishingDate: Boolean? = null,
 )
 
 data class Contact(
-    val name: String?,
-    val email: String?,
-    val phone: String?,
-    val role: String?,
-    val title: String?
+    val name: String? = null,
+    val email: String? = null,
+    val phone: String? = null,
+    val role: String? = null,
+    val title: String? = null,
 )
 
 data class Media(
     val mediaLink: String?,
-    val filename: String?
+    val filename: String?,
 )
 
 data class Geografi(
-    val address: String?,
-    val postalCode: String?,
-    val county: String?,
-    val municipal: String?,
-    val municipalCode: String?,
-    val city: String?,
-    val country: String?,
-    val latitude: String?,
-    val longitude: String?
+    val address: String? = null,
+    val postalCode: String? = null,
+    val county: String? = null,
+    val municipal: String? = null,
+    val municipalCode: String? = null,
+    val city: String? = null,
+    val country: String? = null,
+    val latitude: String? = null,
+    val longitude: String? = null,
 )

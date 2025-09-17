@@ -29,6 +29,8 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
+  envFrom:
+    - secret: rekrutteringsbistand-arbeidsplassen-secret
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
@@ -36,6 +38,8 @@ spec:
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: IMPORT_API_BASE_URL
+      value: http://pam-import-api.teampam
   accessPolicy:
     outbound:
       rules:

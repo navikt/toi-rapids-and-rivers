@@ -6,8 +6,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.publiser.arbeidsplassen.dto.RapidHendelse
 
-class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : River.PacketListener  {
+class StillingTilArbeidsplassenLytter(
+    rapidsConnection: RapidsConnection,
+    private val arbeidsplassenRestKlient: ArbeidsplassenRestKlient,
+) : River.PacketListener  {
     init {
         River(rapidsConnection).apply {
             precondition {
@@ -24,8 +28,14 @@ class StillingTilArbeidsplassenLytter(rapidsConnection: RapidsConnection) : Rive
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        log.info("Mottok stilling ${packet.toJson()}")
         val stilling = RapidHendelse.fraJson(packet).direktemeldtStilling
-        log.info("Mottok stilling med stillingsId ${stilling.stillingsId}")
-
+        log.info("Mottok stilling med stillingsId ${stilling.stillingsId} status: ${stilling.status} privacy: ${stilling.innhold.privacy}")
+        val arbeidsplassenStilling = konverterTilArbeidsplassenStilling(stilling)
+        if (stilling.status.uppercase() == "ACTIVE" && stilling.innhold.privacy == "SHOW_ALL") {
+            arbeidsplassenRestKlient.publiserStilling(arbeidsplassenStilling)
+        } else {
+            arbeidsplassenRestKlient.avpubliserStilling(arbeidsplassenStilling)
+        }
     }
 }
