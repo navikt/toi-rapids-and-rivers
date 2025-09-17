@@ -23,6 +23,8 @@ data class Melding(
             .registerModule(JavaTimeModule())
 
         fun fraJson(jsonMessage: JsonMessage): Melding = mapper.readValue(jsonMessage.toJson(), Melding::class.java)
+
+        fun fraJsonTilStillingsinfo(jsonMessage: JsonMessage): Stillingsinfo = mapper.readValue(jsonMessage.toJson(), Stillingsinfo::class.java)
     }
 }
 
