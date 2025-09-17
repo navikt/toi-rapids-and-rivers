@@ -28,19 +28,21 @@ class IndekserStillingsinfoLytter(rapidsConnection: RapidsConnection,
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val stillingsinfo: Stillingsinfo
+        val stillingsinfoMelding: StillingsinfoMelding
         try {
-            stillingsinfo = Melding.fraJsonTilStillingsinfo(packet)
+            stillingsinfoMelding = StillingsinfoMelding.fraJson(packet)
         }catch (e: Exception) {
             log.error("Gå forbi feil format på melding", e)
             return
         }
+        val stillingsId = stillingsinfoMelding.stillingsId
+        val stillingsinfo = stillingsinfoMelding.stillingsinfo
 
         if(stillingsinfo != null) {
-            log.info("Mottok oppdatert stillingsinfo for stilling: ${stillingsinfo.stillingsid}")
-            openSearchService.oppdaterStillingsinfo(stillingsId =  stillingsinfo.stillingsid, stillingsinfo = stillingsinfo, indeks = indeks)
+            log.info("Mottok oppdatert stillingsinfo for stilling: $stillingsId")
+            openSearchService.oppdaterStillingsinfo(stillingsId =  stillingsId, stillingsinfo = stillingsinfo, indeks = indeks)
         } else {
-            log.warn("Ingen stillingsinfo i melding for stilling: ${stillingsinfo.stillingsid}, hopper over oppdatering av stillingsinfo")
+            log.warn("Ingen stillingsinfo i melding for stilling: $stillingsId, hopper over oppdatering av stillingsinfo")
         }
     }
 }

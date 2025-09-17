@@ -23,8 +23,20 @@ data class Melding(
             .registerModule(JavaTimeModule())
 
         fun fraJson(jsonMessage: JsonMessage): Melding = mapper.readValue(jsonMessage.toJson(), Melding::class.java)
+    }
+}
 
-        fun fraJsonTilStillingsinfo(jsonMessage: JsonMessage): Stillingsinfo = mapper.readValue(jsonMessage.toJson(), Stillingsinfo::class.java)
+data class StillingsinfoMelding(
+    val stillingsId: String,
+    val stillingsinfo: Stillingsinfo?
+) {
+    companion object {
+        private val mapper = jacksonObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .registerModule(JavaTimeModule())
+
+        fun fraJson(jsonMessage: JsonMessage): StillingsinfoMelding = mapper.readValue(jsonMessage.toJson(), StillingsinfoMelding::class.java)
     }
 }
 
