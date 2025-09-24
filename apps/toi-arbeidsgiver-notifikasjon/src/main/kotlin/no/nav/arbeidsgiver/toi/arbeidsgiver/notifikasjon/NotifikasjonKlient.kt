@@ -56,7 +56,7 @@ class NotifikasjonKlient(
         } catch (e: Throwable) {
             log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
             secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
-            throw e
+            //throw e
         }
     }
 
