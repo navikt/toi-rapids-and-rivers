@@ -147,6 +147,32 @@ class OpenSearchServiceTest {
     }
 
     @Test
+    fun `Skal lese inn melding om stillingsinfo fra rapid og oppdatere stillingsinfo i opensearch`() {
+        leggTilKafkaMiljøvariabler()
+        opprettIndeks()
+
+        testProgramMedHendelse(env, melding) {
+            assertThat(size).isEqualTo(0)
+        }
+        // Oppdaterer stillingsinfo for stilling som allerede er indeksert
+        testProgramMedHendelse(env, stillingsinfoMelding) {
+            assertThat(size).isEqualTo(0)
+        }
+        testMetoderOpenSearch.refreshIndex()
+
+        val antallDokumenter = testMetoderOpenSearch.hentAntallDokumenter("stilling_20250328")
+        assertThat(antallDokumenter).isEqualTo(1)
+
+        val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+        val stillingsinfo = rekrutteringsbistandStilling?.stillingsinfo
+
+        assertThat(stillingsinfo).isNotNull
+        assertThat(stillingsinfo?.eierNavident).isEqualTo("T23456")
+        assertThat(stillingsinfo?.eierNavn).isEqualTo("Tester 2")
+        assertThat(stillingsinfo?.eierNavKontorEnhetId).isEqualTo("5678")
+    }
+
+    @Test
     fun `Skal legge inn melding fra rapid inn i OpenSearch`() {
         leggTilKafkaMiljøvariabler()
         opprettIndeks()
@@ -257,4 +283,19 @@ class OpenSearchServiceTest {
                 "@event_name": "indekserDirektemeldtStilling"
             }
             """.trimIndent()
+
+    private var stillingsinfoMelding = """
+        {
+            "@event_name": "indekserStillingsinfo",
+            "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+            "stillingsinfo": {
+                "eierNavident": "T23456",
+                "eierNavn": "Tester 2",
+                "eierNavKontorEnhetId": "5678",
+                "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
+                "stillingsinfoid": "24553",
+                "stillingskategori": "STILLING"
+            }
+        }
+    """.trimIndent()
 }
