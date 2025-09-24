@@ -49,7 +49,8 @@ class NotifikasjonKlient(
                 }
 
                 else -> {
-                    håndterFeil(json, response, query)
+                    log.info("Hoppet over feilende melding")
+                    //håndterFeil(json, response, query)
                 }
             }
         } catch (e: Throwable) {
