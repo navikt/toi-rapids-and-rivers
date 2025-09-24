@@ -24,6 +24,8 @@ private const val defaultFrKode = "0"
 private const val harIkkeGjeldende14aVedtak = "HAR_IKKE_GJELDENDE_14A_VEDTAK"
 private val fritattAgKandidatsokerDeprikert: Boolean? = null
 
+private const val indekseringsnøkkel = "arenaKandidatnr"
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsCv(
     private val aktorId: String,
@@ -193,9 +195,12 @@ class EsCv(
         }
         private val postDataDAO = PostDataDAO()
 
+        fun indekseringsnøkkel(packet: JsonMessage) = if(packet["arbeidsmarkedCv"].isMissingOrNull()) null else
+            getCvNode(packet["arbeidsmarkedCv"])[indekseringsnøkkel].asText(null)
+
         fun fraMelding(packet: JsonMessage): EsCv {
             val arbeidsmarkedCv = packet["arbeidsmarkedCv"]
-            val cvNode = listOf("slettCv", "endreCv", "opprettCv").first { arbeidsmarkedCv.hasNonNull(it) }.let { arbeidsmarkedCv[it] }["cv"]
+            val cvNode = getCvNode(arbeidsmarkedCv)
             val jobbProfilNode = listOf("slettJobbprofil", "endreJobbprofil", "opprettJobbprofil").first { arbeidsmarkedCv.hasNonNull(it) }.let { arbeidsmarkedCv[it] }["jobbprofil"]
 
             val postData = postDataDAO.findPostData(cvNode["postnummer"].asText())
@@ -214,7 +219,7 @@ class EsCv(
                 mobiltelefon = ingenMobiltelefon,
                 telefon = cvNode["telefon"].asText(null),
                 statsborgerskap = ingenNasjonalitet,
-                kandidatnr = cvNode["arenaKandidatnr"].asText(null),
+                kandidatnr = cvNode[indekseringsnøkkel].asText(null),
                 beskrivelse = cvNode["sammendrag"].asText(null),
                 samtykkeStatus = ingenAnonymitet,
                 samtykkeDato = Instant.ofEpochMilli((cvNode["opprettet"].asDouble() * 1000).toLong())
@@ -267,8 +272,12 @@ class EsCv(
                 arbeidstidJobbonskerObj = EsArbeidstidJobbonsker.fraMelding(jobbProfilNode),
                 godkjenninger = EsGodkjenning.fraMelding(cvNode),
                 perioderMedInaktivitet = EsPerioderMedInaktivitet.fraMelding(packet)
-            )
+            ).apply { require(indekseringsnøkkel() == indekseringsnøkkel(packet)) }
         }
+
+        private fun getCvNode(arbeidsmarkedCv: JsonNode): JsonNode =
+            listOf("slettCv", "endreCv", "opprettCv").first { arbeidsmarkedCv.hasNonNull(it) }
+                .let { arbeidsmarkedCv[it] }["cv"]
     }
 }
 

@@ -30,6 +30,12 @@ class ESClient(
         }
     }
 
+    fun slettCv(indekseringsnøkkel: String) {
+        openSearchClient.delete { req ->
+            req.index(esIndex).id(indekseringsnøkkel)
+        }
+    }
+
     init {
         val host = HttpHost.create(esUrl)
         val credentialsProvider = BasicCredentialsProvider().apply {

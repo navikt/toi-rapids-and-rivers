@@ -9,6 +9,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.indekseringsnøkkel
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
@@ -28,6 +30,7 @@ class UsynligKandidatfeedLytter(
                 it.requireValue("synlighet.erSynlig", false)
                 it.requireValue("synlighet.ferdigBeregnet", true)
                 it.forbidValue("@slutt_av_hendelseskjede", true)
+                it.interestedIn("arbeidsmarkedCv")
             }
         }.register(this)
     }
@@ -38,27 +41,14 @@ class UsynligKandidatfeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktørId"].asText()
-        val packetUtenMetadata = packet.fjernMetadataOgKonverter()
-        val melding = ProducerRecord(topicName, aktørId, packetUtenMetadata.toString())
-
-        TODO()
-        /*producer.send(melding) { _, exception ->
-            if (exception == null) {
-                log.info("Sendte kandidat med aktørId (se securelog), synlighet er false")
-                secureLog.info("Sendte kandidat med aktørId $aktørId, synlighet er false")
-            } else {
-                log.error("Klarte ikke å sende kandidat med aktørId (se securelog)", exception)
-                secureLog.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
-            }
-            packet["@slutt_av_hendelseskjede"] = true
-            context.publish(packet.toJson())
-        }*/
-    }
-
-    private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
-        val jsonNode = jacksonObjectMapper().readTree(this.toJson()) as ObjectNode
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        return jsonNode.remove(metadataFelter)
+        val indekseringsnøkkel = indekseringsnøkkel(packet)
+        packet["kandidatFunnetOgSlettet"] = if(indekseringsnøkkel==null) {
+            false
+        } else {
+            esClient.slettCv(indekseringsnøkkel)
+            true
+        }
+        packet["@slutt_av_hendelseskjede"] = true
+        context.publish(packet.toJson())
     }
 }

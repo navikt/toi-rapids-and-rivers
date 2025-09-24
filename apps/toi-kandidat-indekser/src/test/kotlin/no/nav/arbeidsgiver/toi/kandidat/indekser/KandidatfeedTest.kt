@@ -29,6 +29,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.opensearch.client.opensearch.OpenSearchClient
+import org.opensearch.client.opensearch.core.DeleteByQueryRequest
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
@@ -62,6 +63,11 @@ class KandidatfeedTest {
             ApacheHttpClient5TransportBuilder.builder(
                 HttpHost.create(elasticsearch.httpHostAddress)
             ).build())
+        client.deleteByQuery(DeleteByQueryRequest.Builder()
+            .index(esIndex)
+            .query { it.matchAll { it } }
+            .build()
+        )
     }
 
     @Test
@@ -119,6 +125,26 @@ class KandidatfeedTest {
             ontologi = ontologiDel(),
             kandidatnr = expectedKandidatnr
         )
+        val testrapid = TestRapid()
+
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
+
+        testrapid.sendTestMessage(meldingSynlig)
+
+        assertEnKandidatMedKandidatnr(expectedKandidatnr)
+    }
+
+    @Test
+    fun `Meldinger der synlighet er ferdig beregnet til false, skal kandidat slettes om han er lagt til i ES`() {
+        assertIngenIIndekser()
+        val expectedKandidatnr = "CG133310"
+        val meldingSynlig = rapidMelding(
+            synlighet(erSynlig = true, ferdigBeregnet = true),
+            organisasjonsenhetsnavn = "NAV et kontor",
+            ontologi = ontologiDel(),
+            kandidatnr = expectedKandidatnr
+        )
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
@@ -132,9 +158,9 @@ class KandidatfeedTest {
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingSynlig)
-        testrapid.sendTestMessage(meldingUsynlig)
-
         assertEnKandidatMedKandidatnr(expectedKandidatnr)
+        testrapid.sendTestMessage(meldingUsynlig)
+        assertIngenIIndekser()
     }
 
     @Test
@@ -320,12 +346,12 @@ class KandidatfeedTest {
         val expectedOmfangJobbonskerOmfangKodeTekst = "Heltid"
         val expectedAnsettelsesformJobbonskerAnsettelsesformKode = "FAST"
         val expectedAnsettelsesformJobbonskerAnsettelsesformKodeTekst = "Fast"
-        val expectedArbeidstidsordningJobbonskerArbeidstidsordningKode = "DAG"
-        val expectedArbeidstidsordningJobbonskerArbeidstidsordningKodeTekst = "Dag"
+        val expectedArbeidstidsordningJobbonskerArbeidstidsordningKode = "SKIFT"
+        val expectedArbeidstidsordningJobbonskerArbeidstidsordningKodeTekst = "Skift"
         val expectedArbeidsdagerJobbonskerArbeidsdagerKode = Arbeidsdager.UKEDAGER.name
         val expectedArbeidsdagerJobbonskerArbeidsdagerKodeTekst = "Ukedager"
-        val expectedArbeidstidJobbonskerArbeidstidKode = "HELTID"
-        val expectedArbeidstidJobbonskerArbeidstidKodeTekst = "Heltid"
+        val expectedArbeidstidJobbonskerArbeidstidKode = "DAGTID"
+        val expectedArbeidstidJobbonskerArbeidstidKodeTekst = "Dagtid"
         val expectedGodkjenningerTittel = "Dette er en godkjenning"
         val expectedGodkjenningerUtsteder = "Utsteder"
         val expectedGodkjenningerGjennomfoert = LocalDate.of(2020, 5, 1)
@@ -338,7 +364,8 @@ class KandidatfeedTest {
             synlighet(erSynlig = true, ferdigBeregnet = true),
             ontologi = ontologiDel(
                 stillingstittel = mapOf(
-                    expectedYrkeserfaringStillingstittel to (listOf(expectedYrkeserfaringStillingstitlerForTypeahead) to listOf(expectedYrkeserfaringSokeTitler))
+                    expectedYrkeserfaringStillingstittel to (listOf(expectedYrkeserfaringStillingstitlerForTypeahead) to listOf(expectedYrkeserfaringSokeTitler)),
+                    "Ekstra yrkebeskrivelse" to (listOf("Ekstra yrkebeskrivelse") to listOf("Ekstra yrkebeskrivelse"))
                 ),
                 kompetansenavn = mapOf(
                     *expectedKompetanser.map { it to (listOf("TODO") to listOf("TODO 2")) }.toTypedArray()
@@ -602,16 +629,20 @@ class KandidatfeedTest {
     }
 
     private fun assertIngenIIndekser() {
-        assertThat(client.count().count()).isEqualTo(0)
+        waitForCount(0)
     }
 
     private fun assertEnKandidatMedKandidatnr(expectedKandidatnr: String) {
-        assertThat(client.count().count()).isEqualTo(1)
+        waitForCount(1)
         val cv = client.get({ req ->
             req.index(esIndex).id("123")
         }, EsCv::class.java)
         assertThat(cv.found()).isTrue
         assertThat(cv.index()).isEqualTo(expectedKandidatnr)
         assertThat(jacksonObjectMapper().readTree(cv.toJsonString())["kandidatnr"]).isEqualTo(expectedKandidatnr)
+    }
+    private fun waitForCount(expected: Long) {
+        Thread.sleep(100)
+        assertThat(client.count().count()).isEqualTo(expected)
     }
 }

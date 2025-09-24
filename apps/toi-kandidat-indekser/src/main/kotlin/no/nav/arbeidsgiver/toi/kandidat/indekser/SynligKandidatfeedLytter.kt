@@ -50,29 +50,12 @@ class SynligKandidatfeedLytter(
         val aktørId = packet["aktørId"].asText()
 
         esClient.lagreEsCv(EsCv.fraMelding(packet))
-        TODO()
-        /*producer.send(melding) { _, exception ->
-            if (exception == null) {
-                log.info("Sendte kandidat med aktørId (se securelog), synlighet er true")
-                secureLog.info("Sendte kandidat med aktørId $aktørId, synlighet er true")
-            } else {
-                log.error("Klarte ikke å sende kandidat med aktørId (se securelog)", exception)
-                secureLog.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
-            }
-            packet["@slutt_av_hendelseskjede"] = true
-            context.publish(packet.toJson())
-        }*/
+        packet["@slutt_av_hendelseskjede"] = true
+        context.publish(packet.toJson())
     }
-
-    private fun konverterTilObjectNode(packet: JsonMessage) =
-        jacksonObjectMapper().readTree(packet.toJson()) as ObjectNode
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
-    }
-
-    private fun ObjectNode.fjernMetadataOgKonverter() {
-        val metadataFelter = listOf("system_read_count", "system_participating_services", "@event_name")
-        this.remove(metadataFelter)
+        throw Error()
     }
 }
