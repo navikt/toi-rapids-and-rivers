@@ -73,23 +73,23 @@ class KandidatlisteOpprettetLytterTest {
         testRapid.sendTestMessage(opprettetKandidatlisteMelding)
     }
 
-//    @Test
-//    fun `Når vi får errors i svaret fra notifikasjonssystemet skal vi kaste feilmelding`() {
-//        wiremock.stubErrorsIRespons()
-//
-//        assertThrows<RuntimeException> {
-//            testRapid.sendTestMessage(opprettetKandidatlisteMelding)
-//        }
-//    }
-//
-//    @Test
-//    fun `Når vi får ukjent verdi for notifikasjonssvar skal vi kaste feilmelding`() {
-//        wiremock.stubUventetStatusIRespons("nyBeskjed")
-//
-//        assertThrows<RuntimeException> {
-//            testRapid.sendTestMessage(opprettetKandidatlisteMelding)
-//        }
-//    }
+    @Test
+    fun `Når vi får errors i svaret fra notifikasjonssystemet skal vi kaste feilmelding`() {
+        wiremock.stubErrorsIRespons()
+
+        assertThrows<RuntimeException> {
+            testRapid.sendTestMessage(opprettetKandidatlisteMelding)
+        }
+    }
+
+    @Test
+    fun `Når vi får ukjent verdi for notifikasjonssvar skal vi kaste feilmelding`() {
+        wiremock.stubUventetStatusIRespons("nyBeskjed")
+
+        assertThrows<RuntimeException> {
+            testRapid.sendTestMessage(opprettetKandidatlisteMelding)
+        }
+    }
 
     private val opprettetKandidatlisteMelding = """
         {

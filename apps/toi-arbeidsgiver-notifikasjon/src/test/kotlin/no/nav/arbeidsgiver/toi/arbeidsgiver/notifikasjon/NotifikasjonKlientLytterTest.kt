@@ -127,57 +127,57 @@ class NotifikasjonKlientLytterTest {
         testRapid.sendTestMessage(melding)
     }
 
-//    @Test
-//    fun `Når vi får errors i svaret fra notifikasjonssystemet skal vi throwe error`() {
-//        val melding = """
-//            {
-//              "@event_name": "notifikasjon.cv-delt",
-//              "arbeidsgiversEpostadresser": ["test@testepost.no"],
-//              "notifikasjonsId": "enEllerAnnenId",
-//              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-//              "virksomhetsnummer": "123456789",
-//              "utførtAvVeilederFornavn": "Veileder",
-//              "utførtAvVeilederEtternavn": "Veiledersen",
-//              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
-//              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-//              "stilling": {
-//                "stillingstittel": "En tittel beriket av stillingapi"
-//              }
-//            }
-//        """.trimIndent()
-//
-//        wiremock.stubErrorsIRespons()
-//
-//        assertThrows<RuntimeException> {
-//            testRapid.sendTestMessage(melding)
-//        }
-//    }
+    @Test
+    fun `Når vi får errors i svaret fra notifikasjonssystemet skal vi throwe error`() {
+        val melding = """
+            {
+              "@event_name": "notifikasjon.cv-delt",
+              "arbeidsgiversEpostadresser": ["test@testepost.no"],
+              "notifikasjonsId": "enEllerAnnenId",
+              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+              "virksomhetsnummer": "123456789",
+              "utførtAvVeilederFornavn": "Veileder",
+              "utførtAvVeilederEtternavn": "Veiledersen",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
+              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
+            }
+        """.trimIndent()
 
-//    @Test
-//    fun `Når vi får ukjent verdi for notifikasjonssvar skal vi throwe error`() {
-//        val melding = """
-//            {
-//              "@event_name": "notifikasjon.cv-delt",
-//              "arbeidsgiversEpostadresser": ["test@testepost.no"],
-//              "notifikasjonsId": "enEllerAnnenId",
-//              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
-//              "virksomhetsnummer": "123456789",
-//              "utførtAvVeilederFornavn": "Veileder",
-//              "utførtAvVeilederEtternavn": "Veiledersen",
-//              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
-//              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
-//              "stilling": {
-//                "stillingstittel": "En tittel beriket av stillingapi"
-//              }
-//            }
-//        """.trimIndent()
-//
-//        wiremock.stubUventetStatusIRespons("nyBeskjed")
-//
-//        assertThrows<RuntimeException> {
-//            testRapid.sendTestMessage(melding)
-//        }
-//    }
+        wiremock.stubErrorsIRespons()
+
+        assertThrows<RuntimeException> {
+            testRapid.sendTestMessage(melding)
+        }
+    }
+
+    @Test
+    fun `Når vi får ukjent verdi for notifikasjonssvar skal vi throwe error`() {
+        val melding = """
+            {
+              "@event_name": "notifikasjon.cv-delt",
+              "arbeidsgiversEpostadresser": ["test@testepost.no"],
+              "notifikasjonsId": "enEllerAnnenId",
+              "stillingsId": "666028e2-d031-4d53-8a44-156efc1a3385",
+              "virksomhetsnummer": "123456789",
+              "utførtAvVeilederFornavn": "Veileder",
+              "utførtAvVeilederEtternavn": "Veiledersen",
+              "tidspunktForHendelse": "2023-02-09T10:37:45.108+01:00",
+              "meldingTilArbeidsgiver": "Her har du noen fine kandidater!",
+              "stilling": {
+                "stillingstittel": "En tittel beriket av stillingapi"
+              }
+            }
+        """.trimIndent()
+
+        wiremock.stubUventetStatusIRespons("nyBeskjed")
+
+        assertThrows<RuntimeException> {
+            testRapid.sendTestMessage(melding)
+        }
+    }
 
     @Test
     fun `Skal fjerne tabs og spaces fra epostadresser`() {
