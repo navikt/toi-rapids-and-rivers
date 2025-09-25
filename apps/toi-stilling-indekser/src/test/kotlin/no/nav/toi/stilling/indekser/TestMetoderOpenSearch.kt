@@ -25,6 +25,7 @@ class TestMetoderOpenSearch(private val client: OpenSearchClient) {
         return response
     }
 
+    // Må kalle denne for å finne endringer i opensearch
     fun refreshIndex() {
         val request = RefreshRequest.Builder().index("$stillingAlias*").build()
         client.indices().refresh(request)

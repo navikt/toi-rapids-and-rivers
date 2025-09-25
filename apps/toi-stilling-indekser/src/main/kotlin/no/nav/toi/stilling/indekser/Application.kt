@@ -97,7 +97,8 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                     Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
                     gammelStillingConsumer.start(indeks)
                 }
-                IndekserStillingLytter(rapid, openSearchService, indeks)
+                IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
             } else {
                 // Initiell indeksering av stillinger, samt kontinuerlig lesing av oppdateringer på rapid og ekstern-topic
                 log.info("Starter indeksering av stillinger på indeks $indeks")
@@ -105,7 +106,8 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilStillingConsumer, env))
                 val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
 
-                IndekserStillingLytter(rapid, openSearchService, indeks)
+                IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
 
                 thread(name = "indekserStillingConsumer" ) {
                     Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
