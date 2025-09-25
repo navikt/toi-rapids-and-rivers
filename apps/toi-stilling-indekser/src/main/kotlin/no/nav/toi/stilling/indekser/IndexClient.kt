@@ -77,7 +77,7 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
                 .build()
 
             val response = client.update(request, RekrutteringsbistandStilling::class.java)
-            log.info("Oppdaterte dokument $stillingsId i indeks $indeks med felter $felter, result=${response.result()}")
+            log.info("Oppdaterte stillingsinfo for dokument $stillingsId i indeks $indeks result=${response.result()}")
 
         } catch (e: Exception) {
             log.error("Greide ikke å oppdatere dokument med id $stillingsId i indeks $indeks", e)
