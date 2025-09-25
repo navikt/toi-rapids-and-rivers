@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.OffsetDateTime
@@ -9,14 +10,14 @@ import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsKompetanse(
-    private val fraDato: OffsetDateTime?,
-    private val kompKode: String?,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val kompKodeNavn: String,
-    private val alternativtNavn: String?,
-    private val beskrivelse: String?,
+    @field:JsonProperty private val fraDato: OffsetDateTime?,
+    @field:JsonProperty private val kompKode: String?,
+    @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val kompKodeNavn: String,
+    @field:JsonProperty private val alternativtNavn: String?,
+    @field:JsonProperty private val beskrivelse: String?,
     sokeNavn: List<String>
 ): EnAvFlereSamledeKompetaser {
-    private val sokeNavn = sokeNavn + kompKodeNavn
+    @field:JsonProperty private val sokeNavn = sokeNavn + kompKodeNavn
 
     constructor(kompetanse: String, sokeNavn: List<String>) : this(
         null,

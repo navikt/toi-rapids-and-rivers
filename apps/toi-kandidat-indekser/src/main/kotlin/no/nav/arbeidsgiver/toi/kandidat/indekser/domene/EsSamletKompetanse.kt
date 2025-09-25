@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
 interface EnAvFlereSamledeKompetaser{
@@ -10,7 +11,7 @@ interface EnAvFlereSamledeKompetaser{
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsSamletKompetanse(
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val samletKompetanseTekst: String
+    @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val samletKompetanseTekst: String
 ) {
     override fun equals(other: Any?) = other is EsSamletKompetanse && samletKompetanseTekst == other.samletKompetanseTekst
 

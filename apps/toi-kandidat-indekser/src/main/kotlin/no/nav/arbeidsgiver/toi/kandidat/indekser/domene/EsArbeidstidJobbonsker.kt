@@ -1,13 +1,14 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsArbeidstidJobbonsker(
-    private val arbeidstidKode: String,
-    private val arbeidstidKodeTekst: String
+    @field:JsonProperty private val arbeidstidKode: String,
+    @field:JsonProperty private val arbeidstidKodeTekst: String
 ) {
     override fun equals(other: Any?) = other is EsArbeidstidJobbonsker && arbeidstidKode == other.arbeidstidKode
             && arbeidstidKodeTekst == other.arbeidstidKodeTekst

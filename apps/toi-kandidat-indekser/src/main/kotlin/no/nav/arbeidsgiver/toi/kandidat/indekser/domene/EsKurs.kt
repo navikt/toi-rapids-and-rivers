@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -8,11 +9,11 @@ import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsKurs(
-    private val tittel: String,
-    private val arrangor: String,
-    private val omfangEnhet: String?,
-    private val omfangVerdi: Int?,
-    private val tilDato: LocalDate
+    @field:JsonProperty private val tittel: String,
+    @field:JsonProperty private val arrangor: String,
+    @field:JsonProperty private val omfangEnhet: String?,
+    @field:JsonProperty private val omfangVerdi: Int?,
+    @field:JsonProperty private val tilDato: LocalDate
 ) {
     override fun equals(other: Any?) = other is EsKurs && tilDato == other.tilDato
             && tittel == other.tittel && arrangor == other.arrangor

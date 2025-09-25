@@ -2,19 +2,23 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsFagdokumentasjon(
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @field:JsonProperty
     private val type: String,
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @field:JsonProperty
     private val tittel: String?,
 
     // TODO dette feltet er ikke lenger i bruk - bør fjernes
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @field:JsonProperty
     private var beskrivelse: String?
 ): EnAvFlereSamledeKompetaser {
     override fun equals(other: Any?): Boolean {

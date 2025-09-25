@@ -1,27 +1,8 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsAnnenErfaring
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsAnsettelsesformJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsArbeidsdagerJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsArbeidstidJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsArbeidstidsordningJobbonsker
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsFagdokumentasjon
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsForerkort
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsGeografiJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsGodkjenning
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsKompetanse
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsKurs
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsOmfangJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsPerioderMedInaktivitet
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSertifikat
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsSprak
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsUtdanning
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeJobbonsker
-import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
 import no.nav.toi.TestRapid
 import org.apache.hc.core5.http.HttpHost
@@ -54,6 +35,7 @@ class KandidatfeedTest {
                 .withEnv("xpack.security.enabled", "false")
         private lateinit var testEsClient: ESClient
         private lateinit var client: OpenSearchClient
+        private fun OpenSearchClient.flush() = this.indices().flush { it.index(esIndex) }
     }
 
     @BeforeEach
@@ -63,15 +45,23 @@ class KandidatfeedTest {
             ApacheHttpClient5TransportBuilder.builder(
                 HttpHost.create(elasticsearch.httpHostAddress)
             ).build())
-        client.deleteByQuery(DeleteByQueryRequest.Builder()
-            .index(esIndex)
-            .query { it.matchAll { it } }
-            .build()
-        )
+        val indexExists = client.indices().exists { it.index(esIndex) }.value()
+        if (indexExists) {
+            client.deleteByQuery(DeleteByQueryRequest.Builder()
+                .index(esIndex)
+                .query { it.matchAll { it } }
+                .build()
+            )
+            client.flush()
+        } else {
+            client.indices().create { it.index(esIndex) }
+            client.flush()
+        }
     }
 
     @Test
     fun `Melding med kun CV og aktørId vil ikke opprette kandidat i ES`() {
+        assertIngenIIndekser()
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
 
         val testrapid = TestRapid()
@@ -85,6 +75,7 @@ class KandidatfeedTest {
 
     @Test
     fun `Meldinger der synlighet er ferdig beregnet til true men dekte behov ikke eksisterer på meldingen skal ikke kandidat legges i ES`() {
+        assertIngenIIndekser()
         val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true))
 
         val testrapid = TestRapid()
@@ -99,6 +90,7 @@ class KandidatfeedTest {
 
     @Test
     fun `Meldinger der synlighet er ferdig beregnet til false men dekte behov ikke eksisterer skal kandidat enda slettes i ES`() {
+        assertIngenIIndekser()
         val kandidatnr = "CG133309"
 
         testEsClient.lagreEsCv(EsCvObjectMother.giveMeEsCv(kandidatnr = kandidatnr))
@@ -165,6 +157,7 @@ class KandidatfeedTest {
 
     @Test
     fun `Meldinger der synlighet ikke er ferdig beregnet skal ikke kandidat legges i ES`() {
+        assertIngenIIndekser()
         val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = false))
 
         val testrapid = TestRapid()
@@ -178,6 +171,7 @@ class KandidatfeedTest {
 
     @Test
     fun `UsynligKandidatfeedLytter leser ikke melding om slutt_av_hendelseskjede er true`() {
+        assertIngenIIndekser()
         val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true), sluttAvHendelseskjede = true)
 
         val testrapid = TestRapid()
@@ -193,6 +187,7 @@ class KandidatfeedTest {
 
     @Test
     fun `SynligKandidatfeedLytter leser ikke melding om slutt_av_hendelseskjede er true`() {
+        assertIngenIIndekser()
         val rapidMelding =
             rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = "{}", sluttAvHendelseskjede = true)
         val testrapid = TestRapid()
@@ -208,6 +203,7 @@ class KandidatfeedTest {
 
     @Test
     fun `UsynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
+        assertIngenIIndekser()
         val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true))
 
         val testrapid = TestRapid()
@@ -223,6 +219,7 @@ class KandidatfeedTest {
 
     @Test
     fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
+        assertIngenIIndekser()
         val rapidMelding =
             rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", ontologi = ontologiDel())
 
@@ -635,14 +632,15 @@ class KandidatfeedTest {
     private fun assertEnKandidatMedKandidatnr(expectedKandidatnr: String) {
         waitForCount(1)
         val cv = client.get({ req ->
-            req.index(esIndex).id("123")
+            req.index(esIndex).id(expectedKandidatnr)
         }, EsCv::class.java)
         assertThat(cv.found()).isTrue
-        assertThat(cv.index()).isEqualTo(expectedKandidatnr)
-        assertThat(jacksonObjectMapper().readTree(cv.toJsonString())["kandidatnr"]).isEqualTo(expectedKandidatnr)
+        assertThat(cv.id()).isEqualTo(expectedKandidatnr)
+        assertThat(cv.source()?.indekseringsnøkkel()).isEqualTo(expectedKandidatnr)
     }
     private fun waitForCount(expected: Long) {
-        Thread.sleep(100)
+        Thread.sleep(1000)
+        client.flush()
         assertThat(client.count().count()).isEqualTo(expected)
     }
 }

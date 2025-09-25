@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -28,89 +29,90 @@ private const val indekseringsnøkkel = "arenaKandidatnr"
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsCv(
-    private val aktorId: String,
-    private val fodselsnummer: String,
-    private val fornavn: String,
-    private val etternavn: String,
-    private val fodselsdato: LocalDate,
+    @field:JsonProperty private val aktorId: String,
+    @field:JsonProperty private val fodselsnummer: String,
+    @field:JsonProperty private val fornavn: String,
+    @field:JsonProperty private val etternavn: String,
+    @field:JsonProperty private val fodselsdato: LocalDate,
 
-    private val fodselsdatoErDnr: Boolean,
-    private val formidlingsgruppekode: String,
-    private val epostadresse: String,
-    private val mobiltelefon: String?,
-    private val telefon: String,
+    @field:JsonProperty private val fodselsdatoErDnr: Boolean,
+    @field:JsonProperty private val formidlingsgruppekode: String,
+    @field:JsonProperty private val epostadresse: String,
+    @field:JsonProperty private val mobiltelefon: String?,
+    @field:JsonProperty private val telefon: String,
 
-    private val statsborgerskap: String?,
-    private val kandidatnr: String,
-    private val beskrivelse: String,
-    private val samtykkeStatus: String,
-    private val samtykkeDato: OffsetDateTime,
+    @field:JsonProperty private val statsborgerskap: String?,
+    @field:JsonProperty private val kandidatnr: String,
+    @field:JsonProperty private val beskrivelse: String,
+    @field:JsonProperty private val samtykkeStatus: String,
+    @field:JsonProperty private val samtykkeDato: OffsetDateTime,
 
-    private val adresselinje1: String,
-    private val adresselinje2: String,
-    private val adresselinje3: String,
-    private val postnummer: String,
-    private val poststed: String,
+    @field:JsonProperty private val adresselinje1: String,
+    @field:JsonProperty private val adresselinje2: String,
+    @field:JsonProperty private val adresselinje3: String,
+    @field:JsonProperty private val postnummer: String,
+    @field:JsonProperty private val poststed: String,
 
-    private val landkode: String?,
-    private val kommunenummer: Int,
-    private val disponererBil: Boolean?,
-    private val tidsstempel: OffsetDateTime,  // TODO Dårlig/vagt navn, bør hete sistEndret, slik at det stemmer med CV AVRO-modellen
-    private val kommunenummerkw: Int,
+    @field:JsonProperty private val landkode: String?,
+    @field:JsonProperty private val kommunenummer: Int,
+    @field:JsonProperty private val disponererBil: Boolean?,
+    @field:JsonProperty private val tidsstempel: OffsetDateTime,  // TODO Dårlig/vagt navn, bør hete sistEndret, slik at det stemmer med CV AVRO-modellen
+    @field:JsonProperty private val kommunenummerkw: Int,
 
-    private val doed: Boolean,
-    private val frKode: String?,
-    private val kvalifiseringsgruppekode: String?,
-    private val hovedmaalkode: String?,
-    private val hovedmal: String?,
-    private val innsatsgruppe: String?,
-    private val navkontor: String?,
-    private val orgenhet: String?,
+    @field:JsonProperty private val doed: Boolean,
+    @field:JsonProperty private val frKode: String?,
+    @field:JsonProperty private val kvalifiseringsgruppekode: String?,
+    @field:JsonProperty private val hovedmaalkode: String?,
+    @field:JsonProperty private val hovedmal: String?,
+    @field:JsonProperty private val innsatsgruppe: String?,
+    @field:JsonProperty private val navkontor: String?,
+    @field:JsonProperty private val orgenhet: String?,
 
-    private val fritattKandidatsok: Boolean?,
-    private val fritattAgKandidatsok: Boolean?,
-    private val synligForArbeidsgiverSok: Boolean,
-    private val synligForVeilederSok: Boolean,
-    private val oppstartKode: String?,
+    @field:JsonProperty private val fritattKandidatsok: Boolean?,
+    @field:JsonProperty private val fritattAgKandidatsok: Boolean?,
+    @field:JsonProperty private val synligForArbeidsgiverSok: Boolean,
+    @field:JsonProperty private val synligForVeilederSok: Boolean,
+    @field:JsonProperty private val oppstartKode: String?,
 
-    private val kommunenummerstring: String,
+    @field:JsonProperty private val kommunenummerstring: String,
     veilederIdent: String,
-    private val veilederVisningsnavn: String?,
-    private val veilederEpost: String?,
-    private val fylkeNavn: String?,
-    private val kommuneNavn: String?,
+    @field:JsonProperty private val veilederVisningsnavn: String?,
+    @field:JsonProperty private val veilederEpost: String?,
+    @field:JsonProperty private val fylkeNavn: String?,
+    @field:JsonProperty private val kommuneNavn: String?,
 
-    private val utdanning: List<EsUtdanning>,
-    private val fagdokumentasjon: List<EsFagdokumentasjon>,
-    private val yrkeserfaring: List<EsYrkeserfaring>,
-    private val kompetanseObj: List<EsKompetanse>,
-    private val annenerfaringObj: List<EsAnnenErfaring>,
-    private val sertifikatObj: List<EsSertifikat>,
-    private val forerkort: List<EsForerkort>,
-    private val sprak: List<EsSprak>,
-    private val kursObj: List<EsKurs>,
-    private val geografiJobbonsker: List<EsGeografiJobbonsker>,
-    private val yrkeJobbonskerObj: List<EsYrkeJobbonsker>,
-    private val omfangJobbonskerObj: List<EsOmfangJobbonsker>,
-    private val ansettelsesformJobbonskerObj: List<EsAnsettelsesformJobbonsker>,
-    private val arbeidstidsordningJobbonskerObj: List<EsArbeidstidsordningJobbonsker>,
-    private val arbeidsdagerJobbonskerObj: List<EsArbeidsdagerJobbonsker>,
-    private val arbeidstidJobbonskerObj: List<EsArbeidstidJobbonsker>,
-    private val godkjenninger: List<EsGodkjenning>,
-    private val perioderMedInaktivitet: EsPerioderMedInaktivitet?
+    @field:JsonProperty private val utdanning: List<EsUtdanning>,
+    @field:JsonProperty private val fagdokumentasjon: List<EsFagdokumentasjon>,
+    @field:JsonProperty private val yrkeserfaring: List<EsYrkeserfaring>,
+    @field:JsonProperty private val kompetanseObj: List<EsKompetanse>,
+    @field:JsonProperty private val annenerfaringObj: List<EsAnnenErfaring>,
+    @field:JsonProperty private val sertifikatObj: List<EsSertifikat>,
+    @field:JsonProperty private val forerkort: List<EsForerkort>,
+    @field:JsonProperty private val sprak: List<EsSprak>,
+    @field:JsonProperty private val kursObj: List<EsKurs>,
+    @field:JsonProperty private val geografiJobbonsker: List<EsGeografiJobbonsker>,
+    @field:JsonProperty private val yrkeJobbonskerObj: List<EsYrkeJobbonsker>,
+    @field:JsonProperty private val omfangJobbonskerObj: List<EsOmfangJobbonsker>,
+    @field:JsonProperty private val ansettelsesformJobbonskerObj: List<EsAnsettelsesformJobbonsker>,
+    @field:JsonProperty private val arbeidstidsordningJobbonskerObj: List<EsArbeidstidsordningJobbonsker>,
+    @field:JsonProperty private val arbeidsdagerJobbonskerObj: List<EsArbeidsdagerJobbonsker>,
+    @field:JsonProperty private val arbeidstidJobbonskerObj: List<EsArbeidstidJobbonsker>,
+    @field:JsonProperty private val godkjenninger: List<EsGodkjenning>,
+    @field:JsonProperty private val perioderMedInaktivitet: EsPerioderMedInaktivitet?
 ) {
-    private val fritekst: String? = null
-    private val isHarKontaktinformasjon: Boolean = listOfNotNull(epostadresse, mobiltelefon, telefon).any(String::isNotBlank)
-    private val arenaKandidatnr: String = kandidatnr
+    @field:JsonProperty private val fritekst: String? = null
+    @field:JsonProperty private val isHarKontaktinformasjon: Boolean = listOfNotNull(epostadresse, mobiltelefon, telefon).any(String::isNotBlank)
+    @field:JsonProperty private val arenaKandidatnr: String = kandidatnr
 
-    private val totalLengdeYrkeserfaring = yrkeserfaring.totalYrkeserfaringIManeder()
+    @field:JsonProperty private val totalLengdeYrkeserfaring = yrkeserfaring.totalYrkeserfaringIManeder()
 
-    private val veilederIdent = veilederIdent.lowercase(Locale.getDefault())
+    @field:JsonProperty private val veilederIdent = veilederIdent.lowercase(Locale.getDefault())
 
     @Deprecated("")
+    @field:JsonProperty
     private val veileder = veilederIdent
 
-    private val samletKompetanseObj: List<EsSamletKompetanse> = listOfNotNull(fagdokumentasjon, kompetanseObj, sertifikatObj, godkjenninger)
+    @field:JsonProperty private val samletKompetanseObj: List<EsSamletKompetanse> = listOfNotNull(fagdokumentasjon, kompetanseObj, sertifikatObj, godkjenninger)
         .flatMap { it.flatMap(EnAvFlereSamledeKompetaser::tilSamletKompetanse) }
 
     override fun toString(): String {

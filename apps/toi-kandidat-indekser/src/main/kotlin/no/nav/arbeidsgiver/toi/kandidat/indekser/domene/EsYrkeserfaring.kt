@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.OffsetDateTime
@@ -12,24 +13,24 @@ import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsYrkeserfaring(
-    private val fraDato: YearMonth,
-    private val tilDato: YearMonth?,
-    private val arbeidsgiver: String,
-    private val styrkKode: String?,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val stillingstittel: String,
-    private val stillingstitlerForTypeahead: Set<String>,
-    private val alternativStillingstittel: String,
-    private val organisasjonsnummer: String?,
-    private val naceKode: String?,
-    private val utelukketForFremtiden: Boolean,
+    @field:JsonProperty private val fraDato: YearMonth,
+    @field:JsonProperty private val tilDato: YearMonth?,
+    @field:JsonProperty private val arbeidsgiver: String,
+    @field:JsonProperty private val styrkKode: String?,
+    @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val stillingstittel: String,
+    @field:JsonProperty private val stillingstitlerForTypeahead: Set<String>,
+    @field:JsonProperty private val alternativStillingstittel: String,
+    @field:JsonProperty private val organisasjonsnummer: String?,
+    @field:JsonProperty private val naceKode: String?,
+    @field:JsonProperty private val utelukketForFremtiden: Boolean,
     sokeTitler: List<String>,
-    private val sted: String,
-    private val beskrivelse: String?
+    @field:JsonProperty private val sted: String,
+    @field:JsonProperty private val beskrivelse: String?
 ) {
-    private val styrkKode4Siffer =  (styrkKode?.let { (if (it.length <= 3) null else it.substring(0, 4)) })
-    private val styrkKode3Siffer = (styrkKode?.let { (if (styrkKode.length <= 2) null else styrkKode.substring(0, 3)) })
-    private val sokeTitler: List<String> = sokeTitler + stillingstittel
-    private val yrkeserfaringManeder = toYrkeserfaringManeder(fraDato, tilDato)
+    @field:JsonProperty private val styrkKode4Siffer =  (styrkKode?.let { (if (it.length <= 3) null else it.substring(0, 4)) })
+    @field:JsonProperty private val styrkKode3Siffer = (styrkKode?.let { (if (styrkKode.length <= 2) null else styrkKode.substring(0, 3)) })
+    @field:JsonProperty private val sokeTitler: List<String> = sokeTitler + stillingstittel
+    @field:JsonProperty private val yrkeserfaringManeder = toYrkeserfaringManeder(fraDato, tilDato)
 
     constructor(
         fraDato: YearMonth,

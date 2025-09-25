@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -9,12 +10,12 @@ import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsSertifikat(
-    private val fraDato: LocalDate,
-    private val tilDato: LocalDate?,
-    private val sertifikatKode: String?,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) private val sertifikatKodeNavn: String?,
-    private val alternativtNavn: String?,
-    private val utsteder: String
+    @field:JsonProperty private val fraDato: LocalDate,
+    @field:JsonProperty private val tilDato: LocalDate?,
+    @field:JsonProperty private val sertifikatKode: String?,
+    @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val sertifikatKodeNavn: String?,
+    @field:JsonProperty private val alternativtNavn: String?,
+    @field:JsonProperty private val utsteder: String
 ): EnAvFlereSamledeKompetaser {
 
     constructor(fraDato: LocalDate, tilDato: LocalDate?, tittel: String, utsteder: String) : this(
