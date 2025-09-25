@@ -81,6 +81,7 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
 
         } catch (e: Exception) {
             log.error("Greide ikke å oppdatere dokument med id $stillingsId i indeks $indeks", e)
+            throw e
         }
     }
 
