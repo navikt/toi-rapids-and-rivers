@@ -111,6 +111,7 @@ class SisteEvent(private val eventName: String, private val duration: Duration) 
             "arbeidsgiversKandidatliste.VisningKontaktinfo" -> justertGrenseverdiForAlarm(Duration.ofHours(3))
             "notifikasjon.cv-delt" -> justertGrenseverdiForAlarm(Duration.ofHours(2))
             "indekserDirektemeldtStilling" -> justertGrenseverdiForAlarm(Duration.ofHours(2))
+            "indekserStillingsinfo" -> justertGrenseverdiForAlarm(Duration.ofDays(7))
             else -> Duration.ofHours(1)
         }
 
