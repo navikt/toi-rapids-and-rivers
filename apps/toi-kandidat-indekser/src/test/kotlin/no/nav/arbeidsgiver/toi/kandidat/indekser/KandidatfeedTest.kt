@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
@@ -10,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.opensearch.client.opensearch.OpenSearchClient
+import org.opensearch.client.opensearch._types.Refresh
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import org.testcontainers.elasticsearch.ElasticsearchContainer
@@ -47,22 +49,43 @@ class KandidatfeedTest {
             ).build())
         val indexExists = client.indices().exists { it.index(esIndex) }.value()
         if (indexExists) {
-            client.deleteByQuery(DeleteByQueryRequest.Builder()
-                .index(esIndex)
-                .query { it.matchAll { it } }
-                .build()
-            )
-            client.flush()
+            do {
+                client.indices().refresh { it.index(esIndex) }
+                client.deleteByQuery(
+                    DeleteByQueryRequest.Builder()
+                    .index(esIndex)
+                    .query { it.matchAll { it } }
+                    .refresh(Refresh.True)
+                    .build()
+                )
+                println("Vent litt på at ES skal slette alle dokumenter")
+                client.flush()
+            } while (client.count().count() != 0L)
         } else {
             client.indices().create { it.index(esIndex) }
             client.flush()
         }
+        sleepForAsyncES()
+    }
+
+    @Test
+    fun `Melding uten synlighet skal ikke opprette kandidat i ES`() {
+        assertIngenIIndekser()
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = null)
+
+        val testrapid = TestRapid()
+
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        assertIngenIIndekser()
     }
 
     @Test
     fun `Melding med kun CV og aktørId vil ikke opprette kandidat i ES`() {
         assertIngenIIndekser()
-        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = "")
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(erSynlig = false, ferdigBeregnet = false), hullICv = null, ontologi = null, organisasjonsenhetsnavn = null)
 
         val testrapid = TestRapid()
 
@@ -125,6 +148,28 @@ class KandidatfeedTest {
         testrapid.sendTestMessage(meldingSynlig)
 
         assertEnKandidatMedKandidatnr(expectedKandidatnr)
+    }
+
+    @Test
+    fun `Meldinger der synlighet er ferdig beregnet og har dekte behov men slutt av hendelseskjede er satt til true skal ikke kandidat legges til i ES`() {
+        assertIngenIIndekser()
+        val expectedKandidatnr = "CG133310"
+        val meldingSynlig = rapidMelding(
+            synlighet(erSynlig = true, ferdigBeregnet = true),
+            organisasjonsenhetsnavn = "NAV et kontor",
+            ontologi = ontologiDel(),
+            kandidatnr = expectedKandidatnr,
+            sluttAvHendelseskjede = true
+        )
+        val testrapid = TestRapid()
+
+        SynligKandidatfeedLytter(testrapid, testEsClient)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
+
+        testrapid.sendTestMessage(meldingSynlig)
+
+        assertIngenIIndekser()
+        assertThat(testrapid.inspektør.size).isEqualTo(0)
     }
 
     @Test
@@ -488,13 +533,14 @@ class KandidatfeedTest {
 
         testrapid.sendTestMessage(melding)
 
-        assertThat(client.count().count()).isEqualTo(1)
+        waitForCount(1)
         val cv = client.get({ req ->
-            req.index(esIndex).id("123")
+            req.index(esIndex).id(expectedKandidatnr)
         }, EsCv::class.java)
         assertThat(cv.found()).isTrue
-        assertThat(cv.index()).isEqualTo(expectedKandidatnr)
-        val cvJson = jacksonObjectMapper().readTree(cv.toJsonString())
+        assertThat(cv.id()).isEqualTo(expectedKandidatnr)
+        val mapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+        val cvJson = mapper.readTree(mapper.writeValueAsString(cv.source()))
         assertThat(cvJson["aktorId"].asText()).isEqualTo(expectedAktorId)
         assertThat(cvJson["fodselsnummer"].asText()).isEqualTo(expectedFodselsnummer)
         assertThat(cvJson["fornavn"].asText()).isEqualTo(expectedFornavn)
@@ -639,8 +685,22 @@ class KandidatfeedTest {
         assertThat(cv.source()?.indekseringsnøkkel()).isEqualTo(expectedKandidatnr)
     }
     private fun waitForCount(expected: Long) {
-        Thread.sleep(1000)
+        sleepForAsyncES()
+        val deadline = System.currentTimeMillis() + 10000
+        while (System.currentTimeMillis() < deadline) {
+            client.indices().refresh { it.index(esIndex) }
+            client.flush()
+            val current = client.count().count()
+            if (current == expected) return
+            Thread.sleep(200)
+        }
+        // last attempt to surface a helpful failure
+        client.indices().refresh { it.index(esIndex) }
         client.flush()
         assertThat(client.count().count()).isEqualTo(expected)
     }
+}
+
+private fun sleepForAsyncES() {
+    Thread.sleep(1000)
 }
