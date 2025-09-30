@@ -37,7 +37,9 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
+            secureLog.info("Resultat av opprett sak for stillingsId ${stillingsId}: $json")
             val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
+            secureLog.info("NotifikasjonsSvar for stillingsId ${stillingsId}: $notifikasjonsSvar")
 
             when (notifikasjonsSvar) {
                 NySakSvar.NySakVellykket.name -> {
@@ -49,6 +51,7 @@ class NotifikasjonKlient(
                 }
 
                 else -> {
+                    secureLog.error("Feil for stillingsid - ukjent notifikasjonsSvar '${notifikasjonsSvar}': ${stillingsId}")
                     håndterFeil(json, response, query)
                 }
             }
