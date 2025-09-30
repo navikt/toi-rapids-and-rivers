@@ -37,9 +37,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            secureLog.info("Resultat av opprett sak for stillingsId ${stillingsId}: $json")
             val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
-            secureLog.info("NotifikasjonsSvar for stillingsId ${stillingsId}: $notifikasjonsSvar")
 
             when (notifikasjonsSvar) {
                 NySakSvar.NySakVellykket.name -> {
@@ -50,8 +48,12 @@ class NotifikasjonKlient(
                     log.info("Sak ikke opprettet hos notifikasjon-api fordi det allerede finnes en sak med stillingsId: $stillingsId")
                 }
 
+                NySakSvar.DuplikatGrupperingsidEtterDelete.name -> {
+                    log.info("Sak ikke opprettet hos notifikasjon-api fordi det allerede finnes en sak med stillingsId som er slettet: $stillingsId")
+                }
+
                 else -> {
-                    secureLog.error("Feil for stillingsid - ukjent notifikasjonsSvar '${notifikasjonsSvar}': ${stillingsId}")
+                    log.error("Feil for stillingsid - ukjent notifikasjonsSvar '${notifikasjonsSvar}': ${stillingsId}")
                     håndterFeil(json, response, query)
                 }
             }
@@ -238,7 +240,8 @@ class NotifikasjonKlient(
 
     enum class NySakSvar {
         NySakVellykket,
-        DuplikatGrupperingsid
+        DuplikatGrupperingsid,
+        DuplikatGrupperingsidEtterDelete
     }
 
     enum class NyStatusSakSvar {
