@@ -7,18 +7,19 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsForerkort(
-    @field:JsonProperty private val fraDato: LocalDate?,
-    @field:JsonProperty private val tilDato: LocalDate?,
+    @field:JsonProperty private val fraDato: OffsetDateTime?,
+    @field:JsonProperty private val tilDato: OffsetDateTime?,
     @field:JsonProperty private val forerkortKode: String?,
     @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val forerkortKodeKlasse: String,
     @field:JsonProperty private val alternativKlasse: String?,
     @field:JsonProperty private val utsteder: String?
 ) {
-    constructor(fraDato: LocalDate?, tilDato: LocalDate?, klasse: String, klassebeskrivelse: String) : this(
+    constructor(fraDato: OffsetDateTime?, tilDato: OffsetDateTime?, klasse: String, klassebeskrivelse: String) : this(
         fraDato,
         tilDato,
         null,  // Det finnes to formater på førerkort, så vi må håndtere begge
@@ -46,8 +47,8 @@ class EsForerkort(
         fun fraMelding(cvNode: JsonNode): List<EsForerkort> {
             return cvNode["foererkort"]["klasse"].map { forerkortNode ->
                 EsForerkort(
-                    fraDato = forerkortNode["fraTidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
-                    tilDato = forerkortNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
+                    fraDato = forerkortNode["fraTidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC) },
+                    tilDato = forerkortNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC) },
                     klasse = forerkortNode["klasse"].asText(null),
                     klassebeskrivelse = forerkortNode["klasseBeskrivelse"].asText(),
                 )

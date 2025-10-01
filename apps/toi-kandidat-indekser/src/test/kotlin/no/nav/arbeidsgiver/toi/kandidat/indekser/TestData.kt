@@ -24,6 +24,13 @@ data class TestFagdokumentasjon(
     val tittel: String,
     val beskrivelse: String?
 )
+data class TestGodkjenning(
+    val tittel: String,
+    val utsteder: String,
+    val gjennomfoert: LocalDate,
+    val utloeper: LocalDate?,
+    val konseptId: String
+)
 data class TestYrkeserfaring(
     val stillingstittel: String,
     val styrkkode: String,
@@ -39,6 +46,12 @@ data class TestYrkeserfaring(
 data class TestKompetanse(
     val navn: String,
     val nivaa: String
+)
+data class TestSprak(
+    val navn: String,
+    val iso3: String = "??",
+    val ferdighetMuntlig: String,
+    val ferdighetSkriftlig: String
 )
 data class TestAnnenErfaring(
     val beskrivelse: String,
@@ -216,6 +229,22 @@ fun rapidMelding(
             beskrivelse = null
         )
     ),
+    godkjenning: List<TestGodkjenning> = listOf(
+        TestGodkjenning(
+            tittel = "Taxiløyve",
+            utsteder = "Viken fylkeskommune",
+            gjennomfoert = LocalDate.of(2019, 12, 18),
+            utloeper = null,
+            konseptId = "1903811"
+        ),
+        TestGodkjenning(
+            tittel = "Autorisasjon som lege",
+            utsteder = "Legeautorisasjonstjenesten",
+            gjennomfoert = LocalDate.of(2005, 4, 1),
+            utloeper = LocalDate.of(2060, 6, 1),
+            konseptId = "381393"
+        )
+    ),
     yrkeserfaring: List<TestYrkeserfaring> = listOf(
         TestYrkeserfaring(
             stillingstittel = "Lege",
@@ -260,6 +289,14 @@ fun rapidMelding(
         "Definere riggebehov for sirkuskunster",
         "Kontrollere sirkusrigging før fremføring",
         "Servicearbeid"
+    ),
+    sprak: List<TestSprak> = listOf(
+        TestSprak(
+            navn = "Norsk",
+            iso3 = "nor",
+            ferdighetMuntlig = "FOERSTESPRAAK",
+            ferdighetSkriftlig = "FOERSTESPRAAK"
+        )
     ),
     annenErfaring: List<TestAnnenErfaring> = listOf(
         TestAnnenErfaring(
@@ -488,34 +525,17 @@ fun rapidMelding(
                         }
                         """.trimIndent()
                     }},
-                "godkjenninger": [
-                  {
-                    "tittel": "Taxiløyve",
-                    "utsteder": "Viken fylkeskommune",
-                    "gjennomfoert": [
-                      2019,
-                      12,
-                      18
-                    ],
-                    "utloeper": null,
-                    "konseptId": "1903811"
-                  },
-                  {
-                    "tittel": "Autorisasjon som lege",
-                    "utsteder": "Legeautorisasjonstjenesten",
-                    "gjennomfoert": [
-                      2005,
-                      4,
-                      1
-                    ],
-                    "utloeper": [
-                      2060,
-                      6,
-                      1
-                    ],
-                    "konseptId": "381393"
-                  }
-                ],
+                "godkjenninger": ${godkjenning.joinToString(prefix = "[", postfix = "]") {
+                        """
+                        {
+                            "tittel": "${it.tittel}",
+                            "utsteder": "${it.utsteder}",
+                            "gjennomfoert": ${it.gjennomfoert.let { "[${it.year}, ${it.monthValue}, ${it.dayOfMonth}]" }},
+                            "utloeper": ${it.utloeper?.let { "[${it.year}, ${it.monthValue}, ${it.dayOfMonth}]" }},
+                            "konseptId": "${it.konseptId}"
+                          }
+                        """.trimIndent()
+                    }},
                 "kurs": ${kurs.joinToString(prefix = "[", postfix = "]") {
                         """
                         {
@@ -549,14 +569,17 @@ fun rapidMelding(
                         """.trimIndent()
                     }
                 },
-                "spraakferdigheter": [
-                  {
-                    "spraaknavn": "Norsk",
-                    "iso3kode": "nor",
-                    "muntlig": "FOERSTESPRAAK",
-                    "skriftlig": "FOERSTESPRAAK"
-                  }
-                ],
+                "spraakferdigheter": ${sprak.joinToString(prefix = "[", postfix = "]") { 
+                        """
+                        {
+                            "spraaknavn": "${it.navn}",
+                            "iso3kode": "${it.iso3}",
+                            "muntlig": "${it.ferdighetMuntlig}",
+                            "skriftlig": "${it.ferdighetSkriftlig}"
+                        }
+                        """.trimIndent()
+                    }
+                },
                 "annenErfaring": ${annenErfaring.joinToString(prefix = "[", postfix = "]") { 
                         """
                         {

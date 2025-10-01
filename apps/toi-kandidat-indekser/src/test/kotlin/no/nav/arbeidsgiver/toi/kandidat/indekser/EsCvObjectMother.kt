@@ -389,7 +389,7 @@ object EsCvObjectMother {
         tittel: String,
         beskrivelse: String?,
         utsteder: String
-    ) = EsForerkort(LocalDate.from(fraDato), tilDato?.let(LocalDate::from), konseptId, tittel, beskrivelse, utsteder)
+    ) = EsForerkort(fraDato, tilDato, konseptId, tittel, beskrivelse, utsteder)
 
     fun lagEsKurs(
         tittel: String,

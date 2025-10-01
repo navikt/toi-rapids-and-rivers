@@ -66,8 +66,8 @@ class EsSprak(
         fun fraMelding(cvNode: JsonNode) = cvNode["spraakferdigheter"].map { spraakferdigheter ->
             EsSprak(
                 spraaknavn = spraakferdigheter["spraaknavn"].asText(),
-                ferdighetMuntlig = spraakferdigheter["ferdighetMuntlig"]?.asText(null),
-                ferdighetSkriftlig = spraakferdigheter["ferdighetSkriftlig"]?.asText(null)
+                ferdighetMuntlig = spraakferdigheter["muntlig"]?.asText(null),
+                ferdighetSkriftlig = spraakferdigheter["skriftlig"]?.asText(null)
             )
         }
     }
