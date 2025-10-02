@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Disabled
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
@@ -328,7 +329,7 @@ class EsCvObjectMotherVariantIntegrationTest {
     }
 
     @Test
-    fun `giveMeCvFritattForAgKandidatsok - flagg satt (via ES)`() {
+    fun `fritattAgKandidatsok skal fjernes test at felter ikkenfinnes  i ES-dokumentet Fjern testen etter fjerning av feltet`() {
         val cv = EsCvObjectMother.giveMeCvFritattForAgKandidatsok()
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
@@ -337,6 +338,16 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(kandidatnr).isNotBlank
         assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
-        assertThat(cvJson["fritattAgKandidatsok"].asBoolean()).isTrue
+        assertThat(cvJson.has("fritattAgKandidatsok")).isFalse
+    }
+
+    @Test
+    fun `fritattKandidatsok skal fjernes test at felter finnes ikke i ES-dokumentet Fjern testen etter fjerning av feltet`(){
+        val cv = EsCvObjectMother.giveMeEsCv()
+        val response = lagreOgHent(cv)
+        assertThat(response.found()).isTrue
+        val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
+        // Assert that deprecated fields are absent
+        assertThat(cvJson.has("fritattKandidatsok")).isFalse
     }
 }
