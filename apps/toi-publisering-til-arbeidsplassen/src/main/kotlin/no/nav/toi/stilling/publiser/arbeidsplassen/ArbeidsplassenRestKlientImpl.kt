@@ -50,7 +50,7 @@ class ArbeidsplassenRestKlientImpl(
         log.info("Resultat av publisering til Arbeidsplassen: $arbeidsplassenResultat")
 
         if (arbeidsplassenResultat.status == "ERROR") {
-            val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen: ${arbeidsplassenResultat.message}"
+            val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen for stilling ${stilling.reference}: ${arbeidsplassenResultat.message}"
             log.error(feilmeldingVedPublisering)
             error(feilmeldingVedPublisering)
         }
