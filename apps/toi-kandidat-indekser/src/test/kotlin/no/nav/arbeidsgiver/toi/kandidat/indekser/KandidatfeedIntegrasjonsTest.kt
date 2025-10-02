@@ -33,11 +33,7 @@ class KandidatfeedIntegrasjonsTest {
         private val esIndex = "kandidatfeed"
         @Container
         private var elasticsearch: ElasticsearchContainer =
-            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.18.3")
-                .withExposedPorts(9200)
-                .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
-                .withEnv("discovery.type", "single-node")
-                .withEnv("xpack.security.enabled", "false")
+            EsTestUtils.defaultElasticsearchContainer()
         private lateinit var testEsClient: ESClient
         private lateinit var client: OpenSearchClient
         private fun OpenSearchClient.flush() = this.indices().flush { it.index(esIndex) }
@@ -45,30 +41,10 @@ class KandidatfeedIntegrasjonsTest {
 
     @BeforeEach
     fun setUp() {
-        testEsClient = ESClient(elasticsearch.httpHostAddress, esIndex, "kandidat", "kandidat")
-        client = OpenSearchClient(
-            ApacheHttpClient5TransportBuilder.builder(
-                HttpHost.create(elasticsearch.httpHostAddress)
-            ).build())
-        val indexExists = client.indices().exists { it.index(esIndex) }.value()
-        if (indexExists) {
-            do {
-                client.indices().refresh { it.index(esIndex) }
-                client.deleteByQuery(
-                    DeleteByQueryRequest.Builder()
-                    .index(esIndex)
-                    .query { it.matchAll { it } }
-                    .refresh(Refresh.True)
-                    .build()
-                )
-                println("Vent litt på at ES skal slette alle dokumenter")
-                client.flush()
-            } while (client.count().count() != 0L)
-        } else {
-            client.indices().create { it.index(esIndex) }
-            client.flush()
-        }
-        sleepForAsyncES()
+        testEsClient = EsTestUtils.esClient(elasticsearch, esIndex)
+        client = EsTestUtils.openSearchClient(elasticsearch)
+        EsTestUtils.ensureIndexClean(client, esIndex)
+        EsTestUtils.sleepForAsyncES()
     }
 
     @Test
@@ -586,22 +562,22 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cv.source()?.indekseringsnøkkel()).isEqualTo(expectedKandidatnr)
     }
     private fun waitForCount(expected: Long) {
-        sleepForAsyncES()
+        EsTestUtils.sleepForAsyncES()
+        // Keep existing stronger refresh/flush semantics via utils
         val deadline = System.currentTimeMillis() + 10000
         while (System.currentTimeMillis() < deadline) {
             client.indices().refresh { it.index(esIndex) }
-            client.flush()
+            EsTestUtils.flush(client, esIndex)
             val current = client.count().count()
             if (current == expected) return
             Thread.sleep(200)
         }
-        // last attempt to surface a helpful failure
         client.indices().refresh { it.index(esIndex) }
-        client.flush()
+        EsTestUtils.flush(client, esIndex)
         assertThat(client.count().count()).isEqualTo(expected)
     }
 }
 
 private fun sleepForAsyncES() {
-    Thread.sleep(1000)
+    EsTestUtils.sleepForAsyncES()
 }

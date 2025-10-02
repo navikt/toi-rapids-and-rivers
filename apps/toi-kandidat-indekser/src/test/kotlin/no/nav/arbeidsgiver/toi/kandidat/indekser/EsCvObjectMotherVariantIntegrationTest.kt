@@ -17,16 +17,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.apache.hc.core5.http.HttpHost
 
 @Testcontainers
-class EsCvObjectMotherVariantsTest {
+class EsCvObjectMotherVariantIntegrationTest {
     companion object {
         private val esIndex = "kandidatfeed-variants"
         @Container
         private var elasticsearch: ElasticsearchContainer =
-            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.18.3")
-                .withExposedPorts(9200)
-                .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
-                .withEnv("discovery.type", "single-node")
-                .withEnv("xpack.security.enabled", "false")
+            EsTestUtils.defaultElasticsearchContainer()
         private lateinit var testEsClient: ESClient
         private lateinit var client: OpenSearchClient
     }
@@ -37,47 +33,14 @@ class EsCvObjectMotherVariantsTest {
 
     @BeforeEach
     fun setUp() {
-        testEsClient = ESClient(elasticsearch.httpHostAddress, esIndex, "kandidat", "kandidat")
-        client = OpenSearchClient(
-            ApacheHttpClient5TransportBuilder.builder(
-                HttpHost.create(elasticsearch.httpHostAddress)
-            ).build())
-        val indexExists = client.indices().exists { it.index(esIndex) }.value()
-        if (indexExists) {
-            do {
-                client.indices().refresh { it.index(esIndex) }
-                client.deleteByQuery(
-                    DeleteByQueryRequest.Builder()
-                        .index(esIndex)
-                        .query { it.matchAll { it } }
-                        .refresh(Refresh.True)
-                        .build()
-                )
-            } while (client.count().count() != 0L)
-        } else {
-            client.indices().create { it.index(esIndex) }
-        }
-        Thread.sleep(1000)
+        testEsClient = EsTestUtils.esClient(elasticsearch, esIndex)
+        client = EsTestUtils.openSearchClient(elasticsearch)
+        EsTestUtils.ensureIndexClean(client, esIndex)
+        EsTestUtils.sleepForAsyncES()
     }
 
-    private fun lagreOgHent(cv: EsCv) = run {
-        testEsClient.lagreEsCv(cv)
-        waitForCount(1)
-        client.get({ req ->
-            req.index(esIndex).id(cv.indekseringsnøkkel())
-        }, EsCv::class.java)
-    }
-
-    private fun waitForCount(expected: Long) {
-        var attempts = 0
-        while (attempts < 50) {
-            val c = client.count { it.index(esIndex) }.count()
-            if (c == expected) return
-            Thread.sleep(100)
-            attempts++
-        }
-        throw AssertionError("Timed out waiting for count=$expected")
-    }
+    private fun lagreOgHent(cv: EsCv) =
+        EsTestUtils.lagreOgHent(cv, testEsClient, client, esIndex)
 
     @Test
     fun `giveMeEsCv - basis CV med forventet innhold (via ES)`() {
