@@ -8,18 +8,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.opensearch.client.opensearch.OpenSearchClient
-import org.opensearch.client.opensearch._types.Refresh
-import org.opensearch.client.opensearch.core.DeleteByQueryRequest
-import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.apache.hc.core5.http.HttpHost
 
 @Testcontainers
 class EsCvObjectMotherVariantIntegrationTest {
     companion object {
         private val esIndex = "kandidatfeed-variants"
+
         @Container
         private var elasticsearch: ElasticsearchContainer =
             EsTestUtils.defaultElasticsearchContainer()
@@ -62,6 +59,25 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(cvJson["veilederIdent"].asText()).isEqualTo(expectedJson["veilederIdent"].asText())
         assertThat(cvJson["veilederVisningsnavn"].asText()).isEqualTo(expectedJson["veilederVisningsnavn"].asText())
         assertThat(cvJson["veilederEpost"].asText()).isEqualTo(expectedJson["veilederEpost"].asText())
+
+        val harKontakt = cvJson.get("harKontaktinformasjon") ?: cvJson.get("isHarKontaktinformasjon")
+        assertThat(harKontakt).isNotNull
+        assertThat(harKontakt!!.asBoolean()).isTrue
+        assertThat(cvJson.has("totalLengdeYrkeserfaring")).isTrue
+        assertThat(cvJson["totalLengdeYrkeserfaring"].asInt()).isGreaterThan(0)
+
+        // Jobbønsker
+        assertThat(cvJson["geografiJobbonsker"].size()).isGreaterThan(0)
+        assertThat(cvJson["yrkeJobbonskerObj"].size()).isGreaterThan(0)
+        assertThat(cvJson["omfangJobbonskerObj"].size()).isGreaterThan(0)
+        assertThat(cvJson["ansettelsesformJobbonskerObj"].size()).isGreaterThan(0)
+        assertThat(cvJson["arbeidstidsordningJobbonskerObj"].size()).isGreaterThan(0)
+        assertThat(cvJson["arbeidsdagerJobbonskerObj"].size()).isEqualTo(2)
+        assertThat(cvJson["arbeidstidJobbonskerObj"].size()).isGreaterThan(0)
+
+        // Samlet kompetanse (kombinert fra kompetanse/sertifikat/godkjenninger)
+        assertThat(cvJson["samletKompetanseObj"].isArray).isTrue
+        assertThat(cvJson["samletKompetanseObj"].size()).isGreaterThan(0)
 
         // Utdanning
         assertThat(cvJson["utdanning"].size()).isEqualTo(2)
