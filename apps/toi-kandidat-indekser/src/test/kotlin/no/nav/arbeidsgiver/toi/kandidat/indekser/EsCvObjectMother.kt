@@ -214,9 +214,9 @@ object EsCvObjectMother {
 
         val forerkortListe = listOf(forerkort1, forerkort2, forerkort3, forerkort4)
 
-        val sprak1 = EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål")
+        val sprak1 = EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(skriftlig)", "Norwegian", "Morsmål", "Morsmål", null)
 
-        val sprak2 = EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål")
+        val sprak2 = EsSprak(fraIsoDato("2012-12-01"), "78874", "Norsk(muntlig)", "Norwegian", "Morsmål", "Morsmål", null)
 
         val sprakListe = listOf(sprak1, sprak2)
 
