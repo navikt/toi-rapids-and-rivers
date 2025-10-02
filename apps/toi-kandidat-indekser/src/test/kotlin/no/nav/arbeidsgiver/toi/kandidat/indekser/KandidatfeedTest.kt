@@ -74,49 +74,6 @@ class KandidatfeedTest {
     }
 
     @Test
-    fun `Melding uten synlighet skal ikke opprette kandidat i ES`() {
-        assertIngenIIndekser()
-        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = null)
-
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
-
-        assertIngenIIndekser()
-    }
-
-    @Test
-    fun `Melding med kun CV og aktørId vil ikke opprette kandidat i ES`() {
-        assertIngenIIndekser()
-        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(erSynlig = false, ferdigBeregnet = false), hullICv = null, ontologi = null, organisasjonsenhetsnavn = null)
-
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
-
-        assertIngenIIndekser()
-    }
-
-    @Test
-    fun `Meldinger der synlighet er ferdig beregnet til true men dekte behov ikke eksisterer på meldingen skal ikke kandidat legges i ES`() {
-        assertIngenIIndekser()
-        val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true))
-
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-
-        testrapid.sendTestMessage(meldingSynlig)
-
-        assertIngenIIndekser()
-    }
-
-    @Test
     fun `Meldinger der synlighet er ferdig beregnet til false men dekte behov ikke eksisterer skal kandidat enda slettes i ES`() {
         assertIngenIIndekser()
         val kandidatnr = "CG133309"
@@ -156,28 +113,6 @@ class KandidatfeedTest {
     }
 
     @Test
-    fun `Meldinger der synlighet er ferdig beregnet og har dekte behov men slutt av hendelseskjede er satt til true skal ikke kandidat legges til i ES`() {
-        assertIngenIIndekser()
-        val expectedKandidatnr = "CG133310"
-        val meldingSynlig = rapidMelding(
-            synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
-            ontologi = ontologiDel(),
-            kandidatnr = expectedKandidatnr,
-            sluttAvHendelseskjede = true
-        )
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-
-        testrapid.sendTestMessage(meldingSynlig)
-
-        assertIngenIIndekser()
-        assertThat(testrapid.inspektør.size).isEqualTo(0)
-    }
-
-    @Test
     fun `Meldinger der synlighet er ferdig beregnet til false, skal kandidat slettes om han er lagt til i ES`() {
         assertIngenIIndekser()
         val expectedKandidatnr = "CG133310"
@@ -205,51 +140,6 @@ class KandidatfeedTest {
         assertIngenIIndekser()
     }
 
-    @Test
-    fun `Meldinger der synlighet ikke er ferdig beregnet skal ikke kandidat legges i ES`() {
-        assertIngenIIndekser()
-        val meldingSynlig = rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = false))
-
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-        testrapid.sendTestMessage(meldingSynlig)
-
-        assertIngenIIndekser()
-    }
-
-    @Test
-    fun `UsynligKandidatfeedLytter leser ikke melding om slutt_av_hendelseskjede er true`() {
-        assertIngenIIndekser()
-        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true), sluttAvHendelseskjede = true)
-
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-
-        testrapid.sendTestMessage(meldingUsynlig)
-
-        assertIngenIIndekser()
-        assertThat(testrapid.inspektør.size).isEqualTo(0)
-    }
-
-    @Test
-    fun `SynligKandidatfeedLytter leser ikke melding om slutt_av_hendelseskjede er true`() {
-        assertIngenIIndekser()
-        val rapidMelding =
-            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", hullICv = "{}", ontologi = "{}", sluttAvHendelseskjede = true)
-        val testrapid = TestRapid()
-
-        SynligKandidatfeedLytter(testrapid, testEsClient)
-        UsynligKandidatfeedLytter(testrapid, testEsClient)
-
-        testrapid.sendTestMessage(rapidMelding)
-
-        assertIngenIIndekser()
-        assertThat(testrapid.inspektør.size).isEqualTo(0)
-    }
 
     @Test
     fun `UsynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {

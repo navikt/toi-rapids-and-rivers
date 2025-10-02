@@ -1,4 +1,3 @@
-
 plugins {
     id("toi.rapids-and-rivers")
 }
@@ -14,6 +13,8 @@ dependencies {
     implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
     testImplementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelseskodeverkVersion")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("io.mockk:mockk-agent-jvm:1.13.12")
 }
 
 tasks.test {
