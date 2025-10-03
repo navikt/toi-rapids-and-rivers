@@ -18,6 +18,7 @@ class StillingTilArbeidsplassenLytter(
                 it.requireKey("direktemeldtStilling")
                 it.requireKey("stillingsId")
                 it.requireValue("@event_name", "publiserEllerAvpubliserTilArbeidsplassen")
+                it.forbid("stilling") // Ikke les meldingen på nytt etter at den har vært innom stillingPopulator
             }
         }.register(this)
     }

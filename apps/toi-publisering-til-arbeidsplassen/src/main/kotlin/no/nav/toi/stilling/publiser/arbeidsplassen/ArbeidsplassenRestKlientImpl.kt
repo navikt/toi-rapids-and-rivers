@@ -39,7 +39,7 @@ class ArbeidsplassenRestKlientImpl(
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         val statusCode = response.statusCode()
         if (statusCode != 200) {
-            val feilmelding = "Klarte ikke å publisere stilling til Arbeidsplassen $statusCode"
+            val feilmelding = "Klarte ikke å publisere stilling ${stilling.reference} til Arbeidsplassen $statusCode"
             log.error(feilmelding)
             error(feilmelding)
         }
@@ -73,7 +73,7 @@ class ArbeidsplassenRestKlientImpl(
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         val statusCode = response.statusCode()
         if (statusCode != 200 && statusCode != 404) {
-            val feilmelding = "Klarte ikke å avpublisere stilling til Arbeidsplassen $statusCode"
+            val feilmelding = "Klarte ikke å avpublisere stilling ${stilling.reference} til Arbeidsplassen $statusCode"
             log.error(feilmelding)
             error(feilmelding)
         }
