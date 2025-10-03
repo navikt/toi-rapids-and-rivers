@@ -14,8 +14,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/feature/send-stilling-til-arbeidsplassen
-    secrets: inherit
+      deploy_dev_branch: refs/heads/feature/hopp_over_feil_melding
     permissions:
       contents: read
       id-token: write

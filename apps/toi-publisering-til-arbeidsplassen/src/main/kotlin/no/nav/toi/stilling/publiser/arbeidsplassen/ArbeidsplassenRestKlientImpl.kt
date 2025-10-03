@@ -39,7 +39,7 @@ class ArbeidsplassenRestKlientImpl(
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         val statusCode = response.statusCode()
         if (statusCode != 200) {
-            val feilmelding = "Klarte ikke å publisere stilling til Arbeidsplassen $statusCode"
+            val feilmelding = "Klarte ikke å publisere stilling ${stilling.reference} til Arbeidsplassen $statusCode"
             log.error(feilmelding)
             error(feilmelding)
         }
@@ -52,7 +52,8 @@ class ArbeidsplassenRestKlientImpl(
         if (arbeidsplassenResultat.status == "ERROR") {
             val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen for stilling ${stilling.reference}: ${arbeidsplassenResultat.message}"
             log.error(feilmeldingVedPublisering)
-            error(feilmeldingVedPublisering)
+            //error(feilmeldingVedPublisering)
+            return
         }
         log.info("Publiserte stilling til Arbeidsplassen OK: $arbeidsplassenResultat")
     }
