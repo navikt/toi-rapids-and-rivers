@@ -41,7 +41,7 @@ class ArbeidsplassenRestKlientImpl(
         if (statusCode != 200) {
             val feilmelding = "Klarte ikke å publisere stilling ${stilling.reference} til Arbeidsplassen $statusCode"
             log.error(feilmelding)
-            error(feilmelding)
+           // error(feilmelding)
         }
 
         val resultatSomStreng = response.body()
@@ -53,7 +53,6 @@ class ArbeidsplassenRestKlientImpl(
             val feilmeldingVedPublisering = "Feil ved publisering av stilling til Arbeidsplassen for stilling ${stilling.reference}: ${arbeidsplassenResultat.message}"
             log.error(feilmeldingVedPublisering)
             //error(feilmeldingVedPublisering)
-            return
         }
         log.info("Publiserte stilling til Arbeidsplassen OK: $arbeidsplassenResultat")
     }
