@@ -110,3 +110,6 @@ spec:
     - team: toi
       application: toi-publiser-dir-stillinger
       access: readwrite
+    - team: toi
+      application: toi-kandidat-indekser
+      access: readwrite
