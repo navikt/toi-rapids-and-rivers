@@ -16,7 +16,3 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("io.mockk:mockk-agent-jvm:1.13.12")
 }
-
-tasks.test {
-    environment("JAVA_TOOL_OPTIONS", "-XX:UseSVE=0")
-}
