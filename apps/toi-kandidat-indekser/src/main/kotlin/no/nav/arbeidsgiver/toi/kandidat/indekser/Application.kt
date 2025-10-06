@@ -13,9 +13,10 @@ private val secureLog = LoggerFactory.getLogger("secureLog")
 fun main() {
     log.info("Starter app.")
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+    val env = System.getenv()
 
     RapidApplication.create(System.getenv()).also { rapidsConnection ->
-        val esClient = ESClient("", "", "", "")
+        val esClient = ESClient(env["OPEN_SEARCH_URI"]!!, "kandidater", env["OPEN_SEARCH_USERNAME"]!!, env["OPEN_SEARCH_PASSWORD"]!!)
         SynligKandidatfeedLytter(rapidsConnection, esClient)
         UsynligKandidatfeedLytter(rapidsConnection, esClient)
         //UferdigKandidatLytter(rapidsConnection)                   TODO Enn så lenge kandidatfeeds ansvar
