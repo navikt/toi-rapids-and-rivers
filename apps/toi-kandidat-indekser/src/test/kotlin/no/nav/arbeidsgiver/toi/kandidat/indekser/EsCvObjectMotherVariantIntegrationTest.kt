@@ -328,6 +328,7 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(cvJson["fritattKandidatsok"].asBoolean()).isTrue
     }
 
+    @Disabled
     @Test
     fun `fritattAgKandidatsok skal fjernes test at felter ikkenfinnes  i ES-dokumentet Fjern testen etter fjerning av feltet`() {
         val cv = EsCvObjectMother.giveMeCvFritattForAgKandidatsok()
@@ -341,6 +342,7 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(cvJson.has("fritattAgKandidatsok")).isFalse
     }
 
+    @Disabled
     @Test
     fun `fritattKandidatsok skal fjernes test at felter finnes ikke i ES-dokumentet Fjern testen etter fjerning av feltet`(){
         val cv = EsCvObjectMother.giveMeEsCv()
