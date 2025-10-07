@@ -68,7 +68,7 @@ object EsTestUtils {
         throw AssertionError("Timed out waiting for count=$expected in index=$index")
     }
 
-    fun sleepForAsyncES(ms: Long = 1000) = Thread.sleep(ms)
+    fun sleepForAsyncES(ms: Long = 10) = Thread.sleep(ms)
 
     /** Lagrer CV via ESClient og henter den ut igjen via OpenSearchClient. */
     fun lagreOgHent(cv: EsCv, esClient: ESClient, osClient: OpenSearchClient, index: String) =

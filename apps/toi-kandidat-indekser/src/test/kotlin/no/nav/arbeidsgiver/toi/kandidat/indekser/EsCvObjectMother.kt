@@ -51,7 +51,7 @@ object EsCvObjectMother {
 
     private fun nåMinusÅr(antallÅr: Int) = OffsetDateTime.now().minusYears(antallÅr.toLong())
 
-    fun giveMeEsCv(kandidatnr: String = "1L"): EsCv {
+    fun giveMeEsCv(kandidatnr: String = "1L", aktorId: String = nteAktorId(1)): EsCv {
         val utdanning = lagEsUtdanning(
             fraIsoDato("1988-08-20"), fraIsoDato("1989-06-20"), "Otta vgs. Otta",
             "355211", "Mekaniske fag, grunnkurs", "GK maskin/mekaniker"
@@ -277,7 +277,7 @@ object EsCvObjectMother {
         val arbeidsdagerJobbonskerList = listOf(arbeidsdagerJobbonskerLoerdag, arbeidsdagerJobbonskerSoendag)
 
         return EsCv(
-            nteAktorId(1),
+            aktorId,
             "01016012345",
             "OLA",
             "NORDMANN",

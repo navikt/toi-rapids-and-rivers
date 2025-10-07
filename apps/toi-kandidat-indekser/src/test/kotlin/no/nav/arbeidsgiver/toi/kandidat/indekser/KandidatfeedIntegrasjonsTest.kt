@@ -51,10 +51,11 @@ class KandidatfeedIntegrasjonsTest {
     fun `Meldinger der synlighet er ferdig beregnet til false men dekte behov ikke eksisterer skal kandidat enda slettes i ES`() {
         assertIngenIIndekser()
         val kandidatnr = "CG133309"
+        val aktørId = "1234567891011212"
 
-        testEsClient.lagreEsCv(EsCvObjectMother.giveMeEsCv(kandidatnr = kandidatnr))
+        testEsClient.lagreEsCv(EsCvObjectMother.giveMeEsCv(kandidatnr = kandidatnr, aktorId = aktørId))
 
-        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true), kandidatnr = kandidatnr)
+        val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true), kandidatnr = kandidatnr, aktørId = aktørId)
 
         val testrapid = TestRapid()
 

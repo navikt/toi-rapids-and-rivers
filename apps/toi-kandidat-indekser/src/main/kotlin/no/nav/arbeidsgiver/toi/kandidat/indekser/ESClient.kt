@@ -15,6 +15,8 @@ import org.apache.hc.core5.http.HttpHost
 import org.apache.hc.core5.ssl.SSLContextBuilder
 import org.opensearch.client.json.jackson.JacksonJsonpMapper
 import org.opensearch.client.opensearch.OpenSearchClient
+import org.opensearch.client.opensearch._types.FieldValue
+import org.opensearch.client.opensearch._types.Refresh
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 
 
@@ -31,12 +33,15 @@ class ESClient(
             req.index(esIndex)
                 .id(giveMeEsCv.indekseringsnøkkel())
                 .document(giveMeEsCv)
+                .refresh(Refresh.True)
         }
     }
 
-    fun slettCv(indekseringsnøkkel: String) {
-        openSearchClient.delete { req ->
-            req.index(esIndex).id(indekseringsnøkkel)
+    fun slettCv(aktørId: String) {
+        openSearchClient.deleteByQuery{ req ->
+            req.index(esIndex).query { q ->
+                q.term { t -> t.field("aktorId").value(FieldValue.of(aktørId)) }
+            }.refresh(Refresh.True)
         }
     }
 

@@ -102,7 +102,8 @@ class KandidatFeedTest {
         val rapid = nyRapidMedLyttere(esClient)
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
-            sluttAvHendelseskjede = true
+            sluttAvHendelseskjede = true,
+            cvEksisterer = false
         )
 
         rapid.sendTestMessage(meldingUsynlig)
@@ -157,7 +158,8 @@ class KandidatFeedTest {
         val rapid = nyRapidMedLyttere(esClient)
 
         val melding = rapidMelding(
-            synlighetJson = synlighet(erSynlig = false, ferdigBeregnet = true)
+            synlighetJson = synlighet(erSynlig = false, ferdigBeregnet = true),
+            cvEksisterer = false
         )
 
         rapid.sendTestMessage(melding)
