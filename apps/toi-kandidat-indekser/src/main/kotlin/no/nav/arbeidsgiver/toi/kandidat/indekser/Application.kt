@@ -16,7 +16,7 @@ fun main() {
     val env = System.getenv()
 
     RapidApplication.create(System.getenv()).also { rapidsConnection ->
-        val esClient = ESClient(env["OPEN_SEARCH_URI"]!!, "kandidater", env["OPEN_SEARCH_USERNAME"]!!, env["OPEN_SEARCH_PASSWORD"]!!)
+        val esClient = ESClient(env["OPEN_SEARCH_URI"]!!, env["OPEN_SEARCH_USERNAME"]!!, env["OPEN_SEARCH_PASSWORD"]!!)
         SynligKandidatfeedLytter(rapidsConnection, esClient)
         UsynligKandidatfeedLytter(rapidsConnection, esClient)
         //UferdigKandidatLytter(rapidsConnection)                   TODO Enn så lenge kandidatfeeds ansvar

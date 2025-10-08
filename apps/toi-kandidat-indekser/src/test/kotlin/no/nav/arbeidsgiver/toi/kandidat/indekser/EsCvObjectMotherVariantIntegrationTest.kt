@@ -16,7 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 class EsCvObjectMotherVariantIntegrationTest {
     companion object {
-        private val esIndex = "kandidatfeed-variants"
+        private val esIndex = "kandidater"
 
         @Container
         private var elasticsearch: ElasticsearchContainer =
@@ -31,7 +31,7 @@ class EsCvObjectMotherVariantIntegrationTest {
 
     @BeforeEach
     fun setUp() {
-        testEsClient = EsTestUtils.esClient(elasticsearch, esIndex)
+        testEsClient = EsTestUtils.esClient(elasticsearch)
         client = EsTestUtils.openSearchClient(elasticsearch)
         EsTestUtils.ensureIndexClean(client, esIndex)
         EsTestUtils.sleepForAsyncES()

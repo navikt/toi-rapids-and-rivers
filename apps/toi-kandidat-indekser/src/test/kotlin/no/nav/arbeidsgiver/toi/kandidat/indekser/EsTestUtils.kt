@@ -29,8 +29,8 @@ object EsTestUtils {
         )
 
     /** Lager en ESClient mot gitt container og indeks. */
-    fun esClient(container: ElasticsearchContainer, index: String): ESClient =
-        ESClient(container.httpHostAddress, index, "kandidat", "kandidat")
+    fun esClient(container: ElasticsearchContainer): ESClient =
+        ESClient(container.httpHostAddress, "kandidat", "kandidat")
 
     /** Sørger for at indeksen finnes og er tom. */
     fun ensureIndexClean(client: OpenSearchClient, index: String) {

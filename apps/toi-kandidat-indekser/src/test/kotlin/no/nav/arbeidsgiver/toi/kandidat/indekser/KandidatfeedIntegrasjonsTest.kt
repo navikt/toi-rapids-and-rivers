@@ -30,7 +30,7 @@ import java.time.ZoneOffset
 @Testcontainers
 class KandidatfeedIntegrasjonsTest {
     companion object {
-        private val esIndex = "kandidatfeed"
+        private val esIndex = "kandidater"
         @Container
         private var elasticsearch: ElasticsearchContainer =
             EsTestUtils.defaultElasticsearchContainer()
@@ -41,7 +41,7 @@ class KandidatfeedIntegrasjonsTest {
 
     @BeforeEach
     fun setUp() {
-        testEsClient = EsTestUtils.esClient(elasticsearch, esIndex)
+        testEsClient = EsTestUtils.esClient(elasticsearch)
         client = EsTestUtils.openSearchClient(elasticsearch)
         EsTestUtils.ensureIndexClean(client, esIndex)
         EsTestUtils.sleepForAsyncES()

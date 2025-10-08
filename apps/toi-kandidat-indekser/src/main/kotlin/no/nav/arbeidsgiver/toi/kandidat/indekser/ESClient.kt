@@ -22,26 +22,34 @@ import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBui
 
 class ESClient(
     esUrl: String,
-    private val esIndex: String,
     esUsername: String,
     esPassword: String
 ) {
+    private val alias = "kandidater"
+    private val hovedIndex = "kandidater-1"
+    private val ekstraIndekser = listOf<String>()
+    private val indexer = listOf(hovedIndex) + ekstraIndekser
+
     private val openSearchClient: OpenSearchClient
 
     fun lagreEsCv(giveMeEsCv: EsCv) {
-        openSearchClient.index { req ->
-            req.index(esIndex)
-                .id(giveMeEsCv.indekseringsnøkkel())
-                .document(giveMeEsCv)
-                .refresh(Refresh.True)
+        indexer.forEach { index ->
+            openSearchClient.index { req ->
+                req.index(index)
+                    .id(giveMeEsCv.indekseringsnøkkel())
+                    .document(giveMeEsCv)
+                    .refresh(Refresh.True)
+            }
         }
     }
 
     fun slettCv(aktørId: String) {
-        openSearchClient.deleteByQuery{ req ->
-            req.index(esIndex).query { q ->
-                q.term { t -> t.field("aktorId").value(FieldValue.of(aktørId)) }
-            }.refresh(Refresh.True)
+        indexer.forEach { index ->
+            openSearchClient.deleteByQuery{ req ->
+                req.index(index).query { q ->
+                    q.term { t -> t.field("aktorId").value(FieldValue.of(aktørId)) }
+                }.refresh(Refresh.True)
+            }
         }
     }
 
@@ -70,5 +78,54 @@ class ESClient(
             .setMapper(JacksonJsonpMapper(objectMapper))
             .build()
         openSearchClient = OpenSearchClient(transport)
+
+        indexer.filterNot (::finnesIndex).forEach(::opprettIndex)
+
+        if(aliasIndex() != hovedIndex) {
+            oppdaterAlias(hovedIndex)
+        }
+    }
+
+    fun finnesIndex(index: String) = openSearchClient.indices()
+        .exists { req ->
+            req.index(index)
+        }.value()
+
+    private fun opprettIndex(index: String) {
+        openSearchClient.indices().create { req -> req.index(index) }
+    }
+
+    private fun aliasIndex() = try {
+        openSearchClient
+            .indices()
+            .getAlias { req -> req.name(alias) }
+            .result()
+            .keys
+            .firstOrNull()
+    } catch (_: Exception) {
+        null
+    }
+
+    private fun oppdaterAlias(hovedIndex: String) {
+        val currentIndices = try {
+            openSearchClient.indices()
+                .getAlias { req -> req.name(alias) }
+                .result()
+                .keys
+        } catch (_: Exception) {
+            emptyList()
+        }
+        openSearchClient.indices().updateAliases { req ->
+            req.actions { action ->
+                currentIndices.forEach { index ->
+                    action.remove { remove ->
+                        remove.index(index).alias(alias)
+                    }
+                }
+                action.add { add ->
+                    add.index(hovedIndex).alias(alias)
+                }
+            }
+        }
     }
 }
