@@ -5,3 +5,6 @@ reindekser_indeks: stilling_20250611
 reindekser_enabled: false
 stilling_api_url: http://rekrutteringsbistand-stilling-api
 stilling_api_scope: api://prod-gcp.toi.rekrutteringsbistand-stilling-api/.default
+opensearch_plan: "business-4"
+opensearch_project: "nav-prod"
+opensearch_endpoint_id: "76685598-1048-4f56-b34a-9769ef747a92"

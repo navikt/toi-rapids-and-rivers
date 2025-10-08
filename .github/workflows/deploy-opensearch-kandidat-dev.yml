@@ -1,0 +1,24 @@
+name: Deploy Opensearch kandidat dev
+on:
+  push:
+    branches:
+      - main
+      - ny-kandidat-indekser
+    paths:
+      - apps/toi-kandidat-indekser/opensearch.yaml
+      - .github/workflows/deploy-opensearch-kandidat-dev.yml
+jobs:
+  deploy-opensearch:
+    name: Deploy Opensearch instance to cluster
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: deploy to dev
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: apps/toi-kandidat-indekser/opensearch.yaml
+          VARS: apps/toi-kandidat-indekser/nais-dev.yaml
