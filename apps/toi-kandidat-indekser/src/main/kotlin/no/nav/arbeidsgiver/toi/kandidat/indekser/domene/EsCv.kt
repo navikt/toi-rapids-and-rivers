@@ -37,9 +37,9 @@ class EsCv(
 
     @field:JsonProperty private val fodselsdatoErDnr: Boolean,
     @field:JsonProperty private val formidlingsgruppekode: String,
-    @field:JsonProperty private val epostadresse: String,
+    @field:JsonProperty private val epostadresse: String?,
     @field:JsonProperty private val mobiltelefon: String?,
-    @field:JsonProperty private val telefon: String,
+    @field:JsonProperty private val telefon: String?,
 
     @field:JsonProperty private val statsborgerskap: String?,
     @field:JsonProperty private val kandidatnr: String,
@@ -75,7 +75,7 @@ class EsCv(
     @field:JsonProperty private val oppstartKode: String?,
 
     @field:JsonProperty private val kommunenummerstring: String,
-    veilederIdent: String,
+    veilederIdent: String?,
     @field:JsonProperty private val veilederVisningsnavn: String?,
     @field:JsonProperty private val veilederEpost: String?,
     @field:JsonProperty private val fylkeNavn: String?,
@@ -106,7 +106,7 @@ class EsCv(
 
     @field:JsonProperty private val totalLengdeYrkeserfaring = yrkeserfaring.totalYrkeserfaringIManeder()
 
-    @field:JsonProperty private val veilederIdent = veilederIdent.lowercase(Locale.getDefault())
+    @field:JsonProperty private val veilederIdent = veilederIdent?.lowercase(Locale.getDefault())
 
     @Deprecated("")
     @field:JsonProperty
