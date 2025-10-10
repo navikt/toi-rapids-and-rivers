@@ -34,8 +34,8 @@ class SynligKandidatfeedLytter(
                 behovsListe.forEach(it::requireKey)
             }
             validate {
-                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.førsteDagIInneværendeInaktivePeriode", "hullICv.sluttdatoerForInaktivePerioder")
-                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost")
+                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder")
+                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode")
             }
         }.register(this)
     }
