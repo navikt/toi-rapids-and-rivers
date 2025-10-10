@@ -11,7 +11,7 @@ import java.util.Objects
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsAnnenErfaring(
     @field:JsonProperty private val fraDato: YearMonth,
-    @field:JsonProperty private val tilDato: YearMonth,
+    @field:JsonProperty private val tilDato: YearMonth?,
     @field:JsonProperty private val beskrivelse: String,
     @field:JsonProperty private val rolle: String? = null
 ) {
@@ -27,7 +27,7 @@ class EsAnnenErfaring(
         fun fraMelding(cvNode: JsonNode) = cvNode["annenErfaring"].map { annenErfaring ->
             EsAnnenErfaring(
                 fraDato = annenErfaring["fraTidspunkt"].asText().let(YearMonth::parse),
-                tilDato = annenErfaring["tilTidspunkt"].asText().let(YearMonth::parse),
+                tilDato = annenErfaring["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
                 beskrivelse = annenErfaring["beskrivelse"].asText(),
                 rolle = annenErfaring["rolle"].asText()
             )
