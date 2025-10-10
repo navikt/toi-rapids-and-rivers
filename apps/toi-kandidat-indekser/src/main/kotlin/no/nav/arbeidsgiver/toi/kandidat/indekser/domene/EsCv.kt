@@ -47,10 +47,10 @@ class EsCv(
     @field:JsonProperty private val samtykkeStatus: String,
     @field:JsonProperty private val samtykkeDato: OffsetDateTime,
 
-    @field:JsonProperty private val adresselinje1: String,
+    @field:JsonProperty private val adresselinje1: String?,
     @field:JsonProperty private val adresselinje2: String,
     @field:JsonProperty private val adresselinje3: String,
-    @field:JsonProperty private val postnummer: String,
+    @field:JsonProperty private val postnummer: String?,
     @field:JsonProperty private val poststed: String,
 
     @field:JsonProperty private val landkode: String?,
@@ -226,7 +226,7 @@ class EsCv(
                 samtykkeStatus = ingenAnonymitet,
                 samtykkeDato = Instant.ofEpochMilli((cvNode["opprettet"].asDouble() * 1000).toLong())
                     .atOffset(ZoneOffset.UTC), // samtykkeDato, XXX hvorfor heter ikke feltet opprettetDato i EsCV ?
-                adresselinje1 = cvNode["gateadresse"].asText(""),
+                adresselinje1 = cvNode["gateadresse"].asText(null),
                 adresselinje2 = tomAdresse,
                 adresselinje3 = tomAdresse,
                 postnummer = cvNode["postnummer"].asText(null),
