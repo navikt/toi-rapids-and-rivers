@@ -226,7 +226,7 @@ class EsCv(
                 samtykkeStatus = ingenAnonymitet,
                 samtykkeDato = Instant.ofEpochMilli((cvNode["opprettet"].asDouble() * 1000).toLong())
                     .atOffset(ZoneOffset.UTC), // samtykkeDato, XXX hvorfor heter ikke feltet opprettetDato i EsCV ?
-                adresselinje1 = cvNode["gateadresse"].asText(null),
+                adresselinje1 = cvNode["gateadresse"].asText(""),
                 adresselinje2 = tomAdresse,
                 adresselinje3 = tomAdresse,
                 postnummer = cvNode["postnummer"].asText(null),
