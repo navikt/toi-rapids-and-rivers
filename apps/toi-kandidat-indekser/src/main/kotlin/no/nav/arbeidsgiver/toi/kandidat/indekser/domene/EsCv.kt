@@ -54,10 +54,10 @@ class EsCv(
     @field:JsonProperty private val poststed: String?,
 
     @field:JsonProperty private val landkode: String?,
-    @field:JsonProperty private val kommunenummer: Int,
+    @field:JsonProperty private val kommunenummer: Int?,
     @field:JsonProperty private val disponererBil: Boolean?,
     @field:JsonProperty private val tidsstempel: OffsetDateTime,  // TODO Dårlig/vagt navn, bør hete sistEndret, slik at det stemmer med CV AVRO-modellen
-    @field:JsonProperty private val kommunenummerkw: Int,
+    @field:JsonProperty private val kommunenummerkw: Int?,
 
     @field:JsonProperty private val doed: Boolean,
     @field:JsonProperty private val frKode: String?,
@@ -74,7 +74,7 @@ class EsCv(
     @field:JsonProperty private val synligForVeilederSok: Boolean,
     @field:JsonProperty private val oppstartKode: String?,
 
-    @field:JsonProperty private val kommunenummerstring: String,
+    @field:JsonProperty private val kommunenummerstring: String?,
     veilederIdent: String?,
     @field:JsonProperty private val veilederVisningsnavn: String?,
     @field:JsonProperty private val veilederEpost: String?,
@@ -207,7 +207,7 @@ class EsCv(
 
             val postData = postDataDAO.findPostData(cvNode["postnummer"].asText())
             val kommunenummer = postData.map { it.municipality.code }.orElse(null)
-            val fylkeNavn = postData.map { it.county.capitalizedName}.orElse(null)
+            val fylkeNavn = postData.map { it.county.capitalizedName }.orElse(null)
             val kommuneNavn = postData.map { it.municipality.capitalizedName }.orElse(null)
             return EsCv(
                 aktorId = packet["aktørId"].asText(null),
@@ -232,11 +232,11 @@ class EsCv(
                 postnummer = cvNode["postnummer"].asText(null),
                 poststed = cvNode["poststed"].asText(null),
                 landkode = ingenLandkode,
-                kommunenummer = kommunenummer.toInt(),
+                kommunenummer = kommunenummer?.toInt(),
                 disponererBil = ingenDisponererBil,
                 tidsstempel = Instant.ofEpochMilli((cvNode["sistEndret"].asDouble() * 1000).toLong())
                     .atOffset(ZoneOffset.ofHours(0)),
-                kommunenummerkw = kommunenummer.toInt(),
+                kommunenummerkw = kommunenummer?.toInt(),
                 doed = erIkkeDød,
                 frKode = defaultFrKode,
                 kvalifiseringsgruppekode = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asText(""),
