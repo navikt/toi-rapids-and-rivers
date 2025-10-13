@@ -20,7 +20,7 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
         positions = properties["positioncount"]?.toInt() ?: 1,
         title = innhold.title,
         adText = properties["adtext"] ?: "",
-        published = fjernTidssoneOmAngitt(direktemeldtStilling.publisert) ?: LocalDateTime.now().toIsoDateTimeString(),
+        published = LocalDateTime.now().toIsoDateTimeString(), //  Må være et felt som endres ved publisering eller avpublisering
         expires = fjernTidssoneOmAngitt(direktemeldtStilling.utløpsdato),
         privacy = PrivacyType.fromString(innhold.privacy ?: ""),
         contactList = innhold.contactList.filter { it.name != null }.map {

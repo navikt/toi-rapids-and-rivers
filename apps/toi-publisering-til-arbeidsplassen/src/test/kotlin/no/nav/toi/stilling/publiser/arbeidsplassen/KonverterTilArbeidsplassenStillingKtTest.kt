@@ -8,6 +8,7 @@ import no.nav.toi.stilling.publiser.arbeidsplassen.dto.Geografi
 import no.nav.toi.stilling.publiser.arbeidsplassen.dto.PrivacyType
 import no.nav.toi.stilling.publiser.arbeidsplassen.dto.PropertyName
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -76,7 +77,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
 
         assertEquals("123e4567-e89b-12d3-a456-426614174000", arbeidsplassenStilling.reference)
         assertEquals(1, arbeidsplassenStilling.positions)
-        assertEquals("2025-03-25T14:00:00", arbeidsplassenStilling.published)
+        assertNotNull(arbeidsplassenStilling.published)
         assertEquals("2025-04-25T14:00:00", arbeidsplassenStilling.expires)
         assertEquals(PrivacyType.SHOW_ALL, arbeidsplassenStilling.privacy)
         assertEquals("Tittel", arbeidsplassenStilling.title)
