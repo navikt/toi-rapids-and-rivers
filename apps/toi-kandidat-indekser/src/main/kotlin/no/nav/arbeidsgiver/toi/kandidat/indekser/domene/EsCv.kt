@@ -51,7 +51,7 @@ class EsCv(
     @field:JsonProperty private val adresselinje2: String,
     @field:JsonProperty private val adresselinje3: String,
     @field:JsonProperty private val postnummer: String?,
-    @field:JsonProperty private val poststed: String,
+    @field:JsonProperty private val poststed: String?,
 
     @field:JsonProperty private val landkode: String?,
     @field:JsonProperty private val kommunenummer: Int,
