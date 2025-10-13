@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Objects
@@ -48,7 +49,7 @@ class EsSertifikat(
         fun fraMelding(cvNode: JsonNode) = cvNode["sertifikat"].map { sertifikatNode ->
             EsSertifikat(
                 fraDato = sertifikatNode["gjennomfoert"].yyyyMMddTilLocalDate(),
-                tilDato = sertifikatNode["utloeper"]?.let(JsonNode::yyyyMMddTilLocalDate),
+                tilDato = sertifikatNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
                 sertifikatKode = sertifikatNode["konseptId"].asText(null),
                 sertifikatKodeNavn = sertifikatNode["sertifikatnavn"].asText(null),
                 alternativtNavn = sertifikatNode["sertifikatnavnFritekst"].asText(null),
