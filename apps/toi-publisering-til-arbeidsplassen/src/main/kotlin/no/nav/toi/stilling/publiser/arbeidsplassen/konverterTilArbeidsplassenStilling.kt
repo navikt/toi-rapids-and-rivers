@@ -18,17 +18,17 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
     val arbeidsplassenStilling = ArbeidsplassenStilling(
         reference = direktemeldtStilling.stillingsId.toString(),
         positions = properties["positioncount"]?.toInt() ?: 1,
-        title = innhold.title.truncate(512),
+        title = innhold.title.truncate(511),
         adText = properties["adtext"] ?: "",
         published = LocalDateTime.now().toIsoDateTimeString(), //  Må være et felt som endres ved publisering eller avpublisering
         expires = fjernTidssoneOmAngitt(direktemeldtStilling.utløpsdato),
         privacy = PrivacyType.fromString(innhold.privacy ?: ""),
         contactList = innhold.contactList.filter { it.name != null }.map {
             ContactArbeidsplassen(
-                name = it.name!!.truncate(255),
-                email = it.email?.truncate(255),
-                phone = it.phone?.truncate(36),
-                title = it.title?.truncate(255),
+                name = it.name!!.truncate(254),
+                email = it.email?.truncate(254),
+                phone = it.phone?.truncate(35),
+                title = it.title?.truncate(254),
             )
         },
         employer = Employer(
