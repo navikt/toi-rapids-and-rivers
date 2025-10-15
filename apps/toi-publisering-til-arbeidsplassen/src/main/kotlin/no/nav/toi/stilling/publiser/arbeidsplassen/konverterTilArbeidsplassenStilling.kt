@@ -32,7 +32,7 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
             )
         },
         employer = Employer(
-            businessName = employer.name ?: "",
+            businessName = employer.name?.truncate(254) ?: "",
             orgnr = employer.orgnr ?: "",
             location = Location(
                 address = employer.location?.address,
