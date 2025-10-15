@@ -40,6 +40,7 @@ data class Employer(
 enum class PropertyName {
     applicationdue,
     applicationemail,
+    applicationurl,
     employerdescription,
     engagementtype,
     extent,
