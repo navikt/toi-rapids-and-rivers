@@ -18,21 +18,21 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
     val arbeidsplassenStilling = ArbeidsplassenStilling(
         reference = direktemeldtStilling.stillingsId.toString(),
         positions = properties["positioncount"]?.toInt() ?: 1,
-        title = innhold.title,
+        title = innhold.title.truncate(511),
         adText = properties["adtext"] ?: "",
         published = LocalDateTime.now().toIsoDateTimeString(), //  Må være et felt som endres ved publisering eller avpublisering
         expires = fjernTidssoneOmAngitt(direktemeldtStilling.utløpsdato),
         privacy = PrivacyType.fromString(innhold.privacy ?: ""),
         contactList = innhold.contactList.filter { it.name != null }.map {
             ContactArbeidsplassen(
-                name = it.name!!,
-                email = it.email,
-                phone = it.phone,
-                title = it.title,
+                name = it.name!!.truncate(254),
+                email = it.email?.truncate(254),
+                phone = it.phone?.truncate(35),
+                title = it.title?.truncate(254),
             )
         },
         employer = Employer(
-            businessName = employer.name ?: "",
+            businessName = employer.name?.truncate(254) ?: "",
             orgnr = employer.orgnr ?: "",
             location = Location(
                 address = employer.location?.address,
@@ -77,4 +77,11 @@ fun fjernTidssoneOmAngitt(dato: String?): String? {
         .replace("+00:00", "")
         .replace("+01:00", "")
         .replace("+02:00", "")
+}
+
+fun String.truncate(maxLength: Int): String {
+    if (this.length <= maxLength) {
+        return this
+    }
+    return this.substring(0, maxLength)
 }
