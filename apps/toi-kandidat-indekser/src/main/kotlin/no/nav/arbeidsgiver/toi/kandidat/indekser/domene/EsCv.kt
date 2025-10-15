@@ -100,8 +100,7 @@ class EsCv(
     @field:JsonProperty private val godkjenninger: List<EsGodkjenning>,
     @field:JsonProperty private val perioderMedInaktivitet: EsPerioderMedInaktivitet?
 ) {
-    @field:JsonProperty private val fritekst: String? = null
-    @field:JsonProperty private val isHarKontaktinformasjon: Boolean = listOfNotNull(epostadresse, mobiltelefon, telefon).any(String::isNotBlank)
+    @field:JsonProperty private val harKontaktinformasjon: Boolean = listOfNotNull(epostadresse, mobiltelefon, telefon).any(String::isNotBlank)
     @field:JsonProperty private val arenaKandidatnr: String = kandidatnr
 
     @field:JsonProperty private val totalLengdeYrkeserfaring = yrkeserfaring.totalYrkeserfaringIManeder()
@@ -117,7 +116,6 @@ class EsCv(
 
     override fun toString(): String {
         return StringJoiner(", ", EsCv::class.java.getSimpleName() + "[", "]")
-            .add("fritekst='" + fritekst + "'")
             .add("aktorId='" + aktorId + "'")
             .add("fodselsnummer='" + fodselsnummer + "'")
             .add("fornavn='" + fornavn + "'")
@@ -127,7 +125,7 @@ class EsCv(
             .add("formidlingsgruppekode='" + formidlingsgruppekode + "'")
             .add("epostadresse='" + epostadresse + "'")
             .add("mobiltelefon='" + mobiltelefon + "'")
-            .add("harKontaktinformasjon=" + this.isHarKontaktinformasjon)
+            .add("harKontaktinformasjon=" + this.harKontaktinformasjon)
             .add("telefon='" + telefon + "'")
             .add("statsborgerskap='" + statsborgerskap + "'")
             .add("kandidatnr='" + kandidatnr + "'")

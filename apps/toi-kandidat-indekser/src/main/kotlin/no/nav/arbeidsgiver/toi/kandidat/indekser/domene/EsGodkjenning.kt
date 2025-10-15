@@ -12,7 +12,7 @@ class EsGodkjenning(
     @field:JsonProperty private val utsteder: String,
     @field:JsonProperty private val gjennomfoert: LocalDate,
     @field:JsonProperty private val utloeper: LocalDate?,
-    @field:JsonProperty private val konseptId: String
+    @field:JsonProperty private val konseptId: String?
 ): EnAvFlereSamledeKompetaser {
 
     override fun equals(other: Any?) = other is EsGodkjenning && tittel == other.tittel && utsteder == other.utsteder && gjennomfoert == other.gjennomfoert && utloeper == other.utloeper && konseptId == other.konseptId
@@ -27,7 +27,7 @@ class EsGodkjenning(
                 utsteder = godkjenning["utsteder"].asText(),
                 gjennomfoert = godkjenning["gjennomfoert"].yyyyMMddTilLocalDate(),
                 utloeper = godkjenning["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
-                konseptId = godkjenning["konseptId"].asText(""),
+                konseptId = godkjenning["konseptId"].asText(null),
             )
         }
     }

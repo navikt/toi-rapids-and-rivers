@@ -428,6 +428,7 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["mobiltelefon"].isNull).isTrue
         assertThat(cvJson["telefon"].asText()).isEqualTo(expectedTelefon)
         assertThat(cvJson["statsborgerskap"].isNull).isTrue
+        assertThat(cvJson["harKontaktinformasjon"].asBoolean()).isTrue
         assertThat(cvJson["kandidatnr"].asText()).isEqualTo(expectedKandidatnr)
         assertThat(cvJson["beskrivelse"].asText()).isEqualTo(expectedBeskrivelse)
         assertThat(cvJson["samtykkeStatus"].asText()).isEqualTo("G")
@@ -482,7 +483,7 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["yrkeserfaring"][0]["naceKode"].isNull).isTrue
         assertThat(cvJson["yrkeserfaring"][0]["utelukketForFremtiden"].asBoolean()).isFalse
         assertThat(cvJson["yrkeserfaring"][0]["sokeTitler"].map(JsonNode::asText))
-            .isEqualTo(listOf(expectedYrkeserfaringStillingstitlerForTypeahead, expectedYrkeserfaringSokeTitler, expectedYrkeserfaringStillingstittel, expectedYrkeserfaringStillingstittel))
+            .isEqualTo(listOf(expectedYrkeserfaringStillingstitlerForTypeahead, expectedYrkeserfaringSokeTitler, expectedYrkeserfaringStillingstittel))
         assertThat(cvJson["yrkeserfaring"][0]["sted"].asText()).isEqualTo(expectedYrkeserfaringSted)
         assertThat(cvJson["yrkeserfaring"][0]["beskrivelse"].asText()).isEqualTo(expectedYrkeserfaringBeskrivelse)
         expectedKompetanser.forEachIndexed { i, kompetanse ->

@@ -29,7 +29,7 @@ class EsYrkeserfaring(
 ) {
     @field:JsonProperty private val styrkKode4Siffer =  (styrkKode?.let { (if (it.length <= 3) null else it.substring(0, 4)) })
     @field:JsonProperty private val styrkKode3Siffer = (styrkKode?.let { (if (styrkKode.length <= 2) null else styrkKode.substring(0, 3)) })
-    @field:JsonProperty private val sokeTitler: List<String> = sokeTitler + stillingstittel
+    @field:JsonProperty private val sokeTitler: Set<String> = (sokeTitler + stillingstittel).toSet()
     @field:JsonProperty private val yrkeserfaringManeder = toYrkeserfaringManeder(fraDato, tilDato)
 
     constructor(

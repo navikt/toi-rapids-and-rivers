@@ -4,7 +4,7 @@ plugins {
 
 val testContainerVerison = "1.21.3"
 val pamAnsettelseskodeverkVersion = "1.18"
-val pamGeographyVersion = "2.13"
+val pamGeographyVersion = "2.23"
 dependencies {
     testImplementation("org.testcontainers:elasticsearch:$testContainerVerison")
     testImplementation("org.testcontainers:junit-jupiter:$testContainerVerison")

@@ -28,10 +28,10 @@ class EsFagdokumentasjon(
 
     override fun hashCode() = Objects.hash(type, tittel)
     override fun toString() = "EsFagdokumentasjon{" + "type='" + type + '\'' + ", tittel='" + tittel + '\'' + ", beskrivelse='" + beskrivelse + '\'' + '}'
-    override fun tilSamletKompetanse() = listOf(EsSamletKompetanse(tittel ?: getFagdokumentTypeLabel(type)))
+    override fun tilSamletKompetanse() = listOf(EsSamletKompetanse(tittel ?: type))
 
     companion object {
-        fun getFagdokumentTypeLabel(fagdokumentType: String) = when (fagdokumentType) {
+        private fun getFagdokumentTypeLabel(fagdokumentType: String) = when (fagdokumentType) {
             "SVENNEBREV_FAGBREV" -> "Fagbrev/svennebrev"
             "MESTERBREV" -> "Mesterbrev"
             "AUTORISASJON" -> "Autorisasjon"
@@ -40,7 +40,7 @@ class EsFagdokumentasjon(
 
         fun fraMelding(cvNode: JsonNode): List<EsFagdokumentasjon> = cvNode["fagdokumentasjon"].map { fagdokumentasjonNode ->
             EsFagdokumentasjon(
-                type = fagdokumentasjonNode["type"].asText(null),
+                type = getFagdokumentTypeLabel(fagdokumentasjonNode["type"].asText(null)),
                 tittel = fagdokumentasjonNode["tittel"].asText(null),
                 beskrivelse = fagdokumentasjonNode["beskrivelse"].asText(null),
             )
