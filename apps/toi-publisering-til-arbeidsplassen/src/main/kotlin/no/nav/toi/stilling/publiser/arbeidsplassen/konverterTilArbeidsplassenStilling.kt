@@ -55,6 +55,7 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
         },
         properties = mapOf(
             PropertyName.applicationemail to (properties["applicationemail"] ?: ""),
+            PropertyName.applicationurl to (properties["applicationurl"] ?: ""),
             PropertyName.applicationdue to (properties["applicationdue"] ?: ""),
             PropertyName.employerdescription to (properties["employerdescription"] ?: ""),
             PropertyName.engagementtype to (properties["engagementtype"] ?: ""),

@@ -54,6 +54,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
                  properties = mapOf(
                      "applicationdue" to LocalDate.of(2025, 4, 24).format(DateTimeFormatter.ISO_DATE),
                      "applicationemail" to "test@nav.no",
+                     "applicationurl" to "https://www.nav.no/",
                      "engagementtype" to "Fast",
                      "sector" to "Privat",
                      "starttime" to "08.04.2025",
@@ -99,5 +100,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
         assertEquals("Fast", arbeidsplassenStilling.properties[PropertyName.engagementtype])
         assertEquals("08.04.2025", arbeidsplassenStilling.properties[PropertyName.starttime])
         assertEquals("<p>Om arbeidsgiver</p>", arbeidsplassenStilling.properties[PropertyName.employerdescription])
+        assertEquals("test@nav.no", arbeidsplassenStilling.properties[PropertyName.applicationemail])
+        assertEquals("https://www.nav.no/", arbeidsplassenStilling.properties[PropertyName.applicationurl])
     }
 }
