@@ -38,7 +38,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
                      Contact(
                          name = "Navn",
                          email = "test@nav.no",
-                         phone = "11111111",
+                         phone = "1234567890123456789012345678901234567890", // 40 tegn - skal bli trimmet til 36
                      )
                  ),
                  employer = DirektemeldtStillingArbeidsgiver(
@@ -94,6 +94,7 @@ class KonverterTilArbeidsplassenStillingKtTest {
 
         assertEquals(1, arbeidsplassenStilling.contactList.size)
         assertEquals("Navn", arbeidsplassenStilling.contactList[0].name)
+        assertEquals("123456789012345678901234567890123456", arbeidsplassenStilling.contactList[0].phone)
 
         assertEquals("Privat", arbeidsplassenStilling.properties[PropertyName.sector])
         assertEquals("[\"Ukedager\"]", arbeidsplassenStilling.properties[PropertyName.workday])
