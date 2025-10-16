@@ -38,7 +38,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            secureLog.error("Svar fra opprettSak ${stillingsId}: $json")
+            secureLog.info("Svar fra opprettSak ${stillingsId}: $json")
             val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
 
             when (notifikasjonsSvar) {
