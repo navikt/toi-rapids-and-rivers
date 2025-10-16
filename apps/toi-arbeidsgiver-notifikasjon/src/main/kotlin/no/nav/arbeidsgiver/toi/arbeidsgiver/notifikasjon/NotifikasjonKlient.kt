@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
+import erGyldigEpostadresse
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -37,6 +38,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
+            secureLog.error("Svar fra opprettSak ${stillingsId}: $json")
             val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
 
             when (notifikasjonsSvar) {
@@ -58,8 +60,8 @@ class NotifikasjonKlient(
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            log.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId}: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId} $query", e)
             throw e
         }
     }
@@ -79,9 +81,9 @@ class NotifikasjonKlient(
             return
         }
 
-        val gyldigeEpostadresser = mottakerEpostadresser.filter { it.isNotBlank() }
+        val gyldigeEpostadresser = mottakerEpostadresser.filter{ erGyldigEpostadresse(it) }
         if (gyldigeEpostadresser.isEmpty()) {
-            log.info("Ingen gyldige epostadresser")
+            log.error("Ingen gyldige epostadresser for stilling ${stillingsId}")
             return
         }
 
