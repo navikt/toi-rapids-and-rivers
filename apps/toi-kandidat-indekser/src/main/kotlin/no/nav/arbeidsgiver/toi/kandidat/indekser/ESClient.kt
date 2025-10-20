@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import org.apache.hc.client5.http.auth.AuthScope
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider
-import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier
@@ -65,6 +64,7 @@ class ESClient(
 
         val objectMapper = ObjectMapper()
             .registerModule(JavaTimeModule())
+            .registerModule(offsetTidsmodul())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         val transport = ApacheHttpClient5TransportBuilder.builder(host)
             .setHttpClientConfigCallback { builder ->

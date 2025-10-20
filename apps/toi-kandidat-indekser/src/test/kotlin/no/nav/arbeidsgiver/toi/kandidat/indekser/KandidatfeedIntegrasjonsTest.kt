@@ -1,30 +1,20 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
 import no.nav.toi.TestRapid
-import org.apache.hc.core5.http.HttpHost
+import org.assertj.core.api.AbstractStringAssert
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.opensearch.client.opensearch.OpenSearchClient
-import org.opensearch.client.opensearch._types.Refresh
-import org.opensearch.client.opensearch.core.DeleteByQueryRequest
-import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.YearMonth
-import java.time.ZoneOffset
+import java.time.*
+import java.time.format.DateTimeFormatter
 
 
 @Testcontainers
@@ -411,17 +401,15 @@ class KandidatfeedIntegrasjonsTest {
         waitForCount(1)
         val cv = client.get({ req ->
             req.index(esIndex).id(expectedKandidatnr)
-        }, EsCv::class.java)
+        }, JsonNode::class.java)
         assertThat(cv.found()).isTrue
         assertThat(cv.id()).isEqualTo(expectedKandidatnr)
-        val mapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        val cvJson = mapper.readTree(mapper.writeValueAsString(cv.source()))
+        val cvJson = cv.source()!!
         assertThat(cvJson["aktorId"].asText()).isEqualTo(expectedAktorId)
         assertThat(cvJson["fodselsnummer"].asText()).isEqualTo(expectedFodselsnummer)
         assertThat(cvJson["fornavn"].asText()).isEqualTo(expectedFornavn)
         assertThat(cvJson["etternavn"].asText()).isEqualTo(expectedEtternavn)
-        assertThat(cvJson["fodselsdato"].asText()).isEqualTo(expectedFodselsdato.toString())
+        assertThat(cvJson["fodselsdato"].asText()).datoEquals(expectedFodselsdato)
         assertThat(cvJson["fodselsdatoErDnr"].asBoolean()).isEqualTo(expectedFodselsdatoErDnr)
         assertThat(cvJson["formidlingsgruppekode"].asText()).isEqualTo(expectedFormidlingsgruppekode)
         assertThat(cvJson["epostadresse"].asText()).isEqualTo(expectedEpostadresse)
@@ -432,7 +420,7 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["kandidatnr"].asText()).isEqualTo(expectedKandidatnr)
         assertThat(cvJson["beskrivelse"].asText()).isEqualTo(expectedBeskrivelse)
         assertThat(cvJson["samtykkeStatus"].asText()).isEqualTo("G")
-        assertThat(cvJson["samtykkeDato"].asText()).isEqualTo(expectedSamtykkeDato.toString())
+        assertThat(cvJson["samtykkeDato"].asText()).datoEquals(expectedSamtykkeDato)
         assertThat(cvJson["adresselinje1"].asText()).isEqualTo(expectedAdresselinje1)
         assertThat(cvJson["adresselinje2"].asText()).isEqualTo("")
         assertThat(cvJson["adresselinje3"].asText()).isEqualTo("")
@@ -440,8 +428,7 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["poststed"].asText()).isEqualTo(expectedPoststed)
         assertThat(cvJson["landkode"].isNull).isTrue
         assertThat(cvJson["kommunenummer"].asInt()).isEqualTo(expectedKommunenummer)
-        assertThat(OffsetDateTime.parse(cvJson["tidsstempel"].asText()))
-            .isEqualToIgnoringNanos(expectedTidsstempel.withOffsetSameInstant(ZoneOffset.UTC))
+        assertThat(cvJson["tidsstempel"].asText()).datoEquals(expectedTidsstempel)
         assertThat(cvJson["kommunenummerkw"].asInt()).isEqualTo(expectedKommunenummer)
         assertThat(cvJson["doed"].asBoolean()).isEqualTo(expectedDoed)
         assertThat(cvJson["frKode"].asText()).isEqualTo("0")
@@ -462,8 +449,8 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["veilederEpost"].asText()).isEqualTo(expectedVeilederEpost)
         assertThat(cvJson["fylkeNavn"].asText()).isEqualTo(expectedFylkeNavn)
         assertThat(cvJson["kommuneNavn"].asText()).isEqualTo(expectedKommuneNavn)
-        assertThat(cvJson["utdanning"][0]["fraDato"].asText()).isEqualTo(expectedUtdanningFraDato.toString())
-        assertThat(cvJson["utdanning"][0]["tilDato"].asText()).isEqualTo(expectedUtdanningTilDato.toString())
+        assertThat(cvJson["utdanning"][0]["fraDato"].asText()).datoEquals(expectedUtdanningFraDato)
+        assertThat(cvJson["utdanning"][0]["tilDato"].asText()).datoEquals(expectedUtdanningTilDato)
         assertThat(cvJson["utdanning"][0]["utdannelsessted"].asText()).isEqualTo(expectedUtdanningUtdannelsessted)
         assertThat(cvJson["utdanning"][0]["nusKode"].asText()).isEqualTo(expectedUtdanningNusKode)
         assertThat(cvJson["utdanning"][0]["alternativGrad"].asText()).isEqualTo(expectedUtdanningAlternativGrad)
@@ -472,8 +459,8 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["fagdokumentasjon"][0]["type"].asText()).isEqualTo(expectedFagdokumentasjonType)
         assertThat(cvJson["fagdokumentasjon"][0]["tittel"].asText()).isEqualTo(expectedFagdokumentasjonTittel)
         assertThat(cvJson["fagdokumentasjon"][0]["beskrivelse"].asText()).isEqualTo(expectedFagdokumentasjonBeskrivelse)
-        assertThat(cvJson["yrkeserfaring"][0]["fraDato"].asText()).isEqualTo(expectedYrkeserfaringFraDato.toString())
-        assertThat(cvJson["yrkeserfaring"][0]["tilDato"].asText()).isEqualTo(expectedYrkeserfaringTilDato.toString())
+        assertThat(cvJson["yrkeserfaring"][0]["fraDato"].asText()).datoEquals(expectedYrkeserfaringFraDato)
+        assertThat(cvJson["yrkeserfaring"][0]["tilDato"].asText()).datoEquals(expectedYrkeserfaringTilDato)
         assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedYrkeserfaringArbeidsgiver)
         assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedYrkeserfaringStyrkKode)
         assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asText()).isEqualTo(expectedYrkeserfaringStillingstittel)
@@ -492,22 +479,20 @@ class KandidatfeedIntegrasjonsTest {
             assertThat(cvJson["kompetanseObj"][i]["kompKodeNavn"].asText()).isEqualTo(kompetanse)
             assertThat(cvJson["kompetanseObj"][i]["alternativtNavn"].asText()).isEqualTo(kompetanse)
             assertThat(cvJson["kompetanseObj"][i]["beskrivelse"].asText()).isEqualTo("")
-            assertThat(cvJson["kompetanseObj"][i]["sokeNavn"].map(JsonNode::asText)).isEqualTo(ontologiKompetanse + kompetanse + kompetanse)
+            assertThat(cvJson["kompetanseObj"][i]["sokeNavn"].map(JsonNode::asText)).isEqualTo(ontologiKompetanse + kompetanse)
         }
-        assertThat(cvJson["annenerfaringObj"][0]["fraDato"].asText()).isEqualTo(expectedAnnenErfaringFraDato.toString())
-        assertThat(cvJson["annenerfaringObj"][0]["tilDato"].asText()).isEqualTo(expectedAnnenErfaringTilDato.toString())
+        assertThat(cvJson["annenerfaringObj"][0]["fraDato"].asText()).datoEquals(expectedAnnenErfaringFraDato)
+        assertThat(cvJson["annenerfaringObj"][0]["tilDato"].asText()).datoEquals(expectedAnnenErfaringTilDato)
         assertThat(cvJson["annenerfaringObj"][0]["beskrivelse"].asText()).isEqualTo(expectedAnnenErfaringBeskrivelse)
         assertThat(cvJson["annenerfaringObj"][0]["rolle"].asText()).isEqualTo(expectedAnnenErfaringRolle)
         assertThat(cvJson["sertifikatObj"][0]["sertifikatKodeNavn"].asText()).isEqualTo(expectedSertifikatNavn)
         assertThat(cvJson["sertifikatObj"][0]["alternativtNavn"].asText()).isEqualTo(expectedSertifikatnavnFritekst)
         assertThat(cvJson["sertifikatObj"][0]["sertifikatKode"].asText()).isEqualTo(expectedSertifikatKonseptId)
         assertThat(cvJson["sertifikatObj"][0]["utsteder"].asText()).isEqualTo(expectedSertifikatUtsteder)
-        assertThat(cvJson["sertifikatObj"][0]["fraDato"].asText()).isEqualTo(expectedSertifikatGjennomfoert.toString())
-        assertThat(cvJson["sertifikatObj"][0]["tilDato"].asText()).isEqualTo(expectedSertifikatUtloeper.toString())
-        assertThat(OffsetDateTime.parse(cvJson["forerkort"][0]["fraDato"].asText()))
-            .isEqualToIgnoringNanos(expectedForerkortFraDato.atStartOfDay().atOffset(ZoneOffset.UTC))
-        assertThat(OffsetDateTime.parse(cvJson["forerkort"][0]["tilDato"].asText()))
-            .isEqualToIgnoringNanos(expectedForerkortTilDato.atStartOfDay().atOffset(ZoneOffset.UTC))
+        assertThat(cvJson["sertifikatObj"][0]["fraDato"].asText()).datoEquals(expectedSertifikatGjennomfoert)
+        assertThat(cvJson["sertifikatObj"][0]["tilDato"].asText()).datoEquals(expectedSertifikatUtloeper)
+        assertThat(cvJson["forerkort"][0]["fraDato"].asText()).datoEquals(expectedForerkortFraDato)
+        assertThat(cvJson["forerkort"][0]["tilDato"].asText()).datoEquals(expectedForerkortTilDato)
         assertThat(cvJson["forerkort"][0]["forerkortKode"].isNull).isTrue
         assertThat(cvJson["forerkort"][0]["forerkortKodeKlasse"].asText()).isEqualTo(expectedForerkortKodeKlasse)
         assertThat(cvJson["forerkort"][0]["alternativKlasse"].isNull).isTrue
@@ -523,14 +508,14 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["kursObj"][0]["arrangor"].asText()).isEqualTo(expectedKursArrangor)
         assertThat(cvJson["kursObj"][0]["omfangEnhet"].asText()).isEqualTo(expectedKursOmfangEnhet)
         assertThat(cvJson["kursObj"][0]["omfangVerdi"].asInt()).isEqualTo(expectedKursOmfangVerdi)
-        assertThat(cvJson["kursObj"][0]["tilDato"].asText()).isEqualTo(expectedKursTilDato.toString())
+        assertThat(cvJson["kursObj"][0]["tilDato"].asText()).datoEquals(expectedKursTilDato)
         assertThat(cvJson["geografiJobbonsker"][0]["geografiKode"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiKode)
         assertThat(cvJson["geografiJobbonsker"][0]["geografiKodeTekst"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiKodeTekst)
         assertThat(cvJson["yrkeJobbonskerObj"][0]["styrkKode"].isNull).isTrue
         assertThat(cvJson["yrkeJobbonskerObj"][0]["styrkBeskrivelse"].asText()).isEqualTo(expectedYrkeJobbonskerStyrkBeskrivelse)
         assertThat(cvJson["yrkeJobbonskerObj"][0]["primaertJobbonske"].asBoolean()).isFalse
         assertThat(cvJson["yrkeJobbonskerObj"][0]["sokeTitler"].map { it.asText() })
-            .isEqualTo(listOf(expectedYrkeserfaringStillingstitlerForTypeahead, expectedYrkeserfaringSokeTitler, expectedYrkeJobbonskerStyrkBeskrivelse, expectedYrkeJobbonskerStyrkBeskrivelse))
+            .isEqualTo(listOf(expectedYrkeserfaringStillingstitlerForTypeahead, expectedYrkeserfaringSokeTitler, expectedYrkeJobbonskerStyrkBeskrivelse))
         assertThat(cvJson["omfangJobbonskerObj"][0]["omfangKode"].asText()).isEqualTo(expectedOmfangJobbonskerOmfangKode)
         assertThat(cvJson["omfangJobbonskerObj"][0]["omfangKodeTekst"].asText()).isEqualTo(expectedOmfangJobbonskerOmfangKodeTekst)
         assertThat(cvJson["ansettelsesformJobbonskerObj"][0]["ansettelsesformKode"].asText()).isEqualTo(expectedAnsettelsesformJobbonskerAnsettelsesformKode)
@@ -543,11 +528,11 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["arbeidstidJobbonskerObj"][0]["arbeidstidKodeTekst"].asText()).isEqualTo(expectedArbeidstidJobbonskerArbeidstidKodeTekst)
         assertThat(cvJson["godkjenninger"][0]["tittel"].asText()).isEqualTo(expectedGodkjenningerTittel)
         assertThat(cvJson["godkjenninger"][0]["utsteder"].asText()).isEqualTo(expectedGodkjenningerUtsteder)
-        assertThat(cvJson["godkjenninger"][0]["gjennomfoert"].asText()).isEqualTo(expectedGodkjenningerGjennomfoert.toString())
-        assertThat(cvJson["godkjenninger"][0]["utloeper"].asText()).isEqualTo(expectedGodkjenningerUtloeper.toString())
+        assertThat(cvJson["godkjenninger"][0]["gjennomfoert"].asText()).datoEquals(expectedGodkjenningerGjennomfoert)
+        assertThat(cvJson["godkjenninger"][0]["utloeper"].asText()).datoEquals(expectedGodkjenningerUtloeper)
         assertThat(cvJson["godkjenninger"][0]["konseptId"].asText()).isEqualTo(expectedGodkjenningerKonseptId)
-        assertThat(cvJson["perioderMedInaktivitet"]["startdatoForInnevarendeInaktivePeriode"].asText()).isEqualTo(expectedPerioderMedInaktivitetStartdatoForInnevarendeInaktivePeriode.toString())
-        assertThat(cvJson["perioderMedInaktivitet"]["sluttdatoerForInaktivePerioderPaToArEllerMer"][0].asText()).isEqualTo(expectedPerioderMedInaktivitetSluttdatoForInnevarendeInaktivePeriode.toString())
+        assertThat(cvJson["perioderMedInaktivitet"]["startdatoForInnevarendeInaktivePeriode"].asText()).datoEquals(expectedPerioderMedInaktivitetStartdatoForInnevarendeInaktivePeriode)
+        assertThat(cvJson["perioderMedInaktivitet"]["sluttdatoerForInaktivePerioderPaToArEllerMer"][0].asText()).datoEquals(expectedPerioderMedInaktivitetSluttdatoForInnevarendeInaktivePeriode)
     }
 
     private fun assertIngenIIndekser() {
@@ -578,6 +563,20 @@ class KandidatfeedIntegrasjonsTest {
         EsTestUtils.flush(client, esIndex)
         assertThat(client.count().count()).isEqualTo(expected)
     }
+}
+
+private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+
+private fun AbstractStringAssert<*>.datoEquals(expected: YearMonth) {
+    datoEquals(expected.atDay(1))
+}
+
+private fun AbstractStringAssert<*>.datoEquals(expected: LocalDate) {
+    isEqualTo(expected.atStartOfDay(ZoneId.of("Europe/Oslo")).format(format))
+}
+
+private fun AbstractStringAssert<*>.datoEquals(expected: OffsetDateTime) {
+    isEqualTo(expected.atZoneSameInstant(ZoneId.of("Europe/Oslo")).format(format))
 }
 
 private fun sleepForAsyncES() {

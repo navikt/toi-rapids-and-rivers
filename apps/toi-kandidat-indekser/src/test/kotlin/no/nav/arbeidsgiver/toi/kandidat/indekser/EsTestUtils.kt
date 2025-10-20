@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.hc.core5.http.HttpHost
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.Refresh
@@ -7,6 +9,7 @@ import org.opensearch.client.opensearch.core.DeleteByQueryRequest
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
+import org.opensearch.client.json.jackson.JacksonJsonpMapper
 
 /**
  * Felles testverktøy for ES-relaterte integrasjonstester.
@@ -21,12 +24,17 @@ object EsTestUtils {
             .withEnv("xpack.security.enabled", "false")
 
     /** Lager en OpenSearchClient koblet til gitt container. */
-    fun openSearchClient(container: ElasticsearchContainer): OpenSearchClient =
-        OpenSearchClient(
+    fun openSearchClient(container: ElasticsearchContainer): OpenSearchClient {
+        val mapper =
+            JacksonJsonpMapper(jacksonObjectMapper()
+                .registerModule(JavaTimeModule())
+                .registerModule(offsetTidsmodul()))
+        return OpenSearchClient(
             ApacheHttpClient5TransportBuilder.builder(
                 HttpHost.create(container.httpHostAddress)
-            ).build()
+            ).setMapper(mapper).build()
         )
+    }
 
     /** Lager en ESClient mot gitt container og indeks. */
     fun esClient(container: ElasticsearchContainer): ESClient =
