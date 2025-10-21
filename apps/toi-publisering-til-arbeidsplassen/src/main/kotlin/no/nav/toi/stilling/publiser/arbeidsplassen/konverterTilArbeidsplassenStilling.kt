@@ -57,6 +57,7 @@ fun konverterTilArbeidsplassenStilling(direktemeldtStilling: DirektemeldtStillin
             PropertyName.applicationemail to (properties["applicationemail"] ?: ""),
             PropertyName.applicationurl to (properties["applicationurl"] ?: ""),
             PropertyName.applicationdue to (properties["applicationdue"] ?: ""),
+            PropertyName.author to (innhold.administration?.navIdent ?: ""),
             PropertyName.employerdescription to (properties["employerdescription"] ?: ""),
             PropertyName.engagementtype to (properties["engagementtype"] ?: ""),
             PropertyName.extent to (properties["extent"] ?: ""),

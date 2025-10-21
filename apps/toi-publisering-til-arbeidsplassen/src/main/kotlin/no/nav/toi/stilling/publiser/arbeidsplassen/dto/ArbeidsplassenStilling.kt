@@ -41,6 +41,7 @@ enum class PropertyName {
     applicationdue,
     applicationemail,
     applicationurl,
+    author,
     employerdescription,
     engagementtype,
     extent,
