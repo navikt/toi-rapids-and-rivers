@@ -409,7 +409,7 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["fodselsnummer"].asText()).isEqualTo(expectedFodselsnummer)
         assertThat(cvJson["fornavn"].asText()).isEqualTo(expectedFornavn)
         assertThat(cvJson["etternavn"].asText()).isEqualTo(expectedEtternavn)
-        assertThat(cvJson["fodselsdato"].asText()).datoEquals(expectedFodselsdato)
+        assertThat(cvJson["fodselsdato"].asText()).isEqualTo(expectedFodselsdato.toString())
         assertThat(cvJson["fodselsdatoErDnr"].asBoolean()).isEqualTo(expectedFodselsdatoErDnr)
         assertThat(cvJson["formidlingsgruppekode"].asText()).isEqualTo(expectedFormidlingsgruppekode)
         assertThat(cvJson["epostadresse"].asText()).isEqualTo(expectedEpostadresse)

@@ -3,6 +3,10 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring.Companion.totalYrkeserfaringIManeder
@@ -33,6 +37,8 @@ class EsCv(
     @field:JsonProperty private val fodselsnummer: String,
     @field:JsonProperty private val fornavn: String,
     @field:JsonProperty private val etternavn: String,
+    @field:JsonDeserialize(using = LocalDateDeserializer::class)
+    @field:JsonSerialize(using = LocalDateSerializer::class)
     @field:JsonProperty private val fodselsdato: LocalDate,
 
     @field:JsonProperty private val fodselsdatoErDnr: Boolean,
