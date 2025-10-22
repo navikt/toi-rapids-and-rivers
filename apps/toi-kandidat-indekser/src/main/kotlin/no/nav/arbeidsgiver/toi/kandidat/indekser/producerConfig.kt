@@ -6,7 +6,7 @@ import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringSerializer
 
 val producerConfig = mapOf(
-    CommonClientConfigs.CLIENT_ID_CONFIG to "toi-kandidatfeed",
+    CommonClientConfigs.CLIENT_ID_CONFIG to "toi-kandidat-indekser",
     CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG to System.getenv("KAFKA_BROKERS"),
     ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java.name,
     ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java.name,
