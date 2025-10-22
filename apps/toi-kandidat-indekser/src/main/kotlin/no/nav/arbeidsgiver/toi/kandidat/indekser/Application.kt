@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi")
 
 private val log = noClassLogger()
-private val secureLog = LoggerFactory.getLogger("secureLog")
+private val secureLog = SecureLog(log)
 
 fun main() {
     log.info("Starter app.")

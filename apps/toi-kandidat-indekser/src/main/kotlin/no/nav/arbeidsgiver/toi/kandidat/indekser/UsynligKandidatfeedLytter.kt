@@ -14,7 +14,7 @@ class UsynligKandidatfeedLytter(
 ) :
     River.PacketListener {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val secureLog = SecureLog(log)
 
     init {
         River(rapidsConnection).apply {
