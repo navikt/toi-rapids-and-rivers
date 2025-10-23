@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -10,15 +8,16 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
-import org.apache.kafka.clients.producer.Producer
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.slf4j.LoggerFactory
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 
 const val topicName = "toi.kandidat-3"
 
 class SynligKandidatfeedLytter(
     rapidsConnection: RapidsConnection,
-    private val esClient: ESClient
+    private val esClient: ESClient,
+    private val postDataKlient: PostDataKlient,
+    private val geografiKlient: GeografiKlient,
 ) :
     River.PacketListener {
 
@@ -49,7 +48,7 @@ class SynligKandidatfeedLytter(
     ) {
         val aktørId = packet["aktørId"].asText()
 
-        esClient.lagreEsCv(EsCv.fraMelding(packet))
+        esClient.lagreEsCv(EsCv.fraMelding(packet, postDataKlient, geografiKlient))
         packet["@slutt_av_hendelseskjede"] = true
         context.publish(packet.toJson())
     }

@@ -1,23 +1,33 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 import no.nav.toi.TestRapid
 import org.assertj.core.api.AbstractStringAssert
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.*
 import java.time.format.DateTimeFormatter
+import kotlin.div
+import kotlin.rem
 
 
 @Testcontainers
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KandidatfeedIntegrasjonsTest {
     companion object {
         private val esIndex = "kandidater"
@@ -27,6 +37,19 @@ class KandidatfeedIntegrasjonsTest {
         private lateinit var testEsClient: ESClient
         private lateinit var client: OpenSearchClient
         private fun OpenSearchClient.flush() = this.indices().flush { it.index(esIndex) }
+    }
+    private val wireMockServer = WireMockServer(options().port(7664))
+
+    @BeforeAll
+    fun beforeAll() {
+        wireMockServer.stubGeografier()
+        wireMockServer.stubPostData()
+        wireMockServer.start()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        wireMockServer.stop()
     }
 
     @BeforeEach
@@ -49,7 +72,7 @@ class KandidatfeedIntegrasjonsTest {
 
         val testrapid = TestRapid()
 
-        SynligKandidatfeedLytter(testrapid, testEsClient)
+        synligKandidatfeedlytter(testrapid)
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingUsynlig)
@@ -69,7 +92,7 @@ class KandidatfeedIntegrasjonsTest {
         )
         val testrapid = TestRapid()
 
-        SynligKandidatfeedLytter(testrapid, testEsClient)
+        synligKandidatfeedlytter(testrapid)
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingSynlig)
@@ -96,7 +119,7 @@ class KandidatfeedIntegrasjonsTest {
 
         val testrapid = TestRapid()
 
-        SynligKandidatfeedLytter(testrapid, testEsClient)
+        synligKandidatfeedlytter(testrapid)
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingSynlig)
@@ -113,7 +136,7 @@ class KandidatfeedIntegrasjonsTest {
 
         val testrapid = TestRapid()
 
-        SynligKandidatfeedLytter(testrapid, testEsClient)
+        synligKandidatfeedlytter(testrapid)
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(meldingUsynlig)
@@ -130,7 +153,7 @@ class KandidatfeedIntegrasjonsTest {
 
         val testrapid = TestRapid()
 
-        SynligKandidatfeedLytter(testrapid, testEsClient)
+        synligKandidatfeedlytter(testrapid)
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(rapidMelding)
@@ -160,7 +183,7 @@ class KandidatfeedIntegrasjonsTest {
         val expectedPostnummer = "0123"
         val expectedPoststed = "Oslo"
         val expectedKommunenummer = 301
-        val expectedTidsstempel = OffsetDateTime.now()
+        val expectedTidsstempel = OffsetDateTime.now().withNano(8_000_000)
         val expectedDoed = false
         val expectedKvalifiseringsgruppekode = "IVURD"
         val expectedHovedmaalkode = "SKAFFEA"
@@ -223,7 +246,7 @@ class KandidatfeedIntegrasjonsTest {
         val expectedKursOmfangEnhet = "DAGER"
         val expectedKursOmfangVerdi = 5
         val expectedKursTilDato = LocalDate.of(2020, 3, 1)
-        val expectedGeografiJobbonskerGeografiKode = "0301"
+        val expectedGeografiJobbonskerGeografiKode = "NO03.0301"
         val expectedGeografiJobbonskerGeografiKodeTekst = "Oslo"
         val expectedYrkeJobbonskerStyrkBeskrivelse = "Javautvikler"
         val expectedOmfangJobbonskerOmfangKode = "HELTID"
@@ -272,12 +295,12 @@ class KandidatfeedIntegrasjonsTest {
             epostadresse = expectedEpostadresse,
             telefonnummer = expectedTelefon,
             sammendrag = expectedBeskrivelse,
-            opprettetCv = Instant.from(expectedSamtykkeDato).toEpochMilli().let { "${it/1000}.${it%1000}" },
+            opprettetCv = Instant.from(expectedSamtykkeDato).toEpochMilli().let { String.format("%d.%03d", it / 1000, it % 1000) },
             gateadresse = expectedAdresselinje1,
             postnummer = expectedPostnummer,
             poststed = expectedPoststed,
             kommunenr = "54321",
-            sistendret = Instant.from(expectedTidsstempel).toEpochMilli().let { "${it/1000}.${it%1000}" },
+            sistendret = Instant.from(expectedTidsstempel).toEpochMilli().let { String.format("%d.%03d", it / 1000, it % 1000) },
             kvalifiseringsgruppe = expectedKvalifiseringsgruppekode,
             oppfølgingsinformasjonHovedmaal = expectedHovedmaalkode,
             siste14AvedtakHovedmaal = expectedHovedmal,
@@ -393,7 +416,7 @@ class KandidatfeedIntegrasjonsTest {
 
         val testrapid = TestRapid()
 
-        SynligKandidatfeedLytter(testrapid, testEsClient)
+        synligKandidatfeedlytter(testrapid)
         UsynligKandidatfeedLytter(testrapid, testEsClient)
 
         testrapid.sendTestMessage(melding)
@@ -533,6 +556,11 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["godkjenninger"][0]["konseptId"].asText()).isEqualTo(expectedGodkjenningerKonseptId)
         assertThat(cvJson["perioderMedInaktivitet"]["startdatoForInnevarendeInaktivePeriode"].asText()).datoEquals(expectedPerioderMedInaktivitetStartdatoForInnevarendeInaktivePeriode)
         assertThat(cvJson["perioderMedInaktivitet"]["sluttdatoerForInaktivePerioderPaToArEllerMer"][0].asText()).datoEquals(expectedPerioderMedInaktivitetSluttdatoForInnevarendeInaktivePeriode)
+    }
+
+    private fun synligKandidatfeedlytter(testrapid: TestRapid) {
+        val pamUrl = "http://localhost:7664"
+        SynligKandidatfeedLytter(testrapid, testEsClient, PostDataKlient(pamUrl), GeografiKlient(pamUrl))
     }
 
     private fun assertIngenIIndekser() {

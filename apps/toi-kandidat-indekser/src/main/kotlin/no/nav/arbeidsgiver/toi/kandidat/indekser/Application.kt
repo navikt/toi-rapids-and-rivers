@@ -1,7 +1,8 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -15,9 +16,13 @@ fun main() {
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
     val env = System.getenv()
 
-    RapidApplication.create(System.getenv()).also { rapidsConnection ->
+    val pamGeografiUrl = env["PAM_GEOGRAFI_URL"]!!
+    val postDataKlient = PostDataKlient(pamGeografiUrl)
+    val geografiKlient = GeografiKlient(pamGeografiUrl)
+
+    RapidApplication.create(env).also { rapidsConnection ->
         val esClient = ESClient(env["OPEN_SEARCH_URI"]!!, env["OPEN_SEARCH_USERNAME"]!!, env["OPEN_SEARCH_PASSWORD"]!!)
-        SynligKandidatfeedLytter(rapidsConnection, esClient)
+        SynligKandidatfeedLytter(rapidsConnection, esClient, postDataKlient, geografiKlient)
         UsynligKandidatfeedLytter(rapidsConnection, esClient)
         //UferdigKandidatLytter(rapidsConnection)                   TODO Enn så lenge kandidatfeeds ansvar
     }.start()

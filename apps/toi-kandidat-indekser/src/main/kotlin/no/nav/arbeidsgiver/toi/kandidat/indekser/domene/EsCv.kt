@@ -9,8 +9,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring.Companion.totalYrkeserfaringIManeder
-import no.nav.pam.geography.PostDataDAO
+import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
 import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -199,20 +200,19 @@ class EsCv(
             val (year, month, day) = map { it.asInt() }
             return LocalDate.of(year, month, day)
         }
-        private val postDataDAO = PostDataDAO()
 
         fun indekseringsnøkkel(packet: JsonMessage) = if(packet["arbeidsmarkedCv"].isMissingOrNull()) null else
             getCvNode(packet["arbeidsmarkedCv"])[indekseringsnøkkel].asText(null)
 
-        fun fraMelding(packet: JsonMessage): EsCv {
+        fun fraMelding(packet: JsonMessage, postDataKlient: PostDataKlient, geografiKlient: GeografiKlient): EsCv {
             val arbeidsmarkedCv = packet["arbeidsmarkedCv"]
             val cvNode = getCvNode(arbeidsmarkedCv)
             val jobbProfilNode = listOf("slettJobbprofil", "endreJobbprofil", "opprettJobbprofil").first { arbeidsmarkedCv.hasNonNull(it) }.let { arbeidsmarkedCv[it] }["jobbprofil"]
 
-            val postData = postDataDAO.findPostData(cvNode["postnummer"].asText())
-            val kommunenummer = postData.map { it.municipality.code }.orElse(null)
-            val fylkeNavn = postData.map { it.county.capitalizedName }.orElse(null)
-            val kommuneNavn = postData.map { it.municipality.capitalizedName }.orElse(null)
+            val postData = postDataKlient.findPostData(cvNode["postnummer"].asText())
+            val kommunenummer = postData?.kommune?.kommunenummer
+            val fylkeNavn = postData?.fylke?.korrigertNavn
+            val kommuneNavn = postData?.kommune?.korrigertNavn
             return EsCv(
                 aktorId = packet["aktørId"].asText(null),
                 fodselsnummer = cvNode["fodselsnummer"].asText(null),
@@ -269,7 +269,7 @@ class EsCv(
                 forerkort = EsForerkort.fraMelding(cvNode),
                 sprak = EsSprak.fraMelding(cvNode),
                 kursObj = EsKurs.fraMelding(cvNode),
-                geografiJobbonsker = EsGeografiJobbonsker.fraMelding(jobbProfilNode),
+                geografiJobbonsker = EsGeografiJobbonsker.fraMelding(jobbProfilNode, geografiKlient),
                 yrkeJobbonskerObj = EsYrkeJobbonsker.fraMelding(jobbProfilNode, packet),
                 omfangJobbonskerObj = EsOmfangJobbonsker.fraMelding(jobbProfilNode),
                 ansettelsesformJobbonskerObj = EsAnsettelsesformJobbonsker.fraMelding(jobbProfilNode),

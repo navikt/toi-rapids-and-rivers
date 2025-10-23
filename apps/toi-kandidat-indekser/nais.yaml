@@ -39,6 +39,8 @@ spec:
       value: {{kafka_consumer_group_id}}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: PAM_GEOGRAFI_URL
+      value: {{ pam_geografi_url }}
   observability:
     logging:
       destinations:
