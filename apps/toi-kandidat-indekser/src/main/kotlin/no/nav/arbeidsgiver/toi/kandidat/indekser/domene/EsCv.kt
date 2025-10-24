@@ -113,6 +113,7 @@ class EsCv(
     @field:JsonProperty private val totalLengdeYrkeserfaring = yrkeserfaring.totalYrkeserfaringIManeder()
 
     @field:JsonProperty private val veilederIdent = veilederIdent?.lowercase(Locale.getDefault())
+    @field:JsonProperty private val vervObj = emptyList<Any>()
 
     @Deprecated("")
     @field:JsonProperty

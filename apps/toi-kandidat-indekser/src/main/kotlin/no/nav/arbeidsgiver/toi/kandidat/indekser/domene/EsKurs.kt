@@ -15,6 +15,9 @@ class EsKurs(
     @field:JsonProperty private val omfangVerdi: Int?,
     @field:JsonProperty private val tilDato: LocalDate
 ) {
+    @field:JsonProperty private val fraDato: LocalDate? = null
+    @field:JsonProperty private val beskrivelse = ""
+
     override fun equals(other: Any?) = other is EsKurs && tilDato == other.tilDato
             && tittel == other.tittel && arrangor == other.arrangor
             && omfangEnhet == other.omfangEnhet
