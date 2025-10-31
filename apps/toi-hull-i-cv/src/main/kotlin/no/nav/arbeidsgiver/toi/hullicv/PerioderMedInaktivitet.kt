@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.hullicv
 
 import java.time.LocalDate
 

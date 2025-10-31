@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage

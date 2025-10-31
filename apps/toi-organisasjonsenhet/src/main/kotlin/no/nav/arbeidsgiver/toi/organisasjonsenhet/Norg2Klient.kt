@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.organisasjonsenhet
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.jackson.responseObject
