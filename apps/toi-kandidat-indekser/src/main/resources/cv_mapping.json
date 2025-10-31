@@ -1,0 +1,647 @@
+{
+  "date_detection": false,
+  "properties": {
+    "fritekst": {
+      "type": "text",
+      "analyzer": "norwegian"
+    },
+    "aktorId": {
+      "type": "keyword"
+    },
+    "fodselsnummer": {
+      "type": "text"
+    },
+    "fornavn": {
+      "type": "text"
+    },
+    "etternavn": {
+      "type": "text"
+    },
+    "fodselsdato": {
+      "type": "date",
+      "format": "yyyy-MM-dd"
+    },
+    "fodselsdatoErDnr": {
+      "type": "boolean"
+    },
+    "formidlingsgruppekode": {
+      "type": "keyword"
+    },
+    "epostadresse": {
+      "type": "keyword"
+    },
+    "mobiltelefon": {
+      "type": "keyword"
+    },
+    "harKontaktinformasjon": {
+      "type": "boolean"
+    },
+    "telefon": {
+      "type": "keyword"
+    },
+    "statsborgerskap": {
+      "type": "keyword"
+    },
+    "kandidatnr": {
+      "type": "keyword"
+    },
+    "arenaKandidatnr": {
+      "type": "keyword"
+    },
+    "beskrivelse": {
+      "type": "text",
+      "analyzer": "norwegian",
+      "copy_to": "fritekst"
+    },
+    "samtykkeStatus": {
+      "type": "keyword"
+    },
+    "samtykkeDato": {
+      "type": "date"
+    },
+    "adresselinje1": {
+      "type": "text"
+    },
+    "adresselinje2": {
+      "type": "text"
+    },
+    "adresselinje3": {
+      "type": "text"
+    },
+    "postnummer": {
+      "type": "keyword"
+    },
+    "poststed": {
+      "type": "keyword"
+    },
+    "landkode": {
+      "type": "keyword"
+    },
+    "kommunenummer": {
+      "type": "long"
+    },
+    "kommunenummerkw": {
+      "type": "keyword"
+    },
+    "kommunenummerstring": {
+      "type": "keyword"
+    },
+    "kommuneNavn": {
+      "type": "keyword"
+    },
+    "fylkeNavn": {
+      "type": "keyword"
+    },
+    "disponererBil": {
+      "type": "boolean"
+    },
+    "tidsstempel": {
+      "type": "date"
+    },
+    "doed": {
+      "type": "boolean"
+    },
+    "frKode": {
+      "type": "keyword"
+    },
+    "kvalifiseringsgruppekode": {
+      "type": "keyword"
+    },
+    "hovedmaalkode": {
+      "type": "keyword"
+    },
+    "hovedmal": {
+      "type": "keyword"
+    },
+    "innsatsgruppe": {
+      "type": "keyword"
+    },
+    "orgenhet": {
+      "type": "text"
+    },
+    "navkontor": {
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text",
+          "analyzer": "ngram_15_text_analyzer",
+          "search_analyzer": "ngram_text_search_analyzer"
+        },
+        "completion": {
+          "type": "completion"
+        }
+      }
+    },
+    "fritattKandidatsok": {
+      "type": "boolean"
+    },
+    "fritattAgKandidatsok": {
+      "type": "boolean"
+    },
+    "utdanning": {
+      "type": "nested",
+      "properties": {
+        "fraDato": {
+          "type": "date"
+        },
+        "tilDato": {
+          "type": "date"
+        },
+        "utdannelsessted": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "nusKode": {
+          "type": "keyword"
+        },
+        "nusKodeGrad": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "alternativGrad": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "yrkestatus": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "fagdokumentasjon": {
+      "properties": {
+        "type": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "tittel": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "yrkeserfaring": {
+      "type": "nested",
+      "properties": {
+        "fraDato": {
+          "type": "date"
+        },
+        "tilDato": {
+          "type": "date",
+          "null_value": "2099-12-31"
+        },
+        "arbeidsgiver": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "styrkKode": {
+          "type": "keyword"
+        },
+        "styrkKode4Siffer": {
+          "type": "keyword"
+        },
+        "styrkKode3Siffer": {
+          "type": "keyword"
+        },
+        "stillingstittel": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "stillingstitlerForTypeahead": {
+          "type": "completion"
+        },
+        "alternativStillingstittel": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "sokeTitler": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "organisasjonsnummer": {
+          "type": "keyword"
+        },
+        "naceKode": {
+          "type": "keyword"
+        },
+        "yrkeserfaringManeder": {
+          "type": "integer"
+        },
+        "utelukketForFremtiden": {
+          "type": "boolean"
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "sted": {
+          "type": "keyword"
+        }
+      }
+    },
+    "kompetanseObj": {
+      "properties": {
+        "kompKodeNavn": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "sokeNavn": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "alternativtNavn": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "godkjenning": {
+      "properties": {
+        "tittel": {
+          "type": "text"
+        },
+        "gjennomfoert": {
+          "type": "date"
+        },
+        "utloeper": {
+          "type": "date"
+        }
+      }
+    },
+    "annenerfaringObj": {
+      "properties": {
+        "fraDato": {
+          "type": "date"
+        },
+        "tilDato": {
+          "type": "date"
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "rolle": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "sertifikatObj": {
+      "properties": {
+        "sertifikatKodeNavn": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "alternativtNavn": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "utsteder": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "forerkort": {
+      "type": "nested",
+      "properties": {
+        "fraDato": {
+          "type": "date"
+        },
+        "tilDato": {
+          "type": "date"
+        },
+        "forerkortKode": {
+          "type": "keyword"
+        },
+        "forerkortKodeKlasse": {
+          "type": "keyword"
+        },
+        "alternativKlasse": {
+          "type": "text"
+        },
+        "utsteder": {
+          "type": "text"
+        }
+      }
+    },
+    "sprak": {
+      "type": "nested",
+      "properties": {
+        "sprakKodeTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst",
+          "fields": {
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "alternativTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "ferdighetMuntlig": {
+          "type": "keyword"
+        },
+        "ferdighetSkriftlig": {
+          "type": "keyword"
+        }
+      }
+    },
+    "kursObj": {
+      "properties": {
+        "tittel": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "arrangor": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "beskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "vervObj": {
+      "properties": {
+        "organisasjon": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        },
+        "tittel": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "copy_to": "fritekst"
+        }
+      }
+    },
+    "geografiJobbonsker": {
+      "type": "nested",
+      "properties": {
+        "geografiKodeTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "geografiKode": {
+          "type": "keyword"
+        }
+      }
+    },
+    "yrkeJobbonskerObj": {
+      "properties": {
+        "styrkBeskrivelse": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "sokeTitler": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "omfangJobbonskerObj": {
+      "properties": {
+        "omfangKodeTekst": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "ansettelsesformJobbonskerObj": {
+      "properties": {
+        "ansettelsesformKode": {
+          "type": "keyword"
+        },
+        "ansettelsesformKodeTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "arbeidstidsordningJobbonskerObj": {
+      "properties": {
+        "arbeidstidsordningKode": {
+          "type": "keyword"
+        },
+        "arbeidstidsordningKodeTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "arbeidsdagerJobbonskerObj": {
+      "properties": {
+        "arbeidsdagerKode": {
+          "type": "keyword"
+        },
+        "arbeidsdagerKodeTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "arbeidstidJobbonskerObj": {
+      "properties": {
+        "arbeidstidKode": {
+          "type": "keyword"
+        },
+        "arbeidstidKodeTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "samletKompetanseObj": {
+      "properties": {
+        "samletKompetanseTekst": {
+          "type": "text",
+          "analyzer": "norwegian",
+          "position_increment_gap": 100,
+          "fields": {
+            "completion": {
+              "type": "completion",
+              "max_input_length": 100
+            }
+          }
+        }
+      }
+    },
+    "totalLengdeYrkeserfaring": {
+      "type": "integer"
+    },
+    "synligForArbeidsgiverSok": {
+      "type": "boolean"
+    },
+    "synligForVeilederSok": {
+      "type": "boolean"
+    },
+    "oppstartKode": {
+      "type": "keyword"
+    },
+    "veileder": {
+      "type": "keyword"
+    },
+    "veilederIdent": {
+      "type": "keyword"
+    },
+    "veilederVisningsnavn": {
+      "type": "keyword"
+    },
+    "veilederEpost": {
+      "type": "keyword"
+    },
+    "perioderMedInaktivitet": {
+      "properties": {
+        "startdatoForInnevarendeInaktivePeriode": {
+          "type": "date"
+        },
+        "sluttdatoerForInaktivePerioderPaToArEllerMer": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}

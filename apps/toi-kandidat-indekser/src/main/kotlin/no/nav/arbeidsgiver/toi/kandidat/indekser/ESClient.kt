@@ -16,7 +16,11 @@ import org.opensearch.client.json.jackson.JacksonJsonpMapper
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.FieldValue
 import org.opensearch.client.opensearch._types.Refresh
+import org.opensearch.client.opensearch._types.mapping.TypeMapping
+import org.opensearch.client.opensearch.indices.CreateIndexRequest
+import org.opensearch.client.opensearch.indices.IndexSettings
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
+import java.io.StringReader
 
 
 class ESClient(
@@ -79,7 +83,7 @@ class ESClient(
             .build()
         openSearchClient = OpenSearchClient(transport)
 
-        indexer.filterNot (::finnesIndex).forEach(::opprettIndex)
+        indexer.filterNot (::finnesIndex).forEach(::opprettIndeks)
 
         if(aliasIndex() != hovedIndex) {
             oppdaterAlias(hovedIndex)
@@ -91,8 +95,27 @@ class ESClient(
             req.index(index)
         }.value()
 
-    private fun opprettIndex(index: String) {
-        openSearchClient.indices().create { req -> req.index(index) }
+    companion object {
+        private val osSettings = this::class.java
+            .getResource("/cv_settings.json")?.readText()
+        private val stillingMapping = this::class.java
+            .getResource("/cv_mapping.json")?.readText()
+    }
+
+    private fun opprettIndeks(indeksNavn: String) {
+        val mapper = openSearchClient._transport().jsonpMapper()
+
+        val createIndexRequest = CreateIndexRequest.Builder().index(indeksNavn)
+        val settingsParser = mapper.jsonProvider().createParser(osSettings?.let { StringReader(it) })
+        val indexSettings = IndexSettings._DESERIALIZER.deserialize(settingsParser, mapper)
+        createIndexRequest.settings(indexSettings)
+        val mappingsParser = mapper.jsonProvider().createParser(stillingMapping?.let { StringReader(it) })
+        val typeMapping = TypeMapping._DESERIALIZER.deserialize(mappingsParser, mapper)
+        createIndexRequest.mappings(typeMapping)
+
+        val indeksOpprettet = openSearchClient.indices().create(createIndexRequest.build()).acknowledged()
+
+        log.info("Indeks '$indeksNavn' ble opprettet: $indeksOpprettet")
     }
 
     private fun aliasIndex() = try {
