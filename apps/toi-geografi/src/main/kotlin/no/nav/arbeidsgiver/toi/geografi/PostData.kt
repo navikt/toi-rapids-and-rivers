@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kandidat.indekser.geografi
+package no.nav.arbeidsgiver.toi.geografi
 
 class PostData (
     val postkode: String,

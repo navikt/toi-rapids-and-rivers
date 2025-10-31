@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kandidat.indekser
+package no.nav.arbeidsgiver.toi
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse

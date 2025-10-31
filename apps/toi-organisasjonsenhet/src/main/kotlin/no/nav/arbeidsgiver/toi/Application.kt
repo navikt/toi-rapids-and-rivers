@@ -1,31 +1,26 @@
-package no.nav.arbeidsgiver.toi.kandidat.indekser
+package no.nav.arbeidsgiver.toi
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi", "geografi")
-
 private val log = noClassLogger()
-private val secureLog = SecureLog(log)
+val secureLog = LoggerFactory.getLogger("secureLog")!!
 
 fun main() {
     log.info("Starter app.")
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
-    val env = System.getenv()
 
-    RapidApplication.create(env).also { rapidsConnection ->
-        val esClient = ESClient(env["OPEN_SEARCH_URI"]!!, env["OPEN_SEARCH_USERNAME"]!!, env["OPEN_SEARCH_PASSWORD"]!!)
-        SynligKandidatfeedLytter(rapidsConnection, esClient)
-        UsynligKandidatfeedLytter(rapidsConnection, esClient)
-        UferdigKandidatLytter(rapidsConnection)
-    }.start()
+    startApp(Norg2Klient(norg2Url()), RapidApplication.create(System.getenv()))
 }
 
+fun startApp(norg2Klient: Norg2Klient, rapidsConnection: RapidsConnection) = rapidsConnection.also {
+    OrganisasjonsenhetLytter(norg2Klient, rapidsConnection)
+}.start()
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
-
 
 /**
  * Convenience for å slippe å skrive eksplistt navn på Logger når Logger opprettes. Ment å tilsvare Java-måten, hvor
@@ -47,3 +42,5 @@ fun noClassLogger(): Logger {
     val callerClassName = Throwable().stackTrace[1].className
     return LoggerFactory.getLogger(callerClassName)
 }
+
+private fun norg2Url() = System.getenv("NORG2_URL") ?: throw Exception("Mangler NORG2_URL")

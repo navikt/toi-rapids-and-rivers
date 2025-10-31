@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule

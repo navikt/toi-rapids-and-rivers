@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.toi.TestRapid

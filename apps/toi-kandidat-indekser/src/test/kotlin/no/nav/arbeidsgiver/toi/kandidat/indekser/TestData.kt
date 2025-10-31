@@ -134,6 +134,40 @@ fun ontologiDel(
             }}
         }
 """.trimIndent()
+data class PostData (
+    val postkode: String,
+    val fylke: Fylke,
+    val kommune: Kommune
+)
+data class Fylke (
+    val korrigertNavn: String
+)
+data class Kommune (
+    val kommunenummer: String,
+    val korrigertNavn: String
+)
+class Geografi (
+    val geografikode: String,
+    val navn: String
+)
+fun geografiDel(
+    postData: PostData = PostData("1234", Fylke("Oslo"), Kommune("01", "Oslo")),
+    geografi: List<Geografi> = listOf(Geografi("NO01", "Oslo"), Geografi("NO03", "Østfold"), Geografi("NO15.1535", "Vestnes"))
+) = """
+    {
+        "postkode": "${postData.postkode}",
+        "fylke": {
+            "korrigertNavn": "${postData.fylke.korrigertNavn}"
+        },
+        "kommune": {
+            "kommunenummer": "${postData.kommune.kommunenummer}",
+            "korrigertNavn": "${postData.kommune.korrigertNavn}"
+        },
+        "geografi": {
+            ${geografi.joinToString { """"${it.geografikode}": "${it.navn}"""" }}
+        }
+    }
+""".trimIndent()
 fun rapidMelding(
     synlighetJson: String?,
     behovsListe: List<String>? = null,
@@ -145,6 +179,7 @@ fun rapidMelding(
         }
     """.trimIndent(),
     ontologi: String? = null,
+    geografi: String? = null,
     sluttAvHendelseskjede: Boolean? = null,
     kandidatnr: String = "CG133309",
     aktørId: String = "123",
@@ -657,6 +692,7 @@ fun rapidMelding(
           ${organisasjonsenhetsnavn?.let { """"organisasjonsenhetsnavn": "$it",""" } ?: ""}
           ${hullICv?.let { """"hullICv": $it,""" } ?: ""}
           ${ontologi?.let { """"ontologi": $it,""" } ?: ""}
+          ${geografi?.let { """"geografi": $it,""" } ?: ""}
           "system_read_count": 1,
           "system_participating_services": [
             {

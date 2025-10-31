@@ -1,0 +1,4 @@
+kafka_pool: nav-prod
+kafka_consumer_group_id: toi-geografi-rapidconsumer-1
+pam_geografi_url: https://pam-geografi.intern.nav.no
+max_replicas: 6

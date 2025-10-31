@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: toi-kandidat-indekser
+  name: toi-geografi
   namespace: toi
   labels:
     team: toi
@@ -29,16 +29,15 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
-  openSearch:
-    instance: toi-kandidat
-    access: admin
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: {{kafka_consumer_group_id}}
+      value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
       value: "earliest"
+    - name: PAM_GEOGRAFI_URL
+      value: {{ pam_geografi_url }}
   observability:
     logging:
       destinations:

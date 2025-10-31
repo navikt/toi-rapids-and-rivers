@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kandidat.indekser.geografi
+package no.nav.arbeidsgiver.toi.geografi
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -18,7 +18,7 @@ class PostDataKlient(private val url: String) {
     private var sistHentet = LocalDateTime.MIN
 
     private fun hentAllePostkoder(): Map<String, PostData> {
-        if(sistHentet.isBefore(LocalDateTime.now().minusHours(1))) {
+        if(sistHentet.isBefore(now().minusHours(1))) {
             val httpGet = HttpGet("$url/rest/postdata").apply {
                 addHeader("Nav-CallId", UUID.randomUUID())
             }

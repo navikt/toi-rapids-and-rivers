@@ -10,6 +10,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
+import kotlin.text.get
 
 class UferdigKandidatLytter(
     rapidsConnection: RapidsConnection
@@ -49,25 +50,24 @@ class UferdigKandidatLytter(
 
         val aktørId = packet["aktørId"].asText()
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
+        val cvMelding =
+            if (packet["arbeidsmarkedCv.opprettCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettCv"]
+            else if (packet["arbeidsmarkedCv.endreCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.endreCv"]
+            else throw RuntimeException("Cv må finnes i UferdigKandidatLytter")
+        val jobbMelding =
+            if (packet["arbeidsmarkedCv.opprettJobbprofil"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettJobbprofil"]
+            else if (packet["arbeidsmarkedCv.endreJobbprofil"].jsonNodeHasValue()) packet["arbeidsmarkedCv.endreJobbprofil"]
+            else throw RuntimeException("Jobbprofil må finnes i UferdigKandidatLytter")
 
-        leggTilOntologiBehovFelt(packet)
+        leggTilOntologiBehovFelt(packet, cvMelding, jobbMelding)
+        leggTilGeografiBehovFelter(packet, cvMelding, jobbMelding)
 
         log.info("Sender behov for aktørid (se securelog)")
         secureLog.info("Sender behov for $aktørId")
         context.publish(aktørId, packet.toJson())
     }
 
-    private fun leggTilOntologiBehovFelt(packet: JsonMessage) {
-        val cvMelding =
-            if (packet["arbeidsmarkedCv.opprettCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettCv"]
-            else if (packet["arbeidsmarkedCv.endreCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.endreCv"]
-            else throw RuntimeException("Cv må finnes i UferdigKandidatLytter")
-
-        val jobbMelding =
-            if (packet["arbeidsmarkedCv.opprettJobbprofil"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettJobbprofil"]
-            else if (packet["arbeidsmarkedCv.endreJobbprofil"].jsonNodeHasValue()) packet["arbeidsmarkedCv.endreJobbprofil"]
-            else throw RuntimeException("Jobbprofil må finnes i UferdigKandidatLytter")
-
+    private fun leggTilOntologiBehovFelt(packet: JsonMessage, cvMelding: JsonNode, jobbMelding: JsonNode) {
         packet["kompetanse"] = jobbMelding["jobbprofil"]["kompetanser"].map(JsonNode::asText)
 
         val jobbønskeListe = jobbMelding["jobbprofil"]["stillinger"].map(JsonNode::asText)
@@ -76,6 +76,10 @@ class UferdigKandidatLytter(
         packet["stillingstittel"] = arbeidserfaringsListe.union(jobbønskeListe).union(jobbønskeKladdeListe)
     }
 
+    private fun leggTilGeografiBehovFelter(packet: JsonMessage, cvMelding: JsonNode, jobbMelding: JsonNode) {
+        packet["postnummer"] = cvMelding["cv"]["postnummer"].asText()
+        packet["geografiKode"] = jobbMelding["jobbprofil"]["geografi"]?.map { it["kode"].asText() } ?: emptyList<String>()
+    }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())

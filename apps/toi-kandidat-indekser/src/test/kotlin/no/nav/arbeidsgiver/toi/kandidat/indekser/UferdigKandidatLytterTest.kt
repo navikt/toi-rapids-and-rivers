@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UferdigKandidatLytterTest {
-    private val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi")
+    private val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi", "geografi")
 
-    @Disabled
     @Test
     fun `Melding uten behov-felt skal republiseres med behov`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true))
@@ -25,7 +24,6 @@ class UferdigKandidatLytterTest {
         assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).containsAll(behovsListe)
     }
 
-    @Disabled
     @Test
     fun `Melding skal legge ved ontologi kompetanse og stillingstitler den ønsker ontologi på`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true))
@@ -44,7 +42,6 @@ class UferdigKandidatLytterTest {
             .containsExactlyInAnyOrder("Sirkusestetikk", "Sirkusvokabular", "Definere riggebehov for sirkuskunster", "Kontrollere sirkusrigging før fremføring", "Servicearbeid")
     }
 
-    @Disabled
     @Test
     fun `Melding uten gitte behov-verdier skal republiseres med behov`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true),
@@ -60,7 +57,6 @@ class UferdigKandidatLytterTest {
         assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).containsAll(behovsListe)
     }
 
-    @Disabled
     @Test
     fun `Melding med gitte behov-verdier skal ignoreres`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true),
@@ -75,7 +71,6 @@ class UferdigKandidatLytterTest {
         assertThat(inspektør.size).isEqualTo(0)
     }
 
-    @Disabled
     @Test
     fun `Melding uten synlighet ignoreres`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = null)
@@ -89,7 +84,6 @@ class UferdigKandidatLytterTest {
         assertThat(inspektør.size).isEqualTo(0)
     }
 
-    @Disabled
     @Test
     fun `Melding med synlighet false har ikke informasjonsbehov`() {
         val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(false))
@@ -101,5 +95,28 @@ class UferdigKandidatLytterTest {
 
         val inspektør = testrapid.inspektør
         assertThat(inspektør.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `Melding med geografi-behov skal inneholde geografiKode og postnummer det spørres på basis av`() {
+        val expectedGeografiKode = "NO12345"
+        val expectedPostnummer = "0124"
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true), postnummer = expectedPostnummer, geografiJobbonsker = listOf(
+            TestGeografiJobbonsker(
+                kode = expectedGeografiKode,
+                sted = "Sted"
+            )))
+
+        val testrapid = TestRapid()
+
+        UferdigKandidatLytter(testrapid)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        val inspektør = testrapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).contains("geografi")
+        assertThat(melding["geografiKode"].map ( JsonNode::asText )).isEqualTo(listOf(expectedGeografiKode))
+        assertThat(melding["postnummer"].asText()).isEqualTo(expectedPostnummer)
     }
 }

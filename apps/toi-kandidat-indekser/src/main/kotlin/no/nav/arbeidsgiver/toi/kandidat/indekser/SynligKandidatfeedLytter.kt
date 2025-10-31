@@ -8,16 +8,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 
 const val topicName = "toi.kandidat-3"
 
 class SynligKandidatfeedLytter(
     rapidsConnection: RapidsConnection,
-    private val esClient: ESClient,
-    private val postDataKlient: PostDataKlient,
-    private val geografiKlient: GeografiKlient,
+    private val esClient: ESClient
 ) :
     River.PacketListener {
 
@@ -33,7 +29,7 @@ class SynligKandidatfeedLytter(
                 behovsListe.forEach(it::requireKey)
             }
             validate {
-                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder")
+                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn", "geografi.geografi")
                 it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode")
             }
         }.register(this)
@@ -48,7 +44,7 @@ class SynligKandidatfeedLytter(
     ) {
         val aktørId = packet["aktørId"].asText()
 
-        esClient.lagreEsCv(EsCv.fraMelding(packet, postDataKlient, geografiKlient))
+        esClient.lagreEsCv(EsCv.fraMelding(packet))
         packet["@slutt_av_hendelseskjede"] = true
         context.publish(packet.toJson())
     }

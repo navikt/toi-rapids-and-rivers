@@ -1,13 +1,9 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.UtdannelseYrkestatus
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 import no.nav.toi.TestRapid
 import org.assertj.core.api.AbstractStringAssert
 import org.assertj.core.api.Assertions.assertThat
@@ -22,8 +18,6 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.*
 import java.time.format.DateTimeFormatter
-import kotlin.div
-import kotlin.rem
 
 
 @Testcontainers
@@ -37,19 +31,6 @@ class KandidatfeedIntegrasjonsTest {
         private lateinit var testEsClient: ESClient
         private lateinit var client: OpenSearchClient
         private fun OpenSearchClient.flush() = this.indices().flush { it.index(esIndex) }
-    }
-    private val wireMockServer = WireMockServer(options().port(7664))
-
-    @BeforeAll
-    fun beforeAll() {
-        wireMockServer.stubGeografier()
-        wireMockServer.stubPostData()
-        wireMockServer.start()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        wireMockServer.stop()
     }
 
     @BeforeEach
@@ -88,6 +69,7 @@ class KandidatfeedIntegrasjonsTest {
             synlighet(erSynlig = true, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
+            geografi = geografiDel(),
             kandidatnr = expectedKandidatnr
         )
         val testrapid = TestRapid()
@@ -108,12 +90,14 @@ class KandidatfeedIntegrasjonsTest {
             synlighet(erSynlig = true, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
+            geografi = geografiDel(),
             kandidatnr = expectedKandidatnr
         )
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
             organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
+            geografi = geografiDel(),
             kandidatnr = expectedKandidatnr
         )
 
@@ -149,7 +133,7 @@ class KandidatfeedIntegrasjonsTest {
     fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
         assertIngenIIndekser()
         val rapidMelding =
-            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", ontologi = ontologiDel())
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", ontologi = ontologiDel(), geografi = geografiDel())
 
         val testrapid = TestRapid()
 
@@ -284,6 +268,22 @@ class KandidatfeedIntegrasjonsTest {
                 kompetansenavn = mapOf(
                     *expectedKompetanser.map { it to (listOf(ontologiKompetanse[0]) to listOf(ontologiKompetanse[1])) }.toTypedArray()
                 )
+            ),
+            geografi = geografiDel(
+                postData = PostData(
+                    postkode = expectedPostnummer,
+                    fylke = Fylke(
+                        korrigertNavn = expectedFylkeNavn
+                    ),
+                    kommune = Kommune(
+                        korrigertNavn = expectedKommuneNavn,
+                        kommunenummer = expectedKommunenummerstring
+                    )
+                ),
+                geografi = listOf(Geografi(
+                    geografikode = expectedGeografiJobbonskerGeografiKode,
+                    navn = expectedGeografiJobbonskerGeografiKodeTekst
+                ))
             ),
             kandidatnr = expectedKandidatnr,
             aktørId = expectedAktorId,
@@ -560,7 +560,7 @@ class KandidatfeedIntegrasjonsTest {
 
     private fun synligKandidatfeedlytter(testrapid: TestRapid) {
         val pamUrl = "http://localhost:7664"
-        SynligKandidatfeedLytter(testrapid, testEsClient, PostDataKlient(pamUrl), GeografiKlient(pamUrl))
+        SynligKandidatfeedLytter(testrapid, testEsClient)
     }
 
     private fun assertIngenIIndekser() {

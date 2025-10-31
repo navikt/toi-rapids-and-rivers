@@ -1,6 +1,8 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -8,17 +10,20 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.geografi.GeografiKlient
+import no.nav.arbeidsgiver.toi.geografi.PostDataKlient
 
-class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConnection: RapidsConnection) :
+class GeografiLytter(private val geografiKlient: GeografiKlient, private val postDataKlient: PostDataKlient, rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
             precondition {
-                it.demandAtFørstkommendeUløsteBehovEr("organisasjonsenhetsnavn")
+                it.demandAtFørstkommendeUløsteBehovEr("geografi")
             }
             validate {
-                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
+                it.requireKey("postnummer")
+                it.requireKey("geografiKode")
                 it.requireKey("aktørId")
             }
         }.register(this)
@@ -30,25 +35,22 @@ class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConne
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
+        val postnummer: String = packet["postnummer"].asText()
+        val geografiKode: List<String> = packet["geografiKode"].map(JsonNode::asText)
         val aktørid: String = packet["aktørId"].asText()
 
-        val orgnavn = norg2Klient.hentOrgenhetNavn(enhetsnummer)
-        if (orgnavn == null) {
-            if (norg2Klient.erKjentProblematiskEnhet(enhetsnummer)) {
-                log.info("Mangler mapping for kjent problematisk enhet $enhetsnummer på aktørid: (se securelog), setter navn lik tom string")
-                secureLog.info("Mangler mapping for kjent problematisk enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
-            } else {
-                log.error("Mangler mapping for enhet $enhetsnummer på aktørid: (se securelog), setter navn lik tom string")
-                secureLog.error("Mangler mapping for enhet $enhetsnummer på aktørid: $aktørid, setter navn lik tom string")
-            }
-
-            packet["organisasjonsenhetsnavn"] = ""
-        } else {
-            packet["organisasjonsenhetsnavn"] = orgnavn
-        }
-        log.info("Sender løsning på behov for aktørid: (se securelog) enhet: $enhetsnummer ${orgnavn ?: "''"}")
-        secureLog.info("Sender løsning på behov for aktørid: $aktørid enhet: $enhetsnummer ${orgnavn ?: "''"}")
+        val postdata = postDataKlient.findPostData(postnummer) ?: throw Exception("Fant ingen postdata for postnummer $postnummer")
+        val geografiKoder = geografiKode.mapNotNull(geografiKlient::findArenaGeography)
+            .associate { geografi -> geografi.geografikode to geografi.kapitalisertNavn }
+        packet["geografi"] = mapOf(
+            "postkode" to postdata.postkode,
+            "fylke" to mapOf("korrigertNavn" to postdata.fylke.korrigertNavn),
+            "kommune" to mapOf(
+                "kommunenummer" to postdata.kommune.kommunenummer,
+                "korrigertNavn" to postdata.kommune.korrigertNavn
+            ),
+            "geografi" to geografiKoder
+        )
 
         context.publish(aktørid, packet.toJson())
     }

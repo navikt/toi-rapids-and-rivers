@@ -27,4 +27,5 @@ include(
     "apps:toi-stilling-indekser",
     "technical-libs:testrapid",
     "apps:toi-kandidat-indekser",
+    "apps:toi-geografi"
 )

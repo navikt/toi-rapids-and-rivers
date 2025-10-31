@@ -1,0 +1,1 @@
+# Henter ut geografisk informasjon og legger den på rapid 

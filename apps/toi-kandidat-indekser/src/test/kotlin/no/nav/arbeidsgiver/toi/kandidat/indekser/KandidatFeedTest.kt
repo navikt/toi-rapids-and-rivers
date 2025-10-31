@@ -1,15 +1,8 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import io.mockk.confirmVerified
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -23,7 +16,7 @@ class KandidatFeedTest {
     private fun nyRapidMedLyttere(esClient: ESClient): TestRapid {
         val rapid = TestRapid()
         val pamUrl = "http://localhost:7664"
-        SynligKandidatfeedLytter(rapid, esClient, PostDataKlient(pamUrl), GeografiKlient(pamUrl))
+        SynligKandidatfeedLytter(rapid, esClient)
         UsynligKandidatfeedLytter(rapid, esClient)
         return rapid
     }
@@ -146,27 +139,19 @@ class KandidatFeedTest {
         val esClient = mockk<ESClient>(relaxed = true)
         val rapid = nyRapidMedLyttere(esClient)
 
-        val wireMockServer = WireMockServer(options().port(7664))
-        try {
-            wireMockServer.stubPostData()
-            wireMockServer.stubGeografier()
-            wireMockServer.start()
+        val melding = rapidMelding(
+            synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
+            ontologi = ontologiDel(),
+            geografi = geografiDel(),
+            organisasjonsenhetsnavn = "NAV et kontor"
+        )
 
-            val melding = rapidMelding(
-                synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
-                ontologi = ontologiDel(),
-                organisasjonsenhetsnavn = "NAV et kontor"
-            )
+        rapid.sendTestMessage(melding)
 
-            rapid.sendTestMessage(melding)
-
-            verify(exactly = 1) { esClient.lagreEsCv(any()) }
-            verify(exactly = 0) { esClient.slettCv(any()) }
-            confirmVerified(esClient)
-            assertThat(rapid.inspektør.size).isEqualTo(1)
-        } finally {
-            wireMockServer.stop()
-        }
+        verify(exactly = 1) { esClient.lagreEsCv(any()) }
+        verify(exactly = 0) { esClient.slettCv(any()) }
+        confirmVerified(esClient)
+        assertThat(rapid.inspektør.size).isEqualTo(1)
     }
 
     @Test

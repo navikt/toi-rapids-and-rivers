@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.kandidat.indekser.geografi
+package no.nav.arbeidsgiver.toi.geografi
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -17,7 +17,7 @@ class GeografiKlient(private val url: String) {
     private var sistHentet = LocalDateTime.MIN
 
     private fun hentAlleGeografier(): Map<String, Geografi> {
-        if(sistHentet.isBefore(LocalDateTime.now().minusHours(1))) {
+        if(sistHentet.isBefore(now().minusHours(1))) {
             val httpGet = HttpGet("$url/rest/geografier").apply {
                 addHeader("Nav-CallId", UUID.randomUUID())
             }

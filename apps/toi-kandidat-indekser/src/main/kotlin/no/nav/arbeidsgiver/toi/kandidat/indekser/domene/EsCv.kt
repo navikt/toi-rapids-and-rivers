@@ -9,9 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.PostDataKlient
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring.Companion.totalYrkeserfaringIManeder
-import no.nav.arbeidsgiver.toi.kandidat.indekser.geografi.GeografiKlient
 import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -205,15 +203,12 @@ class EsCv(
         fun indekseringsnøkkel(packet: JsonMessage) = if(packet["arbeidsmarkedCv"].isMissingOrNull()) null else
             getCvNode(packet["arbeidsmarkedCv"])[indekseringsnøkkel].asText(null)
 
-        fun fraMelding(packet: JsonMessage, postDataKlient: PostDataKlient, geografiKlient: GeografiKlient): EsCv {
+        fun fraMelding(packet: JsonMessage): EsCv {
             val arbeidsmarkedCv = packet["arbeidsmarkedCv"]
             val cvNode = getCvNode(arbeidsmarkedCv)
             val jobbProfilNode = listOf("slettJobbprofil", "endreJobbprofil", "opprettJobbprofil").first { arbeidsmarkedCv.hasNonNull(it) }.let { arbeidsmarkedCv[it] }["jobbprofil"]
 
-            val postData = postDataKlient.findPostData(cvNode["postnummer"].asText())
-            val kommunenummer = postData?.kommune?.kommunenummer
-            val fylkeNavn = postData?.fylke?.korrigertNavn
-            val kommuneNavn = postData?.kommune?.korrigertNavn
+            val kommunenummer = packet["geografi.kommune.kommunenummer"].asText(null)
             return EsCv(
                 aktorId = packet["aktørId"].asText(null),
                 fodselsnummer = cvNode["fodselsnummer"].asText(null),
@@ -259,8 +254,8 @@ class EsCv(
                 veilederIdent = packet["veileder.veilederId"].asText(null),
                 veilederVisningsnavn = packet["veileder.veilederinformasjon.visningsNavn"].asText(null),
                 veilederEpost = packet["veileder.veilederinformasjon.epost"].asText(null),
-                fylkeNavn = fylkeNavn,
-                kommuneNavn = kommuneNavn,
+                fylkeNavn = packet["geografi.fylke.korrigertNavn"].asText(null),
+                kommuneNavn = packet["geografi.kommune.korrigertNavn"].asText(null),
                 utdanning = EsUtdanning.fraMelding(cvNode),
                 fagdokumentasjon = EsFagdokumentasjon.fraMelding(cvNode),
                 yrkeserfaring = EsYrkeserfaring.fraMelding(packet, cvNode),
@@ -270,7 +265,7 @@ class EsCv(
                 forerkort = EsForerkort.fraMelding(cvNode),
                 sprak = EsSprak.fraMelding(cvNode),
                 kursObj = EsKurs.fraMelding(cvNode),
-                geografiJobbonsker = EsGeografiJobbonsker.fraMelding(jobbProfilNode, geografiKlient),
+                geografiJobbonsker = EsGeografiJobbonsker.fraMelding(jobbProfilNode, packet),
                 yrkeJobbonskerObj = EsYrkeJobbonsker.fraMelding(jobbProfilNode, packet),
                 omfangJobbonskerObj = EsOmfangJobbonsker.fraMelding(jobbProfilNode),
                 ansettelsesformJobbonskerObj = EsAnsettelsesformJobbonsker.fraMelding(jobbProfilNode),
