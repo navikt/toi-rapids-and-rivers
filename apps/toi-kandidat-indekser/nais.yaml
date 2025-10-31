@@ -47,3 +47,8 @@ spec:
         - id: loki
         - id: elastic
       enabled: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
