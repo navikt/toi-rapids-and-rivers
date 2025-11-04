@@ -232,6 +232,8 @@ class KandidatfeedIntegrasjonsTest {
         val expectedKursTilDato = LocalDate.of(2020, 3, 1)
         val expectedGeografiJobbonskerGeografiKode = "NO03.0301"
         val expectedGeografiJobbonskerGeografiKodeTekst = "Oslo"
+        val expectedGeografiJobbonskerGeografiUkjentKode = "Ukjent.Kode"
+        val expectedGeografiJobbonskerGeografiUkjentKodeTekst = "Ukjent kode stedsnavn"
         val expectedYrkeJobbonskerStyrkBeskrivelse = "Javautvikler"
         val expectedOmfangJobbonskerOmfangKode = "HELTID"
         val expectedOmfangJobbonskerOmfangKodeTekst = "Heltid"
@@ -404,6 +406,10 @@ class KandidatfeedIntegrasjonsTest {
                 TestGeografiJobbonsker(
                     kode = expectedGeografiJobbonskerGeografiKode,
                     sted = expectedGeografiJobbonskerGeografiKodeTekst
+                ),
+                TestGeografiJobbonsker(
+                    kode = expectedGeografiJobbonskerGeografiUkjentKode,
+                    sted = expectedGeografiJobbonskerGeografiUkjentKodeTekst
                 )
             ),
             jobbProfilstillinger = listOf(expectedYrkeJobbonskerStyrkBeskrivelse, "Ekstra yrkebeskrivelse"),
@@ -534,6 +540,8 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(cvJson["kursObj"][0]["tilDato"].asText()).datoEquals(expectedKursTilDato)
         assertThat(cvJson["geografiJobbonsker"][0]["geografiKode"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiKode)
         assertThat(cvJson["geografiJobbonsker"][0]["geografiKodeTekst"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiKodeTekst)
+        assertThat(cvJson["geografiJobbonsker"][1]["geografiKode"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiUkjentKode)
+        assertThat(cvJson["geografiJobbonsker"][1]["geografiKodeTekst"].asText()).isEqualTo(expectedGeografiJobbonskerGeografiUkjentKodeTekst)
         assertThat(cvJson["yrkeJobbonskerObj"][0]["styrkKode"].isNull).isTrue
         assertThat(cvJson["yrkeJobbonskerObj"][0]["styrkBeskrivelse"].asText()).isEqualTo(expectedYrkeJobbonskerStyrkBeskrivelse)
         assertThat(cvJson["yrkeJobbonskerObj"][0]["primaertJobbonske"].asBoolean()).isFalse

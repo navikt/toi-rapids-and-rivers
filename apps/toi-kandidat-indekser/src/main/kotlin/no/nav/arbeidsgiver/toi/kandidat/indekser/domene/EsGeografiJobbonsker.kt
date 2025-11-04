@@ -20,7 +20,7 @@ class EsGeografiJobbonsker(
         fun fraMelding(jobbProfilNode: JsonNode, packet: JsonMessage) = jobbProfilNode["geografi"].map { geografi ->
             val geografiKode = geografi["kode"].asText()
             EsGeografiJobbonsker(
-                geografiKodeTekst = packet["geografi.geografi"][geografiKode].asText(null) ?: geografi["sted"].asText(),
+                geografiKodeTekst = packet["geografi.geografi"][geografiKode]?.asText(null) ?: geografi["sted"].asText(),
                 geografiKode = geografiKode
             )
         }
