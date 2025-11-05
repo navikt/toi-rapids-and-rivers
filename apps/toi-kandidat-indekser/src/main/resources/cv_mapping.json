@@ -520,6 +520,9 @@
     },
     "omfangJobbonskerObj": {
       "properties": {
+        "omfangKode": {
+          "type": "keyword"
+        },
         "omfangKodeTekst": {
           "type": "text",
           "fields": {
