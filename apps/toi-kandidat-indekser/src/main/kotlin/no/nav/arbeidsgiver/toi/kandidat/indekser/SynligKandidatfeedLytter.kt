@@ -29,8 +29,8 @@ class SynligKandidatfeedLytter(
                 behovsListe.forEach(it::requireKey)
             }
             validate {
-                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn", "geografi.geografi")
-                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode")
+                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder", "geografi.geografi")
+                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn")
             }
         }.register(this)
     }
@@ -51,6 +51,6 @@ class SynligKandidatfeedLytter(
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
-        throw Error()
+        throw Error(problems.toString())
     }
 }

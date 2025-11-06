@@ -83,6 +83,39 @@ class KandidatfeedIntegrasjonsTest {
     }
 
     @Test
+    fun `Meldinger der synlighet er ferdig beregnet og har dekte behov men ingen geografi skal kandidat legges til i ES`() {
+        assertIngenIIndekser()
+        val expectedKandidatnr = "CG133310"
+        val meldingSynlig = rapidMelding(
+            synlighet(erSynlig = true, ferdigBeregnet = true),
+            organisasjonsenhetsnavn = "NAV et kontor",
+            ontologi = ontologiDel(),
+            geografi = """
+                {
+                    "postkode": null,
+                    "fylke": {
+                        "korrigertNavn": null
+                    },
+                    "kommune": {
+                        "kommunenummer": null,
+                        "korrigertNavn": null
+                    },
+                    "geografi": {}
+                }
+                """.trimIndent(),
+            kandidatnr = expectedKandidatnr
+        )
+        val testrapid = TestRapid()
+
+        synligKandidatfeedlytter(testrapid)
+        UsynligKandidatfeedLytter(testrapid, testEsClient)
+
+        testrapid.sendTestMessage(meldingSynlig)
+
+        assertEnKandidatMedKandidatnr(expectedKandidatnr)
+    }
+
+    @Test
     fun `Meldinger der synlighet er ferdig beregnet til false, skal kandidat slettes om han er lagt til i ES`() {
         assertIngenIIndekser()
         val expectedKandidatnr = "CG133310"
