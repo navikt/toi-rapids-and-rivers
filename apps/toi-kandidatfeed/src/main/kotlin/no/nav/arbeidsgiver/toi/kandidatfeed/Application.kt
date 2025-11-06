@@ -18,7 +18,6 @@ fun main() {
         val kandidatfeedProducer = KafkaProducer<String, String>(producerConfig)
         SynligKandidatfeedLytter(rapidsConnection, kandidatfeedProducer)
         UsynligKandidatfeedLytter(rapidsConnection, kandidatfeedProducer)
-        UferdigKandidatLytter(rapidsConnection)
     }.start()
 }
 
