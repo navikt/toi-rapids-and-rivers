@@ -77,7 +77,7 @@ class UferdigKandidatLytter(
     }
 
     private fun leggTilGeografiBehovFelter(packet: JsonMessage, cvMelding: JsonNode, jobbMelding: JsonNode) {
-        packet["postnummer"] = cvMelding["cv"]["postnummer"].asText()
+        packet["postnummer"] = cvMelding["cv"]["postnummer"]
         packet["geografiKode"] = jobbMelding["jobbprofil"]["geografi"]?.map { it["kode"].asText() } ?: emptyList<String>()
     }
 

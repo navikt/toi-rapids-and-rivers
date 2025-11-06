@@ -119,4 +119,23 @@ class UferdigKandidatLytterTest {
         assertThat(melding["geografiKode"].map ( JsonNode::asText )).isEqualTo(listOf(expectedGeografiKode))
         assertThat(melding["postnummer"].asText()).isEqualTo(expectedPostnummer)
     }
+
+    @Test
+    fun `Melding med geografi-behov skal send postnummer null om det ikke finnes i cv`() {
+        val expectedGeografiKode = "NO12345"
+        val expectedPostnummer: String? = null
+        val meldingMedKunCvOgAktørId = rapidMelding(synlighetJson = synlighet(true), postnummer = expectedPostnummer, geografiJobbonsker = emptyList())
+
+        val testrapid = TestRapid()
+
+        UferdigKandidatLytter(testrapid)
+        testrapid.sendTestMessage(meldingMedKunCvOgAktørId)
+
+        val inspektør = testrapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+        val melding = inspektør.message(0)
+        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).contains("geografi")
+        assertThat(melding["geografiKode"].map ( JsonNode::asText )).hasSize(0)
+        assertThat(melding["postnummer"].isNull()).isTrue
+    }
 }
