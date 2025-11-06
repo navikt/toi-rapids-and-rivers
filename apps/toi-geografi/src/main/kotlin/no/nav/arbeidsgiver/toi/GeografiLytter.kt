@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
@@ -22,9 +23,8 @@ class GeografiLytter(private val geografiKlient: GeografiKlient, private val pos
                 it.demandAtFørstkommendeUløsteBehovEr("geografi")
             }
             validate {
-                it.requireKey("postnummer")
-                it.requireKey("geografiKode")
-                it.requireKey("aktørId")
+                it.interestedIn("postnummer")
+                it.requireKey("geografiKode", "aktørId")
             }
         }.register(this)
     }
@@ -35,19 +35,19 @@ class GeografiLytter(private val geografiKlient: GeografiKlient, private val pos
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val postnummer: String = packet["postnummer"].asText()
+        val postnummer = packet["postnummer"]
         val geografiKode: List<String> = packet["geografiKode"].map(JsonNode::asText)
         val aktørid: String = packet["aktørId"].asText()
 
-        val postdata = postDataKlient.findPostData(postnummer) ?: throw Exception("Fant ingen postdata for postnummer $postnummer")
+        val postdata = if(postnummer.isMissingOrNull()) null else postDataKlient.findPostData(postnummer.asText()) ?: throw Exception("Fant ingen postdata for postnummer $postnummer")
         val geografiKoder = geografiKode.mapNotNull(geografiKlient::findArenaGeography)
             .associate { geografi -> geografi.geografikode to geografi.kapitalisertNavn }
         packet["geografi"] = mapOf(
-            "postkode" to postdata.postkode,
-            "fylke" to mapOf("korrigertNavn" to postdata.fylke.korrigertNavn),
+            "postkode" to postdata?.postkode,
+            "fylke" to mapOf("korrigertNavn" to postdata?.fylke?.korrigertNavn),
             "kommune" to mapOf(
-                "kommunenummer" to postdata.kommune.kommunenummer,
-                "korrigertNavn" to postdata.kommune.korrigertNavn
+                "kommunenummer" to postdata?.kommune?.kommunenummer,
+                "korrigertNavn" to postdata?.kommune?.korrigertNavn
             ),
             "geografi" to geografiKoder
         )

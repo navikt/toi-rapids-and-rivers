@@ -144,6 +144,23 @@ class GeografiTest {
     }
 
     @Test
+    fun `Legg til korrekt postdata på populert melding med postnummer lik null og ingen geografikoder`() {
+        val testRapid = TestRapid()
+        startTestApp(testRapid)
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["geografi"]""", postnummer = null, geografiKode = emptyList()))
+
+        val inspektør = testRapid.inspektør
+
+        assertThat(inspektør.size).isEqualTo(1)
+
+        val geografi = inspektør.message(0)["geografi"]
+        assertThat(geografi["postkode"].isNull()).isTrue
+        assertThat(geografi["fylke"]["korrigertNavn"].isNull()).isTrue
+        assertThat(geografi["kommune"]["kommunenummer"].isNull()).isTrue
+        assertThat(geografi["kommune"]["korrigertNavn"].isNull()).isTrue
+    }
+
+    @Test
     fun `Legg til korrekt geografi på populert melding`() {
         val testRapid = TestRapid()
         startTestApp(testRapid)
@@ -164,11 +181,11 @@ class GeografiTest {
         startApp(testRapid, "http://localhost:8082")
     }
 
-    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList(), postnummer: String ="4701", geografiKode: List<String> = listOf("NO01")) = """
+    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList(), postnummer: String? ="4701", geografiKode: List<String> = listOf("NO01")) = """
         {
             "aktørId":"123",
             "@behov":$behovListe,
-            "postnummer": "$postnummer",
+            "postnummer": ${postnummer?.let { """"$it"""" }},
             "geografiKode": ${geografiKode.joinToString(prefix = "[", postfix = "]") { """"$it"""" }}
             ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
         }
