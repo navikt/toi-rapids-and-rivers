@@ -13,7 +13,7 @@ class EsKurs(
     @field:JsonProperty private val arrangor: String,
     @field:JsonProperty private val omfangEnhet: String?,
     @field:JsonProperty private val omfangVerdi: Int?,
-    @field:JsonProperty private val tilDato: LocalDate
+    @field:JsonProperty private val tilDato: LocalDate?
 ) {
     @field:JsonProperty private val fraDato: LocalDate? = null
     @field:JsonProperty private val beskrivelse = ""
@@ -36,7 +36,7 @@ class EsKurs(
                 arrangor = kursNode["utsteder"].asText(),
                 omfangEnhet = kursNode["varighetEnhet"]?.asText("") ?: "",
                 omfangVerdi = kursNode["varighet"]?.asInt(),
-                tilDato = kursNode["tidspunkt"].yyyyMMddTilLocalDate()
+                tilDato = kursNode["tidspunkt"]?.yyyyMMddTilLocalDate()
             )
         }
     }
