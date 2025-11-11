@@ -77,7 +77,7 @@ data class TestForerkort(
 data class TestKurs(
     val tittel: String,
     val utsteder: String,
-    val tidspunkt: LocalDate,
+    val tidspunkt: LocalDate?,
     val varighet: Int,
     val varighetEnhet: String
 )
@@ -446,6 +446,13 @@ fun rapidMelding(
             tidspunkt = LocalDate.of(2012, 5, 1),
             varighet = 4,
             varighetEnhet = "UKE"
+        ),
+        TestKurs(
+            tittel = "Word-kurs",
+            utsteder = "Itkursagenten",
+            tidspunkt = null,
+            varighet = 4,
+            varighetEnhet = "UKE"
         )
     ),
     geografiJobbonsker: List<TestGeografiJobbonsker> = listOf(
@@ -577,11 +584,11 @@ fun rapidMelding(
                         {
                             "tittel": "${it.tittel}",
                             "utsteder": "${it.utsteder}",
-                            "tidspunkt": [
-                                ${it.tidspunkt.year},
-                                ${it.tidspunkt.monthValue},
-                                ${it.tidspunkt.dayOfMonth}
-                            ],
+                            "tidspunkt": ${it.tidspunkt?.let { 
+                                """
+                                [${it.year}, ${it.monthValue}, ${it.dayOfMonth}]
+                                """.trimIndent()
+                        }},
                             "varighet": ${it.varighet},
                             "varighetEnhet": "${it.varighetEnhet}"
                         }
