@@ -1,19 +1,17 @@
-package no.nav.toi.stilling.indekser
+package no.nav.toi.stilling.publiser.dirstilling
 
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import java.time.ZonedDateTime
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.ZoneOffset
 import java.util.*
 
-data class Melding(
+data class RapidHendelse(
     val stillingsId: String,
-    val stillingsinfo: Stillingsinfo?,
     val direktemeldtStilling: DirektemeldtStilling
 ) {
     companion object {
@@ -22,48 +20,32 @@ data class Melding(
             .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .registerModule(JavaTimeModule())
 
-        fun fraJson(jsonMessage: JsonMessage): Melding = mapper.readValue(jsonMessage.toJson(), Melding::class.java)
-    }
-}
-
-data class StillingsinfoMelding(
-    val stillingsId: String,
-    val stillingsinfo: Stillingsinfo?
-) {
-    companion object {
-        private val mapper = jacksonObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .registerModule(JavaTimeModule())
-
-        fun fraJson(jsonMessage: JsonMessage): StillingsinfoMelding = mapper.readValue(jsonMessage.toJson(), StillingsinfoMelding::class.java)
+        fun fraJson(jsonMessage: JsonMessage): RapidHendelse = mapper.readValue(jsonMessage.toJson(), RapidHendelse::class.java)
     }
 }
 
 data class DirektemeldtStilling(
     val stillingsId: UUID,
-    val annonsenr: String,
     val innhold: DirektemeldtStillingInnhold,
     val opprettet: ZonedDateTime,
     val opprettetAv: String,
     val sistEndret: ZonedDateTime,
     val sistEndretAv: String,
     val status: String,
-    val utløpsdato: ZonedDateTime?,
+    val annonsenr: String?,
+    val adminStatus: String?,
+    val utløpsdato: ZonedDateTime? = null,
     val publisert: ZonedDateTime? = null,
     val publisertAvAdmin: String?,
-    val adminStatus: String?
 ) {
-
-    fun tilStilling(): Stilling = Stilling(
+    fun konverterTilStilling(): Stilling = Stilling(
         uuid = stillingsId,
-        annonsenr = annonsenr,
         created = konverterDato(opprettet),
         updated = konverterDato(sistEndret),
         status = status,
-        tittel = innhold.title,
-        administration = innhold.administration?.copy(status = konverterAdminStatus(adminStatus)),
-        contacts = innhold.contactList,
+        title = innhold.title,
+        administration = innhold.administration?.copy(status = adminStatus),
+        contactList = innhold.contactList,
         privacy = innhold.privacy,
         source = innhold.source,
         medium = innhold.medium,
@@ -71,41 +53,32 @@ data class DirektemeldtStilling(
         published = konverterDatoOptional(publisert),
         expires = konverterDatoOptional(utløpsdato),
         employer = innhold.employer,
-        locations = innhold.locationList,
-        categories = innhold.categoryList,
-        properties = innhold.properties.map { it.key to (tilJson(key = it.key, value = it.value) ?: it.value)}.toMap(),
-        publishedByAdmin = publisertAvAdmin,
+        locationList = innhold.locationList,
+        categoryList = innhold.categoryList,
+        properties = innhold.properties,
+        publishedByAdmin = parseLocalDateTime(publisertAvAdmin),
         businessName = innhold.businessName,
+        adnr = annonsenr.toString()
     )
 
     private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
         return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneId.of("Europe/Oslo")), ZoneId.of("Europe/Oslo"))
             .toLocalDateTime()
     }
-
     private fun konverterDatoOptional(dato: ZonedDateTime?): LocalDateTime? {
         if (dato == null) return null
         return konverterDato(dato)
     }
 
-    private fun konverterAdminStatus(status: String?) : String {
-        return when (status) {
-            null, "RECEIVED" -> "RECEIVED"
-            "PENDING" -> "PENDING"
-            else -> "DONE"
-        }
-    }
-
-    private fun tilJson(key: String, value: String?): JsonNode? {
-        if(value == null) {
-            log.info("Key: $key has null value, returning null")
-            return null
-        }
+    private fun parseLocalDateTime(dateTime: String?): LocalDateTime? {
+        if (dateTime == null) return null
         return try {
-            val json = jacksonObjectMapper().readTree(value)
-            json
-        } catch (exception: JsonProcessingException) {
-            null
+            LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME)
+                .atZone(ZoneId.of("Europe/Oslo"))
+                .toLocalDateTime()
+        } catch (e: Exception) {
+            log.info("Kunne ikke parse dato $dateTime til LocalDateTime: ${e.message} $stillingsId")
+            return null
         }
     }
 }
@@ -114,8 +87,8 @@ data class DirektemeldtStillingKategori(
     val code: String?,
     val categoryType: String?,
     val name: String?,
-    val description: String? = null,
-    val parentId: Int? = null
+    val description: String?,
+    val parentId: Int?
 )
 
 data class DirektemeldtStillingAdministration(
@@ -127,22 +100,30 @@ data class DirektemeldtStillingAdministration(
 )
 
 data class DirektemeldtStillingArbeidsgiver(
+    val mediaList: List<Media> = ArrayList(),
+    val contactList: List<Contact> = ArrayList(),
+    val location: Geografi?,
+    val locationList: List<Geografi> = ArrayList(),
+    val properties: Map<String, String> = HashMap(),
     val name: String?,
     val orgnr: String?,
     val parentOrgnr: String?,
     val publicName: String?,
     val orgform: String?,
+    val employees: Int?
 )
 
 data class DirektemeldtStillingInnhold(
     val title: String,
     val administration: DirektemeldtStillingAdministration?,
+    val mediaList: List<Media> = ArrayList(),
     val contactList: List<Contact> = ArrayList(),
     val privacy: String?,
     val source: String?,
     val medium: String?,
     val reference: String?,
     val employer: DirektemeldtStillingArbeidsgiver?,
+    val location: Geografi?,
     val locationList: List<Geografi> = ArrayList(),
     val categoryList: List<DirektemeldtStillingKategori> = ArrayList(),
     val properties: Map<String, String> = HashMap(),
@@ -160,24 +141,19 @@ data class Contact(
     val title: String?
 )
 
+data class Media(
+    val mediaLink: String?,
+    val filename: String?
+)
+
 data class Geografi(
     val address: String?,
     val postalCode: String?,
     val county: String?,
-    val municipalCode: String?,
-    val countyCode: String? = municipalCode?.substring(0,2),
     val municipal: String?,
+    val municipalCode: String?,
     val city: String?,
     val country: String?,
     val latitude: String?,
     val longitude: String?
-)
-
-data class Stillingsinfo(
-    val eierNavident: String?,
-    val eierNavn: String?,
-    val eierNavKontorEnhetId: String?,
-    val stillingsid: String,
-    val stillingsinfoid: String?,
-    val stillingskategori: String?
 )

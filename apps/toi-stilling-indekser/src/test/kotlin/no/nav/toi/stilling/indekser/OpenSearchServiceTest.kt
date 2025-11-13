@@ -115,17 +115,66 @@ class OpenSearchServiceTest {
     }
 
     @Test
-    fun `Skal legge inn melding fra rapid inn i OpenSearch`() {
-        env["KAFKA_BROKERS"] = "localhost:9092"
-        env["KAFKA_SCHEMA_REGISTRY"]= "http://localhost:8081"
-        env["KAFKA_SCHEMA_REGISTRY_USER"] = "user"
-        env["KAFKA_SCHEMA_REGISTRY_PASSWORD"] = "pwd"
-        env["USER_INFO"] = ""
-        env["KAFKA_TRUSTSTORE_PATH"] = ""
-        env["KAFKA_CREDSTORE_PASSWORD"]= ""
-        env["KAFKA_KEYSTORE_PATH"] = ""
-        env["KAFKA_CREDSTORE_PASSWORD"] = ""
+    fun `Skal kunne oppdatere stillingsinfo for stilling som allerede er indeksert`() {
+        leggTilKafkaMiljøvariabler()
+        opprettIndeks()
 
+        testProgramMedHendelse(env, melding) {
+            assertThat(size).isEqualTo(0)
+        }
+
+        val stillingsinfo = Stillingsinfo(
+            eierNavident = "T98765",
+            eierNavn = "Tester 2",
+            eierNavKontorEnhetId = "1234",
+            stillingsid = "123e4567-e89b-12d3-a456-426614174000",
+            stillingsinfoid = "24553",
+            stillingskategori = "STILLING"
+        )
+        testMetoderOpenSearch.refreshIndex()
+
+        val stillingFørOppdatering = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+
+        openSearchService.oppdaterStillingsinfo(stillingsId = "123e4567-e89b-12d3-a456-426614174000", stillingsinfo = stillingsinfo, indeks = "stilling_20250328")
+        testMetoderOpenSearch.refreshIndex()
+        val stillingEtterOppdatering = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+
+        assertThat(stillingFørOppdatering?.stillingsinfo?.eierNavident).isEqualTo("T123456")
+        assertThat(stillingFørOppdatering?.stillingsinfo?.eierNavn).isEqualTo("Tester")
+
+        assertThat(stillingEtterOppdatering?.stillingsinfo?.eierNavident).isEqualTo("T98765")
+        assertThat(stillingEtterOppdatering?.stillingsinfo?.eierNavn).isEqualTo("Tester 2")
+    }
+
+    @Test
+    fun `Skal lese inn melding om stillingsinfo fra rapid og oppdatere stillingsinfo i opensearch`() {
+        leggTilKafkaMiljøvariabler()
+        opprettIndeks()
+
+        testProgramMedHendelse(env, melding) {
+            assertThat(size).isEqualTo(0)
+        }
+        // Oppdaterer stillingsinfo for stilling som allerede er indeksert
+        testProgramMedHendelse(env, stillingsinfoMelding) {
+            assertThat(size).isEqualTo(0)
+        }
+        testMetoderOpenSearch.refreshIndex()
+
+        val antallDokumenter = testMetoderOpenSearch.hentAntallDokumenter("stilling_20250328")
+        assertThat(antallDokumenter).isEqualTo(1)
+
+        val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+        val stillingsinfo = rekrutteringsbistandStilling?.stillingsinfo
+
+        assertThat(stillingsinfo).isNotNull
+        assertThat(stillingsinfo?.eierNavident).isEqualTo("T23456")
+        assertThat(stillingsinfo?.eierNavn).isEqualTo("Tester 2")
+        assertThat(stillingsinfo?.eierNavKontorEnhetId).isEqualTo("5678")
+    }
+
+    @Test
+    fun `Skal legge inn melding fra rapid inn i OpenSearch`() {
+        leggTilKafkaMiljøvariabler()
         opprettIndeks()
 
         testProgramMedHendelse(env, melding) {
@@ -142,6 +191,18 @@ class OpenSearchServiceTest {
         assertThat(rekrutteringsbistandStilling?.stilling?.uuid.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
     }
 
+    private fun leggTilKafkaMiljøvariabler() {
+        env["KAFKA_BROKERS"] = "localhost:9092"
+        env["KAFKA_SCHEMA_REGISTRY"]= "http://localhost:8081"
+        env["KAFKA_SCHEMA_REGISTRY_USER"] = "user"
+        env["KAFKA_SCHEMA_REGISTRY_PASSWORD"] = "pwd"
+        env["USER_INFO"] = ""
+        env["KAFKA_TRUSTSTORE_PATH"] = ""
+        env["KAFKA_CREDSTORE_PASSWORD"]= ""
+        env["KAFKA_KEYSTORE_PATH"] = ""
+        env["KAFKA_CREDSTORE_PASSWORD"] = ""
+    }
+
     private fun opprettIndeks() {
         openSearchService.opprettIndeks()    }
 
@@ -149,10 +210,10 @@ class OpenSearchServiceTest {
             {
                 "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
                 "stillingsinfo": {
-                    "eierNavIdent": "T123456",
+                    "eierNavident": "T123456",
                     "eierNavn": "Tester",
                     "eierNavKontorEnhetId": "1234",
-                    "stillingsid": "123456",
+                    "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
                     "stillingsinfoid": "24553",
                     "stillingskategori": "STILLING"
                 },
@@ -222,4 +283,19 @@ class OpenSearchServiceTest {
                 "@event_name": "indekserDirektemeldtStilling"
             }
             """.trimIndent()
+
+    private var stillingsinfoMelding = """
+        {
+            "@event_name": "indekserStillingsinfo",
+            "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+            "stillingsinfo": {
+                "eierNavident": "T23456",
+                "eierNavn": "Tester 2",
+                "eierNavKontorEnhetId": "5678",
+                "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
+                "stillingsinfoid": "24553",
+                "stillingskategori": "STILLING"
+            }
+        }
+    """.trimIndent()
 }

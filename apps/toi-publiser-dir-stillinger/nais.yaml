@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: toi-publisering-til-arbeidsplassen
+  name: toi-publiser-dir-stillinger
   namespace: toi
   labels:
     team: toi
@@ -25,26 +25,17 @@ spec:
     requests:
       cpu: 100m
       memory: 512Mi
-  secureLogs:
-    enabled: true
   kafka:
     pool: {{ kafka_pool }}
-  envFrom:
-    - secret: rekrutteringsbistand-arbeidsplassen-secret
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
+    - name: PUBLISERING_TOPIC
+      value: "toi.dir-stilling-ekstern-v1"
     - name: KAFKA_RESET_POLICY
-      value: "earliest"
-    - name: IMPORT_API_BASE_URL
-      value: http://pam-import-api.teampam
-  accessPolicy:
-    outbound:
-      rules:
-        - application: pam-import-api
-          namespace: teampam
+      value: "latest"
   observability:
     logging:
       destinations:

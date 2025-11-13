@@ -119,3 +119,6 @@ spec:
     - team: toi
       application: toi-geografi
       access: readwrite
+    - team: toi
+      application: rekrutteringsbistand-kandidatvarsel-api
+      access: readwrite

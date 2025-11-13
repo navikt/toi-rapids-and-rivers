@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
+import erGyldigEpostadresse
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -37,6 +38,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
+            secureLog.info("Svar fra opprettSak ${stillingsId}: $json")
             val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
 
             when (notifikasjonsSvar) {
@@ -48,13 +50,18 @@ class NotifikasjonKlient(
                     log.info("Sak ikke opprettet hos notifikasjon-api fordi det allerede finnes en sak med stillingsId: $stillingsId")
                 }
 
+                NySakSvar.DuplikatGrupperingsidEtterDelete.name -> {
+                    log.info("Sak ikke opprettet hos notifikasjon-api fordi det allerede finnes en sak med stillingsId som er slettet: $stillingsId")
+                }
+
                 else -> {
+                    log.error("Feil for stillingsid - ukjent notifikasjonsSvar '${notifikasjonsSvar}': ${stillingsId}")
                     håndterFeil(json, response, query)
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            log.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId}: (se secureLog)")
+            secureLog.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId} $query", e)
             throw e
         }
     }
@@ -74,6 +81,12 @@ class NotifikasjonKlient(
             return
         }
 
+        val gyldigeEpostadresser = mottakerEpostadresser.filter { erGyldigEpostadresse(it) }
+        if (gyldigeEpostadresser.isEmpty()) {
+            log.error("Ingen gyldige epostadresser for stilling ${stillingsId}")
+            return
+        }
+
         val epostBody = lagEpostBody(
             tittel = stillingstittel,
             tekst = meldingTilArbeidsgiver,
@@ -87,7 +100,7 @@ class NotifikasjonKlient(
                 virksomhetsnummer = virksomhetsnummer,
                 epostBody = epostBody,
                 tidspunktForVarsel = tidspunktForHendelse,
-                mottakerEpostAdresser = mottakerEpostadresser,
+                mottakerEpostAdresser = gyldigeEpostadresser,
             )
 
         val erLokal: Boolean = System.getenv()["NAIS_CLUSTER_NAME"] == null
@@ -229,7 +242,8 @@ class NotifikasjonKlient(
 
     enum class NySakSvar {
         NySakVellykket,
-        DuplikatGrupperingsid
+        DuplikatGrupperingsid,
+        DuplikatGrupperingsidEtterDelete
     }
 
     enum class NyStatusSakSvar {

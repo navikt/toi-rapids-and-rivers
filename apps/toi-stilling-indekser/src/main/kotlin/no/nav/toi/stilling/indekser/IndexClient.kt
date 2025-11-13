@@ -7,6 +7,7 @@ import org.opensearch.client.opensearch.core.BulkRequest
 import org.opensearch.client.opensearch.core.BulkResponse
 import org.opensearch.client.opensearch.core.IndexRequest
 import org.opensearch.client.opensearch.core.IndexResponse
+import org.opensearch.client.opensearch.core.UpdateRequest
 import org.opensearch.client.opensearch.core.bulk.BulkOperation
 import org.opensearch.client.opensearch.indices.*
 import java.io.StringReader
@@ -61,6 +62,27 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
 
         log.info("Indeksert direktemeldt stilling med UUID $uuid i indeks '$indeks', response: ${response.result()}")
         return response
+    }
+
+    fun oppdaterStillingsinfo(stillingsId: String, indeks: String, stillingsinfo: Stillingsinfo) {
+        val felter = mapOf<String, Any>(
+            "stillingsinfo" to stillingsinfo
+        )
+
+        try {
+            val request = UpdateRequest.Builder<RekrutteringsbistandStilling, Map<String, Any>>()
+                .index(indeks)
+                .id(stillingsId)
+                .doc(felter)
+                .build()
+
+            val response = client.update(request, RekrutteringsbistandStilling::class.java)
+            log.info("Oppdaterte stillingsinfo for dokument $stillingsId i indeks $indeks result=${response.result()}")
+
+        } catch (e: Exception) {
+            log.error("Greide ikke å oppdatere dokument med id $stillingsId i indeks $indeks", e)
+            throw e
+        }
     }
 
     fun finnesIndeks(indeksnavn: String): Boolean {
