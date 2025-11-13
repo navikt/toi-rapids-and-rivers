@@ -113,3 +113,6 @@ spec:
     - team: toi
       application: toi-publiser-dir-stillinger
       access: readwrite
+    - team: toi
+      application: rekrutteringsbistand-kandidatvarsel-api
+      access: readwrite
