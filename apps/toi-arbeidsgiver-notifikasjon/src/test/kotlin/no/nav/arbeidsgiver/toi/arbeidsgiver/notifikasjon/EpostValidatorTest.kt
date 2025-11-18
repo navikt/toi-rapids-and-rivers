@@ -12,6 +12,7 @@ class EpostValidatorTest {
         assertTrue(erGyldigEpostadresse("navn.test.navnesen@test.nav"))
 
         assertFalse(erGyldigEpostadresse(""))
+        assertFalse(erGyldigEpostadresse("test@test.n"))
         assertFalse(erGyldigEpostadresse("  "))
         assertFalse(erGyldigEpostadresse("."))
         assertFalse(erGyldigEpostadresse("@"))
