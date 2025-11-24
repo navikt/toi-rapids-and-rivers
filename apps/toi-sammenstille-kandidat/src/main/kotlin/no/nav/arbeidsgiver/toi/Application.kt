@@ -26,7 +26,6 @@ fun startRapid(
             SamleLytter(rapid, repository, "siste14avedtak")
             SamleLytter(rapid, repository, "oppfølgingsperiode")
             SamleLytter(rapid, repository, "hjemmel")
-            SamleLytter(rapid, repository, "må-behandle-tidligere-cv", "måBehandleTidligereCv")
             SamleLytter(rapid, repository, "kvp")
             NeedLytter(rapid, repository, "arbeidsmarkedCv")
             NeedLytter(rapid, repository, "veileder")
@@ -34,7 +33,6 @@ fun startRapid(
             NeedLytter(rapid, repository, "siste14avedtak")
             NeedLytter(rapid, repository, "oppfølgingsperiode")
             NeedLytter(rapid, repository, "hjemmel")
-            NeedLytter(rapid, repository, "måBehandleTidligereCv")
             NeedLytter(rapid, repository, "kvp")
         }.start()
     } catch (t: Throwable) {

@@ -13,7 +13,6 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSy
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeCV
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeHjemmel
-import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendelseMedParticipatingService
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
@@ -68,7 +67,6 @@ class SynlighetsmotorTest {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(harSettHjemmel.default(false)).isEqualTo(true)
-            assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -98,7 +96,6 @@ class SynlighetsmotorTest {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(harSettHjemmel.default(false)).isEqualTo(true)
-            assertThat(maaIkkeBehandleTidligereCv.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -277,34 +274,8 @@ class SynlighetsmotorTest {
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
     )
 
-    @Test
-    fun `om Person må behandle tidligere CV skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(
-            måBehandleTidligereCv = måBehandleTidligereCv(
-                maaBehandleTidligereCv = true
-            )
-        ),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
-    )
 
-    @Test
-    fun `om Person spesifikt ikke må behandle tidligere CV skal synlighet være true`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(
-            måBehandleTidligereCv = måBehandleTidligereCv(
-                maaBehandleTidligereCv = false
-            )
-        ),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
-    )
 
-    @Test
-    fun `om det er ukjent om en Person ikke må behandle tidligere CV skal synlighet være true`() =
-        testProgramMedHendelse(
-            komplettHendelseSomFørerTilSynlighetTrue(
-                måBehandleTidligereCv = null
-            ),
-            enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, true)
-        )
 
     @Test
     fun `Om person har avsluttet kvp skal synlighet være true`() =

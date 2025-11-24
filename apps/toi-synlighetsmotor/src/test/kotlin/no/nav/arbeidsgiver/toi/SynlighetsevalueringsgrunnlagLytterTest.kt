@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
-import no.nav.arbeidsgiver.toi.Testdata.Companion.måBehandleTidligereCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -29,7 +28,6 @@ class SynlighetsevalueringsgrunnlagLytterTest {
         OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
         OPPFØLGINGSPERIODE("oppfølgingsperiode", aktivOppfølgingsperiode(), avsluttetOppfølgingsperiode()),
         HJEMMEL("hjemmel", hjemmel(), hjemmel(opprettetDato = null, slettetDato = null)),
-        MÅBEHANDLETIDLIGERECV("måBehandleTidligereCv", måBehandleTidligereCv(false), måBehandleTidligereCv(true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
         ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
     }

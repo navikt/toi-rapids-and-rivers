@@ -1,1 +1,0 @@
-# Henter ut "må behandle tidligere CV"-informasjon og legger den på rapid
