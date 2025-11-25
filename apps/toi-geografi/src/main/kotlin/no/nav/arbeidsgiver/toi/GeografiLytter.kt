@@ -45,7 +45,7 @@ class GeografiLytter(private val geografiKlient: GeografiKlient, private val pos
             val postnummerString = postnummer.asText()
             if(postnummerString == "") null
             else postDataKlient.findPostData(postnummer.asText())
-                ?: throw Exception("Fant ingen postdata for postnummer $postnummer")
+                //?: throw Exception("Fant ingen postdata for postnummer $postnummer")
         }
         val geografiKoder = geografiKode.mapNotNull(geografiKlient::findArenaGeography)
             .associate { geografi -> geografi.geografikode to geografi.kapitalisertNavn }
