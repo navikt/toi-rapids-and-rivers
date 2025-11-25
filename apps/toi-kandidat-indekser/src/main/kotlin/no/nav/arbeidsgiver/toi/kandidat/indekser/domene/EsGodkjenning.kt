@@ -10,7 +10,7 @@ import java.util.Objects
 class EsGodkjenning(
     @field:JsonProperty private val tittel: String,
     @field:JsonProperty private val utsteder: String,
-    @field:JsonProperty private val gjennomfoert: LocalDate,
+    @field:JsonProperty private val gjennomfoert: LocalDate?,
     @field:JsonProperty private val utloeper: LocalDate?,
     @field:JsonProperty private val konseptId: String?
 ): EnAvFlereSamledeKompetaser {
@@ -25,7 +25,7 @@ class EsGodkjenning(
             EsGodkjenning(
                 tittel = godkjenning["tittel"].asText(),
                 utsteder = godkjenning["utsteder"].asText(),
-                gjennomfoert = godkjenning["gjennomfoert"].yyyyMMddTilLocalDate(),
+                gjennomfoert = godkjenning["gjennomfoert"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
                 utloeper = godkjenning["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
                 konseptId = godkjenning["konseptId"].asText(null),
             )
