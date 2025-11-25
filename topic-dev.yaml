@@ -114,5 +114,11 @@ spec:
       application: toi-publiser-dir-stillinger
       access: readwrite
     - team: toi
+      application: toi-kandidat-indekser
+      access: readwrite
+    - team: toi
+      application: toi-geografi
+      access: readwrite
+    - team: toi
       application: rekrutteringsbistand-kandidatvarsel-api
       access: readwrite

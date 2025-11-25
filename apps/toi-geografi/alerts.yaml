@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: toi-geografi
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  groups:
+    - name: toi-geografi
+      rules:
+        - alert: toi-geografi
+          expr: kube_deployment_status_replicas_available{deployment="toi-geografi"} == 0
+          for: 2m
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.adeo.no/app/r/s/IP6nv"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-geografi
+          expr: sum(increase(log_messages_errors{app="toi-geografi", level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.adeo.no/app/r/s/IP6nv"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-geografi
+          expr: sum(increase(log_messages_errors{app="toi-geografi", level="Warning"}[10m])) > 3
+          for: 1s
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.adeo.no/app/r/s/IP6nv"
+          labels:
+            namespace: toi
+            severity: warning

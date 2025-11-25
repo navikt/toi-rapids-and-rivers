@@ -1,4 +1,4 @@
-name: Deploy Opensearch prod
+name: Deploy Opensearch stilling prod
 on:
   push:
     branches:
