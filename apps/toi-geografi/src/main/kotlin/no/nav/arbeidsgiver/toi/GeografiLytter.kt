@@ -39,7 +39,14 @@ class GeografiLytter(private val geografiKlient: GeografiKlient, private val pos
         val geografiKode: List<String> = packet["geografiKode"].map(JsonNode::asText)
         val aktørid: String = packet["aktørId"].asText()
 
-        val postdata = if(postnummer.isMissingOrNull()) null else postDataKlient.findPostData(postnummer.asText()) ?: throw Exception("Fant ingen postdata for postnummer $postnummer")
+        val postdata = if (postnummer.isMissingOrNull()) {
+            null
+        } else {
+            val postnummerString = postnummer.asText()
+            if(postnummerString == "") null
+            else postDataKlient.findPostData(postnummer.asText())
+                ?: throw Exception("Fant ingen postdata for postnummer $postnummer")
+        }
         val geografiKoder = geografiKode.mapNotNull(geografiKlient::findArenaGeography)
             .associate { geografi -> geografi.geografikode to geografi.kapitalisertNavn }
         packet["geografi"] = mapOf(
