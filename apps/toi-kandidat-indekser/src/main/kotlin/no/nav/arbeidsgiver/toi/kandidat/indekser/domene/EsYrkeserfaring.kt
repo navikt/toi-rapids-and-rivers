@@ -13,7 +13,7 @@ import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsYrkeserfaring(
-    @field:JsonProperty private val fraDato: YearMonth,
+    @field:JsonProperty private val fraDato: YearMonth?,
     @field:JsonProperty private val tilDato: YearMonth?,
     @field:JsonProperty private val arbeidsgiver: String,
     @field:JsonProperty private val styrkKode: String?,
@@ -33,7 +33,7 @@ class EsYrkeserfaring(
     @field:JsonProperty private val yrkeserfaringManeder = toYrkeserfaringManeder(fraDato, tilDato)
 
     constructor(
-        fraDato: YearMonth,
+        fraDato: YearMonth?,
         tilDato: YearMonth?,
         arbeidsgiver: String,
         styrkKode: String,
@@ -58,7 +58,7 @@ class EsYrkeserfaring(
         sted, beskrivelse
     )
     constructor(
-        fraDato: YearMonth,
+        fraDato: YearMonth?,
         tilDato: YearMonth?,
         arbeidsgiver: String,
         styrkKode: String?,
@@ -116,15 +116,19 @@ class EsYrkeserfaring(
             + ", utelukketForFremtiden='" + utelukketForFremtiden + '\'' + '}')
 
     companion object {
-        private fun toYrkeserfaringManeder(fraDato: YearMonth, tilDato: YearMonth?) =
-            ChronoUnit.MONTHS.between(fraDato, tilDato?: now()).toInt()
+        private fun toYrkeserfaringManeder(fraDato: YearMonth?, tilDato: YearMonth?) =
+            if(fraDato == null) {
+                1
+            } else {
+                ChronoUnit.MONTHS.between(fraDato, tilDato?: now()).toInt()
+            }
         fun List<EsYrkeserfaring>.totalYrkeserfaringIManeder() = this.sumOf(EsYrkeserfaring::yrkeserfaringManeder)
         fun fraMelding(packet: JsonMessage, cvNode: JsonNode): List<EsYrkeserfaring> = cvNode["arbeidserfaring"].map { arbeidserfaringNode ->
             val stillingstittel = arbeidserfaringNode["stillingstittel"].asText()
             val ontologiRelasjoner = packet["ontologi.stillingstittel"][stillingstittel]
             val typeahead = ontologiRelasjoner["synonymer"].map(JsonNode::asText)
             EsYrkeserfaring(
-                fraDato = arbeidserfaringNode["fraTidspunkt"].asText(null).let(YearMonth::parse),
+                fraDato = arbeidserfaringNode["fraTidspunkt"].asText(null)?.let(YearMonth::parse),
                 tilDato = arbeidserfaringNode["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
                 arbeidsgiver = arbeidserfaringNode["arbeidsgiver"].asText(),
                 styrkKode = arbeidserfaringNode["styrkkode"].asText(),
