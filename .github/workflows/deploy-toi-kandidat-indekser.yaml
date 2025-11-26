@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/ny-kandidat-indekser
+      deploy_dev_branch: refs/heads/fiks_nullpointer_kandiat_indekser
     secrets: inherit
     permissions:
       contents: read
