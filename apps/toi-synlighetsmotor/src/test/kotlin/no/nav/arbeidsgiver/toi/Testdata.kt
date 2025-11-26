@@ -54,7 +54,6 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsperiode",
             "hjemmel",
-            "måBehandleTidligereCv",
             "kvp",
             "arbeidssokeropplysninger"
         ))
@@ -78,7 +77,6 @@ class Testdata {
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             veileder: String? = veileder("123456789"),
             siste14avedtak: String? = siste14avedtak("123456789"),
-            måBehandleTidligereCv: String? = måBehandleTidligereCv(false),
             aktørId: String = """
             "aktørId": "123456789"
         """.trimIndent(),
@@ -92,7 +90,6 @@ class Testdata {
                 arbeidsmarkedCv = arbeidsmarkedCv,
                 hjemmel = hjemmel,
                 participatingService = participatingService,
-                måBehandleTidligereCv = måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
                 aktørId = aktørId,
                 kvp = kvp,
                 veileder = veileder ?: nullVerdiForKey("veileder"),
@@ -118,7 +115,6 @@ class Testdata {
             arbeidsmarkedCv: String? = null,
             hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-            måBehandleTidligereCv: String? = null,
             aktørId: String? = """"aktørId": "123456789"""",
             kvp: String? = null,
             veileder: String? = null,
@@ -136,7 +132,6 @@ class Testdata {
                 oppfølgingsperiode,
                 hjemmel,
                 participatingService,
-                måBehandleTidligereCv,
                 aktørId,
                 kvp,
                 veileder,
@@ -155,7 +150,6 @@ class Testdata {
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
             hjemmel: String? = nullVerdiForKey("hjemmel"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
-            måBehandleTidligereCv: String? = nullVerdiForKey("måBehandleTidligereCv"),
             aktørId: String? = """"aktørId": "123456789"""",
             kvp: String? = nullVerdiForKey("kvp"),
             veileder: String? = nullVerdiForKey("veileder"),
@@ -171,7 +165,6 @@ class Testdata {
                 oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
                 hjemmel ?: nullVerdiForKey("hjemmel"),
                 participatingService,
-                måBehandleTidligereCv ?: nullVerdiForKey("måBehandleTidligereCv"),
                 aktørId,
                 kvp ?: nullVerdiForKey("kvp"),
                 veileder ?: nullVerdiForKey("veileder"),
@@ -309,15 +302,6 @@ class Testdata {
                 "opprettetDato": ${opprettetDato?.let { """"$it"""" }},
                 "slettetDato": ${slettetDato?.let { """"$it"""" }},
                 "fnr": "12345678912"
-            }
-        """.trimIndent()
-
-        fun måBehandleTidligereCv(
-            maaBehandleTidligereCv: Boolean = false
-        ) =
-            """
-            "måBehandleTidligereCv": {
-                "maaBehandleTidligereCv": "$maaBehandleTidligereCv"
             }
         """.trimIndent()
 

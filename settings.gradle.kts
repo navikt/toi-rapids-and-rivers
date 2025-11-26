@@ -11,7 +11,6 @@ include(
     "apps:toi-synlighetsmotor",
     "apps:toi-oppfolgingsperiode",
     "apps:toi-hjemmel",
-    "apps:toi-maa-behandle-tidligere-cv",
     "apps:toi-organisasjonsenhet",
     "apps:toi-helseapp",
     "apps:toi-hull-i-cv",

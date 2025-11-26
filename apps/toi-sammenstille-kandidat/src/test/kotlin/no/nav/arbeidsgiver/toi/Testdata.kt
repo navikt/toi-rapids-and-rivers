@@ -172,13 +172,3 @@ fun hjemmelMelding(aktørId: String) = """
         }
     """.trimIndent()
 
-fun måBehandleTidligereCvMelding(aktørId: String) = """
-        {
-            "aktørId": "$aktørId",
-            "@event_name": "må-behandle-tidligere-cv",
-            "måBehandleTidligereCv": {
-              "aktorId" : "$aktørId",
-              "maaBehandleTidligereCv": true
-            }
-        }
-    """.trimIndent()
