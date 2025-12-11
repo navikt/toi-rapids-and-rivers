@@ -129,7 +129,7 @@ data class Kandidat(
     }
 
     @Deprecated(message = "Se på å bruk populerMelding for å istedetfor gjenbruke eksisterende melding")
-    fun somJsonMessage(meterRegistry: MeterRegistry) = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""), meterRegistry)
+    fun somJsonMessage(meterRegistry: MeterRegistry) = JsonMessage(somJsonUtenNullFelt(), MessageProblems(""))
 
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)
     fun populerMelding(packet: JsonMessage): JsonMessage {
