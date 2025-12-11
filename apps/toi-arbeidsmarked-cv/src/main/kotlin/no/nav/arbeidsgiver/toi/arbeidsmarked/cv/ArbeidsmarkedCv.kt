@@ -16,7 +16,7 @@ class ArbeidsmarkedCv(melding: Melding, val meterRegistry: MeterRegistry) {
     val aktørId = melding.aktoerId
     val arbeidsmarkedCv = melding
 
-    fun somJson() = JsonMessage(objectMapper.writeValueAsString(this), MessageProblems("{}"), metrics = meterRegistry).toJson()
+    fun somJson() = JsonMessage(objectMapper.writeValueAsString(this), MessageProblems("{}")).toJson()
 
 }
 

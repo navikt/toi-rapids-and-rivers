@@ -14,7 +14,6 @@ data class Kandidat(
     private val oppfølgingsinformasjon: Synlighetsnode<Oppfølgingsinformasjon>,
     private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
     private val hjemmel: Synlighetsnode<Hjemmel>,
-    private val måBehandleTidligereCv: Synlighetsnode<MåBehandleTidligereCv>,
     private val kvp: Synlighetsnode<Kvp>,
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     val adressebeskyttelse: Synlighetsnode<String>,
@@ -32,7 +31,6 @@ data class Kandidat(
         harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
         harSettHjemmel = hjemmel.hvisIkkeNullOg(::harSettHjemmel),
-        maaIkkeBehandleTidligereCv = måBehandleTidligereCv.hvisNullEller(::maaIkkeBehandleTidligereCv),
         erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
@@ -45,7 +43,6 @@ data class Kandidat(
     )
 
     private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
-    private fun maaIkkeBehandleTidligereCv(it: MåBehandleTidligereCv) = !it.maaBehandleTidligereCv
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
     private fun erIkkeSperretAnsatt(it: Oppfølgingsinformasjon) = !it.sperretAnsatt
     private fun erIkkeDød(it: Oppfølgingsinformasjon) = !it.erDoed
@@ -95,7 +92,7 @@ data class Kandidat(
 
     private fun beregningsgrunnlag() = listOf(
         arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        hjemmel, måBehandleTidligereCv, kvp, adressebeskyttelse,
+        hjemmel, kvp, adressebeskyttelse,
         arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
@@ -114,7 +111,6 @@ data class Kandidat(
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
                 hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
-                måBehandleTidligereCv = Synlighetsnode.fromJsonNode(json.path("måBehandleTidligereCv"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
                 adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
                 arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
@@ -195,9 +191,6 @@ enum class Samtykkeressurs {
     CV_HJEMMEL
 }
 
-data class MåBehandleTidligereCv(
-    val maaBehandleTidligereCv: Boolean
-)
 
 data class Kvp(
     val event: String
