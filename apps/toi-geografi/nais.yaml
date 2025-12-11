@@ -1,0 +1,53 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: toi-geografi
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  image: {{ image }}
+  port: 8080
+  liveness:
+    path: /isalive
+  readiness:
+    path: /isready
+  prometheus:
+    enabled: true
+    path: /metrics
+  replicas:
+    min: 1
+    max: {{ max_replicas }}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+  secureLogs:
+    enabled: true
+  kafka:
+    pool: {{ kafka_pool }}
+  env:
+    - name: KAFKA_RAPID_TOPIC
+      value: toi.rapid-1
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: {{ kafka_consumer_group_id }}
+    - name: KAFKA_RESET_POLICY
+      value: "earliest"
+    - name: PAM_GEOGRAFI_URL
+      value: http://pam-geografi.teampam
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+      enabled: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
+        - application: pam-geografi
+          namespace: teampam

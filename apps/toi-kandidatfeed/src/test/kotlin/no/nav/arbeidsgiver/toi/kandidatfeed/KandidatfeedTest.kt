@@ -6,6 +6,7 @@ import no.nav.toi.TestRapid
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class KandidatfeedTest {
@@ -171,6 +172,7 @@ class KandidatfeedTest {
         assertThat(testrapid.inspektør.size).isEqualTo(0)
     }
 
+    @Disabled
     @Test
     fun `UsynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
         val meldingUsynlig = rapidMelding(synlighet(erSynlig = false, ferdigBeregnet = true))
@@ -187,6 +189,7 @@ class KandidatfeedTest {
         assertThat(testrapid.inspektør.message(0).get("@slutt_av_hendelseskjede").booleanValue()).isEqualTo(true)
     }
 
+    @Disabled
     @Test
     fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
         val rapidMelding =

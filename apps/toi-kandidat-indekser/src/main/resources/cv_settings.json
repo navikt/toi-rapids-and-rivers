@@ -1,0 +1,27 @@
+{
+  "index": {
+    "number_of_shards": 3,
+    "number_of_replicas": 2
+  },
+  "analysis": {
+    "analyzer": {
+      "ngram_15_text_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["lowercase", "edge_ngrams_15"]
+      },
+      "ngram_text_search_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["lowercase"]
+      }
+    },
+    "filter": {
+      "edge_ngrams_15": {
+        "type": "edge_ngram",
+        "min_gram": 1,
+        "max_gram": 15
+      }
+    }
+  }
+}

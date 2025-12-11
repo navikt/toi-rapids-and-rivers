@@ -1,0 +1,22 @@
+name: toi-kandidat-indekser
+
+on:
+  push:
+    paths:
+      - apps/toi-kandidat-indekser/**
+      - .github/workflows/deploy-toi-kandidat-indekser.yaml
+      - .github/workflows/deploy-toi-template.yaml
+      - buildSrc/**
+      - technical-libs/testrapid
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/deploy-toi-template.yaml
+    with:
+      app_name: ${{ github.workflow }}
+      deploy_dev_branch: refs/heads/fiks_nullpointer_kandiat_indekser
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write

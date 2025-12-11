@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.toi.organisasjonsenhet
+package no.nav.arbeidsgiver.toi.hullicv
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -458,14 +458,14 @@ class HullCvLytterTest {
             "2001-12-01" to "2003-06-01",
             "1999-04-01" to "2000-11-01"
         ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
-            .map { CVPeriode(it.first,it.second) }
+            .map { CVPeriode(it.first, it.second) }
         val utdanninger = listOf(
             "2013-07-01" to "2014-05-01",
             "1999-07-01" to "2000-05-01",
             "1995-07-01" to "1998-05-01",
             "1985-07-01" to "1995-05-01"
         ).map { LocalDate.parse(it.first) to LocalDate.parse(it.second) }
-            .map { CVPeriode(it.first,it.second) }
+            .map { CVPeriode(it.first, it.second) }
 
         val melding = lagBehovmeldingMedErfaring(
             arbeidserfaring = yrkeserfaringer,

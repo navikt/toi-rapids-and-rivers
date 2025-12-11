@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("gradle-plugin"))
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
 }
 
 java {
@@ -23,7 +23,7 @@ java {
 
 tasks {
     withType<Wrapper> {
-        gradleVersion = "8.11.1"
+        gradleVersion = "9.1.0"
     }
 
     withType<AnalyzeDependenciesTask> {

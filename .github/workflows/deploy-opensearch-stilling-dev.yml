@@ -1,4 +1,4 @@
-name: Deploy Opensearch dev
+name: Deploy Opensearch stilling dev
 on:
   push:
     branches:

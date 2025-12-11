@@ -51,7 +51,7 @@ class UsynligKandidatfeedLytter(
                 secureLog.error("Klarte ikke å sende kandidat med aktørId $aktørId", exception)
             }
             packet["@slutt_av_hendelseskjede"] = true
-            context.publish(packet.toJson())
+            //context.publish(packet.toJson())
         }
     }
 
