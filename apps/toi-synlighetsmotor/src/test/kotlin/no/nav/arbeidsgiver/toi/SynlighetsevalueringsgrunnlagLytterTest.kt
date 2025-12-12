@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
-import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import org.assertj.core.api.Assertions.assertThat
