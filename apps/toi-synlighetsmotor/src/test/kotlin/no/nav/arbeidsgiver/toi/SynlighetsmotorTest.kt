@@ -8,11 +8,9 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseEtterBehovsHenting
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseFørBehovsHenting
-import no.nav.arbeidsgiver.toi.Testdata.Companion.hjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
 import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeCV
-import no.nav.arbeidsgiver.toi.Testdata.Companion.manglendeHjemmel
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjonHendelseMedParticipatingService
 import no.nav.arbeidsgiver.toi.Testdata.Companion.participatingService
@@ -47,7 +45,6 @@ class SynlighetsmotorTest {
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
                 false
             ), "123456789", null
         )
@@ -65,7 +62,6 @@ class SynlighetsmotorTest {
         repository.hentMedAktørid(aktorId = "123456789")?.run {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
-            assertThat(harSettHjemmel.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -94,7 +90,6 @@ class SynlighetsmotorTest {
         repository.hentMedAktørid(aktorId = "123456789")?.run {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
-            assertThat(harSettHjemmel.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -240,40 +235,6 @@ class SynlighetsmotorTest {
         komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = harOpprettJobbrofil()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
     )
-
-    @Test
-    fun `om Person ikke har sett hjemmel skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(hjemmel = manglendeHjemmel()),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
-    )
-
-    @Test
-    fun `person skal være synlig selv om hjemmelen er opprettet frem i tid`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(hjemmel = hjemmel(
-            opprettetDato = ZonedDateTime.now().plusHours(2),
-            slettetDato = null
-        )),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = true, ferdigBeregnet = true)
-    )
-
-    @Test
-    fun `om Person har hjemmel for feil ressurs skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(hjemmel = hjemmel(ressurs = "CV_GENERELL")),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
-    )
-
-    @Test
-    fun `om Person har hjemmel som er avsluttet skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(
-            hjemmel = hjemmel(
-                opprettetDato = ZonedDateTime.now().minusYears(2),
-                slettetDato = ZonedDateTime.now().minusYears(1)
-            )
-        ),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, ferdigBeregnet = true)
-    )
-
-
 
 
     @Test

@@ -154,21 +154,4 @@ fun kvp(aktørId: String) = """
         }
     """.trimIndent()
 
-fun hjemmelMelding(aktørId: String) = """
-        {
-            "aktørId": "$aktørId",
-            "@event_name": "hjemmel",
-            "hjemmel": {
-                "samtykkeId" : 1,
-                "aktoerId" : "AktorId(aktorId=$aktørId)",
-                "fnr" : "27075349594",
-                "ressurs" : "CV_HJEMMEL",
-                "opprettetDato" : "2019-01-09T12:36:06+01:00",
-                "slettetDato" : null,
-                "versjon" : 1,
-                "versjonGjeldendeFra" : null,
-                "versjonGjeldendeTil" : "2019-04-08"
-            }
-        }
-    """.trimIndent()
 
