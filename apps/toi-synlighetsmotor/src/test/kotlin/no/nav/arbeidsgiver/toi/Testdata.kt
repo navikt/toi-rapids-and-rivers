@@ -7,7 +7,6 @@ import no.nav.security.token.support.core.configuration.IssuerProperties
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions
 import java.net.URI
-import java.time.ZonedDateTime
 
 fun testProgramMedHendelse(
     hendelse: String,
@@ -53,7 +52,6 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "oppfølgingsinformasjon",
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsperiode",
-            "hjemmel",
             "kvp",
             "arbeidssokeropplysninger"
         ))
@@ -73,7 +71,6 @@ class Testdata {
             arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
-            hjemmel: String = hjemmel(),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             veileder: String? = veileder("123456789"),
             siste14avedtak: String? = siste14avedtak("123456789"),
@@ -88,7 +85,6 @@ class Testdata {
                 arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
-                hjemmel = hjemmel,
                 participatingService = participatingService,
                 aktørId = aktørId,
                 kvp = kvp,
@@ -113,7 +109,6 @@ class Testdata {
             arbeidssøkeropplysninger: String? = null,
             oppfølgingsinformasjon: String? = null,
             arbeidsmarkedCv: String? = null,
-            hjemmel: String? = null,
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             aktørId: String? = """"aktørId": "123456789"""",
             kvp: String? = null,
@@ -130,7 +125,6 @@ class Testdata {
                 arbeidssøkerperiode,
                 arbeidssøkeropplysninger,
                 oppfølgingsperiode,
-                hjemmel,
                 participatingService,
                 aktørId,
                 kvp,
@@ -148,7 +142,6 @@ class Testdata {
             arbeidssøkeropplysninger: String? = nullVerdiForKey("arbeidssokeropplysninger"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
-            hjemmel: String? = nullVerdiForKey("hjemmel"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             aktørId: String? = """"aktørId": "123456789"""",
             kvp: String? = nullVerdiForKey("kvp"),
@@ -163,7 +156,6 @@ class Testdata {
                 arbeidsmarkedCv ?: nullVerdiForKey("arbeidsmarkedCv"),
                 oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
-                hjemmel ?: nullVerdiForKey("hjemmel"),
                 participatingService,
                 aktørId,
                 kvp ?: nullVerdiForKey("kvp"),
@@ -291,19 +283,6 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun hjemmel(
-            ressurs: String = "CV_HJEMMEL",
-            opprettetDato: ZonedDateTime? = ZonedDateTime.now().minusDays(1),
-            slettetDato: ZonedDateTime? = null
-        ) =
-            """
-            "hjemmel": {
-                "ressurs": "$ressurs",
-                "opprettetDato": ${opprettetDato?.let { """"$it"""" }},
-                "slettetDato": ${slettetDato?.let { """"$it"""" }},
-                "fnr": "12345678912"
-            }
-        """.trimIndent()
 
         fun kvp(startdato: String? = null, sluttdato: String? = null, event: String): String =
             """
@@ -331,11 +310,6 @@ class Testdata {
             """
               "adressebeskyttelse": "$gradering"
             """.trimIndent()
-
-        fun manglendeHjemmel() =
-            """
-            "hjemmel": null
-        """.trimIndent()
 
         fun participatingService(service: String) =
             """

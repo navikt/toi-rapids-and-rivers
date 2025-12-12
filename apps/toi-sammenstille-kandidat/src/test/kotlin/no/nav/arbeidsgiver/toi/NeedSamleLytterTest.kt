@@ -30,7 +30,6 @@ class NeedSamleLytterTest {
                     "oppfølgingsinformasjon": "$oppfølgingsinformasjon",
                     "siste14avedtak": "$siste14avedtak",
                     "oppfølgingsperiode": "$oppfølgingsperiode",
-                    "hjemmel": "$hjemmel",
                     "kvp": "$kvp"
                 }
             """.trimIndent()
@@ -62,7 +61,6 @@ class NeedSamleLytterTest {
         val oppfølgingsinformasjon = "Gyldig oppfølgingsinformasjon-svar"
         val siste14avedtak = "Gyldig svar på siste 14 a-status"
         val oppfølgingsperiode = "Gyldig oppfølgingsperiode-svar"
-        val hjemmel = "Gyldig hjemmel-svar"
         val kvp = "Gyldig kvp-status"
         @JvmStatic
         private fun felter() = listOf(
@@ -71,7 +69,6 @@ class NeedSamleLytterTest {
             Arguments.of("oppfølgingsinformasjon", oppfølgingsinformasjon),
             Arguments.of("siste14avedtak", siste14avedtak),
             Arguments.of("oppfølgingsperiode", oppfølgingsperiode),
-            Arguments.of("hjemmel", hjemmel),
             Arguments.of("kvp", kvp)
         ).stream()
     }

@@ -42,7 +42,6 @@ private fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()
 private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = harAktivCv.default(false),
     harJobbprofil = harJobbprofil.default(false),
-    harSettHjemmel = harSettHjemmel.default(false),
     erUnderOppfoelging = erUnderOppfoelging.default(false),
     harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
     erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
@@ -54,7 +53,6 @@ private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDis
 data class EvalueringUtenDiskresjonskodeDTO(
     val harAktivCv: Boolean,
     val harJobbprofil: Boolean,
-    val harSettHjemmel: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
@@ -66,7 +64,6 @@ data class EvalueringUtenDiskresjonskodeDTO(
         fun medAlleVerdierFalse() = EvalueringUtenDiskresjonskodeDTO(
             harAktivCv = false,
             harJobbprofil = false,
-            harSettHjemmel = false,
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,

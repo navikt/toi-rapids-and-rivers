@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
-import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
@@ -224,7 +223,6 @@ private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.iss
 private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = true,
     harJobbprofil = true,
-    harSettHjemmel = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
     erIkkeSperretAnsatt = true,
@@ -236,7 +234,6 @@ private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjon
 private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = false,
     harJobbprofil = false,
-    harSettHjemmel = false,
     erUnderOppfoelging = false,
     harRiktigFormidlingsgruppe = false,
     erIkkeSperretAnsatt = false,

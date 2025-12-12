@@ -45,9 +45,6 @@ spec:
       application: toi-synlighetsmotor
       access: readwrite
     - team: toi
-      application: toi-hjemmel
-      access: readwrite
-    - team: toi
       application: toi-organisasjonsenhet
       access: readwrite
     - team: toi
