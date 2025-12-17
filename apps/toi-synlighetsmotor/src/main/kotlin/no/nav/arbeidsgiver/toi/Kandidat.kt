@@ -13,7 +13,6 @@ data class Kandidat(
     private val arbeidsmarkedCv: Synlighetsnode<CvMelding>,
     private val oppfølgingsinformasjon: Synlighetsnode<Oppfølgingsinformasjon>,
     private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
-    private val hjemmel: Synlighetsnode<Hjemmel>,
     private val kvp: Synlighetsnode<Kvp>,
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     val adressebeskyttelse: Synlighetsnode<String>,
@@ -30,7 +29,6 @@ data class Kandidat(
     fun toEvaluering() = Evaluering(
         harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
-        harSettHjemmel = hjemmel.hvisIkkeNullOg(::harSettHjemmel),
         erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
@@ -52,11 +50,6 @@ data class Kandidat(
 
     private fun harJobbprofil(cvMelding: CvMelding) =
         cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
-
-    private fun harSettHjemmel(hjemmel: Hjemmel) =
-        hjemmel.ressurs == Samtykkeressurs.CV_HJEMMEL &&
-                hjemmel.opprettetDato != null &&
-                hjemmel.slettetDato == null
 
     private fun erUnderOppfølging(oppfølgingsperiode: Oppfølgingsperiode): Boolean {
         val now = Instant.now()
@@ -92,7 +85,7 @@ data class Kandidat(
 
     private fun beregningsgrunnlag() = listOf(
         arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
-        hjemmel, kvp, adressebeskyttelse,
+        kvp, adressebeskyttelse,
         arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
 
@@ -110,7 +103,6 @@ data class Kandidat(
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
-                hjemmel = Synlighetsnode.fromJsonNode(json.path("hjemmel"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
                 adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
                 arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
@@ -120,7 +112,7 @@ data class Kandidat(
 
     fun fødselsNummer() =
         arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
-            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer ?: hjemmel.verdiEllerNull()?.fnr
+            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer
             ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer
 }
 
@@ -179,18 +171,6 @@ typealias Diskresjonskode = String
 enum class Formidlingsgruppe {
     ARBS
 }
-
-data class Hjemmel(
-    val ressurs: Samtykkeressurs?,
-    val opprettetDato: ZonedDateTime?,
-    val slettetDato: ZonedDateTime?,
-    val fnr: String?
-)
-
-enum class Samtykkeressurs {
-    CV_HJEMMEL
-}
-
 
 data class Kvp(
     val event: String
