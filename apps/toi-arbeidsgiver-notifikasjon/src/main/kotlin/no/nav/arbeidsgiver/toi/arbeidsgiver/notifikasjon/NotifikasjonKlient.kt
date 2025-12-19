@@ -81,7 +81,8 @@ class NotifikasjonKlient(
             return
         }
 
-        val gyldigeEpostadresser = mottakerEpostadresser.filter { erGyldigEpostadresse(it) }
+        val trimmetEpostadresser = mottakerEpostadresser.map { mottakerEpostadresse -> mottakerEpostadresse.trim() }
+        val gyldigeEpostadresser = trimmetEpostadresser.filter { erGyldigEpostadresse(it) }
         if (gyldigeEpostadresser.isEmpty()) {
             log.error("Ingen gyldige epostadresser for stilling ${stillingsId}")
             return
