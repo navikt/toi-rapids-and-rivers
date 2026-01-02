@@ -1,0 +1,114 @@
+package no.nav.arbeidsgiver.toi.oppfolgingsperiode
+
+import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
+import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.StreamsBuilder
+import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
+import java.util.*
+
+private val log = noClassLogger()
+
+private const val oppfølgingsTopic = "poao.siste-oppfolgingsperiode-v2"
+
+fun main() {
+    log.info("Starter app.")
+    secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+
+    val topology = StreamsBuilder().apply {
+        globalTable(
+            oppfølgingsTopic,
+            Materialized.`as`<String, String>(
+                RocksDBKeyValueBytesStoreSupplier(oppfølgingsTopic, false)
+            ).withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
+        )
+    }.build()
+    val env = System.getenv()
+    val kafkaStreams = KafkaStreams(topology, streamProperties(env))
+    kafkaStreams.start()
+    kafkaStreams.setStateListener(object : KafkaStreams.StateListener {
+        override fun onChange(newState: KafkaStreams.State, oldState: KafkaStreams.State) {
+            log.info("Kafka Streams state changed from $oldState to $newState")
+            if(newState == KafkaStreams.State.RUNNING) {
+                log.info("Antar alt er lest. Store size: " + kafkaStreams.streamsMetadataForStore(oppfølgingsTopic).count())
+            }
+        }
+    })
+
+    //RapidApplication.create(env).also { rapidsConnection ->
+    //}.start()
+}
+
+private fun streamProperties(env: Map<String, String>): Properties {
+    val p = Properties()
+    p[StreamsConfig.APPLICATION_ID_CONFIG] = "toi-siste-oppfolgingsperiode"
+    p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
+    p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
+    p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
+    return p
+}
+
+val Any.log: Logger
+    get() = LoggerFactory.getLogger(this::class.java)
+
+/**
+ * Convenience for å slippe å skrive eksplistt navn på Logger når Logger opprettes. Ment å tilsvare Java-måten, hvor
+ * Loggernavnet pleier å være pakkenavn+klassenavn på den loggende koden.
+ * Brukes til å logging fra Kotlin-kode hvor vi ikke er inne i en klasse, typisk i en "top level function".
+ * Kalles fra den filen du ønsker å logg i slik:
+ *```
+ * import no.nav.yada.no.nav.toi.noClassLogger
+ * private val no.nav.toi.log: Logger = no.nav.toi.noClassLogger()
+ * fun myTopLevelFunction() {
+ *      no.nav.toi.log.info("yada yada yada")
+ *      ...
+ * }
+ *```
+ *
+ *@return En Logger hvor navnet er sammensatt av pakkenavnet og filnavnet til den kallende koden
+ */
+fun noClassLogger(): Logger {
+    val callerClassName = Throwable().stackTrace[1].className
+    return LoggerFactory.getLogger(callerClassName)
+}
+
+class SecureLogLogger private constructor(private val l: Logger) {
+
+    val markerName: String = "SECURE_LOG"
+
+    private val m: Marker = MarkerFactory.getMarker(markerName)
+
+    fun info(msg: String) {
+        l.info(m, msg)
+    }
+
+    fun info(msg: String, t: Throwable) {
+        l.info(m, msg, t)
+    }
+
+    fun warn(msg: String) {
+        l.warn(m, msg)
+    }
+
+    fun warn(msg: String, t: Throwable) {
+        l.warn(m, msg, t)
+    }
+
+    fun error(msg: String) {
+        l.error(m, msg)
+    }
+
+    fun error(msg: String, t: Throwable) {
+        l.error(m, msg, t)
+    }
+
+    companion object {
+        fun secure(l: Logger) = SecureLogLogger(l)
+    }
+}

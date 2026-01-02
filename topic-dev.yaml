@@ -33,6 +33,9 @@ spec:
       application: toi-oppfolgingsperiode
       access: readwrite
     - team: toi
+      application: toi-siste-oppfolgingsperiode
+      access: readwrite
+    - team: toi
       application: toi-sammenstille-kandidat
       access: readwrite
     - team: toi
