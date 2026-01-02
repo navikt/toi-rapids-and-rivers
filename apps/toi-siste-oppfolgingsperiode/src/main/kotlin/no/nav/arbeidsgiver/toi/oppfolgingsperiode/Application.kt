@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
+import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
 import java.util.*
+import kotlin.text.set
 
 private val log = noClassLogger()
 
@@ -51,6 +53,15 @@ private fun streamProperties(env: Map<String, String>): Properties {
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
+    env["KAFKA_CREDSTORE_PASSWORD"]?.let {
+        p[StreamsConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
+        p[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
+        p[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = env["KAFKA_TRUSTSTORE_PATH"]
+        p[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = it
+        p[SslConfigs.SSL_KEYSTORE_TYPE_CONFIG] = "PKCS12"
+        p[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = env["KAFKA_KEYSTORE_PATH"]
+        p[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = it
+    }
     return p
 }
 
