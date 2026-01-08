@@ -28,6 +28,7 @@ fun startApp(
 
     rapidsConnection.also {
         SynlighetsgrunnlagLytter(it, repository)
+        SynlighetRekrutteringstreffLytter(it, repository)
     }.start()
 }
 
