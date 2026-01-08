@@ -21,8 +21,6 @@ spec:
   replicas:
     min: 2
     max: {{ max_replicas }}
-  secureLogs:
-    enabled: true
   resources:
     limits:
       cpu: 3000m
@@ -32,6 +30,9 @@ spec:
       memory: 512Mi
   accessPolicy:
     outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
       external:
         - host: {{notifikasjon_api_host}}
     inbound:

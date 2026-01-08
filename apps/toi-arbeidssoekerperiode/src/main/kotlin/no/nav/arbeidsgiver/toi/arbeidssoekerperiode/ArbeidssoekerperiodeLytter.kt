@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import no.nav.arbeidsgiver.toi.arbeidssoekerperiode.SecureLogLogger.Companion.secure
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -19,6 +18,7 @@ class ArbeidssoekerperiodeLytter(
     private val consumer: () -> Consumer<Long, Periode>,
     private val behandleArbeidssokerPeriode: (Periode) -> ArbeidssokerPeriode
 ) : CoroutineScope, RapidsConnection.StatusListener {
+    private val secureLog = SecureLog(log)
 
     val arbeidssokerperioderTopic = "paw.arbeidssokerperioder-v1"
 
@@ -46,13 +46,13 @@ class ArbeidssoekerperiodeLytter(
                     try {
                         val records: ConsumerRecords<Long, Periode> = consumer.poll(Duration.ofSeconds(5))
                         val arbeidssokerperioderMeldinger = records.map {
-                            secure(log).info("Mottok periodemelding fra asr: ${it.value()}")
+                            secureLog.info("Mottok periodemelding fra asr: ${it.value()}")
                             behandleArbeidssokerPeriode(it.value())
                         }
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
                             log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
-                            secure(log).info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
+                            secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
 
                             val melding = mapOf(
                                 "fodselsnummer" to periode.identitetsnummer,

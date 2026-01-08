@@ -19,6 +19,7 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
     init {
         River(rapidsConnection).apply {
             precondition{
+                it.interestedIn("@event_name")
                 it.demandAtFørstkommendeUløsteBehovEr("adressebeskyttelse")
             }
             validate {

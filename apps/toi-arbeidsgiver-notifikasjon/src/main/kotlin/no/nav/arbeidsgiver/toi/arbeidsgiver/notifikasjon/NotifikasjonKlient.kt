@@ -15,6 +15,8 @@ class NotifikasjonKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
+    private val secureLog = SecureLog(log)
+
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
 

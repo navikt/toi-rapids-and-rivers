@@ -7,10 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
-import no.nav.paw.arbeidssokerregisteret.api.v1.JaNeiVetIkke
-import no.nav.paw.arbeidssokerregisteret.api.v4.OpplysningerOmArbeidssoeker
-import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
@@ -22,6 +18,7 @@ import javax.sql.DataSource
 
 class Repository(private val datasource: DataSource) {
     companion object {
+        private val secureLog = SecureLog(log)
         private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
@@ -31,7 +28,7 @@ class Repository(private val datasource: DataSource) {
 
     fun lagreArbeidssøkerperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
-        secure(log).info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
+        secureLog.info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
             "Start ${periode.startet} avslutt: ${periode.avsluttet}")
 
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid

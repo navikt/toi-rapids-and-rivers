@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val log = noClassLogger()
-val secureLog = LoggerFactory.getLogger("secureLog")!!
+private val secureLog = SecureLog(log)
 
 fun startApp(
     notifikasjonKlient: NotifikasjonKlient,
