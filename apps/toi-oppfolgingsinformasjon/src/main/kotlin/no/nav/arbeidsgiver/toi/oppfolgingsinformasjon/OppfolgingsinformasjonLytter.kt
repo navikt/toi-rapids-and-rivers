@@ -11,6 +11,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 
 class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+    private val secureLog = SecureLog(log)
+
     init {
         River(rapidsConnection).apply {
             precondition{
@@ -36,6 +38,7 @@ class OppfolgingsinformasjonLytter(private val rapidsConnection: RapidsConnectio
         )
 
         log.info("Skal publisere oppfølgingsinformasjonmelding med sistEndretDato ${packet["sistEndretDato"]}")
+        secureLog.info("Skal publisere oppfølgingsinformasjonmelding: $melding")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
