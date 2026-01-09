@@ -9,7 +9,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.SecureLogLogger.Companion.secure
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.thread
@@ -20,6 +19,7 @@ class PubliserOpplysningerJobb(
     private val leaderElector: LeaderElector,
     private val meterRegistry: MeterRegistry
 ) {
+    private val secureLog = SecureLog(log)
 
     companion object {
         private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
@@ -54,7 +54,7 @@ class PubliserOpplysningerJobb(
                 opplysninger.forEach { opplysning ->
                     publiserArbeidssøkeropplysning(opplysning)
                     repository.behandlePeriodeOpplysning(opplysning.periodeId)
-                    secure(log).info("""
+                    secureLog.info("""
                         Publiserte opplysning om ${opplysning.identitetsnummer} start: ${opplysning.periodeStartet}
                         stopp ${opplysning.periodeAvsluttet} 
                         """.trimIndent()

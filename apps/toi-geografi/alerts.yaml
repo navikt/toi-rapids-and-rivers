@@ -14,7 +14,7 @@ spec:
           for: 2m
           annotations:
             summary: Appen er nede
-            action: "https://logs.adeo.no/app/r/s/IP6nv"
+            action: "https://logs.az.nav.no/goto/8a6433f10a18f0540b9719b4b2359703?security_tenant=navlogs"
           labels:
             namespace: toi
             severity: critical
@@ -24,7 +24,7 @@ spec:
           for: 1s
           annotations:
             summary: Appen har logget en error
-            action: "https://logs.adeo.no/app/r/s/IP6nv"
+            action: "https://logs.az.nav.no/goto/8a6433f10a18f0540b9719b4b2359703?security_tenant=navlogs"
           labels:
             namespace: toi
             severity: critical
@@ -34,7 +34,7 @@ spec:
           for: 1s
           annotations:
             summary: Økning i warnings
-            action: "https://logs.adeo.no/app/r/s/IP6nv"
+            action: "https://logs.az.nav.no/goto/8a6433f10a18f0540b9719b4b2359703?security_tenant=navlogs"
           labels:
             namespace: toi
             severity: warning

@@ -21,7 +21,7 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
         rapidsConnection.register(this)
     }
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val secureLog = SecureLog(log)
 
     private val leesahTopic = "pdl.leesah-v1"
 

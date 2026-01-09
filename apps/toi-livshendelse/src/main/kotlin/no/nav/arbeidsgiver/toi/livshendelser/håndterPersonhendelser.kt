@@ -6,7 +6,7 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
 import org.slf4j.LoggerFactory
 
 class PersonhendelseService(private val rapidsConnection: RapidsConnection, private val pdlKlient: PdlKlient) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val secureLog = SecureLog(log)
 
     fun håndter(personHendelser: List<Personhendelse>) {
 

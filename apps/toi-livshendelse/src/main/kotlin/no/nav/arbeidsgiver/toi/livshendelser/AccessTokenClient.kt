@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import java.time.Instant
 
 class AccessTokenClient(private val env: Map<String, String>) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val secureLog = SecureLog(log)
 
     private var tokenUtgår = Instant.ofEpochSecond(0)
     private var cachedToken = AccessTokenResponse("uinitialisert", 0)

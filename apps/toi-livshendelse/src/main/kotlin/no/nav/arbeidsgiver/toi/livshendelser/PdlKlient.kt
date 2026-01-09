@@ -7,7 +7,7 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
 import org.slf4j.LoggerFactory
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val secureLog = SecureLog(log)
 
     fun hentGraderingPerAktørId(ident: String): Map<String, String> {
         val accessToken = accessTokenClient.hentAccessToken()
