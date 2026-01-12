@@ -10,16 +10,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 
 /**
- *
  * Lytter på need-meldinger fra rekrutteringstreff-api og besvarer med synlighetsinformasjon.
  *
  * Denne er for generell bruk, men tar med beskrivelse av foreløpig eneste klient:
- * Klient ( for eksempel rekrutteringstreff når en jobbsøker legges til), sender ut et behov
+ * Klient (for eksempel rekrutteringstreff når en jobbsøker legges til), sender ut et behov
  * for å sjekke om personen er synlig. Denne lytteren svarer med synlighetsstatus basert på
  * informasjonen lagret i synlighetsmotor-databasen.
  *
- * Hvis personen ikke finnes i databasen, returneres erSynlig=true som default,
- * siden personen var synlig da de ble funnet i kandidatsøket.
+ * Hvis personen ikke finnes i databasen, returneres erSynlig=false som default.
+ * Begrunnelse: Synlighetsmotor har ikke grunnlag for å si at personen er synlig.
+ * rekrutteringstreff-api håndterer "synlig frem til svar" lokalt ved opprettelse,
+ * men når svaret kommer vil synlighet settes til false med timestamp.
  */
 class SynlighetRekrutteringstreffLytter(
     rapidsConnection: RapidsConnection,
