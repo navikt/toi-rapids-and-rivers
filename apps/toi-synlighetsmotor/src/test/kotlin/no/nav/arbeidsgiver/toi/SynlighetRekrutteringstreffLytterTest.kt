@@ -44,6 +44,7 @@ class SynlighetRekrutteringstreffLytterTest {
             behovMelding("10828497311"),
             repository
         ) {
+            // Siden et felt er false, svarer vi direkte med false uten å trigge adressebeskyttelse
             assertThat(size).isEqualTo(1)
             val synlighet = field(0, "synlighetRekrutteringstreff")
             assertThat(synlighet.get("erSynlig").asBoolean()).isFalse()
@@ -52,10 +53,8 @@ class SynlighetRekrutteringstreffLytterTest {
     }
 
     @Test
-    fun `skal besvare behov basert på evaluering fra database`() {
-        // Lagre en evaluering i databasen
-        // Merk: harIkkeAdressebeskyttelse lagres ikke i databasen, så erSynlig() vil
-        // returnere false pga. Missing-verdien (som ikke er True)
+    fun `skal trigge adressebeskyttelse-behov når alle andre felt er OK`() {
+        // Lagre en evaluering der alle felt bortsett fra adressebeskyttelse er OK
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
@@ -78,8 +77,73 @@ class SynlighetRekrutteringstreffLytterTest {
             behovMelding("10828497311"),
             repository
         ) {
+            // Skal trigge adressebeskyttelse-behov
+            assertThat(size).isEqualTo(1)
+            val behov = field(0, "@behov")
+            assertThat(behov.map { it.asText() }).contains("adressebeskyttelse")
+        }
+    }
+
+    @Test
+    fun `skal besvare behov med erSynlig true når adressebeskyttelse er UGRADERT`() {
+        // Lagre en evaluering der alle felt bortsett fra adressebeskyttelse er OK
+        repository.lagre(
+            Evaluering(
+                harAktivCv = true.tilBooleanVerdi(),
+                harJobbprofil = true.tilBooleanVerdi(),
+                erUnderOppfoelging = true.tilBooleanVerdi(),
+                harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
+                erIkkeKode6eller7 = true.tilBooleanVerdi(),
+                erIkkeSperretAnsatt = true.tilBooleanVerdi(),
+                erIkkeDoed = true.tilBooleanVerdi(),
+                erIkkeKvp = true.tilBooleanVerdi(),
+                harIkkeAdressebeskyttelse = BooleanVerdi.missing,
+                erArbeidssøker = true.tilBooleanVerdi(),
+                komplettBeregningsgrunnlag = true
+            ),
+            aktørId = "1234567890123",
+            fødselsnummer = "10828497311"
+        )
+
+        testProgramMedBehovHendelse(
+            behovMeldingMedAdressebeskyttelse("10828497311", "UGRADERT"),
+            repository
+        ) {
             assertThat(size).isEqualTo(1)
             val synlighet = field(0, "synlighetRekrutteringstreff")
+            assertThat(synlighet.get("erSynlig").asBoolean()).isTrue()
+            assertThat(synlighet.get("ferdigBeregnet").asBoolean()).isTrue()
+        }
+    }
+
+    @Test
+    fun `skal besvare behov med erSynlig false når adressebeskyttelse er STRENGT_FORTROLIG`() {
+        // Lagre en evaluering der alle felt bortsett fra adressebeskyttelse er OK
+        repository.lagre(
+            Evaluering(
+                harAktivCv = true.tilBooleanVerdi(),
+                harJobbprofil = true.tilBooleanVerdi(),
+                erUnderOppfoelging = true.tilBooleanVerdi(),
+                harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
+                erIkkeKode6eller7 = true.tilBooleanVerdi(),
+                erIkkeSperretAnsatt = true.tilBooleanVerdi(),
+                erIkkeDoed = true.tilBooleanVerdi(),
+                erIkkeKvp = true.tilBooleanVerdi(),
+                harIkkeAdressebeskyttelse = BooleanVerdi.missing,
+                erArbeidssøker = true.tilBooleanVerdi(),
+                komplettBeregningsgrunnlag = true
+            ),
+            aktørId = "1234567890123",
+            fødselsnummer = "10828497311"
+        )
+
+        testProgramMedBehovHendelse(
+            behovMeldingMedAdressebeskyttelse("10828497311", "STRENGT_FORTROLIG"),
+            repository
+        ) {
+            assertThat(size).isEqualTo(1)
+            val synlighet = field(0, "synlighetRekrutteringstreff")
+            assertThat(synlighet.get("erSynlig").asBoolean()).isFalse()
             assertThat(synlighet.get("ferdigBeregnet").asBoolean()).isTrue()
         }
     }
@@ -142,6 +206,15 @@ class SynlighetRekrutteringstreffLytterTest {
             "@event_name": "behov",
             "@behov": ["synlighetRekrutteringstreff"],
             "fodselsnummer": "$fodselsnummer"
+        }
+    """.trimIndent()
+
+    private fun behovMeldingMedAdressebeskyttelse(fodselsnummer: String, adressebeskyttelse: String) = """
+        {
+            "@event_name": "behov",
+            "@behov": ["synlighetRekrutteringstreff"],
+            "fodselsnummer": "$fodselsnummer",
+            "adressebeskyttelse": "$adressebeskyttelse"
         }
     """.trimIndent()
 

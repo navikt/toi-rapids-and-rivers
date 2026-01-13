@@ -60,6 +60,24 @@ class Evaluering(
     fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
         .all { it == True } && erFerdigBeregnet
 
+    /**
+     * Sjekker synlighet med ekstern adressebeskyttelse-verdi.
+     * Brukes av SynlighetRekrutteringstreffLytter som henter adressebeskyttelse
+     * via need-melding siden feltet ikke lagres i databasen.
+     */
+    fun erSynligMedAdressebeskyttelse(harIkkeAdressebeskyttelseEkstern: Boolean): Boolean {
+        val alleAndreFeltOk = felterBortsettFraAdressebeskyttelse.all { it == True }
+        return alleAndreFeltOk && harIkkeAdressebeskyttelseEkstern && erFerdigBeregnet
+    }
+
+    /**
+     * Sjekker om personen potensielt kan bli synlig hvis adressebeskyttelse er OK.
+     * Returnerer false hvis noen av de andre feltene er False (usynlig uansett adressebeskyttelse).
+     * Brukes for å unngå unødvendig adressebeskyttelse-oppslag.
+     */
+    fun kanBliSynligMedAdressebeskyttelse(): Boolean {
+        return felterBortsettFraAdressebeskyttelse.all { it == True }
+    }
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),
