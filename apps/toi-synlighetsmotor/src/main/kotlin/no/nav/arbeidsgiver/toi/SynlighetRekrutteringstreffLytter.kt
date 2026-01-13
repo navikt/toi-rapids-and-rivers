@@ -78,7 +78,9 @@ class SynlighetRekrutteringstreffLytter(
             // Adressebeskyttelse ikke hentet ennå - trigger behov for det
             val behov = packet["@behov"].map(JsonNode::asText)
             if (adressebeskyttelseFelt !in behov) {
-                packet["@behov"] = (behov + adressebeskyttelseFelt).distinct()
+                // Legg adressebeskyttelse FORAN i listen slik at det blir første uløste behov
+                // Dette er nødvendig fordi AdressebeskyttelseLytter bruker demandAtFørstkommendeUløsteBehovEr
+                packet["@behov"] = (listOf(adressebeskyttelseFelt) + behov).distinct()
                 log.info("Trigger adressebeskyttelse-behov for synlighetRekrutteringstreff (fødselsnummer i securelog)")
                 secureLog.info("Trigger adressebeskyttelse-behov for fødselsnummer: $fodselsnummer")
                 rapidsConnection.publish(fodselsnummer, packet.toJson())
