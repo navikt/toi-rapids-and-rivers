@@ -56,10 +56,14 @@ class SynlighetsgrunnlagLytter(
 
         if (synlighetsevaluering.erFerdigBeregnet) {
             packet["synlighet"] = synlighetsevaluering.somSynlighet()
+            val fødselsnummer = kandidat.fødselsNummer()
+            if (fødselsnummer != null) {
+                packet["fodselsnummer"] = fødselsnummer
+            }
             repository.lagre(
                 evaluering = synlighetsevaluering,
                 aktørId = kandidat.aktørId,
-                fødselsnummer = kandidat.fødselsNummer()
+                fødselsnummer = fødselsnummer
             )
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
