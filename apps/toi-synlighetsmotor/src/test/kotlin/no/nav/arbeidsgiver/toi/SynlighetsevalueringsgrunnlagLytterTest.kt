@@ -341,4 +341,20 @@ class SynlighetsevalueringsgrunnlagLytterTest {
             assertThat(size).isEqualTo(0)
         })
     }
+
+    @Test
+    fun `meldinger med synlighetRekrutteringstreff i behov-listen skal ignoreres av SynlighetsgrunnlagLytter - de tilhører rekrutteringstreff-flyten`() {
+        // Denne meldingen har adressebeskyttelse-feltet (som normalt ville matchet SynlighetsgrunnlagLytter),
+        // men fordi synlighetRekrutteringstreff er i @behov-listen, skal den ignoreres.
+        // Meldingen mangler fodselsnummer, så SynlighetRekrutteringstreffLytter vil heller ikke plukke den opp.
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ["synlighetRekrutteringstreff", "adressebeskyttelse"],
+                $adressebeskyttelseSynlig
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
 }

@@ -38,6 +38,8 @@ class SynlighetsgrunnlagLytter(
                 it.forbid("synlighet")
                 it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
+                // Ignorer meldinger fra rekrutteringstreff-flyten - de håndteres av SynlighetRekrutteringstreffLytter
+                it.forbidBehovIListe("synlighetRekrutteringstreff")
             }
         }.register(this)
     }
@@ -84,4 +86,20 @@ private fun JsonMessage.requireAny(keys: List<String>) {
             .all { it.isMissingNode }
     )
         throw MessageProblems.MessageException(MessageProblems(toJson()).apply { error("Ingen av feltene fantes i meldingen") })
+}
+
+/**
+ * Avviser meldingen hvis det spesifiserte behovet finnes i @behov-listen.
+ * Brukes for å unngå at denne lytteren plukker opp meldinger ment for en annen flyt.
+ * Hvis @behov ikke finnes i meldingen, passerer denne sjekken (meldingen kan fortsatt prosesseres).
+ */
+private fun JsonMessage.forbidBehovIListe(behov: String) {
+    interestedIn("@behov")
+    val behovNode = this["@behov"]
+    if (!behovNode.isMissingNode && behovNode.isArray) {
+        val behovListe = behovNode.toList().map(JsonNode::asText)
+        if (behov in behovListe) {
+            throw MessageProblems.MessageException(MessageProblems(toJson()).apply { error("Meldingen tilhører $behov-flyten - ignorerer") })
+        }
+    }
 }
