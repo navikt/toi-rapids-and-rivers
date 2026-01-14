@@ -1,7 +1,13 @@
-package no.nav.arbeidsgiver.toi
+package no.nav.arbeidsgiver.toi.rekrutteringstreff
 
 import io.javalin.Javalin
+import no.nav.arbeidsgiver.toi.BooleanVerdi
+import no.nav.arbeidsgiver.toi.Evaluering
+import no.nav.arbeidsgiver.toi.Repository
+import no.nav.arbeidsgiver.toi.TestDatabase
 import no.nav.arbeidsgiver.toi.rest.Rolle
+import no.nav.arbeidsgiver.toi.startApp
+import no.nav.arbeidsgiver.toi.tilBooleanVerdi
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
