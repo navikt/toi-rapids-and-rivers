@@ -86,7 +86,45 @@ class SynlighetRekrutteringstreffLytterTest {
             // Skal trigge adressebeskyttelse-behov
             assertThat(size).isEqualTo(1)
             val behov = field(0, "@behov")
-            assertThat(behov.map { it.asText() }).contains("adressebeskyttelse")
+            assertThat(behov.map { it.asText() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
+        }
+    }
+
+    @Test
+    fun `skal flytte adressebeskyttelse-behov fremst i behov-køen når alle andre felt er OK og adressebeskyttelse er etter synlighetRekrutteringstreff-behov`() {
+        // Lagre en evaluering der alle felt bortsett fra adressebeskyttelse er OK
+        repository.lagre(
+            Evaluering(
+                harAktivCv = true.tilBooleanVerdi(),
+                harJobbprofil = true.tilBooleanVerdi(),
+                erUnderOppfoelging = true.tilBooleanVerdi(),
+                harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
+                erIkkeKode6eller7 = true.tilBooleanVerdi(),
+                erIkkeSperretAnsatt = true.tilBooleanVerdi(),
+                erIkkeDoed = true.tilBooleanVerdi(),
+                erIkkeKvp = true.tilBooleanVerdi(),
+                harIkkeAdressebeskyttelse = BooleanVerdi.missing,
+                erArbeidssøker = true.tilBooleanVerdi(),
+                komplettBeregningsgrunnlag = true
+            ),
+            aktørId = "1234567890123",
+            fødselsnummer = "10828497311"
+        )
+
+        testProgramMedBehovHendelse(
+            """
+                {
+                    "@event_name": "behov",
+                    "@behov": ["synlighetRekrutteringstreff", "adressebeskyttelse"],
+                    "fodselsnummer": "10828497311"
+                }
+            """.trimIndent(),
+            repository
+        ) {
+            // Skal trigge adressebeskyttelse-behov
+            assertThat(size).isEqualTo(1)
+            val behov = field(0, "@behov")
+            assertThat(behov.map { it.asText() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
         }
     }
 
