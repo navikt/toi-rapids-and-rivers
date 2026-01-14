@@ -53,23 +53,14 @@ class SynlighetRekrutteringstreffLytter(
 
         val evaluering = repository.hentMedFnr(fodselsnummer)
 
-        if (evaluering == null) {
-            // Person ikke funnet i databasen - svar med ikke synlig
-            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = true)
-            return
-        }
-
-        // Sjekk om noe allerede gjør personen usynlig (et felt er False, f.eks. erIkkeDoed)
-        // I så fall trenger vi ikke hente adressebeskyttelse - svaret er uansett false
-        if (evaluering.erFerdigBeregnet && !evaluering.kanBliSynligMedAdressebeskyttelse()) {
-            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = true)
-            return
-        }
-
-        // Sjekk om alle felt bortsett fra adressebeskyttelse er klare (ikke Missing)
-        if (!evaluering.harAltBortsettFraAdressebeskyttelse) {
-            // Ikke alle felt er klare - svar med ikke synlig
-            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = evaluering.erFerdigBeregnet)
+        // Returner umiddelbart med usynlig hvis person ikke funnet eller ikke kan bli synlig
+        if (evaluering == null || !evaluering.kanBliSynlig()) {
+            besvarMedSynlighet(
+                packet, 
+                fodselsnummer, 
+                erSynlig = false, 
+                ferdigBeregnet = evaluering?.erFerdigBeregnet ?: true
+            )
             return
         }
 
@@ -88,14 +79,25 @@ class SynlighetRekrutteringstreffLytter(
             return
         }
 
-        // Adressebeskyttelse er hentet - evaluer med den
+        // Adressebeskyttelse er hentet - evaluer synlighet
         val adressebeskyttelse = adressebeskyttelseNode.asText()
-        val harIkkeAdressebeskyttelse = adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT"
+        val harIkkeAdressebeskyttelse = (adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT").tilBooleanVerdi()
         
-        // Kombiner evaluering fra DB med adressebeskyttelse
-        val erSynlig = evaluering.erSynligMedAdressebeskyttelse(harIkkeAdressebeskyttelse)
+        val oppdatertEvaluering = Evaluering(
+            harAktivCv = evaluering.harAktivCv,
+            harJobbprofil = evaluering.harJobbprofil,
+            erUnderOppfoelging = evaluering.erUnderOppfoelging,
+            harRiktigFormidlingsgruppe = evaluering.harRiktigFormidlingsgruppe,
+            erIkkeKode6eller7 = evaluering.erIkkeKode6eller7,
+            erIkkeSperretAnsatt = evaluering.erIkkeSperretAnsatt,
+            erIkkeDoed = evaluering.erIkkeDoed,
+            erIkkeKvp = evaluering.erIkkeKvp,
+            harIkkeAdressebeskyttelse = harIkkeAdressebeskyttelse,
+            erArbeidssøker = evaluering.erArbeidssøker,
+            komplettBeregningsgrunnlag = evaluering.erFerdigBeregnet
+        )
         
-        besvarMedSynlighet(packet, fodselsnummer, erSynlig, ferdigBeregnet = true)
+        besvarMedSynlighet(packet, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true)
     }
 
     private fun besvarMedSynlighet(

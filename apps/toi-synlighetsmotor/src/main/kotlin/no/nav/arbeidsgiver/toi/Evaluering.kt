@@ -57,26 +57,16 @@ class Evaluering(
             .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
-    fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
-        .all { it == True } && erFerdigBeregnet
+    fun erSynlig() = harIkkeAdressebeskyttelse == True && kanBliSynlig() && erFerdigBeregnet
 
     /**
-     * Sjekker om personen potensielt kan bli synlig hvis adressebeskyttelse er OK.
-     * Returnerer false hvis noen av de andre feltene er False (usynlig uansett adressebeskyttelse).
+     * Pre-sjekk: Returnerer false hvis noen felt er False (usynlig uansett adressebeskyttelse).
      * Brukes for å unngå unødvendig adressebeskyttelse-oppslag.
      */
-    fun kanBliSynligMedAdressebeskyttelse(): Boolean {
+    fun kanBliSynlig(): Boolean {
         return felterBortsettFraAdressebeskyttelse.all { it == True }
     }
 
-    /**
-     * Sjekker synlighet med ekstern adressebeskyttelse-verdi.
-     * Brukes av SynlighetRekrutteringstreffLytter som henter adressebeskyttelse
-     * via need-melding siden feltet ikke lagres i databasen.
-     */
-    fun erSynligMedAdressebeskyttelse(harIkkeAdressebeskyttelseEkstern: Boolean): Boolean {
-        return kanBliSynligMedAdressebeskyttelse() && harIkkeAdressebeskyttelseEkstern && erFerdigBeregnet
-    }
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),
