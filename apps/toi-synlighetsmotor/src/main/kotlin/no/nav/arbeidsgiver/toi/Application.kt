@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
 import io.javalin.http.Context
+import no.nav.arbeidsgiver.toi.rekrutteringstreff.SynlighetRekrutteringstreffLytter
 import no.nav.arbeidsgiver.toi.rest.Rolle
 import no.nav.arbeidsgiver.toi.rest.evaluerKandidatFraContext
 import no.nav.arbeidsgiver.toi.rest.evaluerKandidatFraContextGet
@@ -28,6 +29,7 @@ fun startApp(
 
     rapidsConnection.also {
         SynlighetsgrunnlagLytter(it, repository)
+        SynlighetRekrutteringstreffLytter(it, repository)
     }.start()
 }
 

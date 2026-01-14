@@ -15,7 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-class SynlighetsevalueringsgrunnlagLytterTest {
+class SynlighetsgrunnlagLytterTest {
 
     companion object {
         private val aktørId = "1234"
@@ -336,6 +336,22 @@ class SynlighetsevalueringsgrunnlagLytterTest {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
+
+    @Test
+    fun `meldinger med synlighetRekrutteringstreff i behov-listen skal ignoreres av SynlighetsgrunnlagLytter - de tilhører rekrutteringstreff-flyten`() {
+        // Denne meldingen har adressebeskyttelse-feltet (som normalt ville matchet SynlighetsgrunnlagLytter),
+        // men fordi synlighetRekrutteringstreff er i @behov-listen, skal den ignoreres.
+        // Meldingen mangler fodselsnummer, så SynlighetRekrutteringstreffLytter vil heller ikke plukke den opp.
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ["synlighetRekrutteringstreff", "adressebeskyttelse"],
+                $adressebeskyttelseSynlig
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(0)
