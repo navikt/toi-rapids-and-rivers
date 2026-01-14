@@ -10,7 +10,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.Evaluering
 import no.nav.arbeidsgiver.toi.Repository
 import no.nav.arbeidsgiver.toi.demandAtFørstkommendeUløsteBehovEr
-import no.nav.arbeidsgiver.toi.forbidUløstBehov
 import no.nav.arbeidsgiver.toi.leggTilBehov
 import no.nav.arbeidsgiver.toi.log
 import no.nav.arbeidsgiver.toi.secureLog
@@ -39,8 +38,6 @@ class SynlighetRekrutteringstreffLytter(
         River(rapidsConnection).apply {
             precondition {
                 it.demandAtFørstkommendeUløsteBehovEr(synlighetRekrutteringstreffBehov)
-                // Ignorer meldinger der vi har lagt til adressebeskyttelse-behov, men det ikke er løst ennå
-                it.forbidUløstBehov(adressebeskyttelseFelt)
             }
             validate {
                 it.requireKey("fodselsnummer")

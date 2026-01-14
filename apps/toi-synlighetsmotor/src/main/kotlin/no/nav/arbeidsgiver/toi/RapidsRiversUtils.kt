@@ -20,24 +20,6 @@ fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String
 }
 
 /**
- * Avviser meldingen hvis det spesifiserte behovet er i @behov-listen men ikke løst.
- * Brukes for å unngå å behandle meldinger der vi venter på svar fra et annet behov.
- */
-fun JsonMessage.forbidUløstBehov(behov: String) {
-    interestedIn("@behov")
-    interestedIn(behov)
-    require("@behov") { behovNode ->
-        val behovListe = behovNode.toList().map(JsonNode::asText)
-        val behovErIListen = behov in behovListe
-        val behovErLøst = !this[behov].isMissingNode
-        
-        if (behovErIListen && !behovErLøst) {
-            throw Exception("Venter på $behov - ignorerer meldingen")
-        }
-    }
-}
-
-/**
  * Legger til et nytt behov i @behov-listen hvis det ikke allerede finnes der.
  * Behovet legges FORAN i listen for å sikre at det blir neste uløste behov.
  * 
@@ -46,9 +28,6 @@ fun JsonMessage.forbidUløstBehov(behov: String) {
  */
 fun JsonMessage.leggTilBehov(behov: String): Boolean {
     val eksisterendeBehov = this["@behov"].map(JsonNode::asText)
-    if (behov in eksisterendeBehov) {
-        return false
-    }
-    this["@behov"] = (listOf(behov) + eksisterendeBehov).distinct()
+    this["@behov"] = (listOf(behov) + (eksisterendeBehov.distinct()-behov))
     return true
 }
