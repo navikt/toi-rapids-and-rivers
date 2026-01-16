@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val log = noClassLogger()
-private val secureLog = LoggerFactory.getLogger("secureLog")
+private val secureLog = SecureLog(log)
 
 fun main() {
     log.info("Starter app.")

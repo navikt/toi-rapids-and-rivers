@@ -25,8 +25,6 @@ spec:
     requests:
       cpu: 100m
       memory: 512Mi
-  secureLogs:
-    enabled: true
   kafka:
     pool: {{ kafka_pool }}
   env:
@@ -44,3 +42,9 @@ spec:
         - id: loki
         - id: elastic
       enabled: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
+

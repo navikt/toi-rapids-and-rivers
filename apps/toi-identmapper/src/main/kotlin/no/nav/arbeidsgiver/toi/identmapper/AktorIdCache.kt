@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-import org.slf4j.LoggerFactory
-
 
 class AktorIdCache(
     private val repository: Repository,
@@ -9,7 +7,7 @@ class AktorIdCache(
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val secureLog = SecureLog(log)
 
     fun hentAktørId(fødselsnummer: String): String? {
         val cachetAktørId = hentCachetAktørId(fødselsnummer)
