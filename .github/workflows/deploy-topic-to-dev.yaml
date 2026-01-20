@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - ny-kandidat-indekser
+      - synlig_for_muligheter
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
