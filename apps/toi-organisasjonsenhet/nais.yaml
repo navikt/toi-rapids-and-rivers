@@ -25,12 +25,13 @@ spec:
     requests:
       cpu: 100m
       memory: 512Mi
-  secureLogs:
-    enabled: true
   kafka:
     pool: {{ kafka_pool }}
   accessPolicy:
     outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
       external:
         - host: {{ norg2_host }}
   env:
