@@ -26,10 +26,11 @@ spec:
       memory: 256Mi
   accessPolicy:
     outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
       external:
         - host: {{nom_api_host}}
-  secureLogs:
-    enabled: true
   azure:
     application:
       enabled: true

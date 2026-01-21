@@ -14,7 +14,7 @@ spec:
           for: 2m
           annotations:
             summary: Applikasjonen er nede
-            action: "https://logs.adeo.no/goto/0897adc0-3992-11ed-8607-d590fd125f80"
+            action: "https://logs.az.nav.no/goto/a84f1fb54d61852439e522893c2d74e0?security_tenant=navlogs"
           labels:
             namespace: toi
             severity: critical
@@ -24,7 +24,7 @@ spec:
           for: 1s
           annotations:
             summary: Applikasjonen har logget en error
-            action: "https://logs.adeo.no/goto/0897adc0-3992-11ed-8607-d590fd125f80"
+            action: "https://logs.az.nav.no/goto/a84f1fb54d61852439e522893c2d74e0?security_tenant=navlogs"
           labels:
             namespace: toi
             severity: critical
@@ -34,7 +34,7 @@ spec:
           for: 1s
           annotations:
             summary: Økning i warnings
-            action: "https://logs.adeo.no/goto/0897adc0-3992-11ed-8607-d590fd125f80"
+            action: "https://logs.az.nav.no/goto/a84f1fb54d61852439e522893c2d74e0?security_tenant=navlogs"
           labels:
             namespace: toi
             severity: warning
