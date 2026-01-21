@@ -113,3 +113,6 @@ spec:
     - team: toi
       application: rekrutteringsbistand-kandidatvarsel-api
       access: readwrite
+    - team: teampam
+      application: pam-dir-api
+      access: read
