@@ -34,7 +34,7 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          build-mode: autobuild
+          build-mode: none
 
       - name: Compile for CodeQL scan
         run: ./gradlew build -x test
