@@ -16,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.text.set
@@ -39,33 +40,23 @@ fun main() {
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
 
-    kafkaStreams.setGlobalStateRestoreListener(object : StateRestoreListener {
-        override fun onRestoreStart(
-            topicPartition: TopicPartition,
-            storeName: String,
-            startingOffset: Long,
-            endingOffset: Long
-        ) {
-            log.info("Restore started for $storeName, offsets $startingOffset to $endingOffset")
-        }
+    kafkaStreams.setStateListener { newState, oldState ->
+        log.info("State changed from $oldState to $newState")
 
-        override fun onBatchRestored(
-            topicPartition: TopicPartition,
-            storeName: String,
-            batchEndOffset: Long,
-            numRestored: Long
-        ) {
-            log.info("Batch restored for $storeName, offset $batchEndOffset, count $numRestored")
+        if (newState == KafkaStreams.State.RUNNING) {
+            // Global table is populated when state becomes RUNNING
+            val store = kafkaStreams.store(
+                StoreQueryParameters.fromNameAndType(
+                    oppfølgingsTopic,
+                    QueryableStoreTypes.keyValueStore<String, String>()
+                )
+            )
+            val count = store.approximateNumEntries()
+            log.info("Antall records : $count")
+            Thread.sleep(Duration.ofSeconds(10))
+            log.info("Antall records etter pause : $count")
         }
-
-        override fun onRestoreEnd(
-            topicPartition: TopicPartition,
-            storeName: String,
-            totalRestored: Long
-        ) {
-            log.info("Restore complete for $storeName, total records: $totalRestored")
-        }
-    })
+    }
 
     kafkaStreams.start()
 
