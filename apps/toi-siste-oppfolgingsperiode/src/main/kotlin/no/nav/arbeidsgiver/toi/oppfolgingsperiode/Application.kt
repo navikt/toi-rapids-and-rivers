@@ -38,13 +38,14 @@ fun main() {
     kafkaStreams.setStateListener(object : KafkaStreams.StateListener {
         override fun onChange(newState: KafkaStreams.State, oldState: KafkaStreams.State) {
             log.info("Kafka Streams state changed from $oldState to $newState")
-            val store = kafkaStreams.store(
-                StoreQueryParameters.fromNameAndType(
-                    oppfølgingsTopic,
-                    QueryableStoreTypes.keyValueStore<String, String>()
-                )
-            )
+
             if(newState == KafkaStreams.State.RUNNING) {
+                val store = kafkaStreams.store(
+                    StoreQueryParameters.fromNameAndType(
+                        oppfølgingsTopic,
+                        QueryableStoreTypes.keyValueStore<String, String>()
+                    )
+                )
                 log.info("Antar alt er lest. Store size: " + store.approximateNumEntries())
             }
         }
