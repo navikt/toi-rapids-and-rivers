@@ -4,9 +4,11 @@ import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secu
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -36,8 +38,14 @@ fun main() {
     kafkaStreams.setStateListener(object : KafkaStreams.StateListener {
         override fun onChange(newState: KafkaStreams.State, oldState: KafkaStreams.State) {
             log.info("Kafka Streams state changed from $oldState to $newState")
+            val store = kafkaStreams.store(
+                StoreQueryParameters.fromNameAndType(
+                    oppfølgingsTopic,
+                    QueryableStoreTypes.keyValueStore<String, String>()
+                )
+            )
             if(newState == KafkaStreams.State.RUNNING) {
-                log.info("Antar alt er lest. Store size: " + kafkaStreams.streamsMetadataForStore(oppfølgingsTopic).count())
+                log.info("Antar alt er lest. Store size: " + store.approximateNumEntries())
             }
         }
     })
