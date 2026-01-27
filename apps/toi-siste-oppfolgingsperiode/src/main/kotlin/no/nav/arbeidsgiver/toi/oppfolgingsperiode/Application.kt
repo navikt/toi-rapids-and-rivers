@@ -44,6 +44,7 @@ fun main() {
     })
 
     //RapidApplication.create(env).also { rapidsConnection ->
+
     //}.start()
 }
 
