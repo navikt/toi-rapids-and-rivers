@@ -33,7 +33,6 @@ fun main() {
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
-    kafkaStreams.start()
     kafkaStreams.setStateListener(object : KafkaStreams.StateListener {
         override fun onChange(newState: KafkaStreams.State, oldState: KafkaStreams.State) {
             log.info("Kafka Streams state changed from $oldState to $newState")
@@ -42,6 +41,7 @@ fun main() {
             }
         }
     })
+    kafkaStreams.start()
 
     //RapidApplication.create(env).also { rapidsConnection ->
 
