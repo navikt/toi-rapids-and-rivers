@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -8,6 +9,7 @@ import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.processor.StateRestoreListener
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
 import org.slf4j.Logger
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import kotlin.text.set
 
 private val log = noClassLogger()
@@ -35,21 +38,35 @@ fun main() {
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
-    kafkaStreams.setStateListener(object : KafkaStreams.StateListener {
-        override fun onChange(newState: KafkaStreams.State, oldState: KafkaStreams.State) {
-            log.info("Kafka Streams state changed from $oldState to $newState")
 
-            if(newState == KafkaStreams.State.RUNNING) {
-                val store = kafkaStreams.store(
-                    StoreQueryParameters.fromNameAndType(
-                        oppfølgingsTopic,
-                        QueryableStoreTypes.keyValueStore<String, String>()
-                    )
-                )
-                log.info("Antar alt er lest. Store size: " + store.approximateNumEntries())
-            }
+    kafkaStreams.setGlobalStateRestoreListener(object : StateRestoreListener {
+        override fun onRestoreStart(
+            topicPartition: TopicPartition,
+            storeName: String,
+            startingOffset: Long,
+            endingOffset: Long
+        ) {
+            log.info("Restore started for $storeName, offsets $startingOffset to $endingOffset")
+        }
+
+        override fun onBatchRestored(
+            topicPartition: TopicPartition,
+            storeName: String,
+            batchEndOffset: Long,
+            numRestored: Long
+        ) {
+            log.info("Batch restored for $storeName, offset $batchEndOffset, count $numRestored")
+        }
+
+        override fun onRestoreEnd(
+            topicPartition: TopicPartition,
+            storeName: String,
+            totalRestored: Long
+        ) {
+            log.info("Restore complete for $storeName, total records: $totalRestored")
         }
     })
+
     kafkaStreams.start()
 
     //RapidApplication.create(env).also { rapidsConnection ->
