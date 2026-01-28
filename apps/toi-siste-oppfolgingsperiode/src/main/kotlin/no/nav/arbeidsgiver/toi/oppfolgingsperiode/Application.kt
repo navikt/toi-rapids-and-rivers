@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
 import java.time.Duration
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.text.set
@@ -26,6 +27,7 @@ private val log = noClassLogger()
 private const val oppfølgingsTopic = "poao.siste-oppfolgingsperiode-v2"
 
 fun main() {
+    val startTid = Instant.now()
     log.info("Starter app.")
     secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
@@ -40,26 +42,26 @@ fun main() {
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
 
-    kafkaStreams.setStateListener { newState, oldState ->
-        log.info("State changed from $oldState to $newState")
+    val stateRestoreListener = StateRestoreListener(kafkaStreams::state)
 
-        if (newState == KafkaStreams.State.RUNNING) {
-            // Global table is populated when state becomes RUNNING
-            val store = kafkaStreams.store(
-                StoreQueryParameters.fromNameAndType(
-                    oppfølgingsTopic,
-                    QueryableStoreTypes.keyValueStore<String, String>()
-                )
-            )
-            val count = store.approximateNumEntries()
-            log.info("Antall records : $count")
-            Thread.sleep(Duration.ofSeconds(10))
-            log.info("Antall records etter pause : $count")
-        }
-    }
-
+    kafkaStreams.setGlobalStateRestoreListener(stateRestoreListener)
     kafkaStreams.start()
 
+    while (!stateRestoreListener.isReady()) {
+        log.info("Venter på at Kafka Streams skal bli klar...")
+        Thread.sleep(1000)
+    }
+    log.info("Kafka Streams er klar! Oppstartstid: ${Duration.between(startTid, Instant.now())}")
+    val store = kafkaStreams.store(
+        StoreQueryParameters.fromNameAndType(
+            oppfølgingsTopic,
+            QueryableStoreTypes.keyValueStore<String, String>()
+        )
+    )
+    val count = store.approximateNumEntries()
+    log.info("Antall records : $count")
+    Thread.sleep(Duration.ofSeconds(10))
+    log.info("Antall records etter pause : $count")
     //RapidApplication.create(env).also { rapidsConnection ->
 
     //}.start()
