@@ -1,0 +1,26 @@
+name: Deploy siste oppfolgingsperiode-topic to dev
+
+on:
+  push:
+    branches:
+      - main
+      - ny-oppfølgingsperiode
+    paths:
+      - .github/workflows/deploy-topic-siste-oppfolgingsperiode-to-dev.yaml
+      - apps/toi-siste-oppfolgingsperiode/topic.yaml
+
+jobs:
+  deploy-rapid-to-dev:
+    name: Deploy siste-oppfølgingsperiode-topic to dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: nais/deploy/actions/deploy@master
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: apps/toi-siste-oppfolgingsperiode/topic.yaml
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write

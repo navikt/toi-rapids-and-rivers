@@ -2,20 +2,14 @@ package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
-import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
-import org.apache.kafka.streams.StoreQueryParameters
+import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
-import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Materialized
-import org.apache.kafka.streams.processor.StateRestoreListener
-import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
-import org.rocksdb.Options
-import org.rocksdb.RocksDB
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
@@ -23,37 +17,32 @@ import org.slf4j.MarkerFactory
 import java.time.Duration
 import java.time.Instant
 import java.util.*
-import java.util.concurrent.CountDownLatch
-import kotlin.text.set
 
 private val log = noClassLogger()
 
-private const val oppfølgingsTopic = "poao.siste-oppfolgingsperiode-v2"
+private const val toiOppfolgingsperiodeTopic = "siste-oppfolgingsperiode-fra-aktørid-v1"
+private const val poaoOppfølgingsperiodeTopic = "poao.siste-oppfolgingsperiode-v2"
 
 fun main() {
     val startTid = Instant.now()
     log.info("Starter app.")
     secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
-    RocksDB.loadLibrary()
-    val options = Options().setCreateIfMissing(true)
-    val db = RocksDB.open(options, "/tmp/aktorid-rocksdb")
-
     val objectMapper = jacksonObjectMapper()
 
     val topology = StreamsBuilder().apply {
-        stream(oppfølgingsTopic, Consumed.with(Serdes.String(), Serdes.String()))
-            .foreach { _, value ->
+        stream<String,String>(poaoOppfølgingsperiodeTopic)
+            .map { _, value ->
                 val node = objectMapper.readTree(value)
                 val aktørId = node["aktorId"].asText()
-                db.put(aktørId.toByteArray(), value.toByteArray())
-            }
-        /*globalTable(
-            oppfølgingsTopic,
+                KeyValue(aktørId, value)
+            }.to(toiOppfolgingsperiodeTopic)
+        globalTable(
+            toiOppfolgingsperiodeTopic,
             Materialized.`as`<String, String>(
-                RocksDBKeyValueBytesStoreSupplier(oppfølgingsTopic, false)
+                RocksDBKeyValueBytesStoreSupplier(toiOppfolgingsperiodeTopic, false)
             ).withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
-        )*/
+        )
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
