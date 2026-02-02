@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: siste-oppfolgingsperiode-fra-aktørid-v1
+  name: siste-oppfolgingsperiode-fra-aktorid-v1
   namespace: toi
   labels:
     team: toi

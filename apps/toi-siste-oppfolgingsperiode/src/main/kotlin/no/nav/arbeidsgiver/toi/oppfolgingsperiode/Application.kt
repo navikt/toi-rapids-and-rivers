@@ -20,7 +20,7 @@ import java.util.*
 
 private val log = noClassLogger()
 
-private const val toiOppfolgingsperiodeTopic = "siste-oppfolgingsperiode-fra-aktørid-v1"
+private const val toiOppfolgingsperiodeTopic = "toi.siste-oppfolgingsperiode-fra-aktorid-v1"
 private const val poaoOppfølgingsperiodeTopic = "poao.siste-oppfolgingsperiode-v2"
 
 fun main() {
