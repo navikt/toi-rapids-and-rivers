@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.config.SslConfigs
@@ -8,10 +9,13 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.processor.StateRestoreListener
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
+import org.rocksdb.Options
+import org.rocksdb.RocksDB
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
