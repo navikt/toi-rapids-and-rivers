@@ -6,9 +6,11 @@ import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.KeyValue
+import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -57,32 +59,15 @@ fun main() {
         Thread.sleep(1000)
     }
     log.info("Kafka Streams er klar! Oppstartstid: ${Duration.between(startTid, Instant.now())}")
-    /*val store = kafkaStreams.store(
+    val store = kafkaStreams.store(
         StoreQueryParameters.fromNameAndType(
-            oppfølgingsTopic,
+            toiOppfolgingsperiodeTopic,
             QueryableStoreTypes.keyValueStore<String, String>()
         )
-    )*/
-    val count = db.newIterator().use { iterator ->
-        var counter = 0
-        iterator.seekToFirst()
-        while (iterator.isValid) {
-            counter++
-            iterator.next()
-        }
-        counter
-    }
-    val eksempelVerdi = db.newIterator().use { iterator ->
-        iterator.seekToFirst()
-        if (iterator.isValid) {
-            val key = String(iterator.key())
-            val value = String(iterator.value())
-            Pair(key, value)
-        } else {
-            Pair("ingen key funnet", "ingen value funnet")
-        }
-    }
-    log.info("Eksempel: Key ${eksempelVerdi.first}, Value ${eksempelVerdi.second}")
+    )
+    val eksempelVerdi = store.all().iterator().next()
+    log.info("Eksempel: Key ${eksempelVerdi.key}, Value ${eksempelVerdi.value}")
+    val count = store.approximateNumEntries()
     log.info("Antall records : $count")
     Thread.sleep(Duration.ofSeconds(10))
     log.info("Antall records etter pause : $count")
