@@ -35,13 +35,25 @@ fun main() {
     log.info("Starter app.")
     secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
+    RocksDB.loadLibrary()
+    val options = Options().setCreateIfMissing(true)
+    val db = RocksDB.open(options, "/tmp/aktorid-rocksdb")
+
+    val objectMapper = jacksonObjectMapper()
+
     val topology = StreamsBuilder().apply {
-        globalTable(
+        stream(oppfølgingsTopic, Consumed.with(Serdes.String(), Serdes.String()))
+            .foreach { _, value ->
+                val node = objectMapper.readTree(value)
+                val aktørId = node["aktorId"].asText()
+                db.put(aktørId.toByteArray(), value.toByteArray())
+            }
+        /*globalTable(
             oppfølgingsTopic,
             Materialized.`as`<String, String>(
                 RocksDBKeyValueBytesStoreSupplier(oppfølgingsTopic, false)
             ).withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
-        )
+        )*/
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
@@ -56,15 +68,32 @@ fun main() {
         Thread.sleep(1000)
     }
     log.info("Kafka Streams er klar! Oppstartstid: ${Duration.between(startTid, Instant.now())}")
-    val store = kafkaStreams.store(
+    /*val store = kafkaStreams.store(
         StoreQueryParameters.fromNameAndType(
             oppfølgingsTopic,
             QueryableStoreTypes.keyValueStore<String, String>()
         )
-    )
-    val count = store.approximateNumEntries()
-    val eksempelVerdi = store.all().iterator().next()
-    log.info("Eksempel: Key ${eksempelVerdi.key}, Value ${eksempelVerdi.value}")
+    )*/
+    val count = db.newIterator().use { iterator ->
+        var counter = 0
+        iterator.seekToFirst()
+        while (iterator.isValid) {
+            counter++
+            iterator.next()
+        }
+        counter
+    }
+    val eksempelVerdi = db.newIterator().use { iterator ->
+        iterator.seekToFirst()
+        if (iterator.isValid) {
+            val key = String(iterator.key())
+            val value = String(iterator.value())
+            Pair(key, value)
+        } else {
+            Pair("ingen key funnet", "ingen value funnet")
+        }
+    }
+    log.info("Eksempel: Key ${eksempelVerdi.first}, Value ${eksempelVerdi.second}")
     log.info("Antall records : $count")
     Thread.sleep(Duration.ofSeconds(10))
     log.info("Antall records etter pause : $count")
