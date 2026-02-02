@@ -59,6 +59,8 @@ fun main() {
         )
     )
     val count = store.approximateNumEntries()
+    val eksempelVerdi = store.all().iterator().next()
+    log.info("Eksempel: Key ${eksempelVerdi.key}, Value ${eksempelVerdi.value}")
     log.info("Antall records : $count")
     Thread.sleep(Duration.ofSeconds(10))
     log.info("Antall records etter pause : $count")
