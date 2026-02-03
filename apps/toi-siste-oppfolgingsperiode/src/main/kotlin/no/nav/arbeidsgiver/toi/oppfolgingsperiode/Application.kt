@@ -1,6 +1,11 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.internals.AutoOffsetResetStrategy
@@ -56,6 +61,15 @@ fun main() {
 
     kafkaStreams.setGlobalStateRestoreListener(stateRestoreListener)
     kafkaStreams.start()
+
+
+    embeddedServer(Netty, port = 8080) {
+        routing {
+            get("/isalive") {
+                call.respondText("ALIVE")
+            }
+        }
+    }.start(wait = false)
 
     while (!stateRestoreListener.isReady()) {
         log.info("Venter på at Kafka Streams skal bli klar...")
