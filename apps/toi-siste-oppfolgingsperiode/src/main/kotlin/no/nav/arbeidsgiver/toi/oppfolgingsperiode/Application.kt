@@ -2,8 +2,11 @@ package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.internals.AutoOffsetResetStrategy
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.streams.AutoOffsetReset
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StoreQueryParameters
@@ -82,6 +85,7 @@ private fun streamProperties(env: Map<String, String>): Properties {
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
+    p[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
     env["KAFKA_CREDSTORE_PASSWORD"]?.let {
         p[StreamsConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
         p[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
