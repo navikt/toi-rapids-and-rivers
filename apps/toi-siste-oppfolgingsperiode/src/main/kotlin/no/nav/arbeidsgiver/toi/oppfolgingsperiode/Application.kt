@@ -27,6 +27,7 @@ import org.slf4j.MarkerFactory
 import java.time.Duration
 import java.time.Instant
 import java.util.*
+import kotlin.system.exitProcess
 
 private val log = noClassLogger()
 
@@ -88,6 +89,7 @@ fun main() {
     log.info("Antall records : $count")
     Thread.sleep(Duration.ofSeconds(10))
     log.info("Antall records etter pause : $count")
+    exitProcess(0)
     //RapidApplication.create(env).also { rapidsConnection ->
 
     //}.start()
