@@ -25,9 +25,15 @@ private const val toiOppfolgingsperiodeTopic = "toi.siste-oppfolgingsperiode-fra
 private const val poaoOppfølgingsperiodeTopic = "poao.siste-oppfolgingsperiode-v2"
 
 fun main() {
-    RapidApplication.create(System.getenv()).also { rapidsConnection ->
+    startApp(System.getenv())
+}
+
+fun startApp(envs: Map<String, String>) {
+
+    RapidApplication.create(envs).also { rapidsConnection ->
         rapidsConnection.register(object: RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
+                /*
                 val startTid = Instant.now()
                 log.info("Starter app.")
                 secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
@@ -75,6 +81,7 @@ fun main() {
                 log.info("Antall records etter pause : $count")
                 SisteOppfolgingsperiodeLytter(rapidsConnection)
                 SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
+                */
             }
         })
     }.start()
