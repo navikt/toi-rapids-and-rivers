@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import org.apache.kafka.common.TopicPartition
-import org.apache.kafka.streams.KafkaStreams
+/*import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.processor.StateRestoreListener
 
 class StateRestoreListener(private val kafkaState: () -> KafkaStreams.State): StateRestoreListener {
@@ -40,4 +40,4 @@ class StateRestoreListener(private val kafkaState: () -> KafkaStreams.State): St
         batchEndOffset: Long,
         numRestored: Long
     ) {}
-}
+}*/

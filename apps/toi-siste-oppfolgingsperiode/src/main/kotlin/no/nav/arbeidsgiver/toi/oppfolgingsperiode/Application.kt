@@ -7,10 +7,10 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.*
+/*import org.apache.kafka.streams.*
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.state.QueryableStoreTypes
-import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
+import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier*/
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
@@ -87,7 +87,7 @@ fun startApp(envs: Map<String, String>) {
     }.start()
 }
 
-private fun streamProperties(env: Map<String, String>): Properties {
+/*private fun streamProperties(env: Map<String, String>): Properties {
     val p = Properties()
     p[StreamsConfig.APPLICATION_ID_CONFIG] = "toi-siste-oppfolgingsperiode"
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
@@ -104,7 +104,7 @@ private fun streamProperties(env: Map<String, String>): Properties {
         p[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = it
     }
     return p
-}
+}*/
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
