@@ -34,7 +34,7 @@ spec:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
     - name: KAFKA_EXTRA_TOPIC
-      value: pto.siste-oppfolgingsperiode-v1
+      value: poao.siste-oppfolgingsperiode-v2
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
