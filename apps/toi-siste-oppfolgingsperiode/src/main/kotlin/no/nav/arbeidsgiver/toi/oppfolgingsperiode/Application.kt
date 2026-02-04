@@ -64,7 +64,7 @@ fun main() {
     kafkaStreams.start()
 
 
-    embeddedServer(Netty, port = 8080) {
+    val server = embeddedServer(Netty, port = 8080) {
         routing {
             get("/isalive") {
                 call.respondText("ALIVE")
@@ -89,7 +89,7 @@ fun main() {
     log.info("Antall records : $count")
     Thread.sleep(Duration.ofSeconds(10))
     log.info("Antall records etter pause : $count")
-    exitProcess(0)
+    server.stop(1000, 2000)
     //RapidApplication.create(env).also { rapidsConnection ->
 
     //}.start()
