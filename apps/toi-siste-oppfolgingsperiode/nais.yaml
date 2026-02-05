@@ -33,6 +33,8 @@ spec:
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
+    - name: KAFKA_EXTRA_TOPIC
+      value: toi.siste-oppfolgingsperiode-fra-aktorid-v1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: {{ kafka_consumer_group_id }}
     - name: KAFKA_RESET_POLICY
