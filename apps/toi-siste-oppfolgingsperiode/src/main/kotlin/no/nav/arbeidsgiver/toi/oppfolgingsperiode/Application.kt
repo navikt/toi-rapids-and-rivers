@@ -47,7 +47,7 @@ fun startApp(envs: Map<String, String>) {
                         .map { _, value ->
                             val node = objectMapper.readTree(value)
                             val aktørId = node["aktorId"].asText()
-                            log.info("Skal publisere siste oppfølgingsperiodemelding for aktørid (se securelog)")
+                            log.info("Skal dytte siste oppfølgingsperiodemelding over i toi-topic for aktørid (se securelog)")
                             secure(log).info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
                             KeyValue(aktørId, value)
                         }.to(toiOppfolgingsperiodeTopic)
