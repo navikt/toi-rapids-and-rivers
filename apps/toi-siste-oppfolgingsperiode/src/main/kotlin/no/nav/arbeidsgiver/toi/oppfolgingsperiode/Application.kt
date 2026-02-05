@@ -1,23 +1,10 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.config.SslConfigs
-import org.apache.kafka.common.serialization.Serdes
-/*import org.apache.kafka.streams.*
-import org.apache.kafka.streams.kstream.Materialized
-import org.apache.kafka.streams.state.QueryableStoreTypes
-import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier*/
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
-import java.time.Duration
-import java.time.Instant
-import java.util.*
 
 private val log = noClassLogger()
 
@@ -30,10 +17,9 @@ fun main() {
 
 fun startApp(envs: Map<String, String>) {
 
-    RapidApplication.create(envs).also { rapidsConnection ->
+    RapidApplication.create(envs).also { rapidsConnection ->/*
         rapidsConnection.register(object: RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
-                /*
                 val startTid = Instant.now()
                 log.info("Starter app.")
                 secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
@@ -81,9 +67,9 @@ fun startApp(envs: Map<String, String>) {
                 log.info("Antall records etter pause : $count")
                 SisteOppfolgingsperiodeLytter(rapidsConnection)
                 SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
-                */
             }
         })
+                */
     }.start()
 }
 
