@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -48,6 +47,8 @@ fun startApp(envs: Map<String, String>) {
                         .map { _, value ->
                             val node = objectMapper.readTree(value)
                             val aktørId = node["aktorId"].asText()
+                            log.info("Skal publisere siste oppfølgingsperiodemelding for aktørid (se securelog)")
+                            secure(log).info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
                             KeyValue(aktørId, value)
                         }.to(toiOppfolgingsperiodeTopic)
                     globalTable(
@@ -95,7 +96,6 @@ private fun streamProperties(env: Map<String, String>): Properties {
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
-    p[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
     env["KAFKA_CREDSTORE_PASSWORD"]?.let {
         p[StreamsConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
         p[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
