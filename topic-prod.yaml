@@ -36,9 +36,6 @@ spec:
       application: toi-sammenstille-kandidat
       access: readwrite
     - team: toi
-      application: toi-kandidatfeed
-      access: readwrite
-    - team: toi
       application: toi-identmapper
       access: readwrite
     - team: toi
@@ -75,9 +72,6 @@ spec:
       application: toi-ontologitjeneste
       access: readwrite
     - team: toi
-      application: toi-rapids-and-rivers-grapher
-      access: read
-    - team: toi
       application: toi-arbeidsgiver-notifikasjon
       access: readwrite
     - team: toi
@@ -85,9 +79,6 @@ spec:
       access: readwrite
     - team: toi
       application: toi-livshendelse
-      access: readwrite
-    - team: toi
-      application: toi-evaluertdatalogger
       access: readwrite
     - team: toi
       application: toi-evaluertdatalogger
@@ -115,4 +106,13 @@ spec:
       access: readwrite
     - team: toi
       application: rekrutteringsbistand-kandidatvarsel-api
+      access: readwrite
+    - team: teampam
+      application: pam-dir-api
+      access: read
+    - team: toi
+      application: rekrutteringsbistand-aktivitetskort
+      access: readwrite
+    - team: toi
+      application: rekrutteringstreff-api
       access: readwrite

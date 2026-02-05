@@ -8,7 +8,6 @@ import io.javalin.http.UnauthorizedResponse
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import no.nav.arbeidsgiver.toi.SecureLogLogger.Companion.secure
 
 class Republiserer(
     private val repository: Repository,
@@ -19,6 +18,7 @@ class Republiserer(
 ) {
 
     private val republiseringspath = "republiser"
+    private val secureLog = SecureLog(log)
 
     init {
         javalin
@@ -46,7 +46,7 @@ class Republiserer(
             context.status(404)
         } else {
             log.info("Skal republisere aktør (se securelog)")
-            secure(log).info("Skal republisere $aktørId")
+            secureLog.info("Skal republisere $aktørId")
             val pakke = lagPakke(kandidat)
             rapidsConnection.publish(aktørId, pakke.toJson())
             context.status(200)

@@ -17,7 +17,7 @@ import no.nav.security.token.support.core.configuration.IssuerProperties
 private val env = System.getenv()
 
 private val log = noClassLogger()
-private val secureLog = LoggerFactory.getLogger("secureLog")
+private val secureLog = SecureLog(log)
 
 fun opprettJavalinMedTilgangskontroll(port: Int): Javalin =
     Javalin.create {

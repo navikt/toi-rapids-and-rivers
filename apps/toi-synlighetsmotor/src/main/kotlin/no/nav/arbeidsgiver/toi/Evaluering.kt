@@ -57,8 +57,15 @@ class Evaluering(
             .none { it == Missing }
     private val ukomplettMenGirUsynlig = harAltBortsettFraAdressebeskyttelse && minstEtFeltErUsynlig
     val erFerdigBeregnet = komplettBeregningsgrunnlag || ukomplettMenGirUsynlig
-    fun erSynlig() = (felterBortsettFraAdressebeskyttelse + harIkkeAdressebeskyttelse)
-        .all { it == True } && erFerdigBeregnet
+    fun erSynlig() = harIkkeAdressebeskyttelse == True && kanBliSynlig() && erFerdigBeregnet
+
+    /**
+     * Pre-sjekk: Returnerer false hvis noen felt er False (usynlig uansett adressebeskyttelse).
+     * Brukes for å unngå unødvendig adressebeskyttelse-oppslag.
+     */
+    fun kanBliSynlig(): Boolean {
+        return felterBortsettFraAdressebeskyttelse.all { it == True }
+    }
 
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(

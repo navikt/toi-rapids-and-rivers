@@ -4,7 +4,6 @@ include(
     "apps:toi-arbeidsmarked-cv",
     "apps:toi-veileder",
     "apps:toi-sammenstille-kandidat",
-    "apps:toi-kandidatfeed",
     "apps:toi-oppfolgingsinformasjon",
     "apps:toi-siste-14a-vedtak",
     "apps:toi-identmapper",
