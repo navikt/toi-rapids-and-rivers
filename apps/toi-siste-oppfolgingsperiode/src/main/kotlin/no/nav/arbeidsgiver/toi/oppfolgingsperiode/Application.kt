@@ -1,10 +1,27 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
 import no.nav.helse.rapids_rivers.RapidApplication
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.KeyValue
+import org.apache.kafka.streams.StoreQueryParameters
+import org.apache.kafka.streams.StreamsBuilder
+import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.state.QueryableStoreTypes
+import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
+import java.time.Duration
+import java.time.Instant
+import java.util.Properties
 
 private val log = noClassLogger()
 
@@ -17,7 +34,7 @@ fun main() {
 
 fun startApp(envs: Map<String, String>) {
 
-    RapidApplication.create(envs).also { rapidsConnection ->/*
+    RapidApplication.create(envs).also { rapidsConnection ->
         rapidsConnection.register(object: RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 val startTid = Instant.now()
@@ -69,11 +86,10 @@ fun startApp(envs: Map<String, String>) {
                 SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
             }
         })
-                */
     }.start()
 }
 
-/*private fun streamProperties(env: Map<String, String>): Properties {
+private fun streamProperties(env: Map<String, String>): Properties {
     val p = Properties()
     p[StreamsConfig.APPLICATION_ID_CONFIG] = "toi-siste-oppfolgingsperiode"
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
@@ -90,7 +106,7 @@ fun startApp(envs: Map<String, String>) {
         p[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = it
     }
     return p
-}*/
+}
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)

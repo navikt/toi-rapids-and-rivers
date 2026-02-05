@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    //implementation("org.apache.kafka:kafka-streams:4.1.0")
+    implementation("org.apache.kafka:kafka-streams:4.1.0")
 }
