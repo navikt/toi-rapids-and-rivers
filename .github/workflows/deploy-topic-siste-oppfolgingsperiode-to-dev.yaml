@@ -1,18 +1,17 @@
-name: Deploy rapid-topic to dev
+name: Deploy siste oppfolgingsperiode-topic to dev
 
 on:
   push:
     branches:
       - main
       - ny-oppfølgingsperiode
-      - synlig_for_muligheter
     paths:
-      - .github/workflows/deploy-topic-to-dev.yaml
-      - topic-dev.yaml
+      - .github/workflows/deploy-topic-siste-oppfolgingsperiode-to-dev.yaml
+      - apps/toi-siste-oppfolgingsperiode/topic-dev.yaml
 
 jobs:
   deploy-rapid-to-dev:
-    name: Deploy rapid-topic to dev
+    name: Deploy siste-oppfølgingsperiode-topic to dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -20,7 +19,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: topic-dev.yaml
+          RESOURCE: apps/toi-siste-oppfolgingsperiode/topic-dev.yaml
     permissions:
       contents: read
       id-token: write

@@ -9,6 +9,7 @@ include(
     "apps:toi-identmapper",
     "apps:toi-synlighetsmotor",
     "apps:toi-oppfolgingsperiode",
+    "apps:toi-siste-oppfolgingsperiode",
     "apps:toi-organisasjonsenhet",
     "apps:toi-helseapp",
     "apps:toi-hull-i-cv",
