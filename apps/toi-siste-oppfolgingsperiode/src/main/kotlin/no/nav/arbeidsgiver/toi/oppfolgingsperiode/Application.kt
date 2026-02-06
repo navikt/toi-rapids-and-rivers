@@ -77,8 +77,6 @@ fun startApp(envs: Map<String, String>) {
                         QueryableStoreTypes.keyValueStore<String, String>()
                     )
                 )
-                val eksempelVerdi = store.all().iterator().next()
-                log.info("Eksempel: Key ${eksempelVerdi.key}, Value ${eksempelVerdi.value}")
                 val count = store.approximateNumEntries()
                 log.info("Antall records : $count")
                 Thread.sleep(Duration.ofSeconds(10))
