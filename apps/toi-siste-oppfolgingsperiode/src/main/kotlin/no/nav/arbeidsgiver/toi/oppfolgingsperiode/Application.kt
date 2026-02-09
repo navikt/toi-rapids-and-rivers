@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import no.nav.arbeidsgiver.toi.oppfolgingsperiode.SecureLogLogger.Companion.secure
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
@@ -38,7 +37,7 @@ fun startApp(envs: Map<String, String>) {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 val startTid = Instant.now()
                 log.info("Starter app.")
-                secure(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+                secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
                 val objectMapper = jacksonObjectMapper()
 
@@ -48,7 +47,7 @@ fun startApp(envs: Map<String, String>) {
                             val node = objectMapper.readTree(value)
                             val aktørId = node["aktorId"].asText()
                             log.info("Skal dytte siste oppfølgingsperiodemelding over i toi-topic for aktørid (se securelog)")
-                            secure(log).info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
+                            secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
                             KeyValue(aktørId, value)
                         }.to(toiOppfolgingsperiodeTopic)
                     globalTable(
@@ -108,6 +107,8 @@ private fun streamProperties(env: Map<String, String>): Properties {
 
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
+val Any.secureLog: Logger
+    get() = SecureLog(log)
 
 /**
  * Convenience for å slippe å skrive eksplistt navn på Logger når Logger opprettes. Ment å tilsvare Java-måten, hvor
@@ -130,37 +131,143 @@ fun noClassLogger(): Logger {
     return LoggerFactory.getLogger(callerClassName)
 }
 
-class SecureLogLogger private constructor(private val l: Logger) {
+private val teamLogsMarker: Marker = MarkerFactory.getMarker("TEAM_LOGS")
 
-    val markerName: String = "SECURE_LOG"
+class SecureLog(private val logger: Logger): Logger {
+    override fun getName() = logger.name
+    override fun isTraceEnabled() = logger.isTraceEnabled
+    override fun trace(msg: String?) = logger.trace(teamLogsMarker, msg)
+    override fun trace(format: String?, arg: Any?) = logger.trace(teamLogsMarker, format, arg)
+    override fun trace(format: String?, arg1: Any?, arg2: Any?) = logger.trace(teamLogsMarker, format, arg1, arg2)
+    override fun trace(format: String?, vararg arguments: Any?) = logger.trace(teamLogsMarker, format, *arguments)
+    override fun trace(msg: String?, t: Throwable?) = logger.trace(teamLogsMarker, msg, t)
+    override fun isTraceEnabled(marker: Marker?): Boolean = logger.isTraceEnabled(marker)
+    override fun isDebugEnabled() = logger.isDebugEnabled
+    override fun debug(msg: String?) = logger.debug(teamLogsMarker, msg)
+    override fun debug(format: String?, arg: Any?) = logger.debug(teamLogsMarker, format, arg)
+    override fun debug(format: String?, arg1: Any?, arg2: Any?) = logger.debug(teamLogsMarker, format, arg1, arg2)
+    override fun debug(format: String?, vararg arguments: Any?) = logger.debug(teamLogsMarker, format, *arguments)
+    override fun debug(msg: String?, t: Throwable?) = logger.debug(teamLogsMarker, msg, t)
+    override fun isDebugEnabled(marker: Marker?) = logger.isDebugEnabled(marker)
+    override fun isInfoEnabled() = logger.isInfoEnabled
+    override fun info(msg: String?) = logger.info(teamLogsMarker, msg)
+    override fun info(format: String?, arg: Any?) = logger.info(teamLogsMarker, format, arg)
+    override fun info(format: String?, arg1: Any?, arg2: Any?) = logger.info(teamLogsMarker, format, arg1, arg2)
+    override fun info(format: String?, vararg arguments: Any?) = logger.info(teamLogsMarker, format, *arguments)
+    override fun info(msg: String?, t: Throwable?) = logger.info(teamLogsMarker, msg, t)
+    override fun isInfoEnabled(marker: Marker?) = logger.isInfoEnabled(marker)
+    override fun isWarnEnabled() = logger.isWarnEnabled
+    override fun warn(msg: String?) = logger.warn(teamLogsMarker, msg)
+    override fun warn(format: String?, arg: Any?) = logger.warn(teamLogsMarker, format, arg)
+    override fun warn(format: String?, vararg arguments: Any?) = logger.warn(teamLogsMarker, format, *arguments)
+    override fun warn(format: String?, arg1: Any?, arg2: Any?) = logger.warn(teamLogsMarker, format, arg1, arg2)
+    override fun warn(msg: String?, t: Throwable?) = logger.warn(teamLogsMarker, msg, t)
+    override fun isWarnEnabled(marker: Marker?) = logger.isWarnEnabled(marker)
+    override fun isErrorEnabled() = logger.isErrorEnabled
+    override fun error(msg: String?) = logger.error(teamLogsMarker, msg)
+    override fun error(format: String?, arg: Any?) = logger.error(teamLogsMarker, format, arg)
+    override fun error(format: String?, arg1: Any?, arg2: Any?) = logger.error(teamLogsMarker, format, arg1, arg2)
+    override fun error(format: String?, vararg arguments: Any?) = logger.error(teamLogsMarker, format, *arguments)
+    override fun error(msg: String?, t: Throwable?) = logger.error(teamLogsMarker, msg, t)
+    override fun isErrorEnabled(marker: Marker?) = logger.isErrorEnabled(marker)
 
-    private val m: Marker = MarkerFactory.getMarker(markerName)
-
-    fun info(msg: String) {
-        l.info(m, msg)
+    override fun trace(marker: Marker?, msg: String?) {
+        TODO("Ikke bruk denne metoden")
     }
 
-    fun info(msg: String, t: Throwable) {
-        l.info(m, msg, t)
+    override fun trace(marker: Marker?, format: String?, arg: Any?) {
+        TODO("Ikke bruk denne metoden")
     }
 
-    fun warn(msg: String) {
-        l.warn(m, msg)
+    override fun trace(marker: Marker?, format: String?, arg1: Any?, arg2: Any?) {
+        TODO("Ikke bruk denne metoden")
     }
 
-    fun warn(msg: String, t: Throwable) {
-        l.warn(m, msg, t)
+    override fun trace(marker: Marker?, format: String?, vararg argArray: Any?) {
+        TODO("Ikke bruk denne metoden")
     }
 
-    fun error(msg: String) {
-        l.error(m, msg)
+    override fun trace(marker: Marker?, msg: String?, t: Throwable?) {
+        TODO("Ikke bruk denne metoden")
     }
 
-    fun error(msg: String, t: Throwable) {
-        l.error(m, msg, t)
+    override fun debug(marker: Marker?, msg: String?) {
+        TODO("Ikke bruk denne metoden")
     }
 
-    companion object {
-        fun secure(l: Logger) = SecureLogLogger(l)
+    override fun debug(marker: Marker?, format: String?, arg: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun debug(marker: Marker?, format: String?, arg1: Any?, arg2: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun debug(marker: Marker?, format: String?, vararg arguments: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun debug(marker: Marker?, msg: String?, t: Throwable?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun info(marker: Marker?, msg: String?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun info(marker: Marker?, format: String?, arg: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun info(marker: Marker?, format: String?, arg1: Any?, arg2: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun info(marker: Marker?, format: String?, vararg arguments: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun info(marker: Marker?, msg: String?, t: Throwable?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun warn(marker: Marker?, msg: String?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun warn(marker: Marker?, format: String?, arg: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun warn(marker: Marker?, format: String?, arg1: Any?, arg2: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun warn(marker: Marker?, format: String?, vararg arguments: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun warn(marker: Marker?, msg: String?, t: Throwable?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun error(marker: Marker?, msg: String?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun error(marker: Marker?, format: String?, arg: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun error(marker: Marker?, format: String?, arg1: Any?, arg2: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun error(marker: Marker?, format: String?, vararg arguments: Any?) {
+        TODO("Ikke bruk denne metoden")
+    }
+
+    override fun error(marker: Marker?, msg: String?, t: Throwable?) {
+        TODO("Ikke bruk denne metoden")
     }
 }
