@@ -78,7 +78,7 @@ fun startApp(envs: Map<String, String>) {
                 )
                 val count = store.approximateNumEntries()
                 log.info("Antall records : $count")
-                Thread.sleep(Duration.ofSeconds(10))
+                Thread.sleep(Duration.ofSeconds(30))
                 log.info("Antall records etter pause : $count")
                 SisteOppfolgingsperiodeLytter(rapidsConnection)
                 SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
