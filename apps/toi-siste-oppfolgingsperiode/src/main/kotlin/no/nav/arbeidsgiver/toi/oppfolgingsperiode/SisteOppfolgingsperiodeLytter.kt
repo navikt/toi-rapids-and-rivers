@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory
 
 class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
-
     init {
         River(rapidsConnection).apply {
             precondition{
