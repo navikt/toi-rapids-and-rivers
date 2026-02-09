@@ -1,4 +1,4 @@
-name: Deploy siste oppfolgingsperiode-topic to dev
+name: Deploy siste oppfolgingsperiode-topic to prod
 
 on:
   push:
@@ -9,15 +9,15 @@ on:
       - apps/toi-siste-oppfolgingsperiode/topic-prod.yaml
 
 jobs:
-  deploy-rapid-to-dev:
-    name: Deploy siste-oppfølgingsperiode-topic to dev
+  deploy-rapid-to-prod:
+    name: Deploy siste-oppfølgingsperiode-topic to prod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-gcp
+          CLUSTER: prod-gcp
           RESOURCE: apps/toi-siste-oppfolgingsperiode/topic-prod.yaml
     permissions:
       contents: read
