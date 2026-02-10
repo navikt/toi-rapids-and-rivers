@@ -10,6 +10,7 @@ include(
     "apps:toi-synlighetsmotor",
     "apps:toi-oppfolgingsperiode",
     "apps:toi-siste-oppfolgingsperiode",
+    "apps:toi-siste-oppfolgingsperiode-pond",
     "apps:toi-organisasjonsenhet",
     "apps:toi-helseapp",
     "apps:toi-hull-i-cv",

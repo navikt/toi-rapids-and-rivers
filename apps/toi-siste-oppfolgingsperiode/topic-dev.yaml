@@ -18,6 +18,9 @@ spec:
     retentionHours: 336
   acl:
     - team: toi
+      application: toi-siste-oppfolgingsperiode-pond
+      access: read
+    - team: toi
       application: toi-siste-oppfolgingsperiode
       access: readwrite
     - team: toi
