@@ -31,8 +31,14 @@ fun main() {
 }
 
 fun startApp(envs: Map<String, String>) {
+    var antallIStore: () -> Long = { 0 }
 
-    RapidApplication.create(envs).also { rapidsConnection ->
+    RapidApplication.create(envs, builder = {
+        withIsAliveCheck {
+            log.info("antallIStore: $antallIStore")
+            true
+        }
+    }).also { rapidsConnection ->
         rapidsConnection.register(object: RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
                 val startTid = Instant.now()
@@ -80,6 +86,7 @@ fun startApp(envs: Map<String, String>) {
                 log.info("Antall records : $count")
                 Thread.sleep(Duration.ofSeconds(30))
                 log.info("Antall records etter pause : $count")
+                antallIStore = store::approximateNumEntries
                 SisteOppfolgingsperiodeLytter(rapidsConnection)
                 SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
             }
