@@ -35,7 +35,7 @@ fun startApp(envs: Map<String, String>) {
 
     RapidApplication.create(envs, builder = {
         withIsAliveCheck {
-            log.info("antallIStore: $antallIStore")
+            log.info("antallIStore: ${antallIStore()}")
             true
         }
     }).also { rapidsConnection ->
