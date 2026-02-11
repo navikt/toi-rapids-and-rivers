@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -53,7 +52,6 @@ fun startApp(envs: Map<String, String>) {
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
-    kafkaStreams.cleanUp()
     kafkaStreams.start()
 }
 
