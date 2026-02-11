@@ -53,17 +53,16 @@ fun startApp(envs: Map<String, String>) {
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
-
+    kafkaStreams.cleanUp()
     kafkaStreams.start()
 }
 
 private fun streamProperties(env: Map<String, String>): Properties {
     val p = Properties()
-    p[StreamsConfig.APPLICATION_ID_CONFIG] = "toi-siste-oppfolgingsperiode-1"
+    p[StreamsConfig.APPLICATION_ID_CONFIG] = "toi-siste-oppfolgingsperiode"
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
-    p[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
     env["KAFKA_CREDSTORE_PASSWORD"]?.let {
         p[StreamsConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
         p[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
