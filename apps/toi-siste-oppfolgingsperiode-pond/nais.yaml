@@ -30,6 +30,11 @@ spec:
   kafka:
     pool: {{ kafka_pool }}
     streams: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
   env:
     - name: KAFKA_RAPID_TOPIC
       value: toi.rapid-1
