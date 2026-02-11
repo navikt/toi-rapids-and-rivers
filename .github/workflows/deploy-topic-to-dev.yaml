@@ -6,6 +6,7 @@ on:
       - main
       - ny-oppfølgingsperiode
       - synlig_for_muligheter
+      - splitt-applikasjoner
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml
