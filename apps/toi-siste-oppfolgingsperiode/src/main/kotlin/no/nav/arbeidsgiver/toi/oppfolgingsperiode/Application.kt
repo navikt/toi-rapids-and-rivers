@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.javalin.Javalin
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
@@ -12,7 +13,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
-import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -53,6 +53,15 @@ fun startApp(envs: Map<String, String>) {
     }.build()
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
+
+    Javalin.create().apply {
+        get("/isalive") { context ->
+            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+        }
+        get("/isready") { context ->
+            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+        }
+    }.start(8080)
     kafkaStreams.start()
 }
 
