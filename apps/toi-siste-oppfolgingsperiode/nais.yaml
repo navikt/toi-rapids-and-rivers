@@ -31,7 +31,7 @@ spec:
     enabled: true
   kafka:
     pool: {{ kafka_pool }}
-    streams: true
+    streams: false
   accessPolicy:
     outbound:
       rules:
