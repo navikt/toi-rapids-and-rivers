@@ -37,9 +37,9 @@ spec:
         - host: {{notifikasjon_api_host}}
     inbound:
       rules:
-        - application: rekrutteringsbistand
-          cluster: {{cluster}}
         - application: rekrutteringsbistand-frontend
+          cluster: {{cluster}}
+        - application: rekrutteringsbistand-frontend2
           cluster: {{cluster}}
   azure:
     application:
