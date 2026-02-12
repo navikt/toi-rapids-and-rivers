@@ -58,7 +58,7 @@ fun startApp(envs: Map<String, String>) {
 
 private fun streamProperties(env: Map<String, String>): Properties {
     val p = Properties()
-    p[StreamsConfig.APPLICATION_ID_CONFIG] = "toi-siste-oppfolgingsperiode-v1"
+    p[StreamsConfig.APPLICATION_ID_CONFIG] = env["KAFKA_STREAMS_APPLICATION_ID"] + "-v1"
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
