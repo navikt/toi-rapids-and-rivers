@@ -1,18 +1,20 @@
-package no.nav.toi.stilling.publiser.dirstilling
+package no.nav.toi.stilling.publiser.dirstilling.dto
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.toi.stilling.publiser.dirstilling.log
 import java.time.ZonedDateTime
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 data class RapidHendelse(
     val stillingsId: String,
-    val direktemeldtStilling: DirektemeldtStilling
+    val direktemeldtStilling: DirektemeldtStilling,
+    val stillingsinfo: Stillingsinfo?
 ) {
     companion object {
         private val mapper = jacksonObjectMapper()
@@ -38,7 +40,7 @@ data class DirektemeldtStilling(
     val publisert: ZonedDateTime? = null,
     val publisertAvAdmin: String?,
 ) {
-    fun konverterTilStilling(): Stilling = Stilling(
+    fun konverterTilStilling(stillingskategori: Stillingskategori?): Stilling = Stilling(
         uuid = stillingsId,
         created = konverterDato(opprettet),
         updated = konverterDato(sistEndret),
@@ -58,7 +60,8 @@ data class DirektemeldtStilling(
         properties = innhold.properties,
         publishedByAdmin = parseLocalDateTime(publisertAvAdmin),
         businessName = innhold.businessName,
-        adnr = annonsenr.toString()
+        adnr = annonsenr.toString(),
+        stillingskategori = stillingskategori
     )
 
     private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
@@ -73,7 +76,7 @@ data class DirektemeldtStilling(
     private fun parseLocalDateTime(dateTime: String?): LocalDateTime? {
         if (dateTime == null) return null
         return try {
-            LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME)
+            LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_DATE_TIME)
                 .atZone(ZoneId.of("Europe/Oslo"))
                 .toLocalDateTime()
         } catch (e: Exception) {

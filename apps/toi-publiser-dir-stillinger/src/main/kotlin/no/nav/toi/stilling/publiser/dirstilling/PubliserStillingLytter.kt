@@ -11,6 +11,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.publiser.dirstilling.dto.RapidHendelse
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import java.util.*
@@ -23,6 +24,7 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("direktemeldtStilling")
+                it.interestedIn("stillingsinfo")
                 it.requireValue("@event_name", "indekserDirektemeldtStilling")
                 it.forbid("stilling") // Ikke les meldingen på nytt etter at den har vært innom stillingPopulator
             }
@@ -45,7 +47,8 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
         val direktemeldtStilling = RapidHendelse.fraJson(packet).direktemeldtStilling
         log.info("Mottok stilling med stillingsId ${direktemeldtStilling.stillingsId}")
 
-        val stilling = direktemeldtStilling.konverterTilStilling()
+        val stillingskategori = RapidHendelse.fraJson(packet).stillingsinfo
+        val stilling = direktemeldtStilling.konverterTilStilling(stillingskategori?.stillingskategori)
         val melding = ProducerRecord(publiseringTopic, stilling.uuid.toString(), objectMapper.writeValueAsString(stilling))
 
         dirStillingProducer.send(melding) { _, exception ->
