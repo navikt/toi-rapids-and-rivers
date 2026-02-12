@@ -57,9 +57,9 @@ spec:
       rules:
         - application: rekrutteringsbistand-container
           cluster: {{ cluster }}
-        - application: rekrutteringsbistand
-          cluster: {{ cluster }}
         - application: rekrutteringsbistand-frontend
+          cluster: {{ cluster }}
+        - application: rekrutteringsbistand-frontend2
           cluster: {{ cluster }}
     outbound:
       rules:
