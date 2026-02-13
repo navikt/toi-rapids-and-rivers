@@ -1,68 +1,83 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.javalin.Javalin
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
-import org.apache.kafka.streams.KeyValue
+import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.state.QueryableStoreTypes
+import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
-import java.time.ZonedDateTime
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 
-private val log = noClassLogger()
 
 private const val toiOppfolgingsperiodeTopic = "toi.siste-oppfolgingsperiode-fra-aktorid-v1"
-private const val poaoOppfølgingsperiodeTopic = "poao.siste-oppfolgingsperiode-v2"
 
 fun main() {
     startApp(System.getenv())
 }
 
 fun startApp(envs: Map<String, String>) {
-    log.info("Starter app.")
-    SecureLog(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+    var antallIStore: () -> Long = { 0 }
 
-    val objectMapper = jacksonObjectMapper()
-
-    val topology = StreamsBuilder().apply {
-        stream<String, String>(poaoOppfølgingsperiodeTopic)
-            .map { _, value ->
-                val node = objectMapper.readTree(value)
-                val aktørId = node["aktorId"].asText()
-                log.info("Skal dytte siste oppfølgingsperiodemelding over i toi-topic for aktørid (se securelog)")
-                secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
-                KeyValue(aktørId, value)
-            }
-            .groupByKey()
-            .reduce { oldValue, newValue ->
-                val oldNode = objectMapper.readTree(oldValue)
-                val newNode = objectMapper.readTree(newValue)
-                val oldTid = ZonedDateTime.parse(oldNode["producerTimestamp"].asText())
-                val newTid = ZonedDateTime.parse(newNode["producerTimestamp"].asText())
-                if (newTid.isAfter(oldTid)) newValue else oldValue
-            }
-            .toStream()
-            .to(toiOppfolgingsperiodeTopic)
-    }.build()
-    val env = System.getenv()
-    val kafkaStreams = KafkaStreams(topology, streamProperties(env))
-
-    Javalin.create().apply {
-        get("/isalive") { context ->
-            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+    RapidApplication.create(envs, builder = {
+        withIsAliveCheck {
+            log.info("antallIStore: ${antallIStore()}")
+            true
         }
-        get("/isready") { context ->
-            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
-        }
-    }.start(8080)
-    kafkaStreams.start()
+    }).also { rapidsConnection ->
+        rapidsConnection.register(object: RapidsConnection.StatusListener {
+            override fun onStartup(rapidsConnection: RapidsConnection) {
+                val startTid = Instant.now()
+                log.info("Starter app.")
+                secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+
+                val topology = StreamsBuilder().apply {
+                    globalTable(
+                        toiOppfolgingsperiodeTopic,
+                        Materialized.`as`<String, String>(
+                            RocksDBKeyValueBytesStoreSupplier(toiOppfolgingsperiodeTopic, false)
+                        ).withKeySerde(Serdes.String()).withValueSerde(Serdes.String())
+                    )
+                }.build()
+                val env = System.getenv()
+                val kafkaStreams = KafkaStreams(topology, streamProperties(env))
+
+                val stateRestoreListener = StateRestoreListener(kafkaStreams::state)
+
+                kafkaStreams.setGlobalStateRestoreListener(stateRestoreListener)
+                kafkaStreams.start()
+
+                while (!stateRestoreListener.isReady()) {
+                    log.info("Venter på at Kafka Streams skal bli klar...")
+                    Thread.sleep(1000)
+                }
+                log.info("Kafka Streams er klar! Oppstartstid: ${Duration.between(startTid, Instant.now())}")
+                val store = kafkaStreams.store(
+                    StoreQueryParameters.fromNameAndType(
+                        toiOppfolgingsperiodeTopic,
+                        QueryableStoreTypes.keyValueStore<String, String>()
+                    )
+                )
+                val count = store.approximateNumEntries()
+                log.info("Antall records : $count")
+                Thread.sleep(Duration.ofSeconds(30))
+                log.info("Antall records etter pause : $count")
+                antallIStore = store::approximateNumEntries
+                SisteOppfolgingsperiodeLytter(rapidsConnection)
+                SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
+            }
+        })
+    }.start()
 }
 
 private fun streamProperties(env: Map<String, String>): Properties {
@@ -71,7 +86,6 @@ private fun streamProperties(env: Map<String, String>): Properties {
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
-    p[StreamsConfig.consumerPrefix(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG)] = "earliest"
     env["KAFKA_CREDSTORE_PASSWORD"]?.let {
         p[StreamsConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
         p[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"

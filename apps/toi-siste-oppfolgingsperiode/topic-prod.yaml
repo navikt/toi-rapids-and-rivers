@@ -18,8 +18,8 @@ spec:
     retentionHours: -1
   acl:
     - team: toi
-      application: toi-siste-oppfolgingsperiode
-      access: readwrite
+      application: toi-siste-oppfolgingsperiode-pond
+      access: read
     - team: toi
-      application: toi-kafkamanager
+      application: toi-siste-oppfolgingsperiode
       access: readwrite

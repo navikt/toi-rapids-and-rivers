@@ -117,5 +117,5 @@ spec:
       application: rekrutteringstreff-api
       access: readwrite
     - team: toi
-      application: toi-siste-oppfolgingsperiode
+      application: toi-siste-oppfolgingsperiode-pond
       access: readwrite

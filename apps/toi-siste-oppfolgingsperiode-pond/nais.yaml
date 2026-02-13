@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: toi-siste-oppfolgingsperiode
+  name: toi-siste-oppfolgingsperiode-pond
   namespace: toi
   labels:
     team: toi
@@ -16,10 +16,8 @@ spec:
     enabled: true
     path: /metrics
   replicas:
-    min: 1
-    max: 1  # Program er laget for å bare ha en instans. Om det er flere kan det føre til at eldre meldinger kan pushes til nytt topic, etter nye.
-  strategy:
-    type: Recreate # Recreate sørger for at det ikke er flere instanser av appen som kjører samtidig, og dermed unngår at eldre meldinger kan pushes til nytt topic, etter nye.
+    min: 2
+    max: 2
   resources:
     limits:
       cpu: 500m
@@ -37,6 +35,15 @@ spec:
       rules:
         - application: logging
           namespace: nais-system
+  env:
+    - name: KAFKA_RAPID_TOPIC
+      value: toi.rapid-1
+    - name: KAFKA_EXTRA_TOPIC
+      value: toi.siste-oppfolgingsperiode-fra-aktorid-v1
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: {{ kafka_consumer_group_id }}
+    - name: KAFKA_RESET_POLICY
+      value: "earliest"
   observability:
     logging:
       destinations:

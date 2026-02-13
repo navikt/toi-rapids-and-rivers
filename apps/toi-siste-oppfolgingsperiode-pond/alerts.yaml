@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: toi-siste-oppfolgingsperiode-pond
+  namespace: toi
+  labels:
+    team: toi
+spec:
+  groups:
+    - name: toi-siste-oppfolgingsperiode-pond
+      rules:
+        - alert: toi-siste-oppfolgingsperiode-pond
+          expr: kube_deployment_status_replicas_available{deployment="toi-siste-oppfolgingsperiode-pond"} == 0
+          for: 2m
+          annotations:
+            summary: Appen er nede
+            action: "https://logs.az.nav.no/goto/c3f6c04a3a818f5b610e77e8e980e694?security_tenant=navlogs"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-siste-oppfolgingsperiode-pond
+          expr: sum(increase(log_messages_errors{app="toi-siste-oppfolgingsperiode-pond", level="Error"}[10m])) > 0
+          for: 1s
+          annotations:
+            summary: Appen har logget en error
+            action: "https://logs.az.nav.no/goto/c3f6c04a3a818f5b610e77e8e980e694?security_tenant=navlogs"
+          labels:
+            namespace: toi
+            severity: critical
+
+        - alert: toi-siste-oppfolgingsperiode-pond
+          expr: sum(increase(log_messages_errors{app="toi-siste-oppfolgingsperiode-pond", level="Warning"}[10m])) > 3
+          for: 1s
+          annotations:
+            summary: Økning i warnings
+            action: "https://logs.az.nav.no/goto/c3f6c04a3a818f5b610e77e8e980e694?security_tenant=navlogs"
+          labels:
+            namespace: toi
+            severity: warning

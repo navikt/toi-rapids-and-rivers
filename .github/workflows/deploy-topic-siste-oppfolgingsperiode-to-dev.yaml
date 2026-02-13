@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - ny-oppfølgingsperiode
+      - splitt-applikasjoner
     paths:
       - .github/workflows/deploy-topic-siste-oppfolgingsperiode-to-dev.yaml
       - apps/toi-siste-oppfolgingsperiode/topic-dev.yaml

@@ -114,5 +114,5 @@ spec:
       application: pam-dir-api
       access: read
     - team: toi
-      application: toi-siste-oppfolgingsperiode
+      application: toi-siste-oppfolgingsperiode-pond
       access: readwrite

@@ -1,10 +1,10 @@
-name:  toi-siste-oppfolgingsperiode
+name:  toi-siste-oppfolgingsperiode-pond
 
 on:
   push:
     paths:
-    - apps/toi-siste-oppfolgingsperiode/**
-    - .github/workflows/deploy-toi-siste-oppfolgingsperiode.yaml
+    - apps/toi-siste-oppfolgingsperiode-pond/**
+    - .github/workflows/deploy-toi-siste-oppfolgingsperiode-pond.yaml
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
     - technical-libs/testrapid
