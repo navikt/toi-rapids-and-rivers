@@ -6,7 +6,7 @@ metadata:
   labels:
     team: toi
   annotations:
-    kafka.nais.io/removeDataWhenResourceIsDeleted: "false"
+    kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
 spec:
   pool: nav-prod
   config:
