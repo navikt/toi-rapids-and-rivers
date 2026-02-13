@@ -57,11 +57,10 @@ data class DirektemeldtStilling(
         employer = innhold.employer,
         locationList = innhold.locationList,
         categoryList = innhold.categoryList,
-        properties = innhold.properties,
+        properties = innhold.properties + ("direktemeldtStillingskategori" to (stillingskategori?.name?: "")),
         publishedByAdmin = parseLocalDateTime(publisertAvAdmin),
         businessName = innhold.businessName,
         adnr = annonsenr.toString(),
-        stillingskategori = stillingskategori
     )
 
     private fun konverterDato(dato: ZonedDateTime): LocalDateTime {

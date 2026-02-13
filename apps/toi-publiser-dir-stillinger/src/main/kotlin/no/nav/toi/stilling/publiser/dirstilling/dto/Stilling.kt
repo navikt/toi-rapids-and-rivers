@@ -26,5 +26,4 @@ data class Stilling(
     val properties: Map<String, String> = HashMap(),
     val contactList: List<Contact> = ArrayList(),
     val title: String,
-    val stillingskategori: Stillingskategori?,
 )
