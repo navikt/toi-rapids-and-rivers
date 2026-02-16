@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-
+    testImplementation("org.testcontainers:testcontainers-kafka:2.0.3")
 }

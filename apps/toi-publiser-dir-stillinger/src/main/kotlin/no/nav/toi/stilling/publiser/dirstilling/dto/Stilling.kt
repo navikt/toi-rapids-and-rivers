@@ -1,7 +1,9 @@
-package no.nav.toi.stilling.publiser.dirstilling
+package no.nav.toi.stilling.publiser.dirstilling.dto
 
 import java.time.LocalDateTime
-import java.util.*
+import java.util.ArrayList
+import java.util.HashMap
+import java.util.UUID
 
 data class Stilling(
     val uuid: UUID,
