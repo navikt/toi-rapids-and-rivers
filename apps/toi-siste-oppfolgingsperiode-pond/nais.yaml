@@ -10,7 +10,8 @@ spec:
   port: 8080
   liveness:
     path: /isalive
-    periodSeconds: 60
+    periodSeconds: 60 # TODO: Fjern etter testing
+    timeout: 55       # TODO: Fjern etter testing
   readiness:
     path: /isready
   prometheus:
