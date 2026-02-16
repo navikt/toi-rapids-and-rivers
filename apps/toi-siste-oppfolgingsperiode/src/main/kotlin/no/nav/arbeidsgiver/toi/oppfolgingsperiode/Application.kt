@@ -56,10 +56,14 @@ fun startApp(envs: Map<String, String>) {
 
     Javalin.create().apply {
         get("/isalive") { context ->
-            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+            val state = kafkaStreams.state()
+            log.info("isalive er kalt ($state)")
+            context.status(if (state == KafkaStreams.State.RUNNING) 200 else 500)
         }
         get("/isready") { context ->
-            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+            val state = kafkaStreams.state()
+            log.info("isready er kalt ($state)")
+            context.status(if (state == KafkaStreams.State.RUNNING) 200 else 500)
         }
     }.start(8080)
     kafkaStreams.start()
