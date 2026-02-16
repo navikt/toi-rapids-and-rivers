@@ -36,7 +36,6 @@ fun startApp(envs: Map<String, String>) {
             .map { _, value ->
                 val node = objectMapper.readTree(value)
                 val aktørId = node["aktorId"].asText()
-                log.info("Skal dytte siste oppfølgingsperiodemelding over i toi-topic for aktørid (se securelog)")
                 secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
                 KeyValue(aktørId, value)
             }
@@ -56,14 +55,10 @@ fun startApp(envs: Map<String, String>) {
 
     Javalin.create().apply {
         get("/isalive") { context ->
-            val state = kafkaStreams.state()
-            log.info("isalive er kalt ($state)")
-            context.status(if (state == KafkaStreams.State.RUNNING) 200 else 500)
+            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
         }
         get("/isready") { context ->
-            val state = kafkaStreams.state()
-            log.info("isready er kalt ($state)")
-            context.status(if (state == KafkaStreams.State.RUNNING) 200 else 500)
+            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
         }
     }.start(8080)
     kafkaStreams.start()

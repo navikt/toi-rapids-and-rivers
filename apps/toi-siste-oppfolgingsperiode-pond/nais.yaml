@@ -10,16 +10,14 @@ spec:
   port: 8080
   liveness:
     path: /isalive
-    periodSeconds: 60 # TODO: Fjern etter testing
-    timeout: 55       # TODO: Fjern etter testing
   readiness:
     path: /isready
   prometheus:
     enabled: true
     path: /metrics
   replicas:
-    min: 2
-    max: 2
+    min: 1
+    max: {{ max_replicas }}
   resources:
     limits:
       cpu: 500m
