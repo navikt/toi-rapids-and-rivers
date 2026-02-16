@@ -10,6 +10,7 @@ import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.state.QueryableStoreTypes
+import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,7 +28,7 @@ fun main() {
 }
 
 fun startApp(envs: Map<String, String>) {
-    var antallIStore: () -> Long = { 0 }
+    var antallIStore: () -> Int = { 0 }
 
     RapidApplication.create(envs, builder = {
         withIsAliveCheck {
@@ -68,17 +69,19 @@ fun startApp(envs: Map<String, String>) {
                         QueryableStoreTypes.keyValueStore<String, String>()
                     )
                 )
-                val count = store.approximateNumEntries()
+                val count = store.exactNumEntries()
                 log.info("Antall records : $count")
                 Thread.sleep(Duration.ofSeconds(30))
                 log.info("Antall records etter pause : $count")
-                antallIStore = store::approximateNumEntries
+                antallIStore = store::exactNumEntries
                 SisteOppfolgingsperiodeLytter(rapidsConnection)
                 SisteOppfolgingsperiodeBehovsLytter(rapidsConnection, store::get)
             }
         })
     }.start()
 }
+
+private fun ReadOnlyKeyValueStore<String, String>.exactNumEntries() = all().asSequence().count()
 
 private fun streamProperties(env: Map<String, String>): Properties {
     val p = Properties()
