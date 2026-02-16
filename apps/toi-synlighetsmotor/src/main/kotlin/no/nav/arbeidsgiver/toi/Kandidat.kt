@@ -15,7 +15,7 @@ data class Kandidat(
     private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
     private val kvp: Synlighetsnode<Kvp>,
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
-    val adressebeskyttelse: Synlighetsnode<String>,
+    private val adressebeskyttelse: Synlighetsnode<String>,
 ) {
     private val erAAP: BooleanVerdi
         get() = oppfølgingsinformasjon.hvisIkkeNullOg(Oppfølgingsinformasjon::erAAP)
@@ -30,6 +30,7 @@ data class Kandidat(
         harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
         erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
+        harOppfølging = TODO(),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
         erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeSperretAnsatt),

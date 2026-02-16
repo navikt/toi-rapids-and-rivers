@@ -100,6 +100,7 @@ class Repository(private val dataSource: DataSource) {
         harAktivCv = resultset.getBoolean(harAktivCvKolonne).tilBooleanVerdi(), // TODO
         harJobbprofil = resultset.getBoolean(harJobbprofilkolonne).tilBooleanVerdi(), // TODO
         erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne).tilBooleanVerdi(), // TODO
+        harOppfølging = TODO(),
         harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne).tilBooleanVerdi(), // TODO
         erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne).tilBooleanVerdi(), // TODO
         erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne).tilBooleanVerdi(), // TODO

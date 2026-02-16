@@ -19,7 +19,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
 
 class SynlighetsmotorTest {
 
@@ -35,6 +34,7 @@ class SynlighetsmotorTest {
     fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
         repository.lagre(
             Evaluering(
+                false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
                 false.tilBooleanVerdi(),
@@ -63,6 +63,7 @@ class SynlighetsmotorTest {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
+            assertThat(harOppfølging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
             assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
@@ -91,6 +92,7 @@ class SynlighetsmotorTest {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
             assertThat(harJobbprofil.default(false)).isEqualTo(true)
             assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
+            assertThat(harOppfølging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
             assertThat(erIkkeSperretAnsatt.default(false)).isEqualTo(true)
