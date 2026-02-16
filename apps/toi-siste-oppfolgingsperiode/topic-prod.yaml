@@ -23,3 +23,6 @@ spec:
     - team: toi
       application: toi-siste-oppfolgingsperiode
       access: readwrite
+    - team: toi
+      application: toi-kafkamanager
+      access: read
