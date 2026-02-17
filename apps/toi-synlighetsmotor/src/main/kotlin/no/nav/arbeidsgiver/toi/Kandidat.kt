@@ -13,6 +13,7 @@ data class Kandidat(
     private val arbeidsmarkedCv: Synlighetsnode<CvMelding>,
     private val oppfølgingsinformasjon: Synlighetsnode<Oppfølgingsinformasjon>,
     private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
+    private val sisteOppfølgingsperiode: Synlighetsnode<SisteOppfølgingsperiode>,
     private val kvp: Synlighetsnode<Kvp>,
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     private val adressebeskyttelse: Synlighetsnode<String>,
@@ -30,7 +31,7 @@ data class Kandidat(
         harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
         erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
-        harOppfølging = TODO(),
+        harOppfølging = sisteOppfølgingsperiode.hvisIkkeNullOg(::harOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
         erIkkeSperretAnsatt = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeSperretAnsatt),
@@ -56,6 +57,14 @@ data class Kandidat(
         val now = Instant.now()
         val startDato = oppfølgingsperiode.startDato.toInstant()
         val sluttDato = oppfølgingsperiode.sluttDato?.toInstant()
+        sanityCheckOppfølging(now, this, startDato, sluttDato)
+        return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
+    }
+
+    private fun harOppfølging(sisteOppfølgingsperiode: SisteOppfølgingsperiode): Boolean {
+        val now = Instant.now()
+        val startDato = sisteOppfølgingsperiode.startTidspunkt.toInstant()
+        val sluttDato = sisteOppfølgingsperiode.sluttTidspunkt?.toInstant()
         sanityCheckOppfølging(now, this, startDato, sluttDato)
         return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
     }
@@ -104,6 +113,7 @@ data class Kandidat(
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
+                sisteOppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("sisteOppfølgingsperiode"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
                 adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
                 arbeidssøkeropplysninger = Synlighetsnode.fromJsonNode(json.path("arbeidssokeropplysninger"), mapper)
@@ -142,6 +152,11 @@ enum class CvMeldingstype {
 data class Oppfølgingsperiode(
     val startDato: ZonedDateTime,
     val sluttDato: ZonedDateTime?
+)
+
+data class SisteOppfølgingsperiode(
+    val startTidspunkt: ZonedDateTime,
+    val sluttTidspunkt: ZonedDateTime?
 )
 
 data class Arbeidssøkeropplysninger(
