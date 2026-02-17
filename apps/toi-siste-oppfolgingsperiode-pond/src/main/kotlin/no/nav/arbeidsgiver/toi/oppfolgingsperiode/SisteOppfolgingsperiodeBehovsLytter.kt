@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
@@ -34,7 +35,7 @@ class SisteOppfolgingsperiodeBehovsLytter(
     ) {
         val aktørid: String = packet["aktørId"].asText()
 
-        packet["sisteOppfølgingsperiode"] = meldingPerAktørid(aktørid)?.let(objectMapper::readTree) ?: false
+        packet["sisteOppfølgingsperiode"] = meldingPerAktørid(aktørid)?.let(objectMapper::readTree) ?: NullNode.instance
 
         context.publish(aktørid, packet.toJson())
     }
