@@ -18,6 +18,7 @@ private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "oppfølgingsinformasjon",
     "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
     "oppfølgingsperiode",
+    "sisteOppfølgingsperiode",
     "kvp",
     "arbeidssokeropplysninger"
 )

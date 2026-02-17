@@ -87,6 +87,7 @@ class SynlighetRekrutteringstreffLytter(
             harAktivCv = evaluering.harAktivCv,
             harJobbprofil = evaluering.harJobbprofil,
             erUnderOppfoelging = evaluering.erUnderOppfoelging,
+            harOppfølging = evaluering.harOppfølging,
             harRiktigFormidlingsgruppe = evaluering.harRiktigFormidlingsgruppe,
             erIkkeKode6eller7 = evaluering.erIkkeKode6eller7,
             erIkkeSperretAnsatt = evaluering.erIkkeSperretAnsatt,

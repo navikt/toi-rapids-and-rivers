@@ -14,6 +14,7 @@ class Repository(private val dataSource: DataSource) {
     private val harAktivCvKolonne = "har_aktiv_cv"
     private val harJobbprofilkolonne = "har_jobbprofil"
     private val erIkkeUnderOppfølgingKolonne = "er_under_oppfolging"
+    private val harOppfølgingKolonne = "har_oppfolging"
     private val harRiktigFormidlingsgruppeKolonne = "har_riktig_formidlingsgruppe"
     private val erIkkeKode6Eller7Kolonne = "er_ikke_kode6_eller_kode7"
     private val erIkkeSperretAnsattKolonne = "er_ikke_sperret_ansatt"
@@ -100,6 +101,7 @@ class Repository(private val dataSource: DataSource) {
         harAktivCv = resultset.getBoolean(harAktivCvKolonne).tilBooleanVerdi(), // TODO
         harJobbprofil = resultset.getBoolean(harJobbprofilkolonne).tilBooleanVerdi(), // TODO
         erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne).tilBooleanVerdi(), // TODO
+        harOppfølging = resultset.getBoolean(harOppfølgingKolonne).tilBooleanVerdi(), // TODO?
         harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne).tilBooleanVerdi(), // TODO
         erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne).tilBooleanVerdi(), // TODO
         erIkkeSperretAnsatt = resultset.getBoolean(erIkkeSperretAnsattKolonne).tilBooleanVerdi(), // TODO
@@ -117,18 +119,23 @@ class Repository(private val dataSource: DataSource) {
         verdier.map { "?" }.joinToString(prefix = "(", separator = ",", postfix = ")")
 
     private fun Evaluering.databaseMap(aktørId: String, fødselsnummer: String?): Map<String, Any?> {
+        /*
+        * Defaulter til true når vi ikke har opplysningene fordi man ikke spør om alle feltene dersom kandidaten har adressebeskyttelse.
+        * Systemet kan ikke anta at ukjente data mangler og skal heller ikke vise bruker dette.
+        */
         return mapOf(
             aktøridKolonne to aktørId,
             fødselsnummerKolonne to fødselsnummer,
-            harAktivCvKolonne to harAktivCv.default(true),     //TODO
-            harJobbprofilkolonne to harJobbprofil.default(true),     //TODO
-            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(true),     //TODO
-            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(true),     //TODO
-            erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(true),     //TODO
-            erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(true),     //TODO
-            erIkkeDødKolonne to erIkkeDoed.default(true),     //TODO
-            erIkkeKvpKolonne to erIkkeKvp.default(true),     //TODO
-            erArbeidssøkerKolonne to erArbeidssøker.default(false), //???
+            harAktivCvKolonne to harAktivCv.default(true),
+            harJobbprofilkolonne to harJobbprofil.default(true),
+            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(true),
+            harOppfølgingKolonne to harOppfølging.default(true),
+            harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(true),
+            erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(true),
+            erIkkeSperretAnsattKolonne to erIkkeSperretAnsatt.default(true),
+            erIkkeDødKolonne to erIkkeDoed.default(true),
+            erIkkeKvpKolonne to erIkkeKvp.default(true),
+            erArbeidssøkerKolonne to erArbeidssøker.default(true),
             erFerdigBeregnetKolonne to erFerdigBeregnet
         )
     }

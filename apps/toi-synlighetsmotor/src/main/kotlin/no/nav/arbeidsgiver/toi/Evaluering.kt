@@ -30,6 +30,7 @@ class Evaluering(
     val harAktivCv: BooleanVerdi,
     val harJobbprofil: BooleanVerdi,
     val erUnderOppfoelging: BooleanVerdi,
+    val harOppfølging: BooleanVerdi,
     val harRiktigFormidlingsgruppe: BooleanVerdi,
     val erIkkeKode6eller7: BooleanVerdi,
     val erIkkeSperretAnsatt: BooleanVerdi,

@@ -52,6 +52,7 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "oppfølgingsinformasjon",
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsperiode",
+            "sisteOppfølgingsperiode",
             "kvp",
             "arbeidssokeropplysninger"
         ))
@@ -68,6 +69,7 @@ class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
             oppfølgingsperiode: String = aktivOppfølgingsperiode(),
+            sisteOppfølgingsperiode: String = aktivSisteOppfølgingsperiode(),
             arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
             arbeidsmarkedCv: String = arbeidsmarkedCv(),
@@ -82,6 +84,7 @@ class Testdata {
         ) =
             hendelseEtterBehovsHenting(
                 oppfølgingsperiode = oppfølgingsperiode,
+                sisteOppfølgingsperiode = sisteOppfølgingsperiode,
                 arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 arbeidsmarkedCv = arbeidsmarkedCv,
@@ -138,6 +141,7 @@ class Testdata {
 
         fun hendelseEtterBehovsHenting(
             oppfølgingsperiode: String? = nullVerdiForKey("oppfølgingsperiode"),
+            sisteOppfølgingsperiode: String? = nullVerdiForKey("sisteOppfølgingsperiode"),
             arbeidssøkerperiode: String? = nullVerdiForKey("arbeidssokerperiode"),
             arbeidssøkeropplysninger: String? = nullVerdiForKey("arbeidssokeropplysninger"),
             oppfølgingsinformasjon: String? = nullVerdiForKey("oppfølgingsinformasjon"),
@@ -156,6 +160,7 @@ class Testdata {
                 arbeidsmarkedCv ?: nullVerdiForKey("arbeidsmarkedCv"),
                 oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
                 oppfølgingsperiode ?: nullVerdiForKey("oppfølgingsperiode"),
+                sisteOppfølgingsperiode ?: nullVerdiForKey("sisteOppfølgingsperiode"),
                 participatingService,
                 aktørId,
                 kvp ?: nullVerdiForKey("kvp"),
@@ -210,6 +215,23 @@ class Testdata {
             }
         """.trimIndent()
 
+        fun aktivSisteOppfølgingsperiode() =
+            """
+            "sisteOppfølgingsperiode": {
+              "startTidspunkt": "2020-10-30T14:15:38.748054+01:00",
+              "kontor": {
+                "kontorNavn": "Nav Drammen",
+                "kontorId": "0602"
+              },
+              "aktorId": "123456789",
+              "ident": "12345678910",
+              "sisteEndringsType": "OPPFOLGING_STARTET",
+              "oppfolgingsperiodeUuid": "d4adee13-ae6c-4ae8-9071-f7d2a46f7741",
+              "sluttTidspunkt": null,
+              "producerTimestamp": "2026-02-16T00:32:08.292395515+01:00"
+            }
+        """.trimIndent()
+
         fun arbeidssøkeropplysninger(aktiv: Boolean = true) :String {
             val avsluttet = if (aktiv) "null" else "\"2020-10-31T14:15:38+01:00\""
             return """
@@ -229,6 +251,23 @@ class Testdata {
                 "aktorId": "123456789",
                 "startDato": "2020-10-30T14:15:38+01:00",
                 "sluttDato": "2021-10-30T14:15:38+01:00"
+            }
+        """.trimIndent()
+
+        fun avsluttetSisteOppfølgingsperiode() =
+            """
+            "sisteOppfølgingsperiode": {
+              "startTidspunkt": "2020-10-30T14:15:38.748054+01:00",
+              "kontor": {
+                "kontorNavn": "Nav Drammen",
+                "kontorId": "0602"
+              },
+              "aktorId": "123456789",
+              "ident": "12345678910",
+              "sisteEndringsType": "OPPFOLGING_STARTET",
+              "oppfolgingsperiodeUuid": "d4adee13-ae6c-4ae8-9071-f7d2a46f7741",
+              "sluttTidspunkt": "2021-10-30T14:15:38.748054+01:00",
+              "producerTimestamp": "2026-02-16T00:32:08.292395515+01:00"
             }
         """.trimIndent()
 
