@@ -59,6 +59,6 @@ class SisteOppfolgingsperiodeBehovsLytterTest {
         val inspektør = rapid.inspektør
         assert(inspektør.size == 1)
         val mottattMelding = inspektør.message(0)
-        assert(mottattMelding["sisteOppfølgingsperiode"].asBoolean(true) == false)
+        assert(mottattMelding["sisteOppfølgingsperiode"].isNull)
     }
 }
