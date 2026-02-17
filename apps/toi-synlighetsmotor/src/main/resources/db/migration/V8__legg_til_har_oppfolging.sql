@@ -1,0 +1,1 @@
+ALTER TABLE evaluering ADD COLUMN har_oppfolging BOOLEAN NOT NULL DEFAULT FALSE;
