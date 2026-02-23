@@ -8,6 +8,7 @@ on:
       - .github/workflows/deploy-toi-template.yaml
       - buildSrc/**
       - technical-libs/testrapid
+  workflow_dispatch:
 
 jobs:
   build-deploy:
