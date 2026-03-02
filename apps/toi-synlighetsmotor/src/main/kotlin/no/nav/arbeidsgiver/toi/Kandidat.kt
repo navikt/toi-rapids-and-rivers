@@ -41,7 +41,7 @@ data class Kandidat(
         erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
     ).apply {
-        secureLog.warn("Uoverensstemmelse mellom erUnderOppfølging og harOppfølging for aktørId: $aktørId. erUnderOppfølging: $erUnderOppfoelging, harOppfølging: $harOppfølging. Dette kan indikere en feil i datagrunnlaget eller i logikken for å bestemme oppfølgingsstatus. SisteOppfølgingsperiode: ${sisteOppfølgingsperiode}, Oppfølgingsperiode: ${oppfølgingsperiode}")
+        secureLog.warn("Logger informasjon om erUnderOppfølging og harOppfølging for aktørId: $aktørId. erUnderOppfølging: ${erUnderOppfoelging.javaClass.simpleName}, harOppfølging: ${harOppfølging.javaClass.simpleName}. Datagrunnlaget eller i logikken for å bestemme oppfølgingsstatus. Oppfølgingsperiode: ${oppfølgingsperiode}, SisteOppfølgingsperiode: ${sisteOppfølgingsperiode}")
     }
 
     private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()

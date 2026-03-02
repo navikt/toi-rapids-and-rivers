@@ -16,7 +16,6 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
     init {
         River(rapidsConnection).apply {
             precondition{
-                it.requireKey("kontor")
                 it.requireKey("aktorId")
                 it.requireKey("startTidspunkt")
                 it.requireKey("ident")
