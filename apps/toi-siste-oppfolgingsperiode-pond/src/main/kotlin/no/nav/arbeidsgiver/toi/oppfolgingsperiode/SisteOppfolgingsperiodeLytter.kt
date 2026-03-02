@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
@@ -16,13 +17,15 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
     init {
         River(rapidsConnection).apply {
             precondition{
+                it.requireKey("oppfolgingsperiodeUuid")
+                it.forbid("@event_name")
+            }
+            validate {
                 it.requireKey("aktorId")
                 it.requireKey("startTidspunkt")
                 it.requireKey("ident")
                 it.requireKey("sisteEndringsType")
-                it.requireKey("oppfolgingsperiodeUuid")
                 it.requireKey("producerTimestamp")
-                it.forbid("@event_name")
             }
         }.register(this)
     }
@@ -45,6 +48,11 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
+    }
+
+    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
+        log.error(problems.toString())
+        secureLog.error(problems.toExtendedReport())
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
