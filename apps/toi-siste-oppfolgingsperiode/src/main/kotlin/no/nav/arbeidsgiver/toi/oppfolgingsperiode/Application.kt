@@ -19,7 +19,7 @@ import java.util.*
 private val log = noClassLogger()
 
 private const val toiOppfolgingsperiodeTopic = "toi.siste-oppfolgingsperiode-fra-aktorid-v1"
-private const val poaoOppfølgingsperiodeTopic = "poao.siste-oppfolgingsperiode-v2"
+private const val poaoOppfølgingsperiodeTopic = "poao.siste-oppfolgingsperiode-v3"
 
 fun main() {
     startApp(System.getenv())
