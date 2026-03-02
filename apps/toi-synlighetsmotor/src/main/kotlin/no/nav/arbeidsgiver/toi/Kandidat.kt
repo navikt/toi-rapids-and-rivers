@@ -40,7 +40,9 @@ data class Kandidat(
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
         erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
-    )
+    ).apply {
+        secureLog.warn("Uoverensstemmelse mellom erUnderOppfølging og harOppfølging for aktørId: $aktørId. erUnderOppfølging: $erUnderOppfoelging, harOppfølging: $harOppfølging. Dette kan indikere en feil i datagrunnlaget eller i logikken for å bestemme oppfølgingsstatus. SisteOppfølgingsperiode: ${sisteOppfølgingsperiode}, Oppfølgingsperiode: ${oppfølgingsperiode}")
+    }
 
     private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
