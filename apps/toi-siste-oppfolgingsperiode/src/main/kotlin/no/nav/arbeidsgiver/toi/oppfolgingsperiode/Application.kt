@@ -6,6 +6,9 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.KafkaStreams.State.CREATED
+import org.apache.kafka.streams.KafkaStreams.State.REBALANCING
+import org.apache.kafka.streams.KafkaStreams.State.RUNNING
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
@@ -61,14 +64,14 @@ fun startApp(envs: Map<String, String>) {
     Javalin.create().apply {
         get("/isalive") { context ->
             val state = kafkaStreams.state()
-            if(state == KafkaStreams.State.RUNNING && !startet.get()) {
-                log.info("applikasjonen ble startet opp, og tok så lang tid på å starte: ${Duration.between(now, ZonedDateTime.now())}")
+            if(state == RUNNING && !startet.get()) {
+                log.info("applikasjonen ble startet opp fullstendig og er nå running, og tok så lang tid: ${Duration.between(now, ZonedDateTime.now())}")
                 startet.set(true)
             }
-            context.status(if (state == KafkaStreams.State.RUNNING) 200 else 500)
+            context.status(if (state in listOf(RUNNING, REBALANCING, CREATED)) 200 else 500)
         }
         get("/isready") { context ->
-            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+            context.status(if (kafkaStreams.state() == RUNNING) 200 else 500)
         }
     }.start(8080)
     kafkaStreams.start()

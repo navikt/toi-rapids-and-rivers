@@ -10,14 +10,8 @@ spec:
   port: 8080
   liveness:
     path: /isalive
-    initialDelay: 300
-    failureThreshold: 120
-    periodSeconds: 30
   readiness:
     path: /isready
-    initialDelay: 300
-    failureThreshold: 120
-    periodSeconds: 30
   prometheus:
     enabled: true
     path: /metrics
