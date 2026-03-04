@@ -13,8 +13,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
+import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 private val log = noClassLogger()
 
@@ -28,6 +30,9 @@ fun main() {
 fun startApp(envs: Map<String, String>) {
     log.info("Starter app.")
     SecureLog(log).info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+
+    val now = ZonedDateTime.now()
+    val startet = AtomicBoolean(false)
 
     val objectMapper = jacksonObjectMapper()
 
@@ -55,7 +60,12 @@ fun startApp(envs: Map<String, String>) {
 
     Javalin.create().apply {
         get("/isalive") { context ->
-            context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
+            val state = kafkaStreams.state()
+            if(state == KafkaStreams.State.RUNNING && !startet.get()) {
+                log.info("applikasjonen ble startet opp, og tok så lang tid på å starte: ${Duration.between(now, ZonedDateTime.now())}")
+                startet.set(true)
+            }
+            context.status(if (state == KafkaStreams.State.RUNNING) 200 else 500)
         }
         get("/isready") { context ->
             context.status(if (kafkaStreams.state() == KafkaStreams.State.RUNNING) 200 else 500)
