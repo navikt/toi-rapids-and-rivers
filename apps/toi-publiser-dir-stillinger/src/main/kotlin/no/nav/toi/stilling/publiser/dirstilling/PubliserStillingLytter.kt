@@ -11,6 +11,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.publiser.dirstilling.dto.Melding
 import no.nav.toi.stilling.publiser.dirstilling.dto.RapidHendelse
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -25,7 +26,7 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
             precondition {
                 it.requireKey("direktemeldtStilling")
                 it.interestedIn("stillingsinfo")
-                it.requireValue("@event_name", "indekserDirektemeldtStilling")
+                it.requireAny("@event_name", listOf("reindekserDirektemeldtStilling", "indekserDirektemeldtStilling"))
                 it.forbid("stilling") // Ikke les meldingen på nytt etter at den har vært innom stillingPopulator
             }
             validate { it.requireKey("stillingsId") }
@@ -45,21 +46,31 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
         meterRegistry: MeterRegistry
     ) {
         val direktemeldtStilling = RapidHendelse.fraJson(packet).direktemeldtStilling
-        val stillingskategori = RapidHendelse.fraJson(packet).stillingsinfo
+        val stillingsinfo = RapidHendelse.fraJson(packet).stillingsinfo
 
-        log.info("Mottok stilling med stillingsId ${direktemeldtStilling.stillingsId} og stillingskategori $stillingskategori")
-        val stilling = direktemeldtStilling.konverterTilStilling(stillingskategori?.stillingskategori)
-        val melding = ProducerRecord(publiseringTopic, stilling.uuid.toString(), objectMapper.writeValueAsString(stilling))
+        if(stillingsinfo != null) {
+            val eventNavn = packet["@event_name"].asText()
 
-        dirStillingProducer.send(melding) { _, exception ->
-            if (exception == null) {
-                log.info("Publisert stilling med stillingsId ${direktemeldtStilling.stillingsId} og stillingskategori $stillingskategori på topic $publiseringTopic")
-            } else {
-                log.error(
-                    "Greide ikke å publisere stilling med stillingsId ${direktemeldtStilling.stillingsId} på topic $publiseringTopic",
-                    exception
-                )
+            log.info("Mottok stilling med stillingsId ${direktemeldtStilling.stillingsId} og stillingskategori ${stillingsinfo.stillingskategori}")
+            val stilling = direktemeldtStilling.konverterTilStilling(stillingskategori = stillingsinfo.stillingskategori, stillingsInfo = stillingsinfo)
+
+            val melding = Melding(stilling = stilling, eventNavn = eventNavn)
+
+            val meldingSomSkalSendes = ProducerRecord(publiseringTopic, stilling.uuid.toString(), objectMapper.writeValueAsString(melding))
+
+            dirStillingProducer.send(meldingSomSkalSendes) { _, exception ->
+                if (exception == null) {
+                    log.info("Publisert stilling med stillingsId ${direktemeldtStilling.stillingsId} og stillingskategori ${stillingsinfo.stillingskategori} på topic $publiseringTopic")
+                } else {
+                    log.error(
+                        "Greide ikke å publisere stilling med stillingsId ${direktemeldtStilling.stillingsId} på topic $publiseringTopic",
+                        exception
+                    )
+                }
             }
+        } else {
+            log.info("Stillingsinfo for stilling med stillingsId ${direktemeldtStilling.stillingsId} er null, sender ikke melding på topic $publiseringTopic")
         }
+
     }
 }
