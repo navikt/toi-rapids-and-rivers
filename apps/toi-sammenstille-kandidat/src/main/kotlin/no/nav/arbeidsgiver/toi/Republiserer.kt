@@ -26,6 +26,9 @@ class Republiserer(
             .post(path = republiseringspath) { ctx ->
                 republiserAlleKandidater(ctx)
             }
+            .post(path = "$republiseringspath/liste") { ctx ->
+                republiserListe(ctx)
+            }
             .post(path = "$republiseringspath/{aktørId}") { ctx ->
                 republiserEnKandidat(ctx)
             }
@@ -51,6 +54,23 @@ class Republiserer(
             rapidsConnection.publish(aktørId, pakke.toJson())
             context.status(200)
         }
+    }
+
+    fun republiserListe(context: Context) {
+        val body = context.bodyAsClass(RepubliseringBodyMedListeAvKandidater::class.java)
+        body.aktorIder.forEach { aktørId ->
+            val kandidat = repository.hentKandidat(aktørId)
+            if (kandidat == null) {
+                log.error("Kandidat finnes ikke i databasen, og kan derfor ikke republiseres (se securelog)")
+                secureLog.error("Kandidat med aktørId $aktørId finnes ikke i databasen, og kan derfor ikke republiseres")
+            } else {
+                log.info("Skal republisere aktør (se securelog)")
+                secureLog.info("Skal republisere $aktørId")
+                val pakke = lagPakke(kandidat)
+                rapidsConnection.publish(aktørId, pakke.toJson())
+            }
+        }
+        context.status(200)
     }
 
     fun republiserAlleKandidater(context: Context) {
@@ -79,4 +99,5 @@ class Republiserer(
     }
 
     data class RepubliseringBody(val passord: String)
+    data class RepubliseringBodyMedListeAvKandidater(val passord: String, val aktorIder: List<String>)
 }

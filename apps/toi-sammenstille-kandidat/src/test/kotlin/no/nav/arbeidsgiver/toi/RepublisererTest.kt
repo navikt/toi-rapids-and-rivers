@@ -88,6 +88,32 @@ class RepublisererTest {
     }
 
     @Test
+    fun `Kall til republiseringsendepunkt for en liste av kandidater skal sende kandidaten på rapid`() {
+        val testRapid = TestRapid()
+        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
+
+        val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
+        val kandidat1 = lagredeKandidater[13]
+        val kandidat2 = lagredeKandidater[15]
+        val kandidat3 = lagredeKandidater[29]
+
+        val body = Republiserer.RepubliseringBodyMedListeAvKandidater(passord = riktigPassord, aktorIder = listOf(kandidat1, kandidat2, kandidat3))
+        var body1 = jacksonObjectMapper().writeValueAsString(body)
+        val response = Fuel.post("http://localhost:9000/republiser/liste")
+            .jsonBody(body1).response().second
+        assertThat(response.statusCode).isEqualTo(200)
+
+        val inspektør = testRapid.inspektør
+        assertThat(inspektør.size).isEqualTo(3)
+        assertThat(Kandidat.fraJson(inspektør.message(0)).aktørId).isEqualTo(kandidat1)
+        assertThat(inspektør.message(0).get("@event_name").asText()).isEqualTo("republisert")
+        assertThat(Kandidat.fraJson(inspektør.message(1)).aktørId).isEqualTo(kandidat2)
+        assertThat(inspektør.message(1).get("@event_name").asText()).isEqualTo("republisert")
+        assertThat(Kandidat.fraJson(inspektør.message(2)).aktørId).isEqualTo(kandidat3)
+        assertThat(inspektør.message(2).get("@event_name").asText()).isEqualTo("republisert")
+    }
+
+    @Test
     fun `Kall til republiseringsendepunkt for en kandidat som ikke finnes returnerer 404 og sender ikke melding på rapid`() {
         val testRapid = TestRapid()
         startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
