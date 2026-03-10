@@ -32,7 +32,6 @@ class SynlighetRekrutteringstreffLytterTest {
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
                 harJobbprofil = true.tilBooleanVerdi(),
-                erUnderOppfoelging = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -66,7 +65,6 @@ class SynlighetRekrutteringstreffLytterTest {
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
                 harJobbprofil = true.tilBooleanVerdi(),
-                erUnderOppfoelging = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -99,7 +97,6 @@ class SynlighetRekrutteringstreffLytterTest {
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
                 harJobbprofil = true.tilBooleanVerdi(),
-                erUnderOppfoelging = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -138,7 +135,6 @@ class SynlighetRekrutteringstreffLytterTest {
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
                 harJobbprofil = true.tilBooleanVerdi(),
-                erUnderOppfoelging = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -171,7 +167,6 @@ class SynlighetRekrutteringstreffLytterTest {
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
                 harJobbprofil = true.tilBooleanVerdi(),
-                erUnderOppfoelging = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),

@@ -51,7 +51,6 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsinformasjon",
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
-            "oppfølgingsperiode",
             "sisteOppfølgingsperiode",
             "kvp",
             "arbeidssokeropplysninger"
@@ -68,7 +67,6 @@ private const val s = """fodselsnummer"""
 class Testdata {
     companion object {
         fun komplettHendelseSomFørerTilSynlighetTrue(
-            oppfølgingsperiode: String = aktivOppfølgingsperiode(),
             sisteOppfølgingsperiode: String = aktivSisteOppfølgingsperiode(),
             arbeidssøkeropplysninger: String = arbeidssøkeropplysninger(),
             oppfølgingsinformasjon: String? = oppfølgingsinformasjon(),
@@ -83,7 +81,6 @@ class Testdata {
             adressebeskyttelse: String? = adressebeskyttelse()
         ) =
             hendelseEtterBehovsHenting(
-                oppfølgingsperiode = oppfølgingsperiode,
                 sisteOppfølgingsperiode = sisteOppfølgingsperiode,
                 arbeidssøkeropplysninger = arbeidssøkeropplysninger,
                 oppfølgingsinformasjon = oppfølgingsinformasjon ?: nullVerdiForKey("oppfølgingsinformasjon"),
@@ -205,16 +202,6 @@ class Testdata {
             }
         """.trimIndent()
 
-        fun aktivOppfølgingsperiode() =
-            """
-            "oppfølgingsperiode": {
-                "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "aktorId": "123456789",
-                "startDato": "2020-10-30T14:15:38+01:00",
-                "sluttDato": null
-            }
-        """.trimIndent()
-
         fun aktivSisteOppfølgingsperiode() =
             """
             "sisteOppfølgingsperiode": {
@@ -243,16 +230,6 @@ class Testdata {
                 }
             """.trimIndent()
         }
-
-        fun avsluttetOppfølgingsperiode() =
-            """
-            "oppfølgingsperiode": {
-                "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "aktorId": "123456789",
-                "startDato": "2020-10-30T14:15:38+01:00",
-                "sluttDato": "2021-10-30T14:15:38+01:00"
-            }
-        """.trimIndent()
 
         fun avsluttetSisteOppfølgingsperiode() =
             """
