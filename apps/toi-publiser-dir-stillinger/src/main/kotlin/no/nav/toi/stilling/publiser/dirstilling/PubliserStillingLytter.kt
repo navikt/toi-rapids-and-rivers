@@ -51,7 +51,7 @@ class PubliserStillingLytter(rapidsConnection: RapidsConnection,
         if(stillingsinfo != null) {
             val eventNavn = packet["@event_name"].asText()
 
-            log.info("Mottok stilling med stillingsId ${direktemeldtStilling.stillingsId} og stillingskategori ${stillingsinfo.stillingskategori}")
+            log.info("Mottok stilling med stillingsId ${direktemeldtStilling.stillingsId} og stillingskategori ${stillingsinfo.stillingskategori} og eventNavn $eventNavn")
             val stilling = direktemeldtStilling.konverterTilStilling(stillingskategori = stillingsinfo.stillingskategori, stillingsInfo = stillingsinfo)
 
             val melding = Melding(stilling = stilling, eventNavn = eventNavn)
