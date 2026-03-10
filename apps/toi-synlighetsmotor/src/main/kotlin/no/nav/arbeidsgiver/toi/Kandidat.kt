@@ -51,14 +51,6 @@ data class Kandidat(
     private fun harJobbprofil(cvMelding: CvMelding) =
         cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
 
-    private fun erUnderOppfølging(oppfølgingsperiode: Oppfølgingsperiode): Boolean {
-        val now = Instant.now()
-        val startDato = oppfølgingsperiode.startDato.toInstant()
-        val sluttDato = oppfølgingsperiode.sluttDato?.toInstant()
-        sanityCheckOppfølging(now, this, startDato, sluttDato)
-        return startDato.isBefore(now) && (sluttDato == null || sluttDato.isAfter(now))
-    }
-
     private fun harOppfølging(sisteOppfølgingsperiode: SisteOppfølgingsperiode): Boolean {
         val now = Instant.now()
         val startDato = sisteOppfølgingsperiode.startTidspunkt.toInstant()
@@ -145,11 +137,6 @@ enum class CvMeldingstype {
     ENDRE,
     OPPRETT
 }
-
-data class Oppfølgingsperiode(
-    val startDato: ZonedDateTime,
-    val sluttDato: ZonedDateTime?
-)
 
 data class SisteOppfølgingsperiode(
     val startTidspunkt: ZonedDateTime,
