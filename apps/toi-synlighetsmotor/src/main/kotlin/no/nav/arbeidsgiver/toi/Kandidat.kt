@@ -12,7 +12,6 @@ data class Kandidat(
     val aktørId: String,
     private val arbeidsmarkedCv: Synlighetsnode<CvMelding>,
     private val oppfølgingsinformasjon: Synlighetsnode<Oppfølgingsinformasjon>,
-    private val oppfølgingsperiode: Synlighetsnode<Oppfølgingsperiode>,
     private val sisteOppfølgingsperiode: Synlighetsnode<SisteOppfølgingsperiode>,
     private val kvp: Synlighetsnode<Kvp>,
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
@@ -30,7 +29,6 @@ data class Kandidat(
     fun toEvaluering() = Evaluering(
         harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
         harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
-        erUnderOppfoelging = oppfølgingsperiode.hvisIkkeNullOg(::erUnderOppfølging),
         harOppfølging = sisteOppfølgingsperiode.hvisIkkeNullOg(::harOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
@@ -40,9 +38,7 @@ data class Kandidat(
         harIkkeAdressebeskyttelse = adressebeskyttelse.hvisIkkeNullOg(::harIkkeAdressebeskyttelse),
         erArbeidssøker = arbeidssøkeropplysninger.hvisIkkeNullOg(::erArbeidssøker),
         komplettBeregningsgrunnlag = beregningsgrunnlag()
-    ).apply {
-        secureLog.warn("Logger informasjon om erUnderOppfølging og harOppfølging for aktørId: $aktørId. erUnderOppfølging: ${erUnderOppfoelging.javaClass.simpleName}, harOppfølging: ${harOppfølging.javaClass.simpleName}. Datagrunnlaget eller i logikken for å bestemme oppfølgingsstatus. Oppfølgingsperiode: ${oppfølgingsperiode}, SisteOppfølgingsperiode: ${sisteOppfølgingsperiode}")
-    }
+    )
 
     private fun erArbeidssøker(it: Arbeidssøkeropplysninger) = it.erArbeidssøker()
     private fun harRiktigFormidlingsgruppe(it: Oppfølgingsinformasjon) = it.formidlingsgruppe == Formidlingsgruppe.ARBS
@@ -96,7 +92,7 @@ data class Kandidat(
 
 
     private fun beregningsgrunnlag() = listOf(
-        arbeidsmarkedCv, oppfølgingsinformasjon, oppfølgingsperiode,
+        arbeidsmarkedCv, oppfølgingsinformasjon, sisteOppfølgingsperiode,
         kvp, adressebeskyttelse,
         arbeidssøkeropplysninger
     ).all { it.svarPåDetteFeltetLiggerPåHendelse() }
@@ -114,7 +110,6 @@ data class Kandidat(
                 aktørId = json["aktørId"].asText(),
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
-                oppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("oppfølgingsperiode"), mapper),
                 sisteOppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("sisteOppfølgingsperiode"), mapper),
                 kvp = Synlighetsnode.fromJsonNode(json.path("kvp"), mapper),
                 adressebeskyttelse = Synlighetsnode.fromJsonNode(json.path("adressebeskyttelse"), mapper),
