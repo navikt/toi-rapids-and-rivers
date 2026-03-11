@@ -117,19 +117,6 @@ fun siste14avedtakMelding(aktørId: String) = """
             }
 """.trimIndent()
 
-fun oppfølgingsperiodeMelding(aktørId: String) = """
-        {
-            "aktørId": "$aktørId",
-            "@event_name": "oppfølgingsperiode",
-            "oppfølgingsperiode": {
-                "uuid": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                "aktorId": "$aktørId",
-                "startDato": "2021-12-01T18:18:00.435004+01:00",
-                "sluttDato": null 
-            }   
-        }
-    """.trimIndent()
-
 
 
 fun kvp(aktørId: String) = """

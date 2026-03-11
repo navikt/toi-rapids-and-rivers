@@ -104,7 +104,6 @@ data class Kandidat(
     val veileder: JsonNode? = null,
     val oppfølgingsinformasjon: JsonNode? = null,
     val siste14avedtak: JsonNode? = null,
-    val oppfølgingsperiode: JsonNode? = null,
     val kvp: JsonNode? = null
 ) {
     companion object {
@@ -116,7 +115,6 @@ data class Kandidat(
             veileder = json["veileder"],
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
             siste14avedtak = json["siste14avedtak"],
-            oppfølgingsperiode = json["oppfølgingsperiode"],
             kvp = json["kvp"]
         )
     }
