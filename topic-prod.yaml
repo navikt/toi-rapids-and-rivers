@@ -29,9 +29,6 @@ spec:
       application: toi-siste-14a-vedtak
       access: readwrite
     - team: toi
-      application: toi-oppfolgingsperiode
-      access: readwrite
-    - team: toi
       application: toi-sammenstille-kandidat
       access: readwrite
     - team: toi
