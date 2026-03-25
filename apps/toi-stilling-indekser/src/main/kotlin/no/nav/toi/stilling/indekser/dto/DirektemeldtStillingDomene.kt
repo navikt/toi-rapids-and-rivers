@@ -1,11 +1,10 @@
-package no.nav.toi.stilling.indekser
+package no.nav.toi.stilling.indekser.dto
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.toi.stilling.indekser.Stilling
+import no.nav.toi.stilling.indekser.log
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -15,30 +14,12 @@ data class Melding(
     val stillingsId: String,
     val stillingsinfo: Stillingsinfo?,
     val direktemeldtStilling: DirektemeldtStilling
-) {
-    companion object {
-        private val mapper = jacksonObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .registerModule(JavaTimeModule())
-
-        fun fraJson(jsonMessage: JsonMessage): Melding = mapper.readValue(jsonMessage.toJson(), Melding::class.java)
-    }
-}
+)
 
 data class StillingsinfoMelding(
     val stillingsId: String,
     val stillingsinfo: Stillingsinfo?
-) {
-    companion object {
-        private val mapper = jacksonObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .registerModule(JavaTimeModule())
-
-        fun fraJson(jsonMessage: JsonMessage): StillingsinfoMelding = mapper.readValue(jsonMessage.toJson(), StillingsinfoMelding::class.java)
-    }
-}
+)
 
 data class DirektemeldtStilling(
     val stillingsId: UUID,
@@ -73,7 +54,7 @@ data class DirektemeldtStilling(
         employer = innhold.employer,
         locations = innhold.locationList,
         categories = innhold.categoryList,
-        properties = innhold.properties.map { it.key to (tilJson(key = it.key, value = it.value) ?: it.value)}.toMap(),
+        properties = innhold.properties.map { it.key to (tilJson(key = it.key, value = it.value) ?: it.value) }.toMap(),
         publishedByAdmin = publisertAvAdmin,
         businessName = innhold.businessName,
     )

@@ -23,13 +23,36 @@
         }
       }
     },
+    "kandidatlisteinfo": {
+      "properties": {
+        "kandidatlisteId": {
+          "type": "keyword"
+        },
+        "antallKandidater": {
+          "type": "integer"
+        },
+        "kandidatlisteStatus": {
+          "type": "keyword"
+        },
+        "opprettetDato": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "eier": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
+
+        }
+      }
+    },
     "stilling": {
       "properties": {
         "uuid": {
           "type": "keyword"
         },
         "annonsenr": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
         },
         "updated": {
           "type": "date",

@@ -1,6 +1,8 @@
 package no.nav.toi.stilling.indekser
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
+import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.mapping.TypeMapping
 import org.opensearch.client.opensearch.core.BulkRequest
@@ -78,6 +80,27 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
 
             val response = client.update(request, RekrutteringsbistandStilling::class.java)
             log.info("Oppdaterte stillingsinfo for dokument $stillingsId i indeks $indeks result=${response.result()}")
+
+        } catch (e: Exception) {
+            log.error("Greide ikke å oppdatere dokument med id $stillingsId i indeks $indeks", e)
+            throw e
+        }
+    }
+
+    fun oppdaterKandidatlisteInfo(kandidatlisteInfo: KandidatlisteInfo, stillingsId: String, indeks: String) {
+        val felter = mapOf<String, Any>(
+            "kandidatlisteInfo" to kandidatlisteInfo
+        )
+
+        try {
+            val request = UpdateRequest.Builder<RekrutteringsbistandStilling, Map<String, Any>>()
+                .index(indeks)
+                .id(stillingsId)
+                .doc(felter)
+                .build()
+
+            val response = client.update(request, RekrutteringsbistandStilling::class.java)
+            log.info("Oppdaterte kandidatlisteinfo for dokument $stillingsId i indeks $indeks result=${response.result()}")
 
         } catch (e: Exception) {
             log.error("Greide ikke å oppdatere dokument med id $stillingsId i indeks $indeks", e)

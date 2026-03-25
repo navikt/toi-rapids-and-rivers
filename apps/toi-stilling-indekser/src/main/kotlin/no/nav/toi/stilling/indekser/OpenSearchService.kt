@@ -1,5 +1,8 @@
 package no.nav.toi.stilling.indekser
 
+import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
+import no.nav.toi.stilling.indekser.dto.Stillingsinfo
+
 class OpenSearchService(private val client: IndexClient, private val env: MutableMap<String, String>) {
 
     fun opprettIndeks() : Boolean {
@@ -34,6 +37,10 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
 
     fun oppdaterStillingsinfo(stillingsId: String, stillingsinfo: Stillingsinfo, indeks: String) {
         client.oppdaterStillingsinfo(stillingsId = stillingsId, stillingsinfo = stillingsinfo, indeks = indeks)
+    }
+
+    fun oppdaterKandidatlisteInfo(stillingsId: String, kandidatlisteInfo: KandidatlisteInfo, indeks: String) {
+        client.oppdaterKandidatlisteInfo(stillingsId = stillingsId, kandidatlisteInfo = kandidatlisteInfo, indeks = indeks)
     }
 
     fun indekserStilling(stilling: RekrutteringsbistandStilling, indeks: String) {

@@ -6,6 +6,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.indekser.dto.Melding
 
 class ReindekserStillingLytter(rapidsConnection: RapidsConnection,
                                private val openSearchService: OpenSearchService,
@@ -31,7 +32,7 @@ class ReindekserStillingLytter(rapidsConnection: RapidsConnection,
     ) {
         val melding: Melding
         try {
-            melding = Melding.fraJson(packet)
+            melding = JacksonConfig.objectMapper.readValue(packet.toJson(), Melding::class.java)
         }catch (e: Exception) {
             log.error("Gå forbi feil format på melding", e)
             return

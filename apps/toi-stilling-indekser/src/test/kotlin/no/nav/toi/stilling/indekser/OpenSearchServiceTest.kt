@@ -9,6 +9,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.opensearch.client.opensearch.OpenSearchClient
