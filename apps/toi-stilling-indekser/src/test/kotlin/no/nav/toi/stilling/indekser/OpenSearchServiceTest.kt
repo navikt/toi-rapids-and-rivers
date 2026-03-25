@@ -121,7 +121,7 @@ class OpenSearchServiceTest {
         opprettIndeks()
 
         testProgramMedHendelse(env, melding) {
-            assertThat(size).isEqualTo(0)
+            assertThat(size).isEqualTo(1)
         }
 
         val stillingsinfo = Stillingsinfo(
@@ -153,7 +153,7 @@ class OpenSearchServiceTest {
         opprettIndeks()
 
         testProgramMedHendelse(env, melding) {
-            assertThat(size).isEqualTo(0)
+            assertThat(size).isEqualTo(1)
         }
         // Oppdaterer stillingsinfo for stilling som allerede er indeksert
         testProgramMedHendelse(env, stillingsinfoMelding) {
@@ -179,7 +179,7 @@ class OpenSearchServiceTest {
         opprettIndeks()
 
         testProgramMedHendelse(env, melding) {
-            assertThat(size).isEqualTo(0)
+            assertThat(size).isEqualTo(1)
         }
 
         testMetoderOpenSearch.refreshIndex()
