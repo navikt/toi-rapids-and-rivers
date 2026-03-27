@@ -9,6 +9,8 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import io.mockk.verify
+import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
 import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -174,7 +176,7 @@ class OpenSearchServiceTest {
     }
 
     @Test
-    fun `Skal legge inn melding fra rapid inn i OpenSearch`() {
+    fun `Skal lese inn melding om stillingsinfo fra rapid og oppdatere stilling med stillingsinfo`() {
         leggTilKafkaMiljøvariabler()
         opprettIndeks()
 
@@ -190,6 +192,93 @@ class OpenSearchServiceTest {
         val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
 
         assertThat(rekrutteringsbistandStilling?.stilling?.uuid.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+    }
+
+    @Test
+    fun `Skal ikke oppdatere stillingsinfo i opensearch hvis stilling ikke finnes`() {
+        val mockIndexClient = mockk<IndexClient>()
+        every { mockIndexClient.finnesStilling(any(), any()) } returns false
+
+        val service = OpenSearchService(mockIndexClient, env)
+        val rapid = no.nav.toi.TestRapid()
+        IndekserStillingsinfoLytter(rapid, service, "stilling_20250328")
+
+        rapid.sendTestMessage(stillingsinfoMelding)
+
+        verify(exactly = 0) { mockIndexClient.oppdaterStillingsinfo(any(), any(), any()) }
+    }
+
+    @Test
+    fun `Skal kunne oppdatere kandidatlisteInfo for stilling som allerede er indeksert`() {
+        leggTilKafkaMiljøvariabler()
+        opprettIndeks()
+
+        testProgramMedHendelse(env, melding) {
+            assertThat(size).isEqualTo(1)
+        }
+
+        val kandidatlisteInfo = KandidatlisteInfo(
+            kandidatlisteId = java.util.UUID.fromString("aaaabbbb-cccc-dddd-eeee-ffff00000001"),
+            antallKandidater = 3,
+            kandidatlisteStatus = "ÅPEN",
+            opprettetDato = java.time.ZonedDateTime.parse("2024-06-01T10:00:00Z"),
+            eier = "T123456"
+        )
+        testMetoderOpenSearch.refreshIndex()
+
+        val stillingFørOppdatering = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+
+        openSearchService.oppdaterKandidatlisteInfo(stillingsId = "123e4567-e89b-12d3-a456-426614174000", kandidatlisteInfo = kandidatlisteInfo, indeks = "stilling_20250328")
+        testMetoderOpenSearch.refreshIndex()
+        val stillingEtterOppdatering = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+
+        assertThat(stillingFørOppdatering?.kandidatlisteInfo).isNull()
+
+        assertThat(stillingEtterOppdatering?.kandidatlisteInfo?.kandidatlisteId.toString()).isEqualTo("aaaabbbb-cccc-dddd-eeee-ffff00000001")
+        assertThat(stillingEtterOppdatering?.kandidatlisteInfo?.antallKandidater).isEqualTo(3)
+        assertThat(stillingEtterOppdatering?.kandidatlisteInfo?.kandidatlisteStatus).isEqualTo("ÅPEN")
+        assertThat(stillingEtterOppdatering?.kandidatlisteInfo?.eier).isEqualTo("T123456")
+    }
+
+    @Test
+    fun `Skal lese inn melding om kandidatlisteInfo fra rapid og oppdatere kandidatlisteInfo i opensearch`() {
+        leggTilKafkaMiljøvariabler()
+        opprettIndeks()
+
+        testProgramMedHendelse(env, melding) {
+            assertThat(size).isEqualTo(1)
+        }
+        // Oppdaterer kandidatlisteInfo for stilling som allerede er indeksert
+        testProgramMedHendelse(env, kandidatlisteInfoMelding) {
+            assertThat(size).isEqualTo(0)
+        }
+        testMetoderOpenSearch.refreshIndex()
+
+        val antallDokumenter = testMetoderOpenSearch.hentAntallDokumenter("stilling_20250328")
+        assertThat(antallDokumenter).isEqualTo(1)
+
+        val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
+        val kandidatlisteInfo = rekrutteringsbistandStilling?.kandidatlisteInfo
+
+        assertThat(kandidatlisteInfo).isNotNull
+        assertThat(kandidatlisteInfo?.kandidatlisteId.toString()).isEqualTo("aaaabbbb-cccc-dddd-eeee-ffff00000002")
+        assertThat(kandidatlisteInfo?.antallKandidater).isEqualTo(7)
+        assertThat(kandidatlisteInfo?.kandidatlisteStatus).isEqualTo("LUKKET")
+        assertThat(kandidatlisteInfo?.eier).isEqualTo("T654321")
+    }
+
+    @Test
+    fun `Skal ikke oppdatere kandidatlisteInfo i opensearch hvis stilling ikke finnes`() {
+        val mockIndexClient = mockk<IndexClient>()
+        every { mockIndexClient.finnesStilling(any(), any()) } returns false
+
+        val service = OpenSearchService(mockIndexClient, env)
+        val rapid = no.nav.toi.TestRapid()
+        KandidatlisteInfoLytter(rapid, service, "stilling_20250328")
+
+        rapid.sendTestMessage(kandidatlisteInfoMelding)
+
+        verify(exactly = 0) { mockIndexClient.oppdaterKandidatlisteInfo(any(), any(), any()) }
     }
 
     private fun leggTilKafkaMiljøvariabler() {
@@ -296,6 +385,20 @@ class OpenSearchServiceTest {
                 "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
                 "stillingsinfoid": "24553",
                 "stillingskategori": "STILLING"
+            }
+        }
+    """.trimIndent()
+
+    private val kandidatlisteInfoMelding = """
+        {
+            "@event_name": "indekserKandidatlisteInfo",
+            "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+            "kandidatlisteInfo": {
+                "kandidatlisteId": "aaaabbbb-cccc-dddd-eeee-ffff00000002",
+                "antallKandidater": 7,
+                "kandidatlisteStatus": "LUKKET",
+                "opprettetDato": "2024-06-01T10:00:00Z",
+                "eier": "T654321"
             }
         }
     """.trimIndent()

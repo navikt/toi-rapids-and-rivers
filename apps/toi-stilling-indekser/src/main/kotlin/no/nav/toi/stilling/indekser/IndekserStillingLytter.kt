@@ -54,11 +54,10 @@ class IndekserStillingLytter(private val rapidsConnection: RapidsConnection,
             mapOf(
                 "@event_name" to "kandidatlisteInfoBehov",
                 "@behov" to listOf("kandidatlisteInfo"),
-                "stillingsId" to stillingsId // Må jeg ha denne i tillegg til at den er key
             )
         )
         rapidsConnection.publish(stillingsId, kandidatlisteInfoBehov.toJson())
-        log.info("Sendt behov om å få kandidatlisteinfo for stilling med stillingsId $stillingsId")
+        log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
 
         openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
     }

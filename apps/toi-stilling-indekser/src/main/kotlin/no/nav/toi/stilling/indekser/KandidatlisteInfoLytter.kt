@@ -18,7 +18,7 @@ class KandidatlisteInfoLytter(rapidsConnection: RapidsConnection,
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("kandidatlisteInfo")
-                it.requireValue("@event_name", "indekserKandidatlisteInfo")
+                it.requireAny("@event_name", listOf("indekserKandidatlisteInfo", "kandidatlisteInfoBehov"))
             }
             validate { it.requireKey("stillingsId") }
         }.register(this)
@@ -44,7 +44,7 @@ class KandidatlisteInfoLytter(rapidsConnection: RapidsConnection,
             return
         }
 
-        log.info("Mottok kandidatlisteinfo for stilling: $stillingsId")
+        log.info("Mottok kandidatlisteInfo for stilling: $stillingsId")
         openSearchService.oppdaterKandidatlisteInfo(stillingsId = stillingsId.toString(), kandidatlisteInfo = kandidatlisteInfo, indeks = indeks)
     }
 }
