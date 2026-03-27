@@ -15,7 +15,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.testcontainers:testcontainers:1.20.5")
+    testImplementation("org.testcontainers:testcontainers:2.0.4")
     testImplementation("org.testcontainers:postgresql:1.20.5")
     testImplementation("org.testcontainers:junit-jupiter:1.20.5")
     testImplementation("io.mockk:mockk:1.13.16")
