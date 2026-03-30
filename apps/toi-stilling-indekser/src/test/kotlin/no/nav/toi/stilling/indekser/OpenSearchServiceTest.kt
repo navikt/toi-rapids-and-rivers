@@ -36,8 +36,8 @@ class OpenSearchServiceTest {
     @BeforeEach
     fun init() {
         env["OPEN_SEARCH_URI"] = osContainer.container.httpHostAddress
-        env["OPEN_SEARCH_USERNAME"] = osContainer.username
-        env["OPEN_SEARCH_PASSWORD"] = osContainer.password
+        env["OPEN_SEARCH_USERNAME"] = ""  // Not needed when security is disabled
+        env["OPEN_SEARCH_PASSWORD"] = ""  // Not needed when security is disabled
 
         env["INDEKS_VERSJON"] = "stilling_20250328"
         env["STILLING_API_URL"] = "enUrl"
