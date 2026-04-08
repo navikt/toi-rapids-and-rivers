@@ -7,6 +7,7 @@ on:
       - ny-oppfølgingsperiode
       - synlig_for_muligheter
       - splitt-applikasjoner
+      - endre_mapping_stilling_indekser
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml

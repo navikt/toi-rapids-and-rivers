@@ -115,3 +115,6 @@ spec:
     - team: toi
       application: toi-siste-oppfolgingsperiode-pond
       access: readwrite
+    - team: toi
+      application: rekrutteringsbistand-kandidat-api
+      access: readwrite
