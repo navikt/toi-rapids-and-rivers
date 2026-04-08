@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/fiks_alert_og_securelog_2
+      deploy_dev_branch: refs/heads/endre_mapping_stilling_indekser
     secrets: inherit
     permissions:
       contents: read
