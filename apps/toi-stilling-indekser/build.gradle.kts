@@ -11,8 +11,8 @@ dependencies {
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.2")
     runtimeOnly("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:2.16.0-alpha")
 
+    testImplementation("org.testcontainers:testcontainers:2.0.4")
     testImplementation("org.testcontainers:elasticsearch:1.21.4")
     testImplementation("org.testcontainers:kafka:1.21.4")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
     testImplementation("io.mockk:mockk:1.13.17")
 }
