@@ -28,6 +28,7 @@ data class Kandidat(
      */
     fun toEvaluering() = Evaluering(
         harAktivCv = arbeidsmarkedCv.hvisIkkeNullOg(::harAktivCv),
+        harJobbprofil = arbeidsmarkedCv.hvisIkkeNullOg(::harJobbprofil),
         harOppfølging = sisteOppfølgingsperiode.hvisIkkeNullOg(::harOppfølging),
         harRiktigFormidlingsgruppe = oppfølgingsinformasjon.hvisIkkeNullOg(::harRiktigFormidlingsgruppe),
         erIkkeKode6eller7 = oppfølgingsinformasjon.hvisIkkeNullOg(::erIkkeKode6EllerKode7),
@@ -46,6 +47,9 @@ data class Kandidat(
     private fun harAktivCv(arbeidsmarkedCv: CvMelding) = arbeidsmarkedCv.meldingstype.let {
         listOf(CvMeldingstype.OPPRETT, CvMeldingstype.ENDRE).contains(it)
     }
+
+    private fun harJobbprofil(cvMelding: CvMelding) =
+        cvMelding.endreJobbprofil != null || cvMelding.opprettJobbprofil != null
 
     private fun harOppfølging(sisteOppfølgingsperiode: SisteOppfølgingsperiode): Boolean {
         val now = Instant.now()
