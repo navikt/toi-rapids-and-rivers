@@ -19,7 +19,7 @@ class EsAnsettelsesformJobbonsker(
             + '\'' + ", ansettelsesformKodeTekst='" + ansettelsesformKodeTekst + '\'' + '}')
 
     companion object {
-        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode["ansettelsesformer"].map(JsonNode::asText)
+        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode.path("ansettelsesformer").map(JsonNode::asText)
             .map(Ansettelsesform::valueOf)
             .map { ansettelsesformJobbønske ->
                 EsAnsettelsesformJobbonsker(
