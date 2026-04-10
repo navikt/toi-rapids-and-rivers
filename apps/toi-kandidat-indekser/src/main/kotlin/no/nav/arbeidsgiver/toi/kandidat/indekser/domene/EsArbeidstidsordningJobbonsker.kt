@@ -19,7 +19,7 @@ class EsArbeidstidsordningJobbonsker(
             + '\'' + ", arbeidstidsordningKodeTekst='" + arbeidstidsordningKodeTekst + '\'' + '}')
 
     companion object {
-        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode["arbeidstidsordninger"].map(JsonNode::asText)
+        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode.path("arbeidstidsordninger").map(JsonNode::asText)
             .map(Arbeidstidsordning::valueOf)
             .map { arbeidstidsordning ->
                 EsArbeidstidsordningJobbonsker(
