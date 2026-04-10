@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
 class UferdigKandidatLytterTest {
@@ -136,6 +136,32 @@ class UferdigKandidatLytterTest {
         val melding = inspektør.message(0)
         assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).contains("geografi")
         assertThat(melding["geografiKode"].map ( JsonNode::asText )).hasSize(0)
-        assertThat(melding["postnummer"].isNull()).isTrue
+        assertThat(melding["postnummer"].isNull).isTrue
+    }
+
+    @Test
+    fun `Melding der jobbprofil mangler (MissingNode) skal godkjennes og prosesseres`() {
+        val melding = rapidMelding(
+            synlighetJson = synlighet(true),
+            jobbprofilEksisterer = false
+        )
+
+        val testrapid = TestRapid()
+        UferdigKandidatLytter(testrapid)
+        testrapid.sendTestMessage(melding)
+
+        val inspektør = testrapid.inspektør
+        assertThat(inspektør.size).isEqualTo(1)
+
+        val resultat = inspektør.message(0)
+        assertThat(resultat["@behov"].asIterable())
+            .map<String>(JsonNode::asText)
+            .containsAll(behovsListe)
+
+        assertFalse(resultat["kompetanse"].isMissingNode)
+        assertThat(resultat["kompetanse"].toList()).isEmpty()
+        assertThat(resultat["geografiKode"].toList()).isEmpty()
+        assertThat(resultat["stillingstittel"].map(JsonNode::asText))
+            .containsExactlyInAnyOrder("Lege", "Pianolærer", "Baker")
     }
 }
