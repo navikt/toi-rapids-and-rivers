@@ -28,6 +28,7 @@ private object Missing : BooleanVerdi {
 
 class Evaluering(
     val harAktivCv: BooleanVerdi,
+    val harJobbprofil: BooleanVerdi,
     val harOppfølging: BooleanVerdi,
     val harRiktigFormidlingsgruppe: BooleanVerdi,
     val erIkkeKode6eller7: BooleanVerdi,
@@ -40,6 +41,7 @@ class Evaluering(
 ) {
     private val felterBortsettFraAdressebeskyttelse = listOf(
         harAktivCv,
+        harJobbprofil,
         harOppfølging,
         //harRiktigFormidlingsgruppe, // ARBS skal ikke lenger være en del av evalueringen. Kommentert ut frem til vi er sikre på at det kan slettes helt
         erIkkeKode6eller7,
@@ -68,6 +70,7 @@ class Evaluering(
 
     fun tilEvalueringUtenDiskresjonskode() = EvalueringUtenDiskresjonskode(
         harAktivCv = harAktivCv.default(false),
+        harJobbprofil = harJobbprofil.default(false),
         erUnderOppfoelging = harOppfølging.default(false),
         harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
         erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
@@ -104,6 +107,7 @@ data class Synlighet(
 
 data class EvalueringUtenDiskresjonskode(
     val harAktivCv: Boolean,
+    val harJobbprofil: Boolean,
     val erUnderOppfoelging: Boolean,
     val harRiktigFormidlingsgruppe: Boolean,
     val erIkkeSperretAnsatt: Boolean,
@@ -113,6 +117,7 @@ data class EvalueringUtenDiskresjonskode(
     companion object {
         fun medAlleVerdierFalse() = EvalueringUtenDiskresjonskode(
             harAktivCv = false,
+            harJobbprofil = false,
             erUnderOppfoelging = false,
             harRiktigFormidlingsgruppe = false,
             erIkkeSperretAnsatt = false,
