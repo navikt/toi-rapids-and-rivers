@@ -19,7 +19,7 @@ class EsOmfangJobbonsker(
             + ", omfangKodeTekst='" + omfangKodeTekst + '\'' + '}')
 
     companion object {
-        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode["omfang"].map(JsonNode::asText)
+        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode.path("omfang").map(JsonNode::asText)
             .map(Omfang::valueOf)
             .map { omfang ->
                 EsOmfangJobbonsker(

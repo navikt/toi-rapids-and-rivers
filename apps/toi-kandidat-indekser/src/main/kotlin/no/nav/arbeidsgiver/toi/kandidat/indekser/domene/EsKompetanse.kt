@@ -44,7 +44,7 @@ class EsKompetanse(
 
     companion object {
         fun fraMelding(jobbProfilNode: JsonNode, packet: JsonMessage) =
-            jobbProfilNode["kompetanser"].map(JsonNode::asText).map { kompetanse ->
+            jobbProfilNode.path("kompetanser").map(JsonNode::asText).map { kompetanse ->
                 EsKompetanse(
                     fraDato = null,
                     kompKode = null,

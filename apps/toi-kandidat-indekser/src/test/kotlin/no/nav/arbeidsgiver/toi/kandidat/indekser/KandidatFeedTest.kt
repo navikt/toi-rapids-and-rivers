@@ -171,4 +171,25 @@ class KandidatFeedTest {
         confirmVerified(esClient)
         assertThat(rapid.inspektør.size).isEqualTo(1)
     }
+
+    @Test
+    fun `Melding som mangler jobbprofil skal godkjennes og lagres i ES`() {
+        val esClient = mockk<ESClient>(relaxed = true)
+        val rapid = nyRapidMedLyttere(esClient)
+
+        val melding = rapidMelding(
+            synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
+            ontologi = ontologiDel(),
+            geografi = geografiDel(),
+            organisasjonsenhetsnavn = "Nav kontor",
+            jobbprofilEksisterer = false
+        )
+
+        rapid.sendTestMessage(melding)
+
+        verify(exactly = 1) { esClient.lagreEsCv(any()) }
+        verify(exactly = 0) { esClient.slettCv(any()) }
+        confirmVerified(esClient)
+        assertThat(rapid.inspektør.size).isEqualTo(1)
+    }
 }
