@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/oppdater_logg_og_alert
+      deploy_dev_branch: refs/heads/bygg-paa-lokal-ubuntu
     secrets: inherit
     permissions:
       contents: read

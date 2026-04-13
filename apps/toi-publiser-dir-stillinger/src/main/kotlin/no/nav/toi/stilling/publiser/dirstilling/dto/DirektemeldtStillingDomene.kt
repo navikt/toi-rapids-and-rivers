@@ -40,13 +40,13 @@ data class DirektemeldtStilling(
     val publisert: ZonedDateTime? = null,
     val publisertAvAdmin: String?,
 ) {
-    fun konverterTilStilling(stillingskategori: Stillingskategori?): Stilling = Stilling(
+    fun konverterTilStilling(stillingskategori: Stillingskategori?, stillingsInfo: Stillingsinfo): Stilling = Stilling(
         uuid = stillingsId,
         created = konverterDato(opprettet),
         updated = konverterDato(sistEndret),
         status = status,
         title = innhold.title,
-        administration = innhold.administration?.copy(status = adminStatus),
+        administration = konverterTilAdministration(stillingsInfo),
         contactList = innhold.contactList,
         privacy = innhold.privacy,
         source = innhold.source,
@@ -62,6 +62,15 @@ data class DirektemeldtStilling(
         businessName = innhold.businessName,
         adnr = annonsenr.toString(),
     )
+
+    private fun konverterTilAdministration(stillingsInfo: Stillingsinfo) =
+        DirektemeldtStillingAdministration(
+            status = adminStatus,
+            comments = null,
+            reportee = stillingsInfo.eierNavn,
+            remarks = emptyList(),
+            navIdent = stillingsInfo.eierNavident
+        )
 
     private fun konverterDato(dato: ZonedDateTime): LocalDateTime {
         return ZonedDateTime.of(LocalDateTime.ofInstant(dato.toInstant(), ZoneId.of("Europe/Oslo")), ZoneId.of("Europe/Oslo"))

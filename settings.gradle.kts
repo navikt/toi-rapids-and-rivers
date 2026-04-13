@@ -8,7 +8,6 @@ include(
     "apps:toi-siste-14a-vedtak",
     "apps:toi-identmapper",
     "apps:toi-synlighetsmotor",
-    "apps:toi-oppfolgingsperiode",
     "apps:toi-siste-oppfolgingsperiode",
     "apps:toi-siste-oppfolgingsperiode-pond",
     "apps:toi-organisasjonsenhet",

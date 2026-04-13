@@ -70,7 +70,7 @@ class PubliserStillingLytterTest {
             jacksonMapper.readValue(rapidHendelse(), RapidHendelse::class.java).direktemeldtStilling
         val stillingsinfo = jacksonMapper.readValue(rapidHendelse(), RapidHendelse::class.java).stillingsinfo
 
-        val stilling = direktemeldtStilling.konverterTilStilling(stillingsinfo?.stillingskategori)
+        val stilling = direktemeldtStilling.konverterTilStilling(stillingsinfo?.stillingskategori, stillingsinfo!!)
 
         assertEquals("123e4567-e89b-12d3-a456-426614174000", stilling.reference)
         assertEquals("STILLING", stilling.properties["direktemeldtStillingskategori"])

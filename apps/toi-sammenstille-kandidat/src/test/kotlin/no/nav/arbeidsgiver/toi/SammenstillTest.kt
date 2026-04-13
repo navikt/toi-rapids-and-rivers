@@ -15,7 +15,6 @@ class SammenstillTest {
         "veileder",
         "oppfølgingsinformasjon",
         "siste14avedtak",
-        "oppfølgingsperiode",
         "kvp"
     )
 

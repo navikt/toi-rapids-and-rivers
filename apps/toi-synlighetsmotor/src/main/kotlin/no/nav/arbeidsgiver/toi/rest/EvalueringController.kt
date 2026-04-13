@@ -42,7 +42,7 @@ private fun Evaluering?.lagEvalueringSomObfuskererKandidaterMedDiskresjonskode()
 private fun Evaluering.tilEvalueringUtenDiskresjonskodeDTO() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = harAktivCv.default(false),
     harJobbprofil = harJobbprofil.default(false),
-    erUnderOppfoelging = erUnderOppfoelging.default(false),
+    erUnderOppfoelging = harOppfølging.default(false),
     harRiktigFormidlingsgruppe = harRiktigFormidlingsgruppe.default(false),
     erIkkeSperretAnsatt = erIkkeSperretAnsatt.default(false),
     erIkkeDoed = erIkkeDoed.default(false),

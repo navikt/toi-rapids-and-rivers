@@ -48,7 +48,7 @@ val epostTemplate = """
                             <li>Velg «Legge til ny person eller virksomhet»</li>
                             <li>Legg inn personnummeret og etternavnet til personen som skal ha tilgang</li>
                             <li>Velg «Gi tilgang til enkelttjenester»</li>
-                            <li>Skriv «Rekruttering», så vil alternativet komme opp som et valg. Velg «Rekruttering».</li>
+                            <li>Skriv «Rekrutteringssaker og CV-er fra Nav», så vil alternativet komme opp som et valg. Velg «Rekrutteringssaker og CV-er fra Nav».</li>
                             <li>Bekreft</li>
                         </ol>
                         <p>Denne enkeltrettigheten gir kun tilgang til å bruke Nav sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra Nav på &quot;Min side - arbeidsgiver&quot; på Nav sitt nettsted.</p>
@@ -57,7 +57,7 @@ val epostTemplate = """
                         <ul style='line-height: 24px'>
                             <li>Du er registrert i Enhetsregisteret som daglig leder, styrets leder, bestyrende reder eller innehaver.</li>
                             <li>Du er registert som hovedadministrator i Altinn.</li>
-                            <li>Du er «Tilgangsstyrer» i Altinn og har én, eller flere av rollene: «Rekruttering», «Lønn og personalmedarbeider», eller «Utfyller/innsender».</li>
+                            <li>Du er «Tilgangsstyrer» i Altinn og har én, eller flere av rollene: «Rekrutteringssaker og CV-er fra Nav», «Lønn og personalmedarbeider», eller «Utfyller/innsender».</li>
                         </ul>
                     </div>
                 </div>
