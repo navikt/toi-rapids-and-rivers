@@ -222,7 +222,6 @@ private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.iss
 
 private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = true,
-    harJobbprofil = true,
     erUnderOppfoelging = true,
     harRiktigFormidlingsgruppe = true,
     erIkkeSperretAnsatt = true,
@@ -233,7 +232,6 @@ private fun evalueringUtenDiskresjonskodeMedAltTrue() = EvalueringUtenDiskresjon
 
 private fun evalueringUtenDiskresjonskodeMedAltFalse() = EvalueringUtenDiskresjonskodeDTO(
     harAktivCv = false,
-    harJobbprofil = false,
     erUnderOppfoelging = false,
     harRiktigFormidlingsgruppe = false,
     erIkkeSperretAnsatt = false,

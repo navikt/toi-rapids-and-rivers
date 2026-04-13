@@ -31,7 +31,6 @@ class SynlighetRekrutteringstreffLytterTest {
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
-                harJobbprofil = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -64,7 +63,6 @@ class SynlighetRekrutteringstreffLytterTest {
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
-                harJobbprofil = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -96,7 +94,6 @@ class SynlighetRekrutteringstreffLytterTest {
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
-                harJobbprofil = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -134,7 +131,6 @@ class SynlighetRekrutteringstreffLytterTest {
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
-                harJobbprofil = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),
@@ -166,7 +162,6 @@ class SynlighetRekrutteringstreffLytterTest {
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
-                harJobbprofil = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
                 erIkkeKode6eller7 = true.tilBooleanVerdi(),

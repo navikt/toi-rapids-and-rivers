@@ -85,7 +85,6 @@ class SynlighetRekrutteringstreffLytter(
 
         val oppdatertEvaluering = Evaluering(
             harAktivCv = evaluering.harAktivCv,
-            harJobbprofil = evaluering.harJobbprofil,
             harOppfølging = evaluering.harOppfølging,
             harRiktigFormidlingsgruppe = evaluering.harRiktigFormidlingsgruppe,
             erIkkeKode6eller7 = evaluering.erIkkeKode6eller7,
