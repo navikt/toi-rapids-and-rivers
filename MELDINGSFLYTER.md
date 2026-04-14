@@ -528,6 +528,33 @@ Greg Young argumenterer for at tradisjonell orkestrert request/response-kommunik
 - **Idempotent berikelse**: Hvis en beriker allerede har lagt til sitt felt, vil den ikke plukke opp meldingen igjen (fordi feltet ikke lenger er "uløst").
 - **Feiltolerant**: Hvis en beriker er nede, stopper meldingen der den er. Når berikeren kommer tilbake, plukker den opp meldingen og kjeden fortsetter.
 
+### Nåværende arkitektur: to mønstre i sameksistens
+
+I dag bruker systemet en blanding av to mønstre for å samle kandidatdata:
+
+**Mønster 1: Database-lagring via toi-sammenstille-kandidat (eldre)**
+
+Datakilder som arbeidsmarkedCv, veileder, oppfølgingsinformasjon, siste14avedtak og kvp lagres i en PostgreSQL-database av `toi-sammenstille-kandidat` (SamleLytter). Når synlighetsmotor trenger disse dataene, sender den et `@behov`, og `toi-sammenstille-kandidat` (NeedLytter) henter dem fra databasen og legger dem på meldingen.
+
+Dette er i praksis et **Claim Check**-mønster: dataene tas av meldingen, lagres et annet sted, og hentes tilbake senere.
+
+**Mønster 2: Ren behovskjede uten database (nyere)**
+
+Datakilder som sisteOppfølgingsperiode, arbeidssokeropplysninger og adressebeskyttelse har egne behov-berikere (`toi-siste-oppfolgingsperiode-pond`, `toi-arbeidssoekeropplysninger`, `toi-livshendelse`) som svarer direkte på `@behov` — uten å gå via toi-sammenstille-kandidat. Disse berikerne henter data fra sin egen kilde (KTable, egen database, PDL-oppslag) og legger det rett på meldingen.
+
+Dette er det rene **Document Message**-mønsteret: dokumentet flyter gjennom berikere som hver legger til sin del, uten en sentral database som mellomledd.
+
+**Retningen videre**
+
+Planen er å fase ut toi-sammenstille-kandidat og gå over til det rene behovskjede-mønsteret for alle datakilder. I praksis betyr det at hver datakilde (veileder, oppfølgingsinformasjon, siste14avedtak, kvp, arbeidsmarkedCv) får sin egen behov-beriker som svarer direkte på `@behov` — på samme måte som toi-siste-oppfolgingsperiode-pond og toi-arbeidssoekeropplysninger allerede gjør.
+
+Fordeler med det rene behovskjede-mønsteret:
+
+- **Eliminerer sentral database**: toi-sammenstille-kandidat sin PostgreSQL-database er en single point of failure og en flaskehals. Uten den trenger ingen app å holde en komplett kopi av alle kandidatdata.
+- **Enklere å legge til nye datakilder**: En ny datakilde trenger bare å implementere en behov-beriker som svarer på sitt felt. Ingen endring i toi-sammenstille-kandidat.
+- **Bedre separasjon av ansvar**: Hver app eier sin egen data og vet best hvordan den skal hentes og berikes.
+- **Konsistent arkitektur**: Alle datakilder følger samme mønster i stedet for at noen går via database og andre ikke.
+
 ### Behovskjeden for indekseringsberikere (kandidat-indekser)
 
 Etter at synlighet er beregnet, legger `UferdigKandidatLytter` i toi-kandidat-indekser til et nytt sett med behov for å berike CV-data til søkeindeksen:
