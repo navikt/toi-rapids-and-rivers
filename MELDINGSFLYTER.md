@@ -6,12 +6,24 @@ Dokumentasjon over alle meldingsflyter på rapiden som ender med kandidat-indeks
 
 Systemet bruker [rapids-and-rivers](https://github.com/navikt/rapids-and-rivers)-arkitekturen. Alle apper deler én Kafka-topic (rapiden). Meldinger flyter gjennom rapiden og berikes underveis av ulike apper. Flyten starter når data kommer inn fra eksterne Kafka-topics, og ender når en komplett kandidatprofil indekseres i OpenSearch.
 
+### KAFKA_EXTRA_TOPIC-mekanismen
+
+Rapids-and-rivers-biblioteket støtter en `KAFKA_EXTRA_TOPIC`-konfigurasjon (satt i `nais.yaml`). Når denne er satt, abonnerer appens consumer på **både** rapid-topicen (`toi.rapid-1`) og det ekstra topicet. Meldinger fra det ekstra topicet dukker opp i consumeren uten `@event_name`-felt, noe transformator-appene utnytter med `forbid("@event_name")` for å kun plukke opp rå-meldinger fra det ekstra topicet.
+
+| App | KAFKA_EXTRA_TOPIC | Ekstern kilde |
+|-----|-------------------|---------------|
+| toi-kvp | `pto.kvp-perioder-v1` | KVP-perioder fra PTO |
+| toi-oppfolgingsinformasjon | `pto.endring-paa-oppfolgingsbruker-v2` | Oppfølgingsbrukerendringer fra PTO |
+| toi-veileder | `pto.siste-tilordnet-veileder-v1` | Veiledertilordninger fra PTO |
+| toi-siste-14a-vedtak | `pto.siste-14a-vedtak-v1` | 14a-vedtak fra PTO |
+| toi-siste-oppfolgingsperiode-pond | `toi.siste-oppfolgingsperiode-fra-aktorid-v1` | Re-keyet oppfølgingsperioder fra toi-siste-oppfolgingsperiode |
+
 ### Roller i arkitekturen
 
 | Rolle | Beskrivelse | Apper |
 |-------|-------------|-------|
-| **Inngangsporter** | Lytter på eksterne Kafka-topics og publiserer hendelser til rapiden | toi-arbeidsmarked-cv, toi-arbeidssoekerperiode, toi-livshendelse |
-| **Transformatorer** | Lytter på rå-meldinger (uten `@event_name`) på rapiden og transformerer til navngitte hendelser | toi-kvp, toi-oppfolgingsinformasjon, toi-veileder, toi-siste-14a-vedtak, toi-siste-oppfolgingsperiode-pond |
+| **Inngangsporter** | Lytter på eksterne Kafka-topics (egne consumere) og publiserer hendelser til rapiden | toi-arbeidsmarked-cv, toi-arbeidssoekerperiode, toi-livshendelse |
+| **Transformatorer** | Lytter på rå-meldinger fra `KAFKA_EXTRA_TOPIC` (uten `@event_name`) og transformerer til navngitte hendelser på rapiden | toi-kvp, toi-oppfolgingsinformasjon, toi-veileder, toi-siste-14a-vedtak, toi-siste-oppfolgingsperiode-pond |
 | **Identmapper** | Slår opp aktørId fra fødselsnummer via PDL og beriker meldingen | toi-identmapper |
 | **Aggregator** | Samler kandidatdata fra alle kilder i en database og svarer på behov | toi-sammenstille-kandidat |
 | **Synlighetsmotor** | Evaluerer om en kandidat skal være synlig i søk | toi-synlighetsmotor |
@@ -29,10 +41,10 @@ flowchart TD
         ASR_TOPIC["paw.arbeidssokerperioder-v1"]
         PDL_TOPIC["pdl.leesah-v1"]
         POAO_TOPIC["poao.siste-oppfolgingsperiode-v3"]
-        RAW_KVP["Rå-melding: kvp"]
-        RAW_OPP["Rå-melding: oppfølgingsinformasjon"]
-        RAW_VEIL["Rå-melding: veiledertilordning"]
-        RAW_14A["Rå-melding: siste 14a-vedtak"]
+        KVP_TOPIC["pto.kvp-perioder-v1<br/>(KAFKA_EXTRA_TOPIC)"]
+        OPP_TOPIC["pto.endring-paa-oppfolgingsbruker-v2<br/>(KAFKA_EXTRA_TOPIC)"]
+        VEIL_TOPIC["pto.siste-tilordnet-veileder-v1<br/>(KAFKA_EXTRA_TOPIC)"]
+        V14A_TOPIC["pto.siste-14a-vedtak-v1<br/>(KAFKA_EXTRA_TOPIC)"]
     end
 
     subgraph Inngangsporter
@@ -84,11 +96,11 @@ flowchart TD
     PDL_TOPIC --> toi-livshendelse
     POAO_TOPIC --> toi-siste-oppfolgingsperiode
 
-    %% Rå-meldinger → Transformatorer
-    RAW_KVP -.->|"på rapiden<br/>uten @event_name"| toi-kvp
-    RAW_OPP -.->|"på rapiden<br/>uten @event_name"| toi-oppfolgingsinformasjon
-    RAW_VEIL -.->|"på rapiden<br/>uten @event_name"| toi-veileder
-    RAW_14A -.->|"på rapiden<br/>uten @event_name"| toi-siste-14a-vedtak
+    %% KAFKA_EXTRA_TOPIC → Transformatorer
+    KVP_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-kvp
+    OPP_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-oppfolgingsinformasjon
+    VEIL_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-veileder
+    V14A_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-siste-14a-vedtak
 
     %% Inngangsporter → hendelser med @event_name
     toi-arbeidsmarked-cv -->|"arbeidsmarked-cv"| toi-sammenstille-kandidat
@@ -195,14 +207,14 @@ Trigges når en bruker starter eller avslutter KVP (Kvalifiseringsprogrammet).
 
 ```mermaid
 sequenceDiagram
-    participant EKS as Ekstern kilde
+    participant EKS as pto.kvp-perioder-v1<br/>(KAFKA_EXTRA_TOPIC)
     participant KVP as toi-kvp
     participant SAM as toi-sammenstille-kandidat<br/>(SamleLytter)
     participant SYN as toi-synlighetsmotor
     participant SAM2 as toi-sammenstille-kandidat<br/>(NeedLytter)
     participant IND as toi-kandidat-indekser
 
-    Note over EKS: Rå-melding på rapiden<br/>uten @event_name,<br/>med event, aktorId,<br/>startet, enhetId
+    Note over EKS: Rå-melding via<br/>KAFKA_EXTRA_TOPIC<br/>uten @event_name,<br/>med event, aktorId,<br/>startet, enhetId
     EKS-->>KVP: Rå kvp-melding
     KVP->>KVP: Validerer event=STARTET/AVSLUTTET
     KVP-->>SAM: @event_name=kvp<br/>aktørId, kvp{event, startet, avsluttet, enhetId}
@@ -222,14 +234,14 @@ Trigges når oppfølgingsinformasjon endres for en bruker.
 
 ```mermaid
 sequenceDiagram
-    participant EKS as Ekstern kilde
+    participant EKS as pto.endring-paa-oppfolgingsbruker-v2<br/>(KAFKA_EXTRA_TOPIC)
     participant OPP as toi-oppfolgingsinformasjon
     participant IDM as toi-identmapper
     participant SAM as toi-sammenstille-kandidat
     participant SYN as toi-synlighetsmotor
     participant IND as toi-kandidat-indekser
 
-    Note over EKS: Rå-melding på rapiden<br/>uten @event_name,<br/>med fodselsnummer,<br/>oppfolgingsenhet,<br/>harOppfolgingssak
+    Note over EKS: Rå-melding via<br/>KAFKA_EXTRA_TOPIC<br/>uten @event_name,<br/>med fodselsnummer,<br/>oppfolgingsenhet,<br/>harOppfolgingssak
     EKS-->>OPP: Rå oppfølgingsmelding
     OPP-->>IDM: @event_name=oppfølgingsinformasjon<br/>fodselsnummer, oppfølgingsinformasjon
     Note over IDM: Slår opp aktørId fra<br/>fødselsnummer via PDL
@@ -247,13 +259,13 @@ Trigges når en veileder tilordnes en bruker.
 
 ```mermaid
 sequenceDiagram
-    participant EKS as Ekstern kilde
+    participant EKS as pto.siste-tilordnet-veileder-v1<br/>(KAFKA_EXTRA_TOPIC)
     participant VEIL as toi-veileder
     participant SAM as toi-sammenstille-kandidat
     participant SYN as toi-synlighetsmotor
     participant IND as toi-kandidat-indekser
 
-    Note over EKS: Rå-melding på rapiden<br/>uten @event_name,<br/>med aktorId, veilederId
+    Note over EKS: Rå-melding via<br/>KAFKA_EXTRA_TOPIC<br/>uten @event_name,<br/>med aktorId, veilederId
     EKS-->>VEIL: Rå veiledermelding
     VEIL->>VEIL: Slår opp veilederinfo i NOM
     VEIL-->>SAM: @event_name=veileder<br/>aktørId, veileder{aktorId, veilederId, veilederinformasjon}
@@ -270,13 +282,13 @@ Trigges når et nytt 14a-vedtak fattes.
 
 ```mermaid
 sequenceDiagram
-    participant EKS as Ekstern kilde
+    participant EKS as pto.siste-14a-vedtak-v1<br/>(KAFKA_EXTRA_TOPIC)
     participant V14 as toi-siste-14a-vedtak
     participant SAM as toi-sammenstille-kandidat
     participant SYN as toi-synlighetsmotor
     participant IND as toi-kandidat-indekser
 
-    Note over EKS: Rå-melding på rapiden<br/>uten @event_name,<br/>med aktorId, innsatsgruppe,<br/>hovedmal, fattetDato
+    Note over EKS: Rå-melding via<br/>KAFKA_EXTRA_TOPIC<br/>uten @event_name,<br/>med aktorId, innsatsgruppe,<br/>hovedmal, fattetDato
     EKS-->>V14: Rå 14a-vedtak-melding
     V14-->>SAM: @event_name=siste14avedtak<br/>aktørId, siste14avedtak
     SAM->>SAM: Lagrer siste14avedtak i DB
