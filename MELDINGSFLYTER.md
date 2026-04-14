@@ -391,29 +391,146 @@ sequenceDiagram
 
 ---
 
-## Behovsmekanismen (@behov)
+## Behovsmekanismen (@behov) — Document-oriented Messaging
 
-Meldinger berikes stegvis gjennom et behovsmønster. Når en app mangler data, legger den til felter i `@behov`-arrayet. Berikere plukker opp meldingen når deres behov er det **første uløste** i listen.
+### Konseptuell bakgrunn
+
+Behovsmønsteret i dette systemet er en implementasjon av **Document Message**-mønsteret fra *Enterprise Integration Patterns* (Hohpe & Woolf, 2003). I stedet for å sende små, spesialiserte kommandoer mellom tjenester, sender systemet ett stort JSON-dokument som flyter gjennom en kjede av berikere. Hver beriker leser fra dokumentet, legger til sin del, og publiserer det tilbake.
+
+Dette er også kjernen i det Greg Young beskriver i sine foredrag om **Document-oriented Messaging**: i stedet for at en orkestrator koordinerer mange request/response-kall til ulike tjenester, lar man **dokumentet selv** flyte gjennom systemet. Hver tjeneste som ser dokumentet kan lese det den trenger og skrive tilbake det den kan bidra med. Dokumentet blir en slags "reisende mappe" som samler informasjon underveis.
+
+### Hvordan det fungerer i praksis
+
+I dette systemet brukes et JSON-felt kalt `@behov` som en **behovsliste** — et array av strenger som angir hvilke datafelter som mangler:
+
+```json
+{
+  "aktørId": "123",
+  "@behov": ["arbeidsmarkedCv", "veileder", "oppfølgingsinformasjon", "siste14avedtak", "kvp"],
+  "arbeidsmarkedCv": null,
+  "veileder": null
+}
+```
+
+Regelen er enkel: **det første uløste behovet i listen avgjør hvem som plukker opp meldingen**. Et behov er "uløst" hvis det tilhørende feltet mangler i dokumentet (`isMissingNode`). Når en beriker har lagt til sitt felt, publiserer den hele dokumentet tilbake til rapiden. Da er neste behov i listen det første uløste, og neste beriker plukker opp meldingen.
+
+#### Valideringslogikken (`demandAtFørstkommendeUløsteBehovEr`)
+
+Berikerne bruker en felles valideringsfunksjon som avgjør om de skal reagere på en melding:
+
+```kotlin
+// Forenklet fremstilling av logikken
+fun demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
+    require("@behov") { behovNode ->
+        val førsteManglendeElement = behovNode
+            .map(JsonNode::asText)         // ["arbeidsmarkedCv", "veileder", ...]
+            .onEach { interestedIn(it) }   // Registrer interesse i alle felter
+            .first { this[it].isMissingNode } // Finn det første feltet som mangler
+
+        if (førsteManglendeElement != informasjonsElement)
+            throw Exception("Uinteressant hendelse") // Ikke mitt behov — ignorer
+    }
+}
+```
+
+Denne funksjonen itererer gjennom `@behov`-listen og finner det **første elementet** som ennå ikke finnes i dokumentet. Hvis dette elementet matcher beriker-appens ansvarsfelt, plukker den opp meldingen. Ellers ignoreres den.
+
+### Steg-for-steg eksempel
+
+Her er et konkret eksempel på hvordan en melding berikes gjennom behovskjeden. Anta at en CV-endring trigger synlighetsmotor, og synlighetsmotor ser at bare `arbeidsmarkedCv` finnes:
+
+```
+Steg 1: toi-synlighetsmotor
+  - Ser at mange felter mangler
+  - Legger til @behov: [arbeidsmarkedCv, veileder, oppfølgingsinformasjon,
+                         siste14avedtak, sisteOppfølgingsperiode, kvp,
+                         arbeidssokeropplysninger]
+  - arbeidsmarkedCv finnes allerede → første ULØSTE behov er "veileder"
+  - Publiserer til rapiden
+
+Steg 2: toi-sammenstille-kandidat (NeedLytter for "veileder")
+  - Ser at første uløste behov er "veileder" → plukker opp
+  - Henter kandidat fra DB, legger til veileder-feltet
+  - Publiserer til rapiden
+  - Neste uløste behov er nå "oppfølgingsinformasjon"
+
+Steg 3: toi-sammenstille-kandidat (NeedLytter for "oppfølgingsinformasjon")
+  - Plukker opp, legger til oppfølgingsinformasjon
+  - ... og slik fortsetter det for siste14avedtak og kvp
+
+Steg 4: toi-siste-oppfolgingsperiode-pond (BehovsLytter)
+  - Første uløste behov er nå "sisteOppfølgingsperiode"
+  - Henter siste oppfølgingsperiode fra KTable, legger til
+  - Publiserer til rapiden
+
+Steg 5: toi-arbeidssoekeropplysninger (BehovLytter)
+  - Første uløste behov er nå "arbeidssokeropplysninger"
+  - Henter fra DB, legger til
+  - Publiserer til rapiden
+
+Steg 6: toi-synlighetsmotor
+  - Alle behov er besvart → evaluerer synlighet
+  - Hvis alt bortsett fra adressebeskyttelse er OK:
+    legger til @behov: [... , adressebeskyttelse]
+  - Publiserer til rapiden
+
+Steg 7: toi-livshendelse (AdressebeskyttelseLytter)
+  - Første uløste behov er "adressebeskyttelse"
+  - Slår opp gradering i PDL
+  - Legger til adressebeskyttelse-feltet
+  - Publiserer til rapiden
+
+Steg 8: toi-synlighetsmotor
+  - Nå er ALT komplett → beregner synlighet
+  - Legger til synlighet = { erSynlig: true/false, ferdigBeregnet: true }
+  - Publiserer til rapiden → plukkes opp av toi-kandidat-indekser
+```
+
+### Mønsteret visualisert
+
+Dokumentet vokser for hver beriker som behandler det:
 
 ```mermaid
 flowchart LR
-    subgraph Synlighetsmotor behov
-        S1["@behov: [arbeidsmarkedCv,<br/>veileder, oppfølgingsinformasjon,<br/>siste14avedtak, sisteOppfølgingsperiode,<br/>kvp, arbeidssokeropplysninger]"]
-        S2["Eventuelt: + adressebeskyttelse"]
+    subgraph "Dokumentet vokser gjennom behovskjeden"
+        direction LR
+        D1["📄 aktørId<br/>arbeidsmarkedCv<br/>@behov: [veileder,<br/>oppfølgingsinformasjon, ...]"]
+        D2["📄 + veileder"]
+        D3["📄 + oppfølgingsinformasjon"]
+        D4["📄 + siste14avedtak, kvp"]
+        D5["📄 + sisteOppfølgingsperiode"]
+        D6["📄 + arbeidssokeropplysninger"]
+        D7["📄 + adressebeskyttelse"]
+        D8["📄 + synlighet ✓"]
     end
 
-    subgraph Kandidat-indekser behov
-        K1["@behov: [..., organisasjonsenhetsnavn,<br/>hullICv, ontologi, geografi]"]
-    end
-
-    S1 -->|"toi-sammenstille-kandidat<br/>svarer sekvensielt"| S2
-    S2 -->|"toi-livshendelse<br/>svarer"| K1
-    K1 -->|"Berikere svarer<br/>sekvensielt"| FERDIG[Alle behov løst]
+    D1 -->|"sammenstille"| D2 -->|"sammenstille"| D3 -->|"sammenstille"| D4
+    D4 -->|"oppf.periode"| D5 -->|"arb.oppl."| D6 -->|"livshendelse"| D7
+    D7 -->|"synlighetsmotor"| D8
 ```
 
-### Behovskjeden for berikere (kandidat-indekser)
+### Kobling til Enterprise Integration Patterns
 
-Berikerne svarer i rekkefølge basert på det første uløste behovet:
+| EIP-mønster | Bruk i dette systemet |
+|-------------|----------------------|
+| **Document Message** | Hele kandidatprofilen sendes som ett JSON-dokument som berikes underveis |
+| **Content-Based Router** | `demandAtFørstkommendeUløsteBehovEr()` fungerer som en implisitt router — det er meldingsinnholdet (hvilke felter som mangler) som avgjør hvem som plukker opp |
+| **Content Enricher** | Hver beriker (organisasjonsenhet, hull-i-cv, geografi, etc.) legger til data fra eksterne kilder |
+| **Pipes and Filters** | Meldingen flyter sekvensielt gjennom berikere, der hver fungerer som et filter som beriker dokumentet |
+| **Claim Check** | `toi-sammenstille-kandidat` fungerer delvis som et Claim Check — den lagrer data i en database og henter den tilbake når behovet oppstår, i stedet for at all data må være i meldingen fra starten |
+
+### Kobling til Greg Youngs Document-oriented Messaging
+
+Greg Young argumenterer for at tradisjonell orkestrert request/response-kommunikasjon mellom mikrotjenester fører til tett kobling og skjøre systemer. I stedet foreslår han at man lar **dokumentet flyte gjennom systemet** som en "reisende mappe":
+
+- **Ingen sentral orkestrator**: Det er ingen tjeneste som koordinerer alle kall. Synlighetsmotor vet ikke hvilke berikere som finnes — den bare publiserer et dokument med behov, og riktig beriker plukker det opp.
+- **Lav kobling**: Berikerne kjenner bare til rapiden og sitt eget behovsnavn. De vet ikke hvem som kommer før eller etter i kjeden.
+- **Idempotent berikelse**: Hvis en beriker allerede har lagt til sitt felt, vil den ikke plukke opp meldingen igjen (fordi feltet ikke lenger er "uløst").
+- **Feiltolerant**: Hvis en beriker er nede, stopper meldingen der den er. Når berikeren kommer tilbake, plukker den opp meldingen og kjeden fortsetter.
+
+### Behovskjeden for indekseringsberikere (kandidat-indekser)
+
+Etter at synlighet er beregnet, legger `UferdigKandidatLytter` i toi-kandidat-indekser til et nytt sett med behov for å berike CV-data til søkeindeksen:
 
 ```mermaid
 flowchart LR
