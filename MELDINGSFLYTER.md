@@ -136,17 +136,18 @@ flowchart TD
     toi-arbeidssoekeropplysninger-b -->|"arbeidssokeropplysninger"| toi-synlighetsmotor
 
     %% Synlighetsmotor legger til @behov for manglende data
-    %% Behov løses sekvensielt: sammenstille-kandidat → siste-oppfolgingsperiode-pond → arbeidssoekeropplysninger → livshendelse
+    %% Behov løses sekvensielt via rapiden — det første uløste behovet avgjør hvem som plukker opp meldingen
     toi-synlighetsmotor -->|"@behov: arbeidsmarkedCv,<br/>veileder, oppfølgingsinformasjon,<br/>siste14avedtak, kvp"| toi-sammenstille-kandidat
     toi-synlighetsmotor -->|"@behov:<br/>sisteOppfølgingsperiode"| toi-siste-oppfolgingsperiode-pond-b
     toi-synlighetsmotor -->|"@behov:<br/>arbeidssokeropplysninger"| toi-arbeidssoekeropplysninger-b
     toi-synlighetsmotor -->|"@behov:<br/>adressebeskyttelse"| toi-livshendelse-behov
 
-    %% Berikere svarer med data → meldingen flyter videre til neste uløste behov
-    toi-sammenstille-kandidat -->|"besvart behov"| toi-siste-oppfolgingsperiode-pond-b
-    toi-siste-oppfolgingsperiode-pond-b -->|"besvart behov"| toi-arbeidssoekeropplysninger-b
-    toi-arbeidssoekeropplysninger-b -->|"besvart behov"| toi-livshendelse-behov
-    toi-livshendelse-behov -->|"alle behov besvart"| toi-synlighetsmotor
+    %% Berikere svarer med data og publiserer til rapiden
+    %% Neste beriker plukker opp meldingen basert på første uløste behov
+    toi-sammenstille-kandidat -->|"besvart behov"| toi-synlighetsmotor
+    toi-siste-oppfolgingsperiode-pond-b -->|"besvart behov"| toi-synlighetsmotor
+    toi-arbeidssoekeropplysninger-b -->|"besvart behov"| toi-synlighetsmotor
+    toi-livshendelse-behov -->|"besvart behov"| toi-synlighetsmotor
 
     %% Synlighetsmotor beregner synlighet og sender videre
     toi-synlighetsmotor -->|"synlighet.erSynlig=true"| toi-kandidat-indekser-uferdig
