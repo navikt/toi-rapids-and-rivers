@@ -45,12 +45,13 @@ flowchart TD
         OPP_TOPIC["pto.endring-paa-oppfolgingsbruker-v2<br/>(KAFKA_EXTRA_TOPIC)"]
         VEIL_TOPIC["pto.siste-tilordnet-veileder-v1<br/>(KAFKA_EXTRA_TOPIC)"]
         V14A_TOPIC["pto.siste-14a-vedtak-v1<br/>(KAFKA_EXTRA_TOPIC)"]
+        SOP_EXTRA["toi.siste-oppfolgingsperiode<br/>-fra-aktorid-v1<br/>(KAFKA_EXTRA_TOPIC)"]
     end
 
     subgraph Inngangsporter
         toi-arbeidsmarked-cv
         toi-arbeidssoekerperiode
-        toi-livshendelse
+        toi-livshendelse["toi-livshendelse<br/>(PDLLytter)"]
         toi-siste-oppfolgingsperiode["toi-siste-oppfolgingsperiode<br/>(Kafka Streams)"]
     end
 
@@ -59,6 +60,7 @@ flowchart TD
         toi-oppfolgingsinformasjon
         toi-veileder
         toi-siste-14a-vedtak
+        toi-siste-oppfolgingsperiode-pond-t["toi-siste-oppfolgingsperiode-pond<br/>(SisteOppfolgingsperiodeLytter)"]
     end
 
     subgraph Identmapper
@@ -73,14 +75,19 @@ flowchart TD
         toi-synlighetsmotor
     end
 
-    subgraph Berikere
+    subgraph Synlighetsmotor-berikere
+        direction LR
+        toi-siste-oppfolgingsperiode-pond-b["toi-siste-oppfolgingsperiode-pond<br/>(BehovsLytter)"]
+        toi-arbeidssoekeropplysninger-b["toi-arbeidssoekeropplysninger<br/>(BehovLytter)"]
+        toi-livshendelse-behov["toi-livshendelse<br/>(AdressebeskyttelseLytter)"]
+    end
+
+    subgraph Indekseringsberikere
+        direction LR
         toi-organisasjonsenhet
         toi-hull-i-cv
         toi-ontologitjeneste
         toi-geografi
-        toi-arbeidssoekeropplysninger
-        toi-siste-oppfolgingsperiode-pond
-        toi-livshendelse-behov["toi-livshendelse<br/>(AdressebeskyttelseLytter)"]
     end
 
     subgraph Indeksering
@@ -90,7 +97,7 @@ flowchart TD
         OPENSEARCH[(OpenSearch<br/>kandidater)]
     end
 
-    %% Eksterne topics → Inngangsporter
+    %% Eksterne topics → Inngangsporter (egne consumere)
     CV_TOPIC --> toi-arbeidsmarked-cv
     ASR_TOPIC --> toi-arbeidssoekerperiode
     PDL_TOPIC --> toi-livshendelse
@@ -101,48 +108,63 @@ flowchart TD
     OPP_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-oppfolgingsinformasjon
     VEIL_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-veileder
     V14A_TOPIC -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-siste-14a-vedtak
+    toi-siste-oppfolgingsperiode -->|"Kafka Streams<br/>re-keyer til aktørId"| SOP_EXTRA
+    SOP_EXTRA -.->|"KAFKA_EXTRA_TOPIC<br/>uten @event_name"| toi-siste-oppfolgingsperiode-pond-t
 
-    %% Inngangsporter → hendelser med @event_name
+    %% Inngangsporter → rapiden (hendelser med @event_name)
     toi-arbeidsmarked-cv -->|"arbeidsmarked-cv"| toi-sammenstille-kandidat
+    toi-arbeidsmarked-cv -->|"arbeidsmarked-cv"| toi-synlighetsmotor
     toi-arbeidssoekerperiode -->|"arbeidssokerperiode"| toi-identmapper
     toi-livshendelse -->|"adressebeskyttelse"| toi-synlighetsmotor
 
-    %% Identmapper beriker med aktørId
-    toi-identmapper -->|"arbeidssokerperiode<br/>+ aktørId"| toi-arbeidssoekeropplysninger
-    toi-identmapper -->|"oppfølgingsinformasjon<br/>+ aktørId"| toi-sammenstille-kandidat
-
-    %% Arbeidssøkeropplysninger lagrer og publiserer
-    toi-arbeidssoekeropplysninger -->|"arbeidssokeropplysninger"| toi-synlighetsmotor
-
-    %% Transformatorer → hendelser med @event_name
+    %% Transformatorer → rapiden (hendelser med @event_name)
     toi-kvp -->|"kvp"| toi-sammenstille-kandidat
+    toi-kvp -->|"kvp"| toi-synlighetsmotor
     toi-oppfolgingsinformasjon -->|"oppfølgingsinformasjon"| toi-identmapper
     toi-veileder -->|"veileder"| toi-sammenstille-kandidat
+    toi-veileder -->|"veileder"| toi-synlighetsmotor
     toi-siste-14a-vedtak -->|"siste14avedtak"| toi-sammenstille-kandidat
-    toi-siste-oppfolgingsperiode -->|"toi.siste-oppfolgingsperiode<br/>-fra-aktorid-v1"| toi-siste-oppfolgingsperiode-pond
+    toi-siste-14a-vedtak -->|"siste14avedtak"| toi-synlighetsmotor
+    toi-siste-oppfolgingsperiode-pond-t -->|"sisteOppfølgingsperiode"| toi-synlighetsmotor
+
+    %% Identmapper beriker med aktørId
+    toi-identmapper -->|"arbeidssokerperiode<br/>+ aktørId"| toi-arbeidssoekeropplysninger-b
+    toi-identmapper -->|"oppfølgingsinformasjon<br/>+ aktørId"| toi-sammenstille-kandidat
+    toi-identmapper -->|"oppfølgingsinformasjon<br/>+ aktørId"| toi-synlighetsmotor
+
+    %% Arbeidssøkeropplysninger lagrer perioder og publiserer opplysninger
+    toi-arbeidssoekeropplysninger-b -->|"arbeidssokeropplysninger"| toi-synlighetsmotor
 
     %% Synlighetsmotor legger til @behov for manglende data
-    toi-synlighetsmotor -->|"+ @behov"| toi-sammenstille-kandidat
+    %% Behov løses sekvensielt: sammenstille-kandidat → siste-oppfolgingsperiode-pond → arbeidssoekeropplysninger → livshendelse
+    toi-synlighetsmotor -->|"@behov: arbeidsmarkedCv,<br/>veileder, oppfølgingsinformasjon,<br/>siste14avedtak, kvp"| toi-sammenstille-kandidat
+    toi-synlighetsmotor -->|"@behov:<br/>sisteOppfølgingsperiode"| toi-siste-oppfolgingsperiode-pond-b
+    toi-synlighetsmotor -->|"@behov:<br/>arbeidssokeropplysninger"| toi-arbeidssoekeropplysninger-b
+    toi-synlighetsmotor -->|"@behov:<br/>adressebeskyttelse"| toi-livshendelse-behov
 
-    %% Sammenstille-kandidat svarer på @behov
-    toi-sammenstille-kandidat -->|"besvart behov"| toi-synlighetsmotor
-    toi-sammenstille-kandidat -->|"besvart behov"| toi-kandidat-indekser-uferdig
+    %% Berikere svarer med data → meldingen flyter videre til neste uløste behov
+    toi-sammenstille-kandidat -->|"besvart behov"| toi-siste-oppfolgingsperiode-pond-b
+    toi-siste-oppfolgingsperiode-pond-b -->|"besvart behov"| toi-arbeidssoekeropplysninger-b
+    toi-arbeidssoekeropplysninger-b -->|"besvart behov"| toi-livshendelse-behov
+    toi-livshendelse-behov -->|"alle behov besvart"| toi-synlighetsmotor
 
-    %% Synlighetsmotor beregner synlighet
-    toi-synlighetsmotor -->|"+ synlighet"| toi-kandidat-indekser-uferdig
-    toi-synlighetsmotor -->|"erSynlig=false"| toi-kandidat-indekser-usynlig
+    %% Synlighetsmotor beregner synlighet og sender videre
+    toi-synlighetsmotor -->|"synlighet.erSynlig=true"| toi-kandidat-indekser-uferdig
+    toi-synlighetsmotor -->|"synlighet.erSynlig=false"| toi-kandidat-indekser-usynlig
 
-    %% UferdigKandidatLytter legger til @behov for berikere
+    %% UferdigKandidatLytter legger til @behov for indekseringsberikere
     toi-kandidat-indekser-uferdig -->|"@behov: organisasjonsenhetsnavn,<br/>hullICv, ontologi, geografi"| toi-organisasjonsenhet
     toi-organisasjonsenhet -->|"+ organisasjonsenhetsnavn"| toi-hull-i-cv
     toi-hull-i-cv -->|"+ hullICv"| toi-ontologitjeneste
     toi-ontologitjeneste -->|"+ ontologi"| toi-geografi
     toi-geografi -->|"+ geografi"| toi-kandidat-indekser-synlig
 
-    %% Indeksering
+    %% Indeksering i OpenSearch
     toi-kandidat-indekser-synlig -->|"indekser CV"| OPENSEARCH
     toi-kandidat-indekser-usynlig -->|"slett CV"| OPENSEARCH
 ```
+
+> **Merk:** Alle meldinger publiseres til den felles rapiden (`toi.rapid-1`). Pilene viser logisk meldingsflyt — meldingen publiseres til rapiden og plukkes opp av lyttere som matcher meldingsinnholdet. Flere apper kan plukke opp samme melding (f.eks. går `arbeidsmarked-cv` til **både** `toi-sammenstille-kandidat` og `toi-synlighetsmotor`). Behovskjeden (`@behov`) løses sekvensielt — det **første uløste behovet** i listen avgjør hvilken beriker som plukker opp meldingen.
 
 ---
 
