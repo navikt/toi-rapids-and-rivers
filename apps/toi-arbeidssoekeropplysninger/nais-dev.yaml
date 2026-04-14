@@ -3,4 +3,6 @@ kafka_pool: nav-dev
 kafka_consumer_group_id: toi-arbeidssoekeropplysninger-rapidconsumer-1
 arbeidssoker_opplysninger_kafka_group_id: toi-arbeidssoekeropplysninger-3
 publiser_til_rapid_enabled: enabled
-
+cpu_request: 20m
+memory_request: 256Mi
+memory_limit: 384Mi

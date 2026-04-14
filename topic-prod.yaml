@@ -11,7 +11,6 @@ spec:
   pool: nav-prod
   config:
     cleanupPolicy: delete
-    minimumInSyncReplicas: 1
     partitions: 6
     replication: 3
     retentionBytes: -1
@@ -28,9 +27,6 @@ spec:
       access: readwrite
     - team: toi
       application: toi-siste-14a-vedtak
-      access: readwrite
-    - team: toi
-      application: toi-oppfolgingsperiode
       access: readwrite
     - team: toi
       application: toi-sammenstille-kandidat

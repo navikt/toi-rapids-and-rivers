@@ -17,7 +17,7 @@ class EsGeografiJobbonsker(
     override fun hashCode() = Objects.hash(geografiKodeTekst, geografiKode)
 
     companion object {
-        fun fraMelding(jobbProfilNode: JsonNode, packet: JsonMessage) = jobbProfilNode["geografi"].map { geografi ->
+        fun fraMelding(jobbProfilNode: JsonNode, packet: JsonMessage) = jobbProfilNode.path("geografi").map { geografi ->
             val geografiKode = geografi["kode"].asText()
             EsGeografiJobbonsker(
                 geografiKodeTekst = packet["geografi.geografi"][geografiKode]?.asText(null) ?: geografi["sted"].asText(),

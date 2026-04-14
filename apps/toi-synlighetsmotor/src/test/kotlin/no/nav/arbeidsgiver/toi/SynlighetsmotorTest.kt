@@ -1,9 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
-import no.nav.arbeidsgiver.toi.Testdata.Companion.harCvManglerJobbprofil
+import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetSisteOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harEndreJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.harOpprettJobbrofil
 import no.nav.arbeidsgiver.toi.Testdata.Companion.hendelseEtterBehovsHenting
@@ -34,18 +33,16 @@ class SynlighetsmotorTest {
     fun `Synlighetsevaluering som følge av melding skal lagres på personen i databasen`() {
         repository.lagre(
             Evaluering(
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false.tilBooleanVerdi(),
-                false
+                harAktivCv = false.tilBooleanVerdi(),
+                harOppfølging = false.tilBooleanVerdi(),
+                harRiktigFormidlingsgruppe = false.tilBooleanVerdi(),
+                erIkkeKode6eller7 = false.tilBooleanVerdi(),
+                erIkkeSperretAnsatt = false.tilBooleanVerdi(),
+                erIkkeDoed = false.tilBooleanVerdi(),
+                erIkkeKvp = false.tilBooleanVerdi(),
+                harIkkeAdressebeskyttelse = false.tilBooleanVerdi(),
+                erArbeidssøker = false.tilBooleanVerdi(),
+                komplettBeregningsgrunnlag = false
             ), "123456789", null
         )
         assertThat(repository.hentMedAktørid(aktorId = "123456789")).isNotNull()
@@ -61,8 +58,6 @@ class SynlighetsmotorTest {
 
         repository.hentMedAktørid(aktorId = "123456789")?.run {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
-            assertThat(harJobbprofil.default(false)).isEqualTo(true)
-            assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harOppfølging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -90,8 +85,6 @@ class SynlighetsmotorTest {
 
         repository.hentMedAktørid(aktorId = "123456789")?.run {
             assertThat(harAktivCv.default(false)).isEqualTo(true)
-            assertThat(harJobbprofil.default(false)).isEqualTo(true)
-            assertThat(erUnderOppfoelging.default(false)).isEqualTo(true)
             assertThat(harOppfølging.default(false)).isEqualTo(true)
             assertThat(harRiktigFormidlingsgruppe.default(false)).isEqualTo(true)
             assertThat(erIkkeKode6eller7.default(false)).isEqualTo(true)
@@ -160,9 +153,9 @@ class SynlighetsmotorTest {
     )
 
     @Test
-    fun `om Person ikke har aktiv oppfølgingsperiode skal synlighet være false`() = testProgramMedHendelse(
+    fun `om Person har avsluttet siste oppfølgingsperiode skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(
-            oppfølgingsperiode = avsluttetOppfølgingsperiode()
+            sisteOppfølgingsperiode = avsluttetSisteOppfølgingsperiode()
         ),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(false, true)
     )
@@ -217,12 +210,6 @@ class SynlighetsmotorTest {
     @Test
     fun `om Person ikke har CV skal synlighet være false`() = testProgramMedHendelse(
         komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = manglendeCV()),
-        enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
-    )
-
-    @Test
-    fun `om Person ikke har jobbprofil skal synlighet være false`() = testProgramMedHendelse(
-        komplettHendelseSomFørerTilSynlighetTrue(arbeidsmarkedCv = harCvManglerJobbprofil()),
         enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(synlighet = false, true)
     )
 

@@ -26,7 +26,7 @@ class EsYrkeJobbonsker(
 
     companion object {
         fun fraMelding(jobbProfilNode: JsonNode, packet: JsonMessage) =
-            jobbProfilNode["stillinger"].map (JsonNode::asText).map { stilling ->
+            jobbProfilNode.path("stillinger").map (JsonNode::asText).map { stilling ->
                 EsYrkeJobbonsker(
                     styrkKode = null,
                     styrkBeskrivelse = stilling,

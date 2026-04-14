@@ -34,11 +34,10 @@ spec:
     max: 1
   resources:
     limits:
-      cpu: 1000m
-      memory: 3072Mi
+      memory: {{ memory_limit }}
     requests:
-      cpu: 200m
-      memory: 1536Mi
+      cpu: {{ cpu_request }}
+      memory: {{ memory_request }}
   kafka:
     pool: {{ kafka_pool }}
   env:

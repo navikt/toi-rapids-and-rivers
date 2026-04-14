@@ -3,11 +3,9 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.arbeidsgiver.toi.CvMeldingstype.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.adressebeskyttelse
-import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivSisteOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
-import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetSisteOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
@@ -27,7 +25,6 @@ class SynlighetsgrunnlagLytterTest {
     enum class Felt(val navn: String, val skalGiSynligTrue: String, val skalGiSynligFalse: String) {
         ARBEIDSMARKED_CV("arbeidsmarkedCv", arbeidsmarkedCv(OPPRETT), arbeidsmarkedCv(SLETT)),
         OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
-        OPPFØLGINGSPERIODE("oppfølgingsperiode", aktivOppfølgingsperiode(), avsluttetOppfølgingsperiode()),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
         ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
         SISTE_OPPFØLGINGSPERIODE("sisteOppfølgingsperiode", aktivSisteOppfølgingsperiode(), avsluttetSisteOppfølgingsperiode()),
@@ -279,7 +276,6 @@ class SynlighetsgrunnlagLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er ikke synlig, skal sende melding om synlig false`(felt: Felt) {
-        if(felt == Felt.SISTE_OPPFØLGINGSPERIODE) return        // TODO: Synlighet er ikke skrudd på for sisteOppfølgingsperiode enda
         val alleFelterUntattEttSattTilÅGiSynligTrue = (Felt.entries-felt).map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {

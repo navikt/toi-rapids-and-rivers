@@ -43,7 +43,6 @@ class SamleLytter(
             "veileder" -> kandidat.copy(veileder = verdi)
             "oppfølgingsinformasjon" -> kandidat.copy(oppfølgingsinformasjon = verdi)
             "siste14avedtak" -> kandidat.copy(siste14avedtak = verdi)
-            "oppfølgingsperiode" -> kandidat.copy(oppfølgingsperiode = verdi)
             "kvp" -> kandidat.copy(kvp = verdi)
             else -> throw NotImplementedError("Mangler implementasjon for lytter for event $eventNavn")
         }

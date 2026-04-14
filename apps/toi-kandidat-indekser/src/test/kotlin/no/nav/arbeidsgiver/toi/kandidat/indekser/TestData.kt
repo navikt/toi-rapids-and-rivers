@@ -475,7 +475,8 @@ fun rapidMelding(
     arbeidstidsordningJobbonsker: List<String> = listOf("SKIFT"),
     arbeidsdagerJobbonsker: List<String> = listOf(),
     arbeidstidJobbonsker: List<String> = listOf(),
-    cvEksisterer: Boolean = true
+    cvEksisterer: Boolean = true,
+    jobbprofilEksisterer: Boolean = true,
 ): String = """
         {
           "@event_name": "arbeidsmarked-cv",
@@ -644,7 +645,7 @@ fun rapidMelding(
             },
             "slettCv": null,
             "opprettJobbprofil": null,
-            "endreJobbprofil": {
+            "endreJobbprofil": ${if (jobbprofilEksisterer) """{
               "jobbprofil": {
                 "opprettet": 1615290716.205,
                 "stillinger": ${jobbProfilstillinger.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }},
@@ -669,7 +670,7 @@ fun rapidMelding(
                 "sistEndret": 1652184804.347,
                 "jobbprofilId": "668794"
               }
-            },
+            }""" else "null"},
             "slettJobbprofil": null,
             "aktoerId": "1000096233942",
             "sistEndret": 1652184804.44

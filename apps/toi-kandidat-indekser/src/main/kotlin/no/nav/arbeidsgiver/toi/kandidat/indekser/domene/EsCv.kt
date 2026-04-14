@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.node.MissingNode
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
@@ -206,7 +207,11 @@ class EsCv(
         fun fraMelding(packet: JsonMessage): EsCv {
             val arbeidsmarkedCv = packet["arbeidsmarkedCv"]
             val cvNode = getCvNode(arbeidsmarkedCv)
-            val jobbProfilNode = listOf("slettJobbprofil", "endreJobbprofil", "opprettJobbprofil").first { arbeidsmarkedCv.hasNonNull(it) }.let { arbeidsmarkedCv[it] }["jobbprofil"]
+            val jobbProfilNode = listOf("slettJobbprofil", "endreJobbprofil", "opprettJobbprofil")
+                .firstOrNull { arbeidsmarkedCv.hasNonNull(it) }
+                ?.let { arbeidsmarkedCv[it] }
+                ?.get("jobbprofil")
+                ?: MissingNode.getInstance()
 
             val kommunenummer = packet["geografi.kommune.kommunenummer"].asText(null)
             return EsCv(
@@ -249,7 +254,7 @@ class EsCv(
                 fritattAgKandidatsok = fritattAgKandidatsokerDeprikert,
                 synligForArbeidsgiverSok = cvNode["synligForArbeidsgiver"].asBoolean(),
                 synligForVeilederSok = cvNode["synligForVeileder"].asBoolean(),
-                oppstartKode = jobbProfilNode["oppstartKode"].asText(""),
+                oppstartKode = jobbProfilNode.path("oppstartKode").asText(""),
                 kommunenummerstring = kommunenummer,
                 veilederIdent = packet["veileder.veilederId"].asText(null),
                 veilederVisningsnavn = packet["veileder.veilederinformasjon.visningsNavn"].asText(null),

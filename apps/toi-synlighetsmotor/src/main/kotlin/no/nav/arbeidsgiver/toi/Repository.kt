@@ -12,8 +12,6 @@ class Repository(private val dataSource: DataSource) {
     private val fødselsnummerKolonne = "fodselsnummer"
 
     private val harAktivCvKolonne = "har_aktiv_cv"
-    private val harJobbprofilkolonne = "har_jobbprofil"
-    private val erIkkeUnderOppfølgingKolonne = "er_under_oppfolging"
     private val harOppfølgingKolonne = "har_oppfolging"
     private val harRiktigFormidlingsgruppeKolonne = "har_riktig_formidlingsgruppe"
     private val erIkkeKode6Eller7Kolonne = "er_ikke_kode6_eller_kode7"
@@ -99,8 +97,6 @@ class Repository(private val dataSource: DataSource) {
 
     private fun evalueringFraDB(resultset: ResultSet) = Evaluering(
         harAktivCv = resultset.getBoolean(harAktivCvKolonne).tilBooleanVerdi(), // TODO
-        harJobbprofil = resultset.getBoolean(harJobbprofilkolonne).tilBooleanVerdi(), // TODO
-        erUnderOppfoelging = resultset.getBoolean(erIkkeUnderOppfølgingKolonne).tilBooleanVerdi(), // TODO
         harOppfølging = resultset.getBoolean(harOppfølgingKolonne).tilBooleanVerdi(), // TODO?
         harRiktigFormidlingsgruppe = resultset.getBoolean(harRiktigFormidlingsgruppeKolonne).tilBooleanVerdi(), // TODO
         erIkkeKode6eller7 = resultset.getBoolean(erIkkeKode6Eller7Kolonne).tilBooleanVerdi(), // TODO
@@ -127,8 +123,6 @@ class Repository(private val dataSource: DataSource) {
             aktøridKolonne to aktørId,
             fødselsnummerKolonne to fødselsnummer,
             harAktivCvKolonne to harAktivCv.default(true),
-            harJobbprofilkolonne to harJobbprofil.default(true),
-            erIkkeUnderOppfølgingKolonne to erUnderOppfoelging.default(true),
             harOppfølgingKolonne to harOppfølging.default(true),
             harRiktigFormidlingsgruppeKolonne to harRiktigFormidlingsgruppe.default(true),
             erIkkeKode6Eller7Kolonne to erIkkeKode6eller7.default(true),
