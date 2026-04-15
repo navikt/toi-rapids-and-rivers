@@ -33,7 +33,7 @@ class ArbeidssoekerperiodeTest {
         produserArbeidssoekerperiodeMelding(consumer, melding)
         arbeidssoekerperiodeLytter.onReady(rapid)
 
-        Thread.sleep(800)
+        waitForRapidMessages(rapid, expectedSize = 1)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
@@ -83,4 +83,12 @@ class ArbeidssoekerperiodeTest {
         .setAvsluttet(null)
         .setIdentitetsnummer("01010012345")
         .build()
+
+    private fun waitForRapidMessages(rapid: TestRapid, expectedSize: Int, timeoutMs: Long = 5000) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            if (rapid.inspektør.size >= expectedSize) return
+            Thread.sleep(50)
+        }
+    }
 }

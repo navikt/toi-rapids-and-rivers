@@ -1,8 +1,24 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm")
     application
+}
+
+// Java 25 toolchain: use JDK 25 for compilation and runtime.
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_25)
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(25)
 }
 
 repositories {
@@ -21,6 +37,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.1")
     testImplementation("org.assertj:assertj-core:3.23.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    // Gradle 9.x no longer auto-provides the JUnit Platform Launcher
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1")
 }
 
 
@@ -46,7 +64,7 @@ tasks {
 
         doLast {
             configurations.runtimeClasspath.get().forEach {
-                val file = File("$buildDir/libs/${it.name}")
+                val file = layout.buildDirectory.file("libs/${it.name}").get().asFile
                 if (!file.exists())
                     it.copyTo(file)
             }
