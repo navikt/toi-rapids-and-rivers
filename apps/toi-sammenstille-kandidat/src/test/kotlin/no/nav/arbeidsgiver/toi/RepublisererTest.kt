@@ -38,7 +38,7 @@ class RepublisererTest {
 
         assertThat(response.statusCode).isEqualTo(200)
 
-        Thread.sleep(200) // Pga. asynkron håndtering av republisering
+        testRapid.waitForMessagesOrTimeout(expectedMinimumNumberOfMessages = lagredeKandidater.size)
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
@@ -60,7 +60,7 @@ class RepublisererTest {
             .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
         assertThat(response.statusCode).isEqualTo(200)
 
-        Thread.sleep(2000)
+        testRapid.waitForMessagesOrTimeout(expectedMinimumNumberOfMessages = lagredeKandidater.size)
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
@@ -98,7 +98,7 @@ class RepublisererTest {
         val kandidat3 = lagredeKandidater[29]
 
         val body = Republiserer.RepubliseringBodyMedListeAvKandidater(passord = riktigPassord, aktorIder = listOf(kandidat1, kandidat2, kandidat3))
-        var body1 = jacksonObjectMapper().writeValueAsString(body)
+        val body1 = jacksonObjectMapper().writeValueAsString(body)
         val response = Fuel.post("http://localhost:9000/republiser/liste")
             .jsonBody(body1).response().second
         assertThat(response.statusCode).isEqualTo(200)
