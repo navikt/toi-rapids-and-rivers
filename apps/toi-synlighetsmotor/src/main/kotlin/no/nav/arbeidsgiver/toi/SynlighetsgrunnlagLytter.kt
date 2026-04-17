@@ -71,7 +71,7 @@ class SynlighetsgrunnlagLytter(
             if (behov.containsAll(requiredFields)) {
                 if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
                     val extraBehov = listOf(adressebeskyttelseFelt)
-                    packet["@behov"] = (behov + extraBehov).distinct()
+                    packet["@behov"] = (extraBehov + behov).distinct()
                     rapidsConnection.publish(kandidat.aktørId, packet.toJson())
                 }
             } else {
