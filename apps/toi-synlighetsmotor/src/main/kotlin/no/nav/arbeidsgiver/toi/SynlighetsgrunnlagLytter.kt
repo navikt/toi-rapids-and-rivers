@@ -12,7 +12,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.Evaluering.Companion.somSynlighet
 
-private fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
+fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "arbeidsmarkedCv",
     "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
     "oppfølgingsinformasjon",
