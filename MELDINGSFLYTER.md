@@ -581,7 +581,7 @@ flowchart LR
 |-----------|-----------|-------|
 | Har aktiv CV | arbeidsmarkedCv | meldingstype er OPPRETT eller ENDRE |
 | Har oppfølging | sisteOppfølgingsperiode | startdato er i fortid OG sluttdato er null eller i fremtid |
-| Riktig formidlingsgruppe | oppfølgingsinformasjon | formidlingsgruppe == ARBS |
+| ~~Riktig formidlingsgruppe~~ | ~~oppfølgingsinformasjon~~ | ~~formidlingsgruppe == ARBS~~ — **inaktiv** (kommentert ut i `Evaluering.kt`: *"ARBS skal ikke lenger være en del av evalueringen. Kommentert ut frem til vi er sikre på at det kan slettes helt"*) |
 | Ikke kode 6/7 | oppfølgingsinformasjon | diskresjonskode ikke er "6" eller "7" |
 | Ikke sperret ansatt | oppfølgingsinformasjon | sperretAnsatt == false |
 | Ikke død | oppfølgingsinformasjon | erDoed == false |
@@ -607,6 +607,46 @@ Alle kriterier må være oppfylt for at kandidaten skal være synlig (`erSynlig=
 | `sisteOppfølgingsperiode` | toi-siste-oppfolgingsperiode-pond | toi-synlighetsmotor |
 | `adressebeskyttelse` | toi-livshendelse | toi-synlighetsmotor |
 | `republisert` | toi-sammenstille-kandidat (manuell) | Alle lyttere (starter full re-flyt) |
+
+---
+
+## SynlighetRekrutteringstreffLytter — eksponert synlighetsspørring
+
+`toi-synlighetsmotor` inneholder en ny lytter, `SynlighetRekrutteringstreffLytter`, som **ikke** er del av kandidat-indekseringsflyten. Den lar eksterne systemer (f.eks. rekrutteringstreff) spørre om en kandidats synlighet via rapiden.
+
+### Hvordan det fungerer
+
+Lytteren følger need-patternet:
+
+1. Et eksternt system sender en melding på rapiden med `@behov: ["synlighetRekrutteringstreff"]` og `fodselsnummer`.
+2. `SynlighetRekrutteringstreffLytter` plukker opp meldingen som første uløste behov.
+3. Den slår opp evalueringen for fødselsnummeret i synlighetsmotor sin database.
+   - Hvis personen ikke finnes, eller allerede er usynlig (`kanBliSynlig() == false`), besvares direkte med `erSynlig: false`.
+   - Ellers trigges et `adressebeskyttelse`-behov. Når `toi-livshendelse` (AdressebeskyttelseLytter) svarer, evalueres synlighet fullstendig.
+4. Lytteren publiserer meldingen tilbake med feltet `synlighetRekrutteringstreff: { erSynlig, ferdigBeregnet }` utfylt.
+
+```mermaid
+sequenceDiagram
+    participant EXT as Eksternt system<br/>(rekrutteringstreff)
+    participant RAPID as toi.rapid-1
+    participant SYNREK as toi-synlighetsmotor<br/>(SynlighetRekrutteringstreffLytter)
+    participant LIV as toi-livshendelse<br/>(AdressebeskyttelseLytter)
+
+    EXT->>RAPID: @behov=["synlighetRekrutteringstreff"]<br/>fodselsnummer
+    RAPID->>SYNREK: Plukker opp (første uløste behov)
+    alt Ikke funnet / allerede usynlig
+        SYNREK->>RAPID: synlighetRekrutteringstreff={erSynlig: false, ferdigBeregnet: ...}
+    else Kan bli synlig — trenger adressebeskyttelse
+        SYNREK->>RAPID: @behov legger til "adressebeskyttelse"
+        RAPID->>LIV: Plukker opp adressebeskyttelse-behov
+        LIV->>RAPID: + adressebeskyttelse (gradering)
+        RAPID->>SYNREK: Plukker opp igjen med adressebeskyttelse
+        SYNREK->>RAPID: synlighetRekrutteringstreff={erSynlig: true/false, ferdigBeregnet: true}
+    end
+    RAPID->>EXT: Melding med synlighetRekrutteringstreff utfylt
+```
+
+> **Merk:** Denne flyten er uavhengig av kandidat-indekseringsflyten. Den bruker synlighetsmotor sin database (som holdes oppdatert av den ordinære indekseringsflyten) og PDL-oppslag via `toi-livshendelse`, men resultatet indekseres **ikke** i OpenSearch — det returneres direkte til det spørrende systemet på rapiden.
 
 ---
 
