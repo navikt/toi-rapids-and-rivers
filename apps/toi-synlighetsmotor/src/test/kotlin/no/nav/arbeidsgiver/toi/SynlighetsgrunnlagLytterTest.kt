@@ -260,6 +260,26 @@ class SynlighetsgrunnlagLytterTest {
     }
 
     @Test
+    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er synlig, skal man be om adressebeskyttelse, selv om det ligger andre behov på meldingen`() {
+        val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${(alleFelter+"synlighet").joinToString(",","[","]"){""""$it""""}},
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
+                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+            }
+            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactly(adressebeskyttelseFeltNavn,*(alleFelter.toTypedArray()),"synlighet")
+            assertThat(melding.path("synlighet").isMissingNode).isTrue()
+        })
+    }
+
+    @Test
     fun `Om man har fått alt utenom adressebeskyttelse, og bedt om adressebeskyttelse, skal man ignorere melding`() {
         val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""

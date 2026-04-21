@@ -92,11 +92,12 @@ class Republiserer(
         }
     }
 
-    private fun lagPakke(kandidat: Kandidat): JsonMessage {
-        val pakke = kandidat.somJsonMessage(meterRegistry)
-        pakke["@event_name"] = "republisert"
-        return pakke
-    }
+    private fun lagPakke(kandidat: Kandidat) = JsonMessage.newMessage("republisert",
+        mapOf(
+            "aktørId" to kandidat.aktørId,
+            "@behov" to listOf("synlighet")
+        )
+    )
 
     data class RepubliseringBody(val passord: String)
     data class RepubliseringBodyMedListeAvKandidater(val passord: String, val aktorIder: List<String>)

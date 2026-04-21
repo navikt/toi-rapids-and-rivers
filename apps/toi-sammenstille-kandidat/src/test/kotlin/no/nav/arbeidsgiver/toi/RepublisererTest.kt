@@ -26,7 +26,7 @@ class RepublisererTest {
     }
 
     @Test
-    fun `Kall til republiseringsendepunkt skal returnere 200 og sende alle sammenstilte kandidater på rapiden`() {
+    fun `Kall til republiseringsendepunkt skal returnere 200 og sende alle sammenstilte kandidaters aktørider på rapiden`() {
         val testRapid = TestRapid()
         startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
 
@@ -43,7 +43,8 @@ class RepublisererTest {
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
         lagredeKandidater.forEachIndexed { index, kandidat ->
-            assertThat(Kandidat.fraJson(inspektør.message(index)).toJson()).isEqualTo(kandidat.toJson())
+            assertThat(inspektør.message(index).get("@behov").first().asText()).isEqualTo("synlighet")
+            assertThat(inspektør.message(index).get("aktørId").asText()).isEqualTo(kandidat.aktørId)
             assertThat(inspektør.message(index).get("@event_name").asText()).isEqualTo("republisert")
         }
     }
