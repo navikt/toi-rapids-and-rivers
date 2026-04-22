@@ -26,14 +26,6 @@ class TestRapid(
         messages.clear()
     }
 
-    fun waitForMessagesOrTimeout(expectedMinimumNumberOfMessages: Int = 1, timeoutMs: Long = 5000) {
-        val deadline = System.currentTimeMillis() + timeoutMs
-        while (System.currentTimeMillis() < deadline) {
-            if (inspektør.size >= expectedMinimumNumberOfMessages) return
-            Thread.sleep(100)
-        }
-    }
-
     fun sendTestMessage(message: String) {
         notifyMessage(
             message,

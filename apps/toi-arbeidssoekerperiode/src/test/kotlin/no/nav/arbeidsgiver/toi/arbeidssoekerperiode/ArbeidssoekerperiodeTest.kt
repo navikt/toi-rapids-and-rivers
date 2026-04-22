@@ -33,7 +33,7 @@ class ArbeidssoekerperiodeTest {
         produserArbeidssoekerperiodeMelding(consumer, melding)
         arbeidssoekerperiodeLytter.onReady(rapid)
 
-        rapid.waitForMessagesOrTimeout()
+        Thread.sleep(800)
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
