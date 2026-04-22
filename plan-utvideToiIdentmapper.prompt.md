@@ -11,7 +11,7 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
 
 ## Steg
 
-1. **Utvid [PdlKlient.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/PdlKlient.kt)** midlertidig med `hentFødselsnummer(aktørId: String): String?` (brukes i PR 2–4 inntil PDL-topic-konsumenten i PR 5 overtar). Spør PDL med `grupper: [FOLKEREGISTERIDENT]`, `historikk: false`. REST-klienten fjernes i PR 5.
+1. **Utvid [PdlKlient.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/PdlKlient.kt)** med `hentFødselsnummer(aktørId: String): String?`. Spør PDL med `grupper: [FOLKEREGISTERIDENT]`, `historikk: false`. REST-klienten beholdes også etter PR 5 som fallback når `IdentCache` får miss (f.eks. aktørId som ennå ikke har kommet på `pdl-aktor-v2`-topic, eller etter restart før konsumenten har innhentet etterslepet).
 
 2. **Rename `Repository.kt` → `IdentRepository.kt`** (klassenavn `IdentRepository`) og utvid — ingen migrering/datamodellendring. `identmapping(aktor_id, fnr, cachet_tidspunkt)` gjenbrukes.
    - Ny metode `hentIdentMappingerForAktørId(aktørId: String): List<IdentMapping>` (analogt med eksisterende `hentIdentMappinger(fnr)`).
@@ -19,7 +19,7 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
    - Generaliser gjerne eksisterende `lagreAktørId` og den nye til én felles privat upsert-funksjon siden logikken blir symmetrisk.
    - Oppdater alle referanser i [Application.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/Application.kt) og eksisterende tester.
 
-3. **Rename `AktorIdCache.kt` → `IdentCache.kt`** (klassenavn `IdentCache`) og utvid slik at den eksponerer både `hentAktørId(fødselsnummer: String): String?` og `hentFødselsnummer(aktørId: String): String?` med samme cache-først-så-PDL-mønster. Bevar negativ-caching-flagget (`cacheNårAktørIdErNull`) — vurder å gjøre det symmetrisk for begge retninger. Etter PR 5 blir dette et rent DB-oppslag (topic-konsumenten sørger for dekning).
+3. **Rename `AktorIdCache.kt` → `IdentCache.kt`** (klassenavn `IdentCache`) og utvid slik at den eksponerer både `hentAktørId(fødselsnummer: String): String?` og `hentFødselsnummer(aktørId: String): String?` med samme cache-først-så-PDL-mønster. Bevar negativ-caching-flagget (`cacheNårAktørIdErNull`) — vurder å gjøre det symmetrisk for begge retninger. Etter PR 5 forblir PDL REST fallback-veien når DB mangler rad; topic-konsumenten reduserer bare hvor ofte fallbacken trenger å kalles.
 
 4. **Rename eksisterende `Lytter.kt` → `FødselsnummerLytter.kt`** (klassenavn `FødselsnummerLytter`) for å gjøre det tydelig hva den håndterer. Oppførselen er uendret: fnr inn → beriker med `aktørId`. Oppdater instansiering i `Application.kt`.
 
@@ -37,12 +37,12 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
    - Lytter-test som verifiserer at synlighetsmelding uten fnr men med aktørId blir beriket, og at andre meldingstyper ignoreres av whitelist.
    - PDL-mock for `hentFødselsnummer`.
 
-9. **Ny PDL-topic-konsument `PdlAktorLytter` og utfasing av PDL REST-klienten.** Identmapper har allerede avro-skjemaet [AktorV2.avdl](apps/toi-identmapper/src/main/avro/AktorV2.avdl) (namespace `no.nav.person.pdl.aktor.v2`) liggende ubrukt.
+9. **Ny PDL-topic-konsument `PdlAktorLytter` som supplement til PDL REST.** Identmapper har allerede avro-skjemaet [AktorV2.avdl](apps/toi-identmapper/src/main/avro/AktorV2.avdl) (namespace `no.nav.person.pdl.aktor.v2`) liggende ubrukt.
    - Konsumer topic `pdl-aktor-v2` med Avro/Confluent-deserializer (samme mønster som [PDLLytter.kt](apps/toi-livshendelse/src/main/kotlin/no/nav/arbeidsgiver/toi/livshendelser/PDLLytter.kt) i `toi-livshendelse`, som allerede konsumerer `pdl.leesah-v1`).
    - For hver `Aktor`-hendelse: plukk `gjeldende` `FOLKEREGISTERIDENT` og `AKTORID` og upsert via `IdentRepository`. Håndter tombstones (slettede aktører) eksplisitt.
-   - Slett [PdlKlient.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/PdlKlient.kt) og [AccessTokenClient.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/AccessTokenClient.kt). `IdentCache` forenkles til rent DB-oppslag (null hvis miss), siden topic-konsumenten sørger for dekning.
-   - NAIS-manifest ([nais-dev.yaml](apps/toi-identmapper/nais-dev.yaml) / [nais-prod.yaml](apps/toi-identmapper/nais-prod.yaml)): fjern `PDL_URL`/`PDL_SCOPE`/Azure-PDL-scope, legg til Kafka-tilgang mot `pdl-aktor-v2` og schema-registry-credentials.
-   - Tester: mapping `Aktor` → upsert, at ikke-gjeldende identifikatorer ignoreres, tombstone-håndtering.
+   - **Behold `PdlKlient` og `AccessTokenClient`** som fallback-vei i `IdentCache` når DB-oppslaget gir miss (ukjent aktørId, eller etterslep på topic). Topic-konsumenten holder dataene ferske; REST håndterer edge-cases og reduserer avhengigheten av et fullstendig backfill før go-live.
+   - NAIS-manifest ([nais-dev.yaml](apps/toi-identmapper/nais-dev.yaml) / [nais-prod.yaml](apps/toi-identmapper/nais-prod.yaml)): behold `PDL_URL`/`PDL_SCOPE`/Azure-PDL-scope, legg til Kafka-tilgang mot `pdl-aktor-v2` og schema-registry-credentials.
+   - Tester: mapping `Aktor` → upsert, at ikke-gjeldende identifikatorer ignoreres, tombstone-håndtering, og at REST-fallback kalles når DB mangler raden.
 
 ## Relatert problemstilling: `/evaluering/{fnr}` i synlighetsmotor
 
@@ -60,7 +60,7 @@ Anbefaler **Alternativ A** som neste steg fordi det er bakoverkompatibelt og kan
 1. **Hvilket felt identifiserer en synlighetsmelding unikt i whitelisten?** `synlighet` (settes av `SynlighetsgrunnlagLytter` før publisering) er den mest presise markøren. Må bekreftes at den alltid er til stede på disse meldingene og ikke brukes andre steder.
 2. **Rekkefølge og idempotens ved race:** Hvis en melding publiseres uten fnr, og identmapper senere beriker — sørg for at downstream-konsumenter tåler at samme aktørId-melding kan komme i to varianter (uten og med fnr). Alternativt: ikke publiser fra synlighetsmotor før identmapper har svart (men det bryter rapid-mønsteret).
 3. **Inkonsistent data ved PDL-endringer:** Løses strukturelt av PR 5 (topic-oppdateringer holder `identmapping` ferskt). Ha observability på lag mellom topic og DB slik at stopp i konsumenten oppdages raskt.
-4. **Backfill av eksisterende rader:** PR 5 dekker fremtidige endringer, men historiske aktørId-er fylles først ved neste PDL-hendelse eller ved eksplisitt oppslag. Vurder engangs-backfill (les `aktor_id`-er fra synlighetsmotor-DB, kall PDL REST én siste gang, upsert i identmapper) *før* REST-klienten slettes i PR 5.
+4. **Backfill av eksisterende rader:** PR 5 dekker fremtidige endringer, men historiske aktørId-er fylles først ved neste PDL-hendelse eller ved eksplisitt oppslag. Siden REST-fallbacken beholdes (se PR 5), er eksplisitt engangs-backfill valgfri — miss på `IdentCache` henter fortsatt via REST. Backfill kan likevel være nyttig for å varme opp cachen og redusere PDL-trafikk.
 5. **Sammenstilleren (`toi-sammenstille-kandidat`):** Nyter samme berikelse så snart meldingene har fnr. Ingen direkte endring nødvendig, men verifiser at den håndterer meldinger uten fnr på en forutsigbar måte i mellomtiden.
 
 ## Foreslått PR-oppdeling
@@ -102,15 +102,15 @@ Arbeidet deles i seks mindre PR-er som hver leverer verdi isolert, kan reviewere
 **Leverer:** Lukker det opprinnelige edge-case-problemet (kandidater med kun adressebeskyttelse får fnr i utgående melding).
 **Risiko:** Middels. Hvis PR 3 ikke er i prod, vil meldinger mangle fnr lenger nedstrøms. Deploy-rekkefølge: PR 3 til prod før PR 4.
 
-### PR 5 — PDL-topic-konsument + fjerning av PDL REST-klient
-**Mål:** Holde `identmapping` proaktivt oppdatert fra `pdl-aktor-v2`, fjerne REST-avhengigheten mot PDL, og løse stale-problemet strukturelt.
+### PR 5 — PDL-topic-konsument (REST-klienten beholdes som fallback)
+**Mål:** Holde `identmapping` proaktivt oppdatert fra `pdl-aktor-v2`, redusere avhengigheten av PDL REST i varm sti, og løse stale-problemet strukturelt — uten å gi opp REST som sikkerhetsnett for miss.
 - Ny `PdlAktorLytter.kt` som konsumerer `pdl-aktor-v2` (Avro-skjemaet finnes allerede i `AktorV2.avdl`). Mapper `Aktor` → upsert av gjeldende fnr/aktørId.
 - Håndter tombstone-meldinger (slettede aktører) — logg og ignorer, eller slett raden (avklares).
-- Før merge: engangs-backfill (se Videre vurderinger #4) for aktørId-er vi allerede kjenner, slik at `IdentCache`-oppslag fortsatt treffer når REST-klienten forsvinner.
-- Slett `PdlKlient.kt` og `AccessTokenClient.kt`. Forenkle `IdentCache` til rent DB-oppslag. Fjern PDL-konfig i NAIS-manifestet og legg til Kafka-tilgang + schema-registry-credentials.
-- Observability: metric for antall hendelser konsumert og upserts, alarm ved stopp i konsumenten.
-**Leverer:** Lavere infrastruktur-footprint (ingen PDL-tokens, ingen REST-retry), ferskere data, løser stale-problemet fra Videre vurderinger #3.
-**Risiko:** Middels–høy. Gjøres alene, ikke sammenpakket med andre endringer. Rulles ut i dev-gcp med monitorering før prod.
+- **Behold `PdlKlient` og `AccessTokenClient`.** `IdentCache` fortsetter å bruke REST som fallback når DB-oppslaget gir miss. Dette fjerner behovet for fullstendig backfill før go-live og gir robusthet mot etterslep/feil i topic-konsumenten.
+- NAIS-manifest: behold PDL-konfig, legg til Kafka-tilgang mot `pdl-aktor-v2` + schema-registry-credentials.
+- Observability: metric for antall hendelser konsumert, antall upserts, og antall REST-fallbacks (siste bør tendere mot null i steady state). Alarm ved stopp i konsumenten.
+**Leverer:** Ferskere data og langt færre PDL-REST-kall i varm sti, uten å innføre hard avhengighet av at topic-konsumenten har innhentet alt.
+**Risiko:** Middels. Gjøres alene, ikke sammenpakket med andre endringer. Rulles ut i dev-gcp med monitorering før prod. Fallback-veien demper konsekvensen av feil i konsumenten.
 
 ### PR 6 — `/evaluering/{fnr}` slår opp via identmapper (Alternativ A)
 **Mål:** Løse tomme treff i HTTP-søket når `evaluering`-raden mangler fnr.
