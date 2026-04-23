@@ -7,8 +7,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.OutgoingMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.SentMessage
 
-class TestRapid(private val meterRegistry: io.micrometer.core.instrument.MeterRegistry = io.micrometer.core.instrument.simple.SimpleMeterRegistry(), private val maxTriggedeMeldinger: Int = 10) :
+class TestRapid(
+    private val meterRegistry: io.micrometer.core.instrument.MeterRegistry = io.micrometer.core.instrument.simple.SimpleMeterRegistry(),
+    private val maxTriggedeMeldinger: Int = 10
+) :
     RapidsConnection() {
+
     private companion object {
         private val objectMapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
             .registerModule(com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
@@ -23,15 +27,22 @@ class TestRapid(private val meterRegistry: io.micrometer.core.instrument.MeterRe
     }
 
     fun sendTestMessage(message: String) {
-        notifyMessage(message, this,
-            com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata("test.message", -1, -1, null, emptyMap()), meterRegistry)
+        notifyMessage(
+            message,
+            this,
+            com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata("test.message", -1, -1, null, emptyMap()),
+            meterRegistry
+        )
         sjekkForLoop()
     }
 
     fun sendTestMessage(message: String, key: String) {
-        notifyMessage(message,
+        notifyMessage(
+            message,
             com.github.navikt.tbd_libs.rapids_and_rivers_api.KeyMessageContext(this, key),
-            com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata("test.message", -1, -1, key, emptyMap()), meterRegistry)
+            com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata("test.message", -1, -1, key, emptyMap()),
+            meterRegistry
+        )
         sjekkForLoop()
     }
 
@@ -46,18 +57,21 @@ class TestRapid(private val meterRegistry: io.micrometer.core.instrument.MeterRe
 
     private fun sjekkForLoopRecursive(kjørFra: Int) {
         val messages = keyOgMeldinger()
-        messages.filterIndexed { index, _ -> index>=kjørFra }.forEach { (key, message) ->
-            if(key == null) {
-                notifyMessage(message.toString(), this,
+        messages.filterIndexed { index, _ -> index >= kjørFra }.forEach { (key, message) ->
+            if (key == null) {
+                notifyMessage(
+                    message.toString(), this,
                     com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata(
                         "test.message",
                         -1,
                         -1,
                         null,
                         emptyMap()
-                    ), meterRegistry)
+                    ), meterRegistry
+                )
             } else {
-                notifyMessage(message.toString(),
+                notifyMessage(
+                    message.toString(),
                     com.github.navikt.tbd_libs.rapids_and_rivers_api.KeyMessageContext(this, key),
                     com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata(
                         "test.message",
@@ -65,15 +79,16 @@ class TestRapid(private val meterRegistry: io.micrometer.core.instrument.MeterRe
                         -1,
                         key,
                         emptyMap()
-                    ), meterRegistry)
+                    ), meterRegistry
+                )
             }
         }
         val newMessages = keyOgMeldinger()
         if (newMessages.size > maxTriggedeMeldinger) {
             throw IllegalStateException("Loop antatt med ${newMessages.size} meldinger: $newMessages")
-        } else if(newMessages.size > messages.size) {
+        } else if (newMessages.size > messages.size) {
             sjekkForLoopRecursive(messages.size)
-        } else if(newMessages.size < messages.size) {
+        } else if (newMessages.size < messages.size) {
             throw IllegalStateException("Skal ikke være mulig å nå denne linjen. Feil i implementasjonen av ${this::class.java.simpleName}")
         }
     }

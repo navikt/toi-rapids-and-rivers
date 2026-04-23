@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/legg_til_event_og_bruk_stillingsinfo
+      deploy_dev_branch: refs/heads/java25
     secrets: inherit
     permissions:
       contents: read

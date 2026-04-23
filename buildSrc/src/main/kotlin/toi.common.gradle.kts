@@ -5,6 +5,10 @@ plugins {
     application
 }
 
+kotlin {
+    jvmToolchain(25)
+}
+
 repositories {
     mavenCentral()
     maven("https://packages.confluent.io/maven/")
@@ -21,6 +25,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.1")
     testImplementation("org.assertj:assertj-core:3.23.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1")
 }
 
 
@@ -46,7 +51,7 @@ tasks {
 
         doLast {
             configurations.runtimeClasspath.get().forEach {
-                val file = File("$buildDir/libs/${it.name}")
+                val file = layout.buildDirectory.file("libs/${it.name}").get().asFile
                 if (!file.exists())
                     it.copyTo(file)
             }
