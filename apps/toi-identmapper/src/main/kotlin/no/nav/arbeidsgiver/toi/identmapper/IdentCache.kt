@@ -1,8 +1,7 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-
-class AktorIdCache(
-    private val repository: Repository,
+class IdentCache(
+    private val repository: IdentRepository,
     private val cacheNårAktørIdErNull: Boolean,
     private val hentAktørIdFraPdl: (String) -> (String?)
 ) {
@@ -23,10 +22,7 @@ class AktorIdCache(
             secureLog.info("Mappet fra fødselsnummer til aktørId $nyAktørId, hentet fra PDL")
 
             if (nyAktørId != null || cacheNårAktørIdErNull) {
-                cacheAktørId(
-                    aktørId = nyAktørId,
-                    fødselsnummer = fødselsnummer
-                )
+                cacheAktørId(aktørId = nyAktørId, fødselsnummer = fødselsnummer)
             }
         }
     }
@@ -38,18 +34,10 @@ class AktorIdCache(
     private fun hentCachetAktørId(fødselsnummer: String): CachetAktørId {
         val identMappinger = repository.hentIdentMappinger(fødselsnummer)
         val sisteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
-
-        return if (sisteMapping == null) {
-            CachetAktørId(false, null)
-        } else CachetAktørId(true, sisteMapping.aktørId)
+        return if (sisteMapping == null) CachetAktørId(false, null)
+        else CachetAktørId(true, sisteMapping.aktørId)
     }
 
-    private fun lagre(aktørid: String, fnr: String) {
-        repository.lagreAktørId(aktørid, fnr)
-    }
-
-    private data class CachetAktørId(
-        val harHentetFraPdl: Boolean,
-        val verdi: String?
-    )
+    private data class CachetAktørId(val harHentetFraPdl: Boolean, val verdi: String?)
 }
+

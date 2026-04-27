@@ -5,11 +5,10 @@ import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.Duration
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
-class Repository(private val dataSource: DataSource) {
+class IdentRepository(private val dataSource: DataSource) {
     private val tabell = "identmapping"
     private val aktørIdKolonne = "aktor_id"
     private val fødselsnummerKolonne = "fnr"
@@ -28,10 +27,9 @@ class Repository(private val dataSource: DataSource) {
                 ).apply {
                     setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()))
                     setString(2, fødselsnummer)
-                    if (aktørId!= null) setString(3, aktørId)
+                    if (aktørId != null) setString(3, aktørId)
                 }
             } else {
-
                 it.prepareStatement("INSERT INTO $tabell($aktørIdKolonne, $fødselsnummerKolonne, $cachetTidspunktKolonne) VALUES (?, ?, ?)")
                     .apply {
                         setString(1, aktørId)

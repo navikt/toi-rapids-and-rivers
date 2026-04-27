@@ -13,25 +13,25 @@ class AktorIdCacheTest {
 
     @BeforeEach
     fun kjørFlyway() {
-        Repository(testDatabase.dataSource).kjørFlywayMigreringer()
+        IdentRepository(testDatabase.dataSource).kjørFlywayMigreringer()
     }
 
     @AfterEach
     fun slettDatabase() {
         testDatabase.slettAlt()
     }
-    
+
     @Test
     fun `Henting av aktørId skal returnere aktørId fra PDL når det ikke finnes i databasen`() {
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
 
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, false) { aktørIdFraPdl }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, false) { aktørIdFraPdl }
 
         assertThat(repository.hentIdentMappinger(fødselsnummer)).isEmpty()
 
-        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+        val hentetAktørId = identCache.hentAktørId(fødselsnummer)
         assertThat(hentetAktørId).isEqualTo(aktørIdFraPdl)
     }
 
@@ -39,10 +39,10 @@ class AktorIdCacheTest {
     fun `Henting av aktørId fra PDL skal lagre identmapping i databasen`() {
         val fødselsnummer = "123"
         val aktørIdFraPdl = "456"
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, false) { aktørIdFraPdl }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, false) { aktørIdFraPdl }
 
-        aktørIdCache.hentAktørId(fødselsnummer)
+        identCache.hentAktørId(fødselsnummer)
 
         val mappinger = repository.hentIdentMappinger(fødselsnummer)
 
@@ -60,8 +60,8 @@ class AktorIdCacheTest {
         val fødselsnummer = "123"
         val aktørIdIDatabasen = "789"
 
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, false) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, false) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -72,7 +72,7 @@ class AktorIdCacheTest {
         )
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
 
-        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+        val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
@@ -83,10 +83,10 @@ class AktorIdCacheTest {
         val fødselsnummer = "123"
         val aktørIdIPDL = null
 
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, true) { aktørIdIPDL }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, true) { aktørIdIPDL }
 
-        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+        val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
@@ -98,10 +98,10 @@ class AktorIdCacheTest {
         val fødselsnummer = "123"
         val aktørIdIPDL = null
 
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, false) { aktørIdIPDL }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, false) { aktørIdIPDL }
 
-        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+        val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(0)
@@ -112,8 +112,8 @@ class AktorIdCacheTest {
         val fødselsnummer = "123"
         val aktørIdIDatabasen = null
 
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, true) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, true) { "dummyAktørIdFraPdlSomIkkeSkalBrukes" }
 
         testDatabase.lagreIdentMapping(
             IdentMapping(
@@ -124,7 +124,7 @@ class AktorIdCacheTest {
         )
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
 
-        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+        val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
         assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
@@ -136,8 +136,8 @@ class AktorIdCacheTest {
         val nyesteAktøridIDatabasen = "456"
         val eldsteAktørIdIDatabasen = "789"
 
-        val repository = Repository(testDatabase.dataSource)
-        val aktørIdCache = AktorIdCache(repository, false) { "dummyAktørIdSomIkkeSkalHentes" }
+        val repository = IdentRepository(testDatabase.dataSource)
+        val identCache = IdentCache(repository, false) { "dummyAktørIdSomIkkeSkalHentes" }
 
         val nyesteIdentMapping = IdentMapping(
             fødselsnummer = fødselsnummer,
@@ -152,7 +152,7 @@ class AktorIdCacheTest {
         testDatabase.lagreIdentMapping(nyesteIdentMapping)
         testDatabase.lagreIdentMapping(eldsteIdentMapping)
 
-        val hentetAktørId = aktørIdCache.hentAktørId(fødselsnummer)
+        val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(nyesteAktøridIDatabasen)
     }
