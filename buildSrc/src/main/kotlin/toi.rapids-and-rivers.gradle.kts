@@ -8,6 +8,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:2025092210081758528498.1d4b108f2c61")
+    implementation("com.github.navikt:rapids-and-rivers:2026031212461773315969.b17173a21e7b")
     testImplementation(project(":technical-libs:testrapid"))
 }
