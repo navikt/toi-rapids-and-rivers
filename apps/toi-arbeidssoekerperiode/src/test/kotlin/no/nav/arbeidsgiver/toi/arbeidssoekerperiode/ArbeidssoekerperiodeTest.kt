@@ -83,4 +83,5 @@ class ArbeidssoekerperiodeTest {
         .setAvsluttet(null)
         .setIdentitetsnummer("01010012345")
         .build()
+
 }

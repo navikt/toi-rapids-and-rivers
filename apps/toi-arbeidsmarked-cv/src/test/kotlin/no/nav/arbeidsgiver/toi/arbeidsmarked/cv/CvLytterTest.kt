@@ -72,8 +72,10 @@ class CvLytterTest {
     }
 
 
-    private fun melding() = Melding().apply { aktoerId = "123"
-        opprettCv = opprettCv() }
+    private fun melding() = Melding().apply {
+        aktoerId = "123"
+        opprettCv = opprettCv()
+    }
 
     private fun opprettCv() = OpprettCv().apply { cv = cv() }
     private fun cv() = Cv().apply() {
@@ -83,8 +85,17 @@ class CvLytterTest {
         foedselsdato = LocalDate.of(1992, 1, 11)
         synligForArbeidsgiver = true
         synligForVeileder = true
-        val foererkortErvervetDato = LocalDate.of(2010, 11,5)
-        foererkort = Foererkort(listOf(FoererkortKlasse("B", "Førerkort klasse B", foererkortErvervetDato, foererkortErvervetDato.plusYears(80))))
+        val foererkortErvervetDato = LocalDate.of(2010, 11, 5)
+        foererkort = Foererkort(
+            listOf(
+                FoererkortKlasse(
+                    "B",
+                    "Førerkort klasse B",
+                    foererkortErvervetDato,
+                    foererkortErvervetDato.plusYears(80)
+                )
+            )
+        )
         arbeidserfaring = emptyList()
         utdannelse = emptyList()
         fagdokumentasjon = emptyList()

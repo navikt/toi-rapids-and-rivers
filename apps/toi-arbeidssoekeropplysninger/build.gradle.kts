@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
+
     implementation(project(":apps:asr-domain"))
     implementation("org.apache.avro:avro:1.12.0")
     implementation("io.confluent:kafka-avro-serializer:7.8.0")
@@ -15,8 +17,8 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.testcontainers:testcontainers:2.0.4")
-    testImplementation("org.testcontainers:postgresql:1.20.5")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.5")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("io.mockk:mockk:1.13.16")
 }

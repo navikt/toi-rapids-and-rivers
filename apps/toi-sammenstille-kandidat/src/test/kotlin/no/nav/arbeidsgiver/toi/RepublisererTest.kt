@@ -26,7 +26,7 @@ class RepublisererTest {
     }
 
     @Test
-    fun `Kall til republiseringsendepunkt skal returnere 200 og sende alle sammenstilte kandidater på rapiden`() {
+    fun `Kall til republiseringsendepunkt skal returnere 200 og sende alle sammenstilte kandidaters aktørider på rapiden`() {
         val testRapid = TestRapid()
         startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
 
@@ -43,7 +43,8 @@ class RepublisererTest {
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
         lagredeKandidater.forEachIndexed { index, kandidat ->
-            assertThat(Kandidat.fraJson(inspektør.message(index)).toJson()).isEqualTo(kandidat.toJson())
+            assertThat(inspektør.message(index).get("@behov").first().asText()).isEqualTo("synlighet")
+            assertThat(inspektør.message(index).get("aktørId").asText()).isEqualTo(kandidat.aktørId)
             assertThat(inspektør.message(index).get("@event_name").asText()).isEqualTo("republisert")
         }
     }
@@ -64,7 +65,8 @@ class RepublisererTest {
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
-        val aktørIderPåRapid = List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
+        val aktørIderPåRapid =
+            List(lagredeKandidater.size) { index -> Kandidat.fraJson(inspektør.message(index)).aktørId }
         assertThat(lagredeKandidater).containsExactlyInAnyOrder(*aktørIderPåRapid.toTypedArray())
     }
 
@@ -97,8 +99,11 @@ class RepublisererTest {
         val kandidat2 = lagredeKandidater[15]
         val kandidat3 = lagredeKandidater[29]
 
-        val body = Republiserer.RepubliseringBodyMedListeAvKandidater(passord = riktigPassord, aktorIder = listOf(kandidat1, kandidat2, kandidat3))
-        var body1 = jacksonObjectMapper().writeValueAsString(body)
+        val body = Republiserer.RepubliseringBodyMedListeAvKandidater(
+            passord = riktigPassord,
+            aktorIder = listOf(kandidat1, kandidat2, kandidat3)
+        )
+        val body1 = jacksonObjectMapper().writeValueAsString(body)
         val response = Fuel.post("http://localhost:9000/republiser/liste")
             .jsonBody(body1).response().second
         assertThat(response.statusCode).isEqualTo(200)

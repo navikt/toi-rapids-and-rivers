@@ -19,7 +19,12 @@ private val uinteressanteHendelser = listOf(
     "application_stop",
     "application_down",
     "republisert",
-    "reindekserDirektemeldtStilling"
+    "reindekserDirektemeldtStilling",
+    "rekrutteringstreffoppdatering",    // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
+    "rekrutteringstreffinvitasjon",     // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
+    "minsideVarselSvar",                // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
+    "behov",                            // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
+    "rekrutteringstreffSvarOgStatus"    // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()

@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies {
-    testImplementation("org.testcontainers:testcontainers-kafka:2.0.3")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
+    testImplementation("org.testcontainers:testcontainers-kafka")
 }
