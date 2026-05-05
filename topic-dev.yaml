@@ -48,7 +48,7 @@ spec:
       access: readwrite
     - team: toi
       application: rekrutteringsbistand-kandidat-api
-      access: write
+      access: readwrite
     - team: toi
       application: foresporsel-om-deling-av-cv-api
       access: readwrite
@@ -111,7 +111,4 @@ spec:
       access: read
     - team: toi
       application: toi-siste-oppfolgingsperiode-pond
-      access: readwrite
-    - team: toi
-      application: rekrutteringsbistand-kandidat-api
       access: readwrite

@@ -260,7 +260,7 @@ class OpenSearchServiceTest {
         val rekrutteringsbistandStilling = testMetoderOpenSearch.finnRekrutteringsbistandStilling("123e4567-e89b-12d3-a456-426614174000", "stilling_20250328")
         val kandidatlisteInfo = rekrutteringsbistandStilling?.kandidatlisteInfo
 
-        assertThat(kandidatlisteInfo).isNotNull
+        assertThat(kandidatlisteInfo).isNotNull()
         assertThat(kandidatlisteInfo?.kandidatlisteId.toString()).isEqualTo("aaaabbbb-cccc-dddd-eeee-ffff00000002")
         assertThat(kandidatlisteInfo?.antallKandidater).isEqualTo(7)
         assertThat(kandidatlisteInfo?.kandidatlisteStatus).isEqualTo("LUKKET")

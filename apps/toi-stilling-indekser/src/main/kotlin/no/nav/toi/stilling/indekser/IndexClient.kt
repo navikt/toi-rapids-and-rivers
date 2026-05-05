@@ -5,16 +5,10 @@ import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
 import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.mapping.TypeMapping
-import org.opensearch.client.opensearch._types.query_dsl.IdsQuery
-import org.opensearch.client.opensearch._types.query_dsl.Query
-import org.opensearch.client.opensearch.core.BulkRequest
-import org.opensearch.client.opensearch.core.BulkResponse
-import org.opensearch.client.opensearch.core.IndexRequest
-import org.opensearch.client.opensearch.core.IndexResponse
-import org.opensearch.client.opensearch.core.SearchRequest
-import org.opensearch.client.opensearch.core.UpdateRequest
+import org.opensearch.client.opensearch.core.*
 import org.opensearch.client.opensearch.core.bulk.BulkOperation
 import org.opensearch.client.opensearch.indices.*
+import org.opensearch.client.opensearch.indices.ExistsRequest
 import java.io.StringReader
 
 
@@ -70,12 +64,12 @@ class IndexClient(private val client: OpenSearchClient, private val objectMapper
     }
 
     fun finnesStilling(stillingsId: String, indeks: String): Boolean {
-        val idQuery = IdsQuery.Builder().values(stillingsId).build()
-        val query = Query.Builder().ids(idQuery).build()
-        val search = SearchRequest.Builder().index(indeks).query(query).build()
+        val request = org.opensearch.client.opensearch.core.ExistsRequest.Builder()
+            .index(indeks)
+            .id(stillingsId)
+            .build()
 
-        val response = client.search(search, RekrutteringsbistandStilling::class.java)
-        return response.hits().hits().isNotEmpty()
+        return client.exists(request).value()
     }
 
     fun oppdaterStillingsinfo(stillingsId: String, indeks: String, stillingsinfo: Stillingsinfo) {

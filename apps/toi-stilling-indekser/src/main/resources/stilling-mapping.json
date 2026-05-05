@@ -23,7 +23,7 @@
         }
       }
     },
-    "kandidatlisteinfo": {
+    "kandidatlisteInfo": {
       "properties": {
         "kandidatlisteId": {
           "type": "keyword"
