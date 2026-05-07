@@ -25,13 +25,13 @@ fun startApp(
 }
 
 fun opprettJavalin(rapidIsAlive: () -> Boolean) {
-    Javalin.create().routes {
-        get("/isalive") { context ->
+    Javalin.create { config ->
+        config.routes.get("/isalive") { context ->
             context
                 .status(if (rapidIsAlive()) 200 else 500)
         }
 
-        get("/template") { context ->
+        config.routes.get("/template") { context ->
             context
                 .html(epostTemplate).status(200)
         }
