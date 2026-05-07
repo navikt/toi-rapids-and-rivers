@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class Republiserer(
     private val repository: Repository,
     private val rapidsConnection: RapidsConnection,
-    javalin: Javalin,
+    port: Int,
     private val passord: String,
     private val meterRegistry: MeterRegistry
 ) {
@@ -20,18 +20,21 @@ class Republiserer(
     private val republiseringspath = "republiser"
     private val secureLog = SecureLog(log)
 
-    init {
-        javalin
-            .before(republiseringspath, ::autentiserPassord)
-            .post(path = republiseringspath) { ctx ->
-                republiserAlleKandidater(ctx)
-            }
-            .post(path = "$republiseringspath/liste") { ctx ->
-                republiserListe(ctx)
-            }
-            .post(path = "$republiseringspath/{aktørId}") { ctx ->
-                republiserEnKandidat(ctx)
-            }
+    private val javalin = Javalin.create { config ->
+        config.routes.before(republiseringspath, ::autentiserPassord)
+        config.routes.post(path = republiseringspath) { ctx ->
+            republiserAlleKandidater(ctx)
+        }
+        config.routes.post(path = "$republiseringspath/liste") { ctx ->
+            republiserListe(ctx)
+        }
+        config.routes.post(path = "$republiseringspath/{aktørId}") { ctx ->
+            republiserEnKandidat(ctx)
+        }
+    }.start(port)
+
+    fun close() {
+        javalin.stop()
     }
 
     fun autentiserPassord(context: Context) {
