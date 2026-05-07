@@ -1,6 +1,6 @@
 # Plan: Utvide toi-identmapper med toveis ident-oppslag
 
-Utvid `toi-identmapper` fra enveis cache (fnr → aktørId) til et toveis ident-oppslag som også støtter aktørId → fnr, og la tjenesten holde seg selv oppdatert via PDL-topic i stedet for REST. Eksisterende `identmapping`-tabell gjenbrukes uten skjemaendringer. Konsumenter (i første omgang `toi-synlighetsmotor` og `toi-sammenstille-kandidat`) får fnr beriket i meldingene sine uten egen DB-kobling eller PDL-kobling.
+Utvid `toi-identmapper` fra enveis cache (fnr → aktørId) til et toveis ident-oppslag som også støtter aktørId → fnr, og la tjenesten holde seg selv oppdatert via PDL-topic i stedet for REST. Eksisterende `identmapping`-tabell gjenbrukes, men det legges inn en liten DB-migrering for indeks på `aktor_id` slik at toveis oppslag støttes effektivt. Konsumenter (i første omgang `toi-synlighetsmotor` og `toi-sammenstille-kandidat`) får fnr beriket i meldingene sine uten egen DB-kobling eller PDL-kobling.
 
 I denne planen navngis komponentene symmetrisk for begge retninger:
 - `Repository` → **`IdentRepository`**
@@ -13,7 +13,7 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
 
 1. **Utvid [PdlKlient.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/PdlKlient.kt)** med `hentFødselsnummer(aktørId: String): String?`. Spør PDL med `grupper: [FOLKEREGISTERIDENT]`, `historikk: false`. REST-klienten beholdes også etter PR 5 som fallback når `IdentCache` får miss (f.eks. aktørId som ennå ikke har kommet på `pdl-aktor-v2`-topic, eller etter restart før konsumenten har innhentet etterslepet).
 
-2. **Rename `Repository.kt` → `IdentRepository.kt`** (klassenavn `IdentRepository`) og utvid — ingen migrering/datamodellendring. `identmapping(aktor_id, fnr, cachet_tidspunkt)` gjenbrukes.
+2. **Rename `Repository.kt` → `IdentRepository.kt`** (klassenavn `IdentRepository`) og utvid. `identmapping(aktor_id, fnr, cachet_tidspunkt)` gjenbrukes, men det legges inn en DB-migrering som oppretter indeks på `aktor_id` for å støtte nye oppslag på `WHERE aktor_id = ?`.
    - Ny metode `hentIdentMappingerForAktørId(aktørId: String): List<IdentMapping>` (analogt med eksisterende `hentIdentMappinger(fnr)`).
    - Ny metode `lagreFødselsnummer(aktørId: String, fødselsnummer: String?)` som upserter på `(aktor_id, fnr)`: finnes raden allerede → oppdater `cachet_tidspunkt`, ellers insert. Gjenbruker unique constraint `uq_fnr_aktor_id`.
    - Generaliser gjerne eksisterende `lagreAktørId` og den nye til én felles privat upsert-funksjon siden logikken blir symmetrisk.
