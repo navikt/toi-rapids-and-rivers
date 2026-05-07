@@ -49,7 +49,11 @@ fun startApp(rapid: RapidsConnection, datasource: DataSource, port: Int, passord
     startRapid(rapid, repository)
 
     return AutoCloseable {
-        republiserer.close()
+        try {
+            republiserer.close()
+        } finally {
+            rapid.stop()
+        }
     }
 }
 
