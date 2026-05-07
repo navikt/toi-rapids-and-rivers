@@ -29,7 +29,7 @@ class AktorIdCacheTest {
         val repository = IdentRepository(testDatabase.dataSource)
         val identCache = IdentCache(repository, false) { aktørIdFraPdl }
 
-        assertThat(repository.hentIdentMappinger(fødselsnummer)).isEmpty()
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer)).isEmpty()
 
         val hentetAktørId = identCache.hentAktørId(fødselsnummer)
         assertThat(hentetAktørId).isEqualTo(aktørIdFraPdl)
@@ -44,7 +44,7 @@ class AktorIdCacheTest {
 
         identCache.hentAktørId(fødselsnummer)
 
-        val mappinger = repository.hentIdentMappinger(fødselsnummer)
+        val mappinger = repository.hentIdentMappingerForFnr(fødselsnummer)
 
         assertThat(mappinger.size).isEqualTo(1)
 
@@ -70,12 +70,12 @@ class AktorIdCacheTest {
                 cachetTidspunkt = LocalDateTime.now()
             )
         )
-        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).size).isEqualTo(1)
 
         val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
-        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).size).isEqualTo(1)
     }
 
     @Test
@@ -89,8 +89,8 @@ class AktorIdCacheTest {
         val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
-        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
-        assertThat(repository.hentIdentMappinger(fødselsnummer).first().aktørId).isNull()
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).first().aktørId).isNull()
     }
 
     @Test
@@ -104,7 +104,7 @@ class AktorIdCacheTest {
         val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIPDL)
-        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(0)
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).size).isEqualTo(0)
     }
 
     @Test
@@ -122,12 +122,12 @@ class AktorIdCacheTest {
                 cachetTidspunkt = LocalDateTime.now()
             )
         )
-        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).size).isEqualTo(1)
 
         val hentetAktørId = identCache.hentAktørId(fødselsnummer)
 
         assertThat(hentetAktørId).isEqualTo(aktørIdIDatabasen)
-        assertThat(repository.hentIdentMappinger(fødselsnummer).size).isEqualTo(1)
+        assertThat(repository.hentIdentMappingerForFnr(fødselsnummer).size).isEqualTo(1)
     }
 
     @Test

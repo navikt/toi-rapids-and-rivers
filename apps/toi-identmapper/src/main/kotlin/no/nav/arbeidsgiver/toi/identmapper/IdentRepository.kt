@@ -15,7 +15,36 @@ class IdentRepository(private val dataSource: DataSource) {
     private val cachetTidspunktKolonne = "cachet_tidspunkt"
 
     fun lagreAktørId(aktørId: String?, fødselsnummer: String) {
-        val identMappingerBasertPåFødselsnummer = hentIdentMappinger(fødselsnummer)
+        lagreIdentMapping(aktørId = aktørId, fødselsnummer = fødselsnummer)
+    }
+
+    fun lagreFødselsnummer(aktørId: String, fødselsnummer: String?) {
+        if (fødselsnummer == null) return
+        lagreIdentMapping(aktørId = aktørId, fødselsnummer = fødselsnummer)
+    }
+
+    fun hentIdentMappingerForFnr(fødselsnummer: String): List<IdentMapping> {
+        return hentIdentMappinger(fødselsnummerKolonne, fødselsnummer)
+    }
+
+    fun hentIdentMappingerForAktørId(aktørId: String): List<IdentMapping> {
+        return hentIdentMappinger(aktørIdKolonne, aktørId)
+    }
+
+    private fun hentIdentMappinger(kolonne: String, verdi: String): List<IdentMapping> {
+        dataSource.connection.use {
+            val resultSet = it.prepareStatement("SELECT * FROM $tabell WHERE $kolonne = ?").apply {
+                setString(1, verdi)
+            }.executeQuery()
+
+            return generateSequence {
+                if (resultSet.next()) tilIdentMapping(resultSet) else null
+            }.toList()
+        }
+    }
+
+    private fun lagreIdentMapping(aktørId: String?, fødselsnummer: String) {
+        val identMappingerBasertPåFødselsnummer = hentIdentMappingerForFnr(fødselsnummer)
         val harSammeMapping = identMappingerBasertPåFødselsnummer.any { it.aktørId == aktørId }
 
         dataSource.connection.use {
@@ -40,17 +69,6 @@ class IdentRepository(private val dataSource: DataSource) {
         }
     }
 
-    fun hentIdentMappinger(fødselsnummer: String): List<IdentMapping> {
-        dataSource.connection.use {
-            val resultSet = it.prepareStatement("SELECT * FROM $tabell WHERE $fødselsnummerKolonne = ?").apply {
-                setString(1, fødselsnummer)
-            }.executeQuery()
-
-            return generateSequence {
-                if (resultSet.next()) tilIdentMapping(resultSet) else null
-            }.toList()
-        }
-    }
 
     private fun tilIdentMapping(resultSet: ResultSet) = IdentMapping(
         aktørId = resultSet.getString(aktørIdKolonne),

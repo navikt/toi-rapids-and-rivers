@@ -32,7 +32,7 @@ class IdentCache(
     }
 
     private fun hentCachetAktørId(fødselsnummer: String): CachetAktørId {
-        val identMappinger = repository.hentIdentMappinger(fødselsnummer)
+        val identMappinger = repository.hentIdentMappingerForFnr(fødselsnummer)
         val sisteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
         return if (sisteMapping == null) CachetAktørId(false, null)
         else CachetAktørId(true, sisteMapping.aktørId)
