@@ -123,7 +123,7 @@ Arbeidet deles i seks mindre PR-er som hver leverer verdi isolert, kan reviewere
 ### Avhengighetsgraf
 ```
 PR 1 (rename) ── PR 2 (datalag) ── PR 3 (AktørIdLytter) ── PR 4 (synlighetsmotor)
-                                                        └── PR 5 (PDL-topic, fjern REST)
+                                                        └── PR 5 (PDL-topic, REST beholdes som fallback)
                                                                             └── PR 6 (/evaluering/{fnr})
 ```
 PR 4 og PR 5 kan i prinsippet kjøre i parallell etter PR 3. PR 6 bør vente til PR 5 er i prod for best datakvalitet.
