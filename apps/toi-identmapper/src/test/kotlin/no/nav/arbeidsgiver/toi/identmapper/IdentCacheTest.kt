@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.time.LocalDateTime
 
-class AktorIdCacheTest {
+class IdentCacheTest {
     private val testDatabase: TestDatabase = TestDatabase()
 
     @BeforeEach
