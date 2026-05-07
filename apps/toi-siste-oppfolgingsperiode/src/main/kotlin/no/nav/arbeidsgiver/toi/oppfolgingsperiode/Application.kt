@@ -61,8 +61,8 @@ fun startApp(envs: Map<String, String>) {
     val env = System.getenv()
     val kafkaStreams = KafkaStreams(topology, streamProperties(env))
 
-    Javalin.create().apply {
-        get("/isalive") { context ->
+    Javalin.create { config ->
+        config.routes.get("/isalive") { context ->
             val state = kafkaStreams.state()
             if(state == RUNNING && !startet.get()) {
                 log.info("applikasjonen ble startet opp fullstendig og er nå running, og tok så lang tid: ${Duration.between(now, ZonedDateTime.now())}")
@@ -70,7 +70,7 @@ fun startApp(envs: Map<String, String>) {
             }
             context.status(if (state in listOf(RUNNING, REBALANCING, CREATED)) 200 else 500)
         }
-        get("/isready") { context ->
+        config.routes.get("/isready") { context ->
             context.status(if (kafkaStreams.state() == RUNNING) 200 else 500)
         }
     }.start(8080)
