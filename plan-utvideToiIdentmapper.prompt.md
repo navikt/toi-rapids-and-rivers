@@ -94,13 +94,14 @@ Arbeidet deles i seks mindre PR-er som hver leverer verdi isolert, kan reviewere
 **Leverer:** Identmapper vil nå berike synlighetsmeldinger uten fnr i prod, forutsatt at synlighetsmotor publiserer dem (skjer først i PR 4). Ingen skade hvis PR 4 forsinkes.
 **Risiko:** Middels. Må verifiseres i dev at whitelist-precondition ikke plukker uønskede meldinger. Rulles ut først i dev-gcp.
 
-### PR 4 — Synlighetsmotor publiserer uten fnr
-**Mål:** La synlighetsmotor publisere meldinger selv når `kandidat.fødselsNummer()` er null, og la identmapperen ta seg av berikelsen.
-- Endring i `SynlighetsgrunnlagLytter.kt`: fjern fnr-kravet før publisering. Dokumenter i kommentar at berikelse skjer i identmapper.
-- Oppdater tester i `toi-synlighetsmotor` tilsvarende.
-- Verifiser i dev-gcp end-to-end før prod-utrulling: melding fra synlighetsmotor uten fnr → identmapper beriker → downstream ser `fodselsnummer`.
-**Leverer:** Lukker det opprinnelige edge-case-problemet (kandidater med kun adressebeskyttelse får fnr i utgående melding).
-**Risiko:** Middels. Hvis PR 3 ikke er i prod, vil meldinger mangle fnr lenger nedstrøms. Deploy-rekkefølge: PR 3 til prod før PR 4.
+### PR 4 — Synlighetsmotor publiserer allerede uten fnr
+**Mål:** Bekrefte og forankre at synlighetsmotor allerede publiserer meldinger når `kandidat.fødselsNummer()` er null, slik at identmapperen kan stå for berikelsen.
+- Ingen kodeendring i `SynlighetsgrunnlagLytter.kt` dersom dagens oppførsel stemmer: lytteren publiserer allerede, og setter bare `packet["fodselsnummer"]` når `kandidat.fødselsNummer()` ikke er null.
+- Oppdater planen og tester i `toi-synlighetsmotor` slik at de reflekterer dagens oppførsel.
+- Verifiser i dev-gcp end-to-end: melding fra synlighetsmotor uten fnr → identmapper beriker → downstream ser `fodselsnummer`.
+- Hvis publisering fortsatt hindres i praksis, pek ut og beskriv den faktiske komponenten som filtrerer eller stopper meldinger uten fnr.
+**Leverer:** Korrigert planbeskrivelse og verifisert flyt for kandidater der fnr mangler i meldingen fra synlighetsmotor.
+**Risiko:** Lav. Hovedrisikoen er feil forståelse av nåværende oppførsel; dersom et annet ledd enn `SynlighetsgrunnlagLytter` stopper meldinger uten fnr, må det adresseres der.
 
 ### PR 5 — PDL-topic-konsument (REST-klienten beholdes som fallback)
 **Mål:** Holde `identmapping` proaktivt oppdatert fra `pdl-aktor-v2`, redusere avhengigheten av PDL REST i varm sti, og løse stale-problemet strukturelt — uten å gi opp REST som sikkerhetsnett for miss.
