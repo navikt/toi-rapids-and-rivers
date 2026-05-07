@@ -18,20 +18,27 @@ val secureLog = SecureLog(log)
 
 fun startApp(
     repository: Repository,
-    javalin: Javalin,
+    port: Int,
     rapidsConnection: RapidsConnection,
     issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>,
     rapidIsAlive: () -> Boolean
-) {
-    javalin.get("/isalive", isAlive(rapidIsAlive))
-    javalin.post("/evaluering", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
-    javalin.get("/evaluering/{fnr}", evaluerKandidatFraContextGet(repository::hentMedFnr, issuerProperties))
+): AutoCloseable {
+    val javalin = Javalin.create { config ->
+        config.routes.get("/isalive", isAlive(rapidIsAlive))
+        config.routes.post("/evaluering", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
+        config.routes.get("/evaluering/{fnr}", evaluerKandidatFraContextGet(repository::hentMedFnr, issuerProperties))
+    }.start(port)
 
     rapidsConnection.also {
         SynlighetsgrunnlagLytter(it, repository)
         SynlighetRekrutteringstreffLytter(it, repository)
         SynlighetBehovsLytter(it)
     }.start()
+
+    return AutoCloseable {
+        javalin.stop()
+        rapidsConnection.stop()
+    }
 }
 
 private val isAlive: (() -> Boolean) -> (Context) -> Unit = { isAlive ->
@@ -40,11 +47,6 @@ private val isAlive: (() -> Boolean) -> (Context) -> Unit = { isAlive ->
     }
 }
 
-fun opprettJavalinMedTilgangskontroll(): Javalin =
-    Javalin.create {
-        it.http.defaultContentType = "application/json"
-    }.start(8301)
-
 fun main() {
     log.info("Starter app.")
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
@@ -52,7 +54,6 @@ fun main() {
     val env = System.getenv()
     val datasource = DatabaseKonfigurasjon(env).lagDatasource()
     val repository = Repository(datasource)
-    val javalin = opprettJavalinMedTilgangskontroll()
 
     lateinit var rapidIsAlive: () -> Boolean
     val rapidsConnection = RapidApplication.create(env, configure = { _, kafkarapid ->
@@ -65,7 +66,7 @@ fun main() {
         })
     }
 
-    startApp(repository, javalin, rapidsConnection, hentIssuerProperties(System.getenv()), rapidIsAlive)
+    startApp(repository, 8301, rapidsConnection, hentIssuerProperties(System.getenv()), rapidIsAlive)
 }
 
 val Any.log: Logger
