@@ -2,9 +2,7 @@ package no.nav.arbeidsgiver.toi.livshendelser.rest
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
-import no.nav.toi.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
-import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.arbeidsgiver.toi.livshendelser.stub404
@@ -12,8 +10,12 @@ import no.nav.arbeidsgiver.toi.livshendelser.stubPdl
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.core.configuration.IssuerProperties
+import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.net.InetAddress
 import java.net.URI
 
@@ -36,12 +38,9 @@ class HarAdressebeskyttelseTest {
     val pdlKlient = PdlKlient("http://localhost:$pdlPort/graphql", AccessTokenClient(envs))
     val testRapid = TestRapid()
 
-    private lateinit var javalin: Javalin
-
     @BeforeAll
     fun beforeAll() {
         mockOAuth2Server.start(InetAddress.getByName("localhost"), oAuthPort)
-
     }
 
     @AfterAll
@@ -63,7 +62,9 @@ class HarAdressebeskyttelseTest {
                 .response().second
 
             assertThat(response.statusCode).isEqualTo(200)
-            assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":true}""")
+            assertThat(
+                response.body().asString("application/json; charset=UTF-8")
+            ).isEqualTo("""{"harAdressebeskyttelse":true}""")
         }
     }
 
@@ -79,7 +80,9 @@ class HarAdressebeskyttelseTest {
                 .response().second
 
             assertThat(response.statusCode).isEqualTo(200)
-            assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":false}""")
+            assertThat(
+                response.body().asString("application/json; charset=UTF-8")
+            ).isEqualTo("""{"harAdressebeskyttelse":false}""")
         }
     }
 
@@ -95,7 +98,9 @@ class HarAdressebeskyttelseTest {
                 .response().second
 
             assertThat(response.statusCode).isEqualTo(200)
-            assertThat(response.body().asString("application/json; charset=UTF-8")).isEqualTo("""{"harAdressebeskyttelse":false}""")
+            assertThat(
+                response.body().asString("application/json; charset=UTF-8")
+            ).isEqualTo("""{"harAdressebeskyttelse":false}""")
         }
     }
 
