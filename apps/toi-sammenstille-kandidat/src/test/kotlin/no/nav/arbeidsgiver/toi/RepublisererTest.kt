@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import no.nav.toi.TestRapid
 import io.javalin.Javalin
+import no.nav.arbeidsgiver.toi.startApp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 
@@ -12,24 +13,23 @@ import org.junit.jupiter.api.*
 class RepublisererTest {
     private val riktigPassord = "passord"
     private val testDatabase = TestDatabase()
-    private lateinit var javalin: Javalin
+    private val testRapid = TestRapid()
+    private lateinit var app: AutoCloseable
 
     @BeforeEach
     fun before() {
-        javalin = Javalin.create().start(9000)
+        app = startApp(testRapid, TestDatabase().dataSource, 9000, riktigPassord)
     }
 
     @AfterEach
     fun after() {
-        javalin.stop()
+        app.close()
+        testRapid.reset()
         testDatabase.slettAlt()
     }
 
     @Test
     fun `Kall til republiseringsendepunkt skal returnere 200 og sende alle sammenstilte kandidaters aktørider på rapiden`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         val lagredeKandidater = lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
 
@@ -51,9 +51,6 @@ class RepublisererTest {
 
     @Test
     fun `Kall til republiseringsendepunkt skal fungere for flere hundre kandidater`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
 
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
@@ -72,9 +69,6 @@ class RepublisererTest {
 
     @Test
     fun `Kall til republiseringsendepunkt for én kandidat skal sende kandidaten på rapid`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
         val aktørIdTilKandidatSomSkalRepubliseres = lagredeKandidater[13]
 
@@ -91,9 +85,6 @@ class RepublisererTest {
 
     @Test
     fun `Kall til republiseringsendepunkt for en liste av kandidater skal sende kandidaten på rapid`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
         val kandidat1 = lagredeKandidater[13]
         val kandidat2 = lagredeKandidater[15]
@@ -120,9 +111,6 @@ class RepublisererTest {
 
     @Test
     fun `Kall til republiseringsendepunkt for en kandidat som ikke finnes returnerer 404 og sender ikke melding på rapid`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
         val ugyldigAktørId = "enUgyldigAktørId"
 
@@ -137,9 +125,6 @@ class RepublisererTest {
 
     @Test
     fun `Kall til republiseringsendepunkt med feil passord skal returnere 401 og ikke republisere noen kandidater`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, TestDatabase().dataSource, javalin, riktigPassord)
-
         lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
 
         val feilPassord = "jalla"

@@ -17,32 +17,27 @@ class SammenstillTest {
         "siste14avedtak",
         "kvp"
     )
+    private val testRapid = TestRapid()
+    private lateinit var app: AutoCloseable
 
-    private lateinit var javalin: Javalin
-
-    private fun kunKandidatfelter(melding: JsonNode) =
-        melding.fieldNames().asSequence().toList().filter { fieldName -> alleKandidatfelter.contains(fieldName) }
+    private val testDatabase = TestDatabase()
 
     @BeforeEach
     fun before() {
-        javalin = Javalin.create().start(9000)
+        app = startApp(testRapid, testDatabase.dataSource, 9000, "dummy")
     }
 
     @AfterEach
     fun after() {
-        javalin.stop()
-        TestDatabase().slettAlt()
+        app.close()
+        testRapid.reset()
+        testDatabase.slettAlt()
     }
 
 
     @Test
     fun `Når siste14avedtak har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(siste14avedtakMelding(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
@@ -53,11 +48,6 @@ class SammenstillTest {
     @Test
     fun `Når arbeidsmarkedCv-melding har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(arbeidsmarkedCvMelding(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
@@ -68,9 +58,6 @@ class SammenstillTest {
     @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
         testRapid.sendTestMessage(cvMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(cvMelding(aktørId))
@@ -85,11 +72,6 @@ class SammenstillTest {
     @Test
     fun `Når kvp-melding har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
-        val testRapid = TestRapid()
-        val testDatabase = TestDatabase()
-
-        startApp(testRapid, TestDatabase().dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(kvp(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()

@@ -16,16 +16,16 @@ fun testProgramMedHendelse(
     val rapid = TestRapid()
 
     startApp(
-        repository, Javalin.create(), rapid, mapOf(
+        repository, 8301, rapid, mapOf(
             Rolle.VEILEDER to ("isso-idtoken" to IssuerProperties(
                 URI("http://localhost:18300/isso-idtoken/.well-known/openid-configuration").toURL(),
                 listOf("audience")
             ))
         )
-    ) { true }
-
-    rapid.sendTestMessage(hendelse)
-    rapid.inspektør.assertion()
+    ) { true }.use {
+        rapid.sendTestMessage(hendelse)
+        rapid.inspektør.assertion()
+    }
 }
 
 fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
