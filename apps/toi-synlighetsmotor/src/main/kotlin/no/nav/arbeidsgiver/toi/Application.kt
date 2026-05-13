@@ -24,9 +24,12 @@ fun startApp(
     rapidIsAlive: () -> Boolean
 ): AutoCloseable {
     val javalin = Javalin.create { config ->
-        config.routes.get("/isalive", isAlive(rapidIsAlive))
-        config.routes.post("/evaluering", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
-        config.routes.get("/evaluering/{fnr}", evaluerKandidatFraContextGet(repository::hentMedFnr, issuerProperties))
+        config.http.defaultContentType = "application/json"
+        with(config.routes) {
+            get("/isalive", isAlive(rapidIsAlive))
+            post("/evaluering", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))
+            get("/evaluering/{fnr}", evaluerKandidatFraContextGet(repository::hentMedFnr, issuerProperties))
+        }
     }.start(port)
 
     rapidsConnection.also {
