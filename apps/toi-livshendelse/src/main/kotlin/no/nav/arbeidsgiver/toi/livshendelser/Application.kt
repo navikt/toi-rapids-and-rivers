@@ -51,9 +51,11 @@ fun startApp(
     ): AutoCloseable {
     val javalin = Javalin.create { config ->
         config.http.defaultContentType = "application/json"
-        config.routes.get("/isalive", isAlive(rapidIsAlive))
-        config.routes.get("isready", isAlive(rapidIsAlive))
-        config.routes.post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
+        with(config.routes) {
+            get("/isalive", isAlive(rapidIsAlive))
+            get("isready", isAlive(rapidIsAlive))
+            post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
+        }
     }.start(port)
 
     val log = LoggerFactory.getLogger("Application.kt")

@@ -21,15 +21,18 @@ class Republiserer(
     private val secureLog = SecureLog(log)
 
     private val javalin = Javalin.create { config ->
-        config.routes.before(republiseringspath, ::autentiserPassord)
-        config.routes.post(path = republiseringspath) { ctx ->
-            republiserAlleKandidater(ctx)
-        }
-        config.routes.post(path = "$republiseringspath/liste") { ctx ->
-            republiserListe(ctx)
-        }
-        config.routes.post(path = "$republiseringspath/{aktørId}") { ctx ->
-            republiserEnKandidat(ctx)
+        with(config.routes)
+        {
+            before(republiseringspath, ::autentiserPassord)
+            post(path = republiseringspath) { ctx ->
+                republiserAlleKandidater(ctx)
+            }
+            post(path = "$republiseringspath/liste") { ctx ->
+                republiserListe(ctx)
+            }
+            post(path = "$republiseringspath/{aktørId}") { ctx ->
+                republiserEnKandidat(ctx)
+            }
         }
     }.start(port)
 
