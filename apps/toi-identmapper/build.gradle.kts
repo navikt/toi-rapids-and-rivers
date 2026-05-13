@@ -10,7 +10,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:7.8.0")
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("org.postgresql:postgresql:42.7.11")
     implementation("org.flywaydb:flyway-core:11.1.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.0")
     implementation("com.zaxxer:HikariCP:6.2.1")
