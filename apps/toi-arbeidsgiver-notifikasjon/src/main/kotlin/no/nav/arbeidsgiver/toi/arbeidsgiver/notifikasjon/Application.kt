@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder.get
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,8 +26,8 @@ fun startApp(
 fun opprettJavalin(rapidIsAlive: () -> Boolean) {
     Javalin.create { config ->
         with(config.routes) {
-            get("/isalive") { context -> context.status(if (rapidIsAlive()) 200 else 500) }
-            get("/template") { context -> context.html(epostTemplate).status(200) }
+            get("/isalive") { it.status(if (rapidIsAlive()) 200 else 500) }
+            get("/template") { it.html(epostTemplate) }
         }
     }.start(8301)
 }
