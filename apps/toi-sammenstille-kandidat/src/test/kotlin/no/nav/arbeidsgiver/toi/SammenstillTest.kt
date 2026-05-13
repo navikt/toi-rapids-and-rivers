@@ -20,27 +20,24 @@ class SammenstillTest {
     private val testRapid = TestRapid()
     private lateinit var app: AutoCloseable
 
-    private fun kunKandidatfelter(melding: JsonNode) =
-        melding.fieldNames().asSequence().toList().filter { fieldName -> alleKandidatfelter.contains(fieldName) }
+    private val testDatabase = TestDatabase()
 
     @BeforeEach
     fun before() {
-        app = startApp(testRapid, TestDatabase().dataSource, 9000, "dummy")
+        app = startApp(testRapid, testDatabase.dataSource, 9000, "dummy")
     }
 
     @AfterEach
     fun after() {
         app.close()
         testRapid.reset()
-        TestDatabase().slettAlt()
+        testDatabase.slettAlt()
     }
 
 
     @Test
     fun `Når siste14avedtak har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
-        val testDatabase = TestDatabase()
-
         testRapid.sendTestMessage(siste14avedtakMelding(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
@@ -51,8 +48,6 @@ class SammenstillTest {
     @Test
     fun `Når arbeidsmarkedCv-melding har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
-        val testDatabase = TestDatabase()
-
         testRapid.sendTestMessage(arbeidsmarkedCvMelding(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()
@@ -63,7 +58,6 @@ class SammenstillTest {
     @Test
     fun `Når flere CV- og veiledermeldinger mottas for én kandidat skal det være én rad for kandidaten i databasen`() {
         val aktørId = "12141321"
-        val testDatabase = TestDatabase()
         testRapid.sendTestMessage(cvMelding(aktørId))
         testRapid.sendTestMessage(veilederMelding(aktørId))
         testRapid.sendTestMessage(cvMelding(aktørId))
@@ -78,8 +72,6 @@ class SammenstillTest {
     @Test
     fun `Når kvp-melding har blitt mottatt skal meldingen lagres i databasen`() {
         val aktørId = "123"
-        val testDatabase = TestDatabase()
-
         testRapid.sendTestMessage(kvp(aktørId))
 
         val lagredeKandidater = testDatabase.hentAlleKandidater()

@@ -53,7 +53,7 @@ fun startApp(
         config.http.defaultContentType = "application/json"
         with(config.routes) {
             get("/isalive", isAlive(rapidIsAlive))
-            get("isready", isAlive(rapidIsAlive))
+            get("/isready", isAlive(rapidIsAlive))
             post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
         }
     }.start(port)
