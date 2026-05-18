@@ -21,7 +21,7 @@ class IdentMapperTest {
         val meldingPåRapid = inspektør.message(0)
 
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(meldingPåRapid.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingPåRapid.propertyNames()).containsExactlyInAnyOrder(
             "fodselsnummer",
             "aktørId",
             "etAnnetFelt",
@@ -36,7 +36,7 @@ class IdentMapperTest {
         assertThat(meldingPåRapid.get(fødselsnummerKey).asText()).isEqualTo(fødselsnummer)
         assertThat(meldingPåRapid.get("aktørId").asText()).isEqualTo(aktørId)
         assertThat(meldingPåRapid.get("etAnnetFelt").asBoolean()).isFalse
-        assertThat(meldingPåRapid.get("etObjekt").fieldNames().asSequence().toList()).containsExactly("enListe")
+        assertThat(meldingPåRapid.get("etObjekt").propertyNames()).containsExactly("enListe")
         assertThat(
             meldingPåRapid.get("etObjekt").get("enListe").asIterable().toList()
                 .map { it.intValue() }).containsExactly(1, 2, 3, 4)

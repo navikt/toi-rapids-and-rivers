@@ -1,12 +1,11 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
@@ -19,11 +18,11 @@ import javax.sql.DataSource
 class Repository(private val datasource: DataSource) {
     companion object {
         private val secureLog = SecureLog(log)
-        private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        private val objectMapper: ObjectMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .build()
     }
 
     fun lagreArbeidssøkerperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {

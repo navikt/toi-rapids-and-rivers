@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import no.nav.toi.TestRapid
@@ -124,18 +124,20 @@ class RepublisererTest {
     }
 
     @Test
-    fun `Kall til republiseringsendepunkt med feil passord skal returnere 401 og ikke republisere noen kandidater`() {
+    fun `Kall til republiseringsendepunkter med feil passord skal returnere 401 og ikke republisere noen kandidater`() {
         lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
 
         val feilPassord = "jalla"
         val body = Republiserer.RepubliseringBody(passord = feilPassord)
-        val response = Fuel.post("http://localhost:9000/republiser")
-            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+        listOf("republiser", "republiser/liste", "republiser/111").forEach { path ->
+            val response = Fuel.post("http://localhost:9000/$path")
+                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
 
-        assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode).isEqualTo(401)
 
-        val inspektør = testRapid.inspektør
-        assertThat(inspektør.size).isEqualTo(0)
+            val inspektør = testRapid.inspektør
+            assertThat(inspektør.size).isEqualTo(0)
+        }
     }
 
     private fun lagre3KandidaterTilDatabasen(repository: Repository) =

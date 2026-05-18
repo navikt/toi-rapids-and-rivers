@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import kotlinx.coroutines.time.delay
 import org.apache.kafka.clients.consumer.KafkaConsumer

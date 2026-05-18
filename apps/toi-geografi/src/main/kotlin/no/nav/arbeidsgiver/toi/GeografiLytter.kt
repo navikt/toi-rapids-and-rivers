@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -36,7 +36,7 @@ class GeografiLytter(private val geografiKlient: GeografiKlient, private val pos
         meterRegistry: MeterRegistry
     ) {
         val postnummer = packet["postnummer"]
-        val geografiKode: List<String> = packet["geografiKode"].map(JsonNode::asText)
+        val geografiKode: List<String> = packet["geografiKode"].toList().map(JsonNode::asText)
         val aktørid: String = packet["aktørId"].asText()
 
         val postdata = if (postnummer.isMissingOrNull()) {

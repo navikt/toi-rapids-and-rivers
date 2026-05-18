@@ -1,7 +1,8 @@
 package no.nav.toi
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.SerializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.FailedMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.OutgoingMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
@@ -14,9 +15,9 @@ class TestRapid(
     RapidsConnection() {
 
     private companion object {
-        private val objectMapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
-            .registerModule(com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        private val objectMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
+            .build()
     }
 
     private val messages = mutableListOf<Pair<String?, String>>()

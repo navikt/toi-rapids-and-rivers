@@ -22,7 +22,7 @@ class KvpTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames()).containsExactlyInAnyOrder(
             "@event_name",
             "kvp",
             "aktørId",
@@ -36,7 +36,7 @@ class KvpTest {
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
         val kvp = meldingJson.get("kvp")
-        assertThat(kvp.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(kvp.propertyNames()).containsExactlyInAnyOrder(
             "event",
             "aktorId",
             "enhetId",

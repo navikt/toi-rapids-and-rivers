@@ -1,12 +1,13 @@
 package no.nav.toi.stilling.publiser.arbeidsplassen
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import tools.jackson.databind.cfg.EnumFeature
 import java.net.URI
 
 private val log = noClassLogger()
@@ -30,10 +31,11 @@ fun rapidsConnection(env: MutableMap<String, String>) = RapidApplication.create(
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
 
-val objectMapper = jacksonObjectMapper()
+val objectMapper = JsonMapper.builder()
+    .addModule(kotlinModule())
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-    .registerModule(JavaTimeModule())
+    .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+    .build()
 
 /**
  * Convenience for å slippe å skrive eksplistt navn på Logger når Logger opprettes. Ment å tilsvare Java-måten, hvor

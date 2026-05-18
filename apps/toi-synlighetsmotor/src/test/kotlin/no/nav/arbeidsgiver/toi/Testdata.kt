@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
 import no.nav.security.token.support.core.configuration.IssuerProperties
@@ -44,9 +44,9 @@ fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
 fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
     {
         Assertions.assertThat(size).isEqualTo(1)
-        Assertions.assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
+        Assertions.assertThat(field(0, "@event_name").asString()).isEqualTo("hendelse")
         Assertions.assertThat(message(0).path("synlighet").isMissingNode).isTrue()
-        Assertions.assertThat(field(0, "@behov").map(JsonNode::asText)).isEqualTo(listOf(
+        Assertions.assertThat(field(0, "@behov").toList().map(JsonNode::asString)).isEqualTo(listOf(
             "arbeidsmarkedCv",
             "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsinformasjon",

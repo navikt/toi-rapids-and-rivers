@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -67,7 +67,7 @@ class SynlighetsgrunnlagLytter(
             )
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-            val behov = packet["@behov"].map(JsonNode::asText)
+            val behov = packet["@behov"].toList().map(JsonNode::asText)
             if (behov.containsAll(requiredFields)) {
                 if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
                     val extraBehov = listOf(adressebeskyttelseFelt)

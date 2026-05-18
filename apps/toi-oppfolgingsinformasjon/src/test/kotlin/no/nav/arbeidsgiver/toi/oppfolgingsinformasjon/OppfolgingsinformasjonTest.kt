@@ -20,7 +20,7 @@ class OppfolgingsinformasjonTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames()).containsExactlyInAnyOrder(
             "@event_name",
             "oppfølgingsinformasjon",
             "fodselsnummer",
@@ -34,7 +34,7 @@ class OppfolgingsinformasjonTest {
         assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
 
         val oppfølgingsinformasjonJson = meldingJson.get("oppfølgingsinformasjon")
-        assertThat(oppfølgingsinformasjonJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(oppfølgingsinformasjonJson.propertyNames()).containsExactlyInAnyOrder(
             "fodselsnummer",
             "formidlingsgruppe",
             "iservFraDato",

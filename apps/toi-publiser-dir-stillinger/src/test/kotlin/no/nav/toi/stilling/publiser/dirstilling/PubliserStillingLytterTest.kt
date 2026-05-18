@@ -1,8 +1,8 @@
 package no.nav.toi.stilling.publiser.dirstilling
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import no.nav.toi.TestRapid
 import no.nav.toi.stilling.publiser.dirstilling.dto.RapidHendelse
 import no.nav.toi.stilling.publiser.dirstilling.dto.Stillingskategori
@@ -11,16 +11,18 @@ import org.junit.jupiter.api.Test
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.kafka.KafkaContainer
 import org.testcontainers.utility.DockerImageName
+import tools.jackson.databind.cfg.EnumFeature
 import kotlin.collections.set
 
 class PubliserStillingLytterTest {
     private var stillingskategori = "STILLING"
     private val testEnv = mutableMapOf<String, String>()
 
-    private val jacksonMapper = jacksonObjectMapper()
+    private val jacksonMapper = JsonMapper.builder()
+        .addModule(kotlinModule())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .registerModule(JavaTimeModule())
+        .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+        .build()
 
     @Suppress("unused")
     val localKafka: Any = KafkaContainer(DockerImageName.parse("apache/kafka-native:4.1.1"))

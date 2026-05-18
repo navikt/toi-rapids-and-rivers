@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
 import erGyldigEpostadresse

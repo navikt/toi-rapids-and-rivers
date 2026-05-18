@@ -1,9 +1,11 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.kotlinModule
+
+import tools.jackson.databind.json.JsonMapper
+
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -11,6 +13,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import tools.jackson.module.kotlin.jacksonMapperBuilder
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 class HullICvLytter(rapidsConnection: RapidsConnection) :
     River.PacketListener {
@@ -31,8 +35,8 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         }.register(this)
     }
 
-    private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper = jacksonMapperBuilder().addModule(kotlinModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build()
 
     override fun onPacket(
         packet: JsonMessage,

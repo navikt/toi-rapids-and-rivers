@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.ontologitjeneste
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.jackson.responseObject
@@ -41,8 +41,8 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         meterRegistry: MeterRegistry
     ) {
         packet["ontologi"] = Ontologi(
-            packet["kompetanse"].map(JsonNode::asText).associateWith(this::synonymerTilKompetanse),
-            packet["stillingstittel"].map(JsonNode::asText).associateWith(this::synonymerTilStillingstittel)
+            packet["kompetanse"].toList().map(JsonNode::asText).associateWith(this::synonymerTilKompetanse),
+            packet["stillingstittel"].toList().map(JsonNode::asText).associateWith(this::synonymerTilStillingstittel)
         )
         context.publish(packet.toJson())
     }

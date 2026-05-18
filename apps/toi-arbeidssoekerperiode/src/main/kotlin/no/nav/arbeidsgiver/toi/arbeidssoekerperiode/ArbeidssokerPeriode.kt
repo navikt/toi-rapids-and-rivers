@@ -2,14 +2,15 @@ package no.nav.arbeidsgiver.toi.arbeidssoekerperiode
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
+import tools.jackson.databind.cfg.DateTimeFeature
+import tools.jackson.databind.cfg.EnumFeature
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -18,11 +19,13 @@ class ArbeidssokerPeriode(@JsonIgnore private val melding: Periode,
                           @JsonIgnore val meterRegistry: MeterRegistry) {
     companion object {
         @JsonIgnore
-        private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        private val objectMapper: ObjectMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
+            .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .build()
     }
 
     //@JsonProperty("@event_name")
