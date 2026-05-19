@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
 import no.nav.toi.TestRapid
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeid.cv.avro.*
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
@@ -18,7 +16,7 @@ class CvLytterTest {
     val cvTopic = TopicPartition("teampam.cv-endret-ekstern-v2", 0)
 
     val behandleCv: (Melding) -> ArbeidsmarkedCv = { melding ->
-        ArbeidsmarkedCv(melding, PrometheusMeterRegistry(PrometheusConfig.DEFAULT))
+        ArbeidsmarkedCv(melding)
     }
 
     @Test
@@ -39,7 +37,6 @@ class CvLytterTest {
         val meldingJson = inspektør.message(0)
 
         Assertions.assertThat(meldingJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "meterRegistry",
             "@event_name",
             "arbeidsmarkedCv",
             "aktørId",

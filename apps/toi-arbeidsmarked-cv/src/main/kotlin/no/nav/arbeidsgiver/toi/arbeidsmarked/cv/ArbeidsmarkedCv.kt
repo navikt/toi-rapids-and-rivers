@@ -6,10 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeid.cv.avro.Melding
 
-class ArbeidsmarkedCv(melding: Melding, val meterRegistry: MeterRegistry) {
+class ArbeidsmarkedCv(melding: Melding) {
     @JsonProperty("@event_name")
     private val event_name = "arbeidsmarked-cv"
 
