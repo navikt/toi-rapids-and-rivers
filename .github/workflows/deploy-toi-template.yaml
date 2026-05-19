@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: build/reports/tests/test
+          path: apps/${{ inputs.app_name }}/build/reports/tests/test
       - name: Push docker image to GAR
         uses: nais/docker-build-push@v0
         id: docker-build-push
