@@ -35,7 +35,7 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
         meterRegistry: MeterRegistry
     ) {
         //Mulige Koder:  "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG", "FORTROLIG", "UGRADERT", null(mappes til UKJENT)
-        val aktørid: String = packet["aktørId"].asText()
+        val aktørid: String = packet["aktørId"].asString()
 
 
         val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
@@ -48,7 +48,7 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
         log.info("Sender løsning på behov for aktørid: (se securelog)")
         secureLog.info("Sender løsning på behov for aktørid: $aktørid")
         if(gradering != null && gradering != "UGRADERT" ) {
-            secureLog.info("Adressebeskyttelse  ${aktørid} $gradering ${packet["@event_name"].asText()}")
+            secureLog.info("Adressebeskyttelse  ${aktørid} $gradering ${packet["@event_name"].asString()}")
         }
 
         context.publish(aktørid, packet.toJson())
@@ -63,7 +63,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

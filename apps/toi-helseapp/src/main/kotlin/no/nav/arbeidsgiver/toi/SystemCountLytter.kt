@@ -27,7 +27,7 @@ class SystemCountLytter(rapidsConnection: RapidsConnection): River.PacketListene
     ) {
         val systemReadCount = packet["system_read_count"].asInt()
         if(systemReadCount>20) {
-            val eventName = packet["@event_name"].asTextNullable()
+            val eventName = packet["@event_name"].asStringNullable()
             val systemParticipatingServices = packet["system_participating_services"].toPrettyString()
             log.error("System-readcount er stor!! Kan være at hendelser har havnet i loop!!\n" +
                     "system_read_count: $systemReadCount.\n" +
@@ -37,4 +37,4 @@ class SystemCountLytter(rapidsConnection: RapidsConnection): River.PacketListene
     }
 }
 
-fun JsonNode.asTextNullable() = asText(null)
+fun JsonNode.asStringNullable() = asString(null)

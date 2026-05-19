@@ -114,7 +114,7 @@ data class Kandidat(
         private val objectMapper = jacksonObjectMapper()
         fun fraJson(json: String): Kandidat = fraJson(objectMapper.readTree(json))
         fun fraJson(json: JsonNode) = Kandidat(
-            aktørId = json["aktørId"].asText(),
+            aktørId = json["aktørId"].asString(),
             arbeidsmarkedCv = json["arbeidsmarkedCv"],
             veileder = json["veileder"],
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],

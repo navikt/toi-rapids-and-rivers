@@ -41,8 +41,8 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
         meterRegistry: MeterRegistry
     ) {
         packet["ontologi"] = Ontologi(
-            packet["kompetanse"].toList().map(JsonNode::asText).associateWith(this::synonymerTilKompetanse),
-            packet["stillingstittel"].toList().map(JsonNode::asText).associateWith(this::synonymerTilStillingstittel)
+            packet["kompetanse"].toList().map(JsonNode::asString).associateWith(this::synonymerTilKompetanse),
+            packet["stillingstittel"].toList().map(JsonNode::asString).associateWith(this::synonymerTilStillingstittel)
         )
         context.publish(packet.toJson())
     }
@@ -93,7 +93,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

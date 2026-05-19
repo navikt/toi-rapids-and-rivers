@@ -79,7 +79,7 @@ class NeedSamleLytterTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val message = inspektør.message(0)
-        assertThat(message[felt].asText()).isEqualTo(expectedVerdi)
+        assertThat(message[felt].asString()).isEqualTo(expectedVerdi)
     }
 
     @ParameterizedTest

@@ -52,7 +52,7 @@ class SynlighetRekrutteringstreffLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val fodselsnummer = packet["fodselsnummer"].asText()
+        val fodselsnummer = packet["fodselsnummer"].asString()
         val adressebeskyttelseNode = packet[adressebeskyttelseFelt]
 
         val evaluering = repository.hentMedFnr(fodselsnummer)
@@ -80,7 +80,7 @@ class SynlighetRekrutteringstreffLytter(
         }
 
         // Adressebeskyttelse er hentet - evaluer synlighet
-        val adressebeskyttelse = adressebeskyttelseNode.asText()
+        val adressebeskyttelse = adressebeskyttelseNode.asString()
         val harIkkeAdressebeskyttelse = (adressebeskyttelse == "UKJENT" || adressebeskyttelse == "UGRADERT").tilBooleanVerdi()
 
         val oppdatertEvaluering = Evaluering(

@@ -67,7 +67,7 @@ class SynlighetsgrunnlagLytter(
             )
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-            val behov = packet["@behov"].toList().map(JsonNode::asText)
+            val behov = packet["@behov"].toList().map(JsonNode::asString)
             if (behov.containsAll(requiredFields)) {
                 if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
                     val extraBehov = listOf(adressebeskyttelseFelt)
@@ -101,7 +101,7 @@ private fun JsonMessage.forbidBehovIListe(behov: String) {
     interestedIn("@behov")
     val behovNode = this["@behov"]
     if (!behovNode.isMissingNode && behovNode.isArray) {
-        val behovListe = behovNode.toList().map(JsonNode::asText)
+        val behovListe = behovNode.toList().map(JsonNode::asString)
         if (behov in behovListe) {
             throw MessageProblems.MessageException(MessageProblems(toJson()).apply { error("Meldingen tilhører $behov-flyten - ignorerer") })
         }

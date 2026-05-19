@@ -42,7 +42,7 @@ class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsC
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["aktørId"].asString()
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
         val jsonInnhold = periodeOpplysninger?.let { jacksonMapper.valueToTree<JsonNode>(it) } ?: NullNode.instance
 
@@ -56,7 +56,7 @@ class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsC
         require("@behov") { behovNode ->
             if (behovNode
                     .toList()
-                    .map(JsonNode::asText)
+                    .map(JsonNode::asString)
                     .onEach { interestedIn(it) }
                     .first { this[it].isMissingNode } != informasjonsElement
             )

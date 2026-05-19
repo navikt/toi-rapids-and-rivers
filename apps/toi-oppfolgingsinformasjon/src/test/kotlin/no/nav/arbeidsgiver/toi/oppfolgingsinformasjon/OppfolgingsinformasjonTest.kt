@@ -30,8 +30,8 @@ class OppfolgingsinformasjonTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("oppfølgingsinformasjon")
-        assertThat(meldingJson.get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
+        assertThat(meldingJson.get("@event_name").asString()).isEqualTo("oppfølgingsinformasjon")
+        assertThat(meldingJson.get("fodselsnummer").asString()).isEqualTo(fødselsnummer)
 
         val oppfølgingsinformasjonJson = meldingJson.get("oppfølgingsinformasjon")
         assertThat(oppfølgingsinformasjonJson.propertyNames()).containsExactlyInAnyOrder(
@@ -54,22 +54,22 @@ class OppfolgingsinformasjonTest {
         )
 
         meldingJson.get("oppfølgingsinformasjon").apply {
-            assertThat(get("fodselsnummer").asText()).isEqualTo(fødselsnummer)
-            assertThat(get("formidlingsgruppe").asText()).isEqualTo("ARBS")
+            assertThat(get("fodselsnummer").asString()).isEqualTo(fødselsnummer)
+            assertThat(get("formidlingsgruppe").asString()).isEqualTo("ARBS")
             assertThat(get("iservFraDato").isNull).isTrue
-            assertThat(get("fornavn").asText()).isEqualTo("TULLETE")
-            assertThat(get("etternavn").asText()).isEqualTo("TABBE")
-            assertThat(get("oppfolgingsenhet").asText()).isEqualTo("0318")
-            assertThat(get("kvalifiseringsgruppe").asText()).isEqualTo("BATT")
-            assertThat(get("rettighetsgruppe").asText()).isEqualTo("AAP")
-            assertThat(get("hovedmaal").asText()).isEqualTo("BEHOLDEA")
+            assertThat(get("fornavn").asString()).isEqualTo("TULLETE")
+            assertThat(get("etternavn").asString()).isEqualTo("TABBE")
+            assertThat(get("oppfolgingsenhet").asString()).isEqualTo("0318")
+            assertThat(get("kvalifiseringsgruppe").asString()).isEqualTo("BATT")
+            assertThat(get("rettighetsgruppe").asString()).isEqualTo("AAP")
+            assertThat(get("hovedmaal").asString()).isEqualTo("BEHOLDEA")
             assertThat(get("sikkerhetstiltakType").isNull).isTrue
             assertThat(get("diskresjonskode").isNull).isTrue
             assertThat(get("harOppfolgingssak").asBoolean()).isTrue
             assertThat(get("sperretAnsatt").asBoolean()).isFalse
             assertThat(get("erDoed").asBoolean()).isFalse
             assertThat(get("doedFraDato").isNull).isTrue
-            assertThat(get("sistEndretDato").asText()).isEqualTo("2020-10-30T14:15:38+01:00")
+            assertThat(get("sistEndretDato").asString()).isEqualTo("2020-10-30T14:15:38+01:00")
         }
     }
 

@@ -30,8 +30,8 @@ class OrganisasjonsenhetLytter(private val norg2Klient: Norg2Klient, rapidsConne
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
-        val aktørid: String = packet["aktørId"].asText()
+        val enhetsnummer: String = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asString()
+        val aktørid: String = packet["aktørId"].asString()
 
         val orgnavn = norg2Klient.hentOrgenhetNavn(enhetsnummer)
         if (orgnavn == null) {
@@ -62,7 +62,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

@@ -43,7 +43,7 @@ fun startApp(envs: Map<String, String>) {
         stream<String, String>(poaoOppfølgingsperiodeTopic)
             .map { _, value ->
                 val node = objectMapper.readTree(value)
-                val aktørId = node["aktorId"].asText()
+                val aktørId = node["aktorId"].asString()
                 secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
                 KeyValue(aktørId, value)
             }
@@ -51,8 +51,8 @@ fun startApp(envs: Map<String, String>) {
             .reduce { oldValue, newValue ->
                 val oldNode = objectMapper.readTree(oldValue)
                 val newNode = objectMapper.readTree(newValue)
-                val oldTid = ZonedDateTime.parse(oldNode["producerTimestamp"].asText())
-                val newTid = ZonedDateTime.parse(newNode["producerTimestamp"].asText())
+                val oldTid = ZonedDateTime.parse(oldNode["producerTimestamp"].asString())
+                val newTid = ZonedDateTime.parse(newNode["producerTimestamp"].asString())
                 if (newTid.isAfter(oldTid)) newValue else oldValue
             }
             .toStream()

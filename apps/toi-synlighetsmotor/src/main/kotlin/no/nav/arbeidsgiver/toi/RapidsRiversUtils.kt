@@ -11,7 +11,7 @@ fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

@@ -44,7 +44,7 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørid: String = packet["aktørId"].asText()
+        val aktørid: String = packet["aktørId"].asString()
         val cvPacket = packet["arbeidsmarkedCv"]["opprettCv"]["cv"] ?: packet["arbeidsmarkedCv"]["endreCv"]["cv"]
         packet[HullICv] =
             if (cvPacket == null) håndterIkkeOpprettEllerEndreCv(packet, aktørid)
@@ -77,7 +77,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

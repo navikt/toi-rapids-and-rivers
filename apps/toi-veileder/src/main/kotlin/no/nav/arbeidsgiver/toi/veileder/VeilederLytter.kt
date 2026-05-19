@@ -30,9 +30,9 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection, private val
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktorId"].asText()
+        val aktørId = packet["aktorId"].asString()
         try {
-            val ident = packet["veilederId"].asText()
+            val ident = packet["veilederId"].asString()
             val veilederinformasjon = nomKlient.hentVeilederinformasjon(ident)
             packet["veilederinformasjon"] = veilederinformasjon?.toJsonNode() ?: JsonNodeFactory.instance.nullNode()
 

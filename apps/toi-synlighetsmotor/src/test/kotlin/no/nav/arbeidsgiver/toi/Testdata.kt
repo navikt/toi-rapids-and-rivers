@@ -34,7 +34,7 @@ fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
 ): TestRapid.RapidInspector.() -> Unit =
     {
         Assertions.assertThat(size).isEqualTo(1)
-        Assertions.assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
+        Assertions.assertThat(field(0, "@event_name").asString()).isEqualTo("hendelse")
         field(0, "synlighet").apply {
             Assertions.assertThat(get("erSynlig").asBoolean()).apply { if (synlighet) isTrue else isFalse }
             Assertions.assertThat(get("ferdigBeregnet").asBoolean()).apply { if (ferdigBeregnet) isTrue else isFalse }

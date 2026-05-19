@@ -33,7 +33,7 @@ class SisteOppfolgingsperiodeBehovsLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørid: String = packet["aktørId"].asText()
+        val aktørid: String = packet["aktørId"].asString()
 
         packet["sisteOppfølgingsperiode"] = meldingPerAktørid(aktørid)?.let(objectMapper::readTree) ?: NullNode.instance
 
@@ -45,7 +45,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

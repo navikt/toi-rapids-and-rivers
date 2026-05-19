@@ -41,7 +41,7 @@ class NotifikasjonKlient(
 
             val json = jacksonObjectMapper().readTree(result.get())
             secureLog.info("Svar fra opprettSak ${stillingsId}: $json")
-            val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
+            val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asString()
 
             when (notifikasjonsSvar) {
                 NySakSvar.NySakVellykket.name -> {
@@ -126,7 +126,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
+            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asString()
 
             when (notifikasjonsSvar) {
                 NyBeskjedSvar.DuplikatEksternIdOgMerkelapp.name -> {
@@ -162,7 +162,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asText()
+            val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asString()
 
             when (svar) {
                 NyStatusSakSvar.NyStatusSakVellykket.name -> {
@@ -202,7 +202,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asText()
+            val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asString()
 
             when (svar) {
                 SlettSakSvar.HardDeleteSakVellykket.name -> {

@@ -100,7 +100,7 @@ data class Kandidat(
         fun fraJson(jsonMessage: JsonMessage): Kandidat {
             val json = mapper.readTree(jsonMessage.toJson())
             return Kandidat(
-                aktørId = json["aktørId"].asText(),
+                aktørId = json["aktørId"].asString(),
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 sisteOppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("sisteOppfølgingsperiode"), mapper),

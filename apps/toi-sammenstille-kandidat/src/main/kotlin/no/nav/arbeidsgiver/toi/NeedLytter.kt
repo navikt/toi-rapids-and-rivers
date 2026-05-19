@@ -28,7 +28,7 @@ class NeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["aktørId"].asString()
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
         kandidat.populerMelding(packet).toJson().also { rapidsConnection.publish(aktørId, it) }
     }
@@ -38,7 +38,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

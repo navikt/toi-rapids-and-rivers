@@ -43,9 +43,9 @@ class RepublisererTest {
         assertThat(inspektør.size).isEqualTo(lagredeKandidater.size)
 
         lagredeKandidater.forEachIndexed { index, kandidat ->
-            assertThat(inspektør.message(index).get("@behov").first().asText()).isEqualTo("synlighet")
-            assertThat(inspektør.message(index).get("aktørId").asText()).isEqualTo(kandidat.aktørId)
-            assertThat(inspektør.message(index).get("@event_name").asText()).isEqualTo("republisert")
+            assertThat(inspektør.message(index).get("@behov").first().asString()).isEqualTo("synlighet")
+            assertThat(inspektør.message(index).get("aktørId").asString()).isEqualTo(kandidat.aktørId)
+            assertThat(inspektør.message(index).get("@event_name").asString()).isEqualTo("republisert")
         }
     }
 
@@ -80,7 +80,7 @@ class RepublisererTest {
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         assertThat(Kandidat.fraJson(inspektør.message(0)).aktørId).isEqualTo(aktørIdTilKandidatSomSkalRepubliseres)
-        assertThat(inspektør.message(0).get("@event_name").asText()).isEqualTo("republisert")
+        assertThat(inspektør.message(0).get("@event_name").asString()).isEqualTo("republisert")
     }
 
     @Test
@@ -102,11 +102,11 @@ class RepublisererTest {
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(3)
         assertThat(Kandidat.fraJson(inspektør.message(0)).aktørId).isEqualTo(kandidat1)
-        assertThat(inspektør.message(0).get("@event_name").asText()).isEqualTo("republisert")
+        assertThat(inspektør.message(0).get("@event_name").asString()).isEqualTo("republisert")
         assertThat(Kandidat.fraJson(inspektør.message(1)).aktørId).isEqualTo(kandidat2)
-        assertThat(inspektør.message(1).get("@event_name").asText()).isEqualTo("republisert")
+        assertThat(inspektør.message(1).get("@event_name").asString()).isEqualTo("republisert")
         assertThat(Kandidat.fraJson(inspektør.message(2)).aktørId).isEqualTo(kandidat3)
-        assertThat(inspektør.message(2).get("@event_name").asText()).isEqualTo("republisert")
+        assertThat(inspektør.message(2).get("@event_name").asString()).isEqualTo("republisert")
     }
 
     @Test

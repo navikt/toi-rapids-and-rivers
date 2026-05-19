@@ -36,15 +36,15 @@ class GeografiLytter(private val geografiKlient: GeografiKlient, private val pos
         meterRegistry: MeterRegistry
     ) {
         val postnummer = packet["postnummer"]
-        val geografiKode: List<String> = packet["geografiKode"].toList().map(JsonNode::asText)
-        val aktørid: String = packet["aktørId"].asText()
+        val geografiKode: List<String> = packet["geografiKode"].toList().map(JsonNode::asString)
+        val aktørid: String = packet["aktørId"].asString()
 
         val postdata = if (postnummer.isMissingOrNull()) {
             null
         } else {
-            val postnummerString = postnummer.asText()
+            val postnummerString = postnummer.asString()
             if(postnummerString == "") null
-            else postDataKlient.findPostData(postnummer.asText())
+            else postDataKlient.findPostData(postnummer.asString())
                 //?: throw Exception("Fant ingen postdata for postnummer $postnummer")
         }
         val geografiKoder = geografiKode.mapNotNull(geografiKlient::findArenaGeography)
@@ -71,7 +71,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

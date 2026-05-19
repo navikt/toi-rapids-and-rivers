@@ -49,7 +49,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             records.filter { it.value().erGyldigJson() }
                 .map { objectMapper.readTree(it.value())["@event_name"] to Instant.ofEpochMilli(it.timestamp()) }
                 .filterNot { (node, _) -> node == null }.filterNot { (node, _) -> node.isMissingOrNull() }
-                .map { (node, instant) -> node.asText() to instant }
+                .map { (node, instant) -> node.asString() to instant }
                 .filterNot { (eventName, _) -> eventName in uinteressanteHendelser }
                 .filterNot { (eventName, _) -> uinteressanteHendelsePrefikser.any(eventName::startsWith) }
                 .forEach { (eventName, instant) ->
