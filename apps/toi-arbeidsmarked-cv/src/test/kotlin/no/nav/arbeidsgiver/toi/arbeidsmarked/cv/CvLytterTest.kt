@@ -29,6 +29,7 @@ class CvLytterTest {
         val cvLytter = CvLytter({ consumer }, behandleCv)
 
         produserCvMelding(consumer, melding)
+        Thread.sleep(800)
         cvLytter.onReady(rapid)
 
         Thread.sleep(800)
