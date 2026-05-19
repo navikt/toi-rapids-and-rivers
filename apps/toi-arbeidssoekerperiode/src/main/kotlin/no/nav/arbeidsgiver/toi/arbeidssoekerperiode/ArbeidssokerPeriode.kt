@@ -21,8 +21,8 @@ class ArbeidssokerPeriode(@JsonIgnore private val melding: Periode,
         @JsonIgnore
         private val objectMapper: ObjectMapper = JsonMapper.builder()
             .addModule(kotlinModule())
-            .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .enable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
             .build()
