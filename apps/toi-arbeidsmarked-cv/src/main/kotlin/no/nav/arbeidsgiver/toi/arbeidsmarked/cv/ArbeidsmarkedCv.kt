@@ -2,14 +2,14 @@ package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.kotlinModule
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
+import tools.jackson.annotation.JsonIgnore
+import tools.jackson.annotation.JsonProperty
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeid.cv.avro.Melding
 
-class ArbeidsmarkedCv(melding: Melding, val meterRegistry: MeterRegistry) {
+class ArbeidsmarkedCv(melding: Melding, private val meterRegistry: MeterRegistry) {
     @JsonProperty("@event_name")
     private val event_name = "arbeidsmarked-cv"
 

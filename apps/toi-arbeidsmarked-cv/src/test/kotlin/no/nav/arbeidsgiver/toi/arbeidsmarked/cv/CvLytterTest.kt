@@ -38,7 +38,6 @@ class CvLytterTest {
         val meldingJson = inspektør.message(0)
 
         Assertions.assertThat(meldingJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
-            "meterRegistry",
             "@event_name",
             "arbeidsmarkedCv",
             "aktørId",
