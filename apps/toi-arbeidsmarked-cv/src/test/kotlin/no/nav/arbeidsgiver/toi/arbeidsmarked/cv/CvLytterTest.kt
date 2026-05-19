@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
-import no.nav.toi.TestRapid
 import no.nav.arbeid.cv.avro.*
+import no.nav.toi.TestRapid
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.MockConsumer
 import org.apache.kafka.clients.consumer.OffsetResetStrategy
