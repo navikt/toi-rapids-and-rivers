@@ -27,11 +27,16 @@ class CvLytterTest {
         val cvLytter = CvLytter({ consumer }, behandleCv)
 
         produserCvMelding(consumer, melding)
-        Thread.sleep(800)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(800)
         val inspektør = rapid.inspektør
+        val startTime = Instant.now()
+        while (inspektør.size < 1) {
+            Thread.sleep(50)
+            if(Instant.now().isAfter(startTime.plusSeconds(30))) {
+                throw AssertionError("Forventet at minst 1 melding skulle være publisert på rapid innen et halvt minutt")
+            }
+        }
         Assertions.assertThat(inspektør.size).isEqualTo(1)
 
         val meldingJson = inspektør.message(0)
