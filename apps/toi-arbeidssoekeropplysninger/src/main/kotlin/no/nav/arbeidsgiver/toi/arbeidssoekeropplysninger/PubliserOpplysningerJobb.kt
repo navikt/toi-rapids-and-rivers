@@ -8,6 +8,7 @@ import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import tools.jackson.databind.cfg.DateTimeFeature
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.thread
@@ -23,6 +24,8 @@ class PubliserOpplysningerJobb(
     companion object {
         private val objectMapper: ObjectMapper = JsonMapper.builder()
             .addModule(kotlinModule())
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
             .build()
