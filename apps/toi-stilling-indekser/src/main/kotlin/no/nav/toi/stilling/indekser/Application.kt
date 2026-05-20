@@ -44,7 +44,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
         .build()
 
     val openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
-    val indexClient = IndexClient(openSearchClient, objectMapper)
+    val indexClient = IndexClient(openSearchClient)
     val accessTokenClient = AccessTokenClient(env, httpClient, objectMapper)
     val stillingApiClient = StillingApiClient(env, httpClient, accessTokenClient)
     val openSearchService = OpenSearchService(indexClient, env)

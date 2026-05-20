@@ -14,7 +14,7 @@ import java.io.StringReader
 
 const val stillingAlias: String = "stilling"
 
-class IndexClient(private val client: OpenSearchClient, private val objectMapper: ObjectMapper) {
+class IndexClient(private val client: OpenSearchClient) {
 
     companion object {
         private val osSettings = IndexClient::class.java

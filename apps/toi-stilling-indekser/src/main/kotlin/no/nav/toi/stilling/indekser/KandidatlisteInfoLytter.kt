@@ -18,7 +18,7 @@ class KandidatlisteInfoLytter(rapidsConnection: RapidsConnection,
         River(rapidsConnection).apply {
             precondition {
                 it.requireKey("kandidatlisteInfo")
-                it.requireAny("@event_name", listOf("indekserKandidatlisteInfo", "kandidatlisteInfoBehov"))
+                it.requireKey("@event_name", "indekserKandidatlisteInfo")
             }
             validate { it.requireKey("stillingsId") }
         }.register(this)

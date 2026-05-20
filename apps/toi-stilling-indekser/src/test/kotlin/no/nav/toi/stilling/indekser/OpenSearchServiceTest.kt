@@ -52,7 +52,7 @@ class OpenSearchServiceTest {
         env["REINDEKSER_INDEKS"] = "stilling_20250401"
 
         openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
-        indexClient = IndexClient(openSearchClient, objectMapper)
+        indexClient = IndexClient(openSearchClient)
         openSearchService = OpenSearchService(indexClient, env)
         testMetoderOpenSearch = TestMetoderOpenSearch(openSearchClient)
 
