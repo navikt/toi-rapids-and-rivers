@@ -17,7 +17,7 @@ fun queryOpprettNyBeskjed(
     mottakerEpostAdresser: List<String>,
     tidspunktForVarsel: ZonedDateTime,
 ): String {
-    val epostTittel = "Kandidater fra Nav";
+    val epostTittel = "Kandidater fra Nav"
     val lenke = opprettLenkeTilStilling(stillingsId, virksomhetsnummer)
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
     val tidspunktForVarselISO8601DateTime =
