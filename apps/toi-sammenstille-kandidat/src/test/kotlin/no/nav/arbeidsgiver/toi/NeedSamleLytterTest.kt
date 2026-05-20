@@ -11,15 +11,12 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class NeedSamleLytterTest {
-
-    private lateinit var javalin: Javalin
-
     val testDatabase = TestDatabase()
 
+    val testRapid = TestRapid()
     @BeforeEach
     fun before() {
-        javalin = Javalin.create().start(9000)
-
+        app = startApp(testRapid, testDatabase.dataSource, 9000, "dummy")
         testDatabase.lagreKandidat(
             Kandidat.fraJson(
                 """
@@ -46,9 +43,12 @@ class NeedSamleLytterTest {
         )
     }
 
+    private lateinit var app: AutoCloseable
+
     @AfterEach
     fun after() {
-        javalin.stop()
+        app.close()
+        testRapid.reset()
     }
 
     companion object {
@@ -73,9 +73,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `legg på svar om første behov er et gitt felt`(felt: String, expectedVerdi: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(behovsMelding(ident = aktørId, behovListe = """["$felt"]"""))
 
         val inspektør = testRapid.inspektør
@@ -88,9 +85,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `legg på et gitt felt lik null om første behov er det feltet og felt-informasjon ikke finnes`(felt: String, ikkeibruk: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(behovsMelding(ident = aktørIdUtenFelter, behovListe = """["$felt"]"""))
 
         val inspektør = testRapid.inspektør
@@ -103,9 +97,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `legg på et gitt felt lik null om person ikke finnes i sammenstiller`(felt: String, ikkeibruk: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(behovsMelding(ident = aktørIdIkkeEksisterende, behovListe = """["$felt"]"""))
 
         val inspektør = testRapid.inspektør
@@ -118,9 +109,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `ikke legg på svar om andre uløste behov enn det gitte feltet er først i listen`(felt: String, ikkeibruk: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(behovsMelding(ident = aktørId, behovListe = """["noeannet", "$felt"]"""))
 
         val inspektør = testRapid.inspektør
@@ -131,9 +119,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `legg på svar om behov nummer 2 er et gitt felt, dersom første behov har en løsning`(felt: String, expectedVerdi: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(
             behovsMelding(
                 ident = aktørId,
@@ -153,9 +138,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `ikke legg på svar om svar allerede er lagt på`(felt: String, ikkeibruk: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(
             behovsMelding(
                 behovListe = """["$felt"]""",
@@ -171,9 +153,6 @@ class NeedSamleLytterTest {
     @ParameterizedTest
     @MethodSource("felter")
     fun `ikke legg på svar om svar allerede er lagt på som null`(felt: String, ikkeibruk: String) {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(
             behovsMelding(
                 behovListe = """["$felt"]""",
@@ -188,9 +167,6 @@ class NeedSamleLytterTest {
 
     @Test
     fun `ikke legg på svar om behov er en tom liste`() {
-        val testRapid = TestRapid()
-        startApp(testRapid, testDatabase.dataSource, javalin, "dummy")
-
         testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
 
         val inspektør = testRapid.inspektør

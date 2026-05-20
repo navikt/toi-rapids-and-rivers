@@ -34,19 +34,27 @@ fun startRapid(
     }
 }
 
-fun startApp(rapid: RapidsConnection, datasource: DataSource, javalin: Javalin, passordForRepublisering: String) {
+fun startApp(rapid: RapidsConnection, datasource: DataSource, port: Int, passordForRepublisering: String): AutoCloseable {
     val repository = Repository(datasource)
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
-    Republiserer(
+    val republiserer = Republiserer(
         repository,
         rapid,
-        javalin,
+        port,
         passordForRepublisering,
         meterRegistry
     )
 
     startRapid(rapid, repository)
+
+    return AutoCloseable {
+        try {
+            republiserer.close()
+        } finally {
+            rapid.stop()
+        }
+    }
 }
 
 fun main() {
@@ -57,8 +65,7 @@ fun main() {
     val passordForRepublisering = System.getenv("PASSORD_FOR_REPUBLISERING")
         ?: throw Exception("PASSORD_FOR_REPUBLISERING kunne ikke hentes fra kubernetes secrets")
 
-    val javalin = Javalin.create().start(9000)
-    startApp(rapidsConnection(), datasource(), javalin, passordForRepublisering)
+    startApp(rapidsConnection(), datasource(), 9000, passordForRepublisering)
 }
 
 fun datasource() = DatabaseKonfigurasjon(System.getenv()).lagDatasource()
