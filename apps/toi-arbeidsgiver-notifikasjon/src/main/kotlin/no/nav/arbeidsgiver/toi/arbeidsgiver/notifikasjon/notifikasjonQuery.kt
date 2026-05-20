@@ -8,6 +8,7 @@ import java.util.*
 
 const val SAK_MERKELAPP = "Kandidater"
 const val PESOSTEGN = "$"
+const val ALLTINN_RESSURS_ID = "nav_rekruttering_kandidater"
 
 fun queryOpprettNyBeskjed(
     notifikasjonsId: String,
@@ -69,7 +70,7 @@ fun queryOpprettNyBeskjed(
                     }
                     mottaker: {
                         altinnRessurs: {
-                            ressursId: \"nav_rekruttering_kandidater\"
+                            ressursId: \"$ALLTINN_RESSURS_ID\"
                         }
                     }
                     notifikasjon: {
@@ -132,7 +133,7 @@ fun queryOpprettNySak(
                 mottakere: [
                     {
                         altinnRessurs: {
-                            ressursId: \"nav_rekruttering_kandidater\"
+                            ressursId: \"$ALLTINN_RESSURS_ID\"
                         }
                     }
                 ],
