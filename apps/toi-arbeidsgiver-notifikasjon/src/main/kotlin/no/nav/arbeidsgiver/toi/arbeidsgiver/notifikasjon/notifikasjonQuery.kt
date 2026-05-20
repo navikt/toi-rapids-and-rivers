@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import io.micrometer.core.instrument.util.StringEscapeUtils
-import java.time.Period
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -18,7 +17,7 @@ fun queryOpprettNyBeskjed(
     mottakerEpostAdresser: List<String>,
     tidspunktForVarsel: ZonedDateTime,
 ): String {
-    val epostTittel = "Kandidater fra NAV";
+    val epostTittel = "Kandidater fra Nav";
     val lenke = opprettLenkeTilStilling(stillingsId, virksomhetsnummer)
     val notifikasjonTekst = "Din virksomhet har mottatt nye kandidater"
     val tidspunktForVarselISO8601DateTime =
@@ -69,9 +68,8 @@ fun queryOpprettNyBeskjed(
                         grupperingsid: ${PESOSTEGN}grupperingsId
                     }
                     mottaker: {
-                        altinn: {
-                            serviceEdition: \"1\"
-                            serviceCode: \"5078\"
+                        altinnRessurs: {
+                            ressursId: \"nav_rekruttering_kandidater\"
                         }
                     }
                     notifikasjon: {
@@ -133,9 +131,8 @@ fun queryOpprettNySak(
                 virksomhetsnummer: ${PESOSTEGN}virksomhetsnummer,
                 mottakere: [
                     {
-                        altinn: {
-                            serviceEdition: \"1\",
-                            serviceCode: \"5078\"
+                        altinnRessurs: {
+                            ressursId: \"nav_rekruttering_kandidater\"
                         }
                     }
                 ],
