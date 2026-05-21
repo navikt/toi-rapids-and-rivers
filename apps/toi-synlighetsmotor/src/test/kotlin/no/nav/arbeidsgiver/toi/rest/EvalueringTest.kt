@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi.rest
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
 import io.javalin.Javalin
@@ -50,7 +50,7 @@ class EvalueringTest {
 
     @Test
     fun `POST mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
@@ -70,7 +70,7 @@ class EvalueringTest {
 
     @Test
     fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
@@ -89,7 +89,7 @@ class EvalueringTest {
 
     @Test // TODO bruk noe annet enn frkas til å flippe status
     fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
@@ -117,7 +117,7 @@ class EvalueringTest {
 
     @Test
     fun `Deprekert til fordel for post GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())

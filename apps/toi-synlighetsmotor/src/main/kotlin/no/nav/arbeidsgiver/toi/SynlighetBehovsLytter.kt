@@ -43,7 +43,7 @@ class SynlighetBehovsLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["aktørId"].asString()
 
         val behov = packet["@behov"]
         packet["@behov"] = requiredFieldsSynlighetsbehovUntattadressebeskyttelse() + behov

@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import no.nav.arbeidsgiver.toi.CvMeldingstype.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.adressebeskyttelse
 import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivSisteOppfølgingsperiode
@@ -48,7 +48,7 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.path(felt.navn).isMissingNode).isFalse()
-            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
                 .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
@@ -66,7 +66,7 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.path(felt.navn).isMissingNode).isFalse()
-            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
                 .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
@@ -98,7 +98,7 @@ class SynlighetsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
                 .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("@behov").asIterable()).hasSize(alleFelter.size)
         })
@@ -117,7 +117,7 @@ class SynlighetsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.path("@behov").asIterable().map(JsonNode::asText))
+            assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
                 .containsExactlyInAnyOrder(*(alleFelter + annetBehov).toTypedArray())
             assertThat(melding.path("@behov").asIterable()).hasSize(alleFelter.size+1)
         })
@@ -150,9 +150,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -177,9 +177,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -203,9 +203,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -229,9 +229,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isTrue()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -252,9 +252,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*(alleFelter.toTypedArray() + adressebeskyttelseFeltNavn))
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*(alleFelter.toTypedArray() + adressebeskyttelseFeltNavn))
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -272,9 +272,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactly(adressebeskyttelseFeltNavn,*(alleFelter.toTypedArray()),"synlighet")
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactly(adressebeskyttelseFeltNavn,*(alleFelter.toTypedArray()),"synlighet")
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -308,9 +308,9 @@ class SynlighetsgrunnlagLytterTest {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
-                assertThat(feltNavn in melding.fieldNames().asSequence().toList()).isTrue()
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -328,7 +328,7 @@ class SynlighetsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -343,7 +343,7 @@ class SynlighetsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.path("@behov").map(JsonNode::asText)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }

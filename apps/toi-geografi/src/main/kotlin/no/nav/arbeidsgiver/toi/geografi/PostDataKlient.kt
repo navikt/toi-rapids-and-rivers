@@ -1,18 +1,20 @@
 package no.nav.arbeidsgiver.toi.geografi
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import tools.jackson.module.kotlin.kotlinModule
+
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.readValue
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.io.entity.EntityUtils
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 
 class PostDataKlient(private val url: String) {
     private val client = HttpClients.createDefault()
-    private val objectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val objectMapper = jacksonMapperBuilder().addModule(kotlinModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build()
 
     private var postKodeData = emptyMap<String, PostData>()
     private var sistHentet = LocalDateTime.MIN

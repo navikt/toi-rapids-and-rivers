@@ -27,11 +27,11 @@ class Lytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
-        val aktørId = hentAktørId(packet[fnrKey].asText())
+        val aktørId = hentAktørId(packet[fnrKey].asString())
 
         if (aktørId == null) {
             if (cluster == "prod-gcp") {
-                val identtype = if (erDnr(packet[fnrKey].asText())) "D-nummer" else "fødselsnummer"
+                val identtype = if (erDnr(packet[fnrKey].asString())) "D-nummer" else "fødselsnummer"
                 log.info("Fant ikke gitt person i PDL, klarte ikke å mappe identtype (se securelog) til aktørId")
                 secureLog.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }

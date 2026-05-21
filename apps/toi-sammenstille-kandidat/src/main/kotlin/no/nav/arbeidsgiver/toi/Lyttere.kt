@@ -28,7 +28,7 @@ class SamleLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["aktørId"].asString()
 
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
         val oppdatertKandidat = oppdaterKandidat(kandidat, packet)

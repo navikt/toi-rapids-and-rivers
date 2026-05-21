@@ -19,7 +19,7 @@ class OppfolgingsperiodeTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "sisteOppfølgingsperiode",
             "aktørId",
@@ -33,7 +33,7 @@ class OppfolgingsperiodeTest {
         assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
 
         val oppfølgingsperiodeJson = meldingJson.get("sisteOppfølgingsperiode")
-        assertThat(oppfølgingsperiodeJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(oppfølgingsperiodeJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
             "kontor",
             "aktorId",
             "startTidspunkt",
