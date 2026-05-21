@@ -30,6 +30,7 @@ class SynlighetBehovsLytter(
             precondition {
                 it.demandAtFørstkommendeUløsteBehovEr(synlighetBehov)
                 it.forbid(*requiredFieldsSynlighetsbehovUntattadressebeskyttelse().toTypedArray())
+                it.requireKey("fodselsnummer")
             }
             validate {
                 it.requireKey("aktørId")

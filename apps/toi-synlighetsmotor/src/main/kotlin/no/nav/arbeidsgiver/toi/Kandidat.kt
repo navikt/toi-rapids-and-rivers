@@ -105,11 +105,6 @@ data class Kandidat(
             )
         }
     }
-
-    fun fødselsNummer() =
-        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
-            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer
-            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer
 }
 
 data class CvMelding(

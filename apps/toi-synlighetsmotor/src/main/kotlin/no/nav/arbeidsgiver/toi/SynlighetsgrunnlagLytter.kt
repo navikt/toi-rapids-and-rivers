@@ -38,6 +38,7 @@ class SynlighetsgrunnlagLytter(
                 it.forbid("synlighet")
                 it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
+                it.requireKey("fodselsnummer")
                 // Ignorer meldinger fra rekrutteringstreff-flyten - de håndteres av SynlighetRekrutteringstreffLytter
                 it.forbidBehovIListe("synlighetRekrutteringstreff")
             }
@@ -56,10 +57,8 @@ class SynlighetsgrunnlagLytter(
 
         if (synlighetsevaluering.erFerdigBeregnet) {
             packet["synlighet"] = synlighetsevaluering.somSynlighet()
-            val fødselsnummer = kandidat.fødselsNummer()
-            if (fødselsnummer != null) {
-                packet["fodselsnummer"] = fødselsnummer
-            }
+            val fødselsnummer = packet["fodselsnummer"].asText()
+
             repository.lagre(
                 evaluering = synlighetsevaluering,
                 aktørId = kandidat.aktørId,
