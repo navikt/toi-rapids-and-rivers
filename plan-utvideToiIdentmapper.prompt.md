@@ -79,7 +79,7 @@ Arbeidet deles i seks mindre PR-er som hver leverer verdi isolert, kan reviewere
 ### PR 2 — Toveis oppslag i datalag (Repository + Cache + PDL), ingen ny lytter
 **Mål:** Tilby `aktørId → fnr`-funksjonalitet internt, men uten å eksponere den på rapid ennå.
 - Utvid `PdlKlient` med `hentFødselsnummer(aktørId)`.
-- Utvid `IdentRepository` med `hentIdentMappingerForAktørId(...)` og `lagreFødselsnummer(...)` (upsert på eksisterende `identmapping`-tabell). Refaktorer til felles privat upsert-funksjon.
+- Utvid `IdentRepository` med `hentIdentMappingerForAktørId(...)` og bruke `lagreIdentMapping(...)` (upsert på eksisterende `identmapping`-tabell).
 - Utvid `IdentCache` med `hentFødselsnummer(aktørId)` (cache-først-så-PDL), symmetrisk med eksisterende `hentAktørId`.
 - Legg til enhetstester for nye metoder (Repository upsert, Cache-fallthrough til PDL, PDL-respons-parsing).
 **Leverer:** Ingen synlig adferdsendring i prod. Merges trygt fordi ny kode er ubrukt, men dekkes av tester.
