@@ -48,7 +48,7 @@ spec:
       access: readwrite
     - team: toi
       application: rekrutteringsbistand-kandidat-api
-      access: write
+      access: readwrite
     - team: toi
       application: foresporsel-om-deling-av-cv-api
       access: readwrite

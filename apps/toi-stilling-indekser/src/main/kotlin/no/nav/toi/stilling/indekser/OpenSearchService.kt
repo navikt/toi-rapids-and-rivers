@@ -1,5 +1,8 @@
 package no.nav.toi.stilling.indekser
 
+import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
+import no.nav.toi.stilling.indekser.dto.Stillingsinfo
+
 class OpenSearchService(private val client: IndexClient, private val env: MutableMap<String, String>) {
 
     fun opprettIndeks() : Boolean {
@@ -33,11 +36,31 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
     }
 
     fun oppdaterStillingsinfo(stillingsId: String, stillingsinfo: Stillingsinfo, indeks: String) {
-        client.oppdaterStillingsinfo(stillingsId = stillingsId, stillingsinfo = stillingsinfo, indeks = indeks)
+        if(finnesStilling(stillingsId, indeks)) {
+            log.info("Oppdaterer stillingsinfo for stilling $stillingsId i indeks $indeks")
+            client.oppdaterStillingsinfo(stillingsId = stillingsId, stillingsinfo = stillingsinfo, indeks = indeks)
+        } else {
+            log.warn("Kan ikke oppdatere stillingsinfo for stilling $stillingsId i indeks $indeks fordi stillingen ikke finnes")
+            return
+        }
+    }
+
+    fun oppdaterKandidatlisteInfo(stillingsId: String, kandidatlisteInfo: KandidatlisteInfo, indeks: String) {
+        if(finnesStilling(stillingsId, indeks)) {
+            log.info("Oppdaterer kandidatlisteInfo for stilling $stillingsId i indeks $indeks")
+            client.oppdaterKandidatlisteInfo(stillingsId = stillingsId, kandidatlisteInfo = kandidatlisteInfo, indeks = indeks)
+        } else {
+            log.warn("Kan ikke oppdatere kandidatlisteInfo for stilling $stillingsId i indeks $indeks fordi stillingen ikke finnes")
+            return
+        }
     }
 
     fun indekserStilling(stilling: RekrutteringsbistandStilling, indeks: String) {
         client.indekserStilling(stilling, indeks)
+    }
+
+    fun finnesStilling(stillingsId: String, indeks: String): Boolean {
+        return client.finnesStilling(stillingsId, indeks)
     }
 
     private fun opprettIndeksHvisDenIkkeFinnes(indeksNavn: String): Boolean {

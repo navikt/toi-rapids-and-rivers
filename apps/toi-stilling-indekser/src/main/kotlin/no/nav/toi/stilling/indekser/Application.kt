@@ -44,7 +44,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
         .build()
 
     val openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
-    val indexClient = IndexClient(openSearchClient, objectMapper)
+    val indexClient = IndexClient(openSearchClient)
     val accessTokenClient = AccessTokenClient(env, httpClient, objectMapper)
     val stillingApiClient = StillingApiClient(env, httpClient, accessTokenClient)
     val openSearchService = OpenSearchService(indexClient, env)
@@ -95,6 +95,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 }
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                KandidatlisteInfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
             } else {
                 // Initiell indeksering av stillinger, samt kontinuerlig lesing av oppdateringer på rapid og ekstern-topic
                 log.info("Starter indeksering av stillinger på indeks $indeks")
@@ -104,6 +105,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                KandidatlisteInfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
 
                 thread(name = "indekserStillingConsumer" ) {
                     Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
