@@ -14,14 +14,6 @@ class IdentRepository(private val dataSource: DataSource) {
     private val fødselsnummerKolonne = "fnr"
     private val cachetTidspunktKolonne = "cachet_tidspunkt"
 
-    fun lagreAktørId(aktørId: String?, fødselsnummer: String) {
-        lagreIdentMapping(aktørId = aktørId, fødselsnummer = fødselsnummer)
-    }
-
-    fun lagreFødselsnummer(aktørId: String, fødselsnummer: String?) {
-        if (fødselsnummer == null) return
-        lagreIdentMapping(aktørId = aktørId, fødselsnummer = fødselsnummer)
-    }
 
     fun hentIdentMappingerForFnr(fødselsnummer: String): List<IdentMapping> {
         return hentIdentMappinger(fødselsnummerKolonne, fødselsnummer)
@@ -43,7 +35,7 @@ class IdentRepository(private val dataSource: DataSource) {
         }
     }
 
-    private fun lagreIdentMapping(aktørId: String?, fødselsnummer: String) {
+    fun lagreIdentMapping(aktørId: String?, fødselsnummer: String) {
         val identMappingerBasertPåFødselsnummer = hentIdentMappingerForFnr(fødselsnummer)
         val harSammeMapping = identMappingerBasertPåFødselsnummer.any { it.aktørId == aktørId }
 

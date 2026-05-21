@@ -28,7 +28,7 @@ class IdentCache(
     }
 
     private fun cacheAktørId(aktørId: String?, fødselsnummer: String) {
-        repository.lagreAktørId(aktørId, fødselsnummer)
+        repository.lagreIdentMapping(aktørId, fødselsnummer)
     }
 
     private fun hentCachetAktørId(fødselsnummer: String): CachetAktørId {

@@ -21,7 +21,7 @@ class IdentRepositoryTest {
     }
 
     @Test
-    fun `lagreFødselsnummer skal oppdatere cachet_tidspunkt når mapping finnes`() {
+    fun `lagreIdentMapping skal oppdatere cachet_tidspunkt når mapping finnes`() {
         val fødselsnummer = "123"
         val aktørId = "456"
         val repository = IdentRepository(testDatabase.dataSource)
@@ -35,19 +35,11 @@ class IdentRepositoryTest {
             )
         )
 
-        repository.lagreFødselsnummer(aktørId, fødselsnummer)
+        repository.lagreIdentMapping(aktørId, fødselsnummer)
 
         val mappinger = repository.hentIdentMappingerForAktørId(aktørId)
         assertThat(mappinger).hasSize(1)
         assertThat(mappinger.first().cachetTidspunkt).isAfter(gammeltTidspunkt)
-    }
-
-    @Test
-    fun `lagreFødselsnummer skal ikke lagre noe når fødselsnummer er null`() {
-        val repository = IdentRepository(testDatabase.dataSource)
-        repository.lagreFødselsnummer("456", null)
-
-        assertThat(repository.hentIdentMappingerForAktørId("456")).isEmpty()
     }
 
     @Test
