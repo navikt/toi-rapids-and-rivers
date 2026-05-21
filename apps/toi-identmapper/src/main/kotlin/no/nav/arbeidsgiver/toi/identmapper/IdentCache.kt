@@ -3,7 +3,8 @@ package no.nav.arbeidsgiver.toi.identmapper
 class IdentCache(
     private val repository: IdentRepository,
     private val cacheNårAktørIdErNull: Boolean,
-    private val hentAktørIdFraPdl: (String) -> (String?)
+    private val hentAktørIdFraPdl: (String) -> (String?),
+    private val hentFødselsnummerFraPdl: (String) -> (String?),
 ) {
 
     private val secureLog = SecureLog(log)
@@ -27,6 +28,25 @@ class IdentCache(
         }
     }
 
+    fun hentFødselsnummer(aktørId: String): String? {
+        val cachetFødselsnummer = hentCachetFødselsnummer(aktørId)
+
+        if (cachetFødselsnummer.harHentetFraPdl) {
+            log.info("Mappet fra aktørId til fødselsnummer, brukte cache")
+            secureLog.info("Mappet fra aktørId til fødselsnummer ${cachetFødselsnummer.verdi}, brukte cache")
+            return cachetFødselsnummer.verdi
+        }
+
+        return hentFødselsnummerFraPdl(aktørId).also { nyttFødselsnummer ->
+            log.info("Mappet fra aktørId til fødselsnummer, hentet fra PDL")
+            secureLog.info("Mappet fra aktørId til fødselsnummer $nyttFødselsnummer, hentet fra PDL")
+
+            if (nyttFødselsnummer != null) {
+                repository.lagreIdentMapping(aktørId = aktørId, fødselsnummer = nyttFødselsnummer)
+            }
+        }
+    }
+
     private fun cacheAktørId(aktørId: String?, fødselsnummer: String) {
         repository.lagreIdentMapping(aktørId, fødselsnummer)
     }
@@ -38,6 +58,14 @@ class IdentCache(
         else CachetAktørId(true, sisteMapping.aktørId)
     }
 
+    private fun hentCachetFødselsnummer(aktørId: String): CachetFødselsnummer {
+        val identMappinger = repository.hentIdentMappingerForAktørId(aktørId)
+        val sisteMapping = identMappinger.maxByOrNull { it.cachetTidspunkt }
+        return if (sisteMapping == null) CachetFødselsnummer(false, null)
+        else CachetFødselsnummer(true, sisteMapping.fødselsnummer)
+    }
+
     private data class CachetAktørId(val harHentetFraPdl: Boolean, val verdi: String?)
+    private data class CachetFødselsnummer(val harHentetFraPdl: Boolean, val verdi: String?)
 }
 

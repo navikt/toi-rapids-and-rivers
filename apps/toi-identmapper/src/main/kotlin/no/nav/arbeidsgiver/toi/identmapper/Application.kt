@@ -26,7 +26,12 @@ fun startApp(
 
         val pdlKlient = PdlKlient(pdlUrl, accessTokenClient)
         val repository = IdentRepository(dataSource)
-        val identCache = IdentCache(repository, cluster == "dev-gcp", pdlKlient::hentAktørId)
+        val identCache = IdentCache(
+            repository,
+            cluster == "dev-gcp",
+            pdlKlient::hentAktørId,
+            pdlKlient::hentFødselsnummer,
+        )
 
         rapidsConnection.register(object: RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
@@ -37,6 +42,11 @@ fun startApp(
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
             FødselsnummerLytter(fnrKey, rapidsConnection, cluster, identCache::hentAktørId)
         }
+
+        AktørIdLytter(
+            rapidsConnection = rapidsConnection,
+            hentFødselsnummer = identCache::hentFødselsnummer,
+        )
     }.start()
 }
 
