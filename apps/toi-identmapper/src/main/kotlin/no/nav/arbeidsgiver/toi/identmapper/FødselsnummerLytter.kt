@@ -36,6 +36,7 @@ class FødselsnummerLytter(
                 secureLog.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }
         } else {
+            log.info("Publiserer melding som har fødselsnummer ($fnrKey), som manglet aktørid")
             packet[aktørIdKey] = aktørId
             rapidsConnection.publish(aktørId, packet.toJson())
         }
