@@ -19,11 +19,6 @@ private val env = System.getenv()
 private val log = noClassLogger()
 private val secureLog = SecureLog(log)
 
-fun opprettJavalinMedTilgangskontroll(port: Int): Javalin =
-    Javalin.create {
-        it.http.defaultContentType = "application/json"
-    }.start(port)
-
 fun main() {
     log.info("Starter app.")
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
@@ -36,7 +31,7 @@ fun main() {
         startApp(
             rapidsConnection,
             PdlKlient(env["PDL_URL"]!!, AccessTokenClient(env)),
-            opprettJavalinMedTilgangskontroll(8080),
+            8080,
             hentIssuerProperties(env),
             rapidIsAlive
         )
@@ -50,13 +45,18 @@ fun main() {
 fun startApp(
     rapidsConnection: RapidsConnection,
     pdlKlient: PdlKlient,
-    javalin: Javalin,
+    port: Int,
     issuerProperties: Map<Rolle, Pair<String, IssuerProperties>>,
     rapidIsAlive: () -> Boolean,
-    ) {
-    javalin.get("/isalive", isAlive(rapidIsAlive))
-    javalin.get("isready", isAlive(rapidIsAlive))
-    javalin.post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
+    ): AutoCloseable {
+    val javalin = Javalin.create { config ->
+        config.http.defaultContentType = "application/json"
+        with(config.routes) {
+            get("/isalive", isAlive(rapidIsAlive))
+            get("/isready", isAlive(rapidIsAlive))
+            post("/adressebeskyttelse", harAdressebeskyttelse(pdlKlient, issuerProperties))
+        }
+    }.start(port)
 
     val log = LoggerFactory.getLogger("Application.kt")
     try {
@@ -72,6 +72,11 @@ fun startApp(
         throw e
     } finally {
         log.info("Applikasjonen stenges ned")
+    }
+    return AutoCloseable {
+        log.info("Stenger ned app")
+        rapidsConnection.stop()
+        javalin.stop()
     }
 }
 

@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeid.cv.avro.Melding
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -17,11 +15,10 @@ fun main() {
     secureLog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
     RapidApplication.create(System.getenv()).apply {
-        val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
         val consumer = { KafkaConsumer<String, Melding>(consumerConfig) }
 
         val behandleCv: (Melding) -> ArbeidsmarkedCv = { melding ->
-            ArbeidsmarkedCv(melding, meterRegistry)
+            ArbeidsmarkedCv(melding)
         }
         val cvLytter = CvLytter(consumer, behandleCv)
         register(cvLytter)

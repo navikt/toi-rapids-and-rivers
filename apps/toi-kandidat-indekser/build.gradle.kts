@@ -10,6 +10,6 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     implementation("org.opensearch.client:opensearch-java:3.2.0")
     testImplementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelseskodeverkVersion")
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("io.mockk:mockk-agent-jvm:1.13.12")
+    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("io.mockk:mockk-agent-jvm:1.14.9")
 }
