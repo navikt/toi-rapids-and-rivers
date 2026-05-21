@@ -71,7 +71,7 @@ class AktørIdLytterTest {
         val rapid = TestRapid()
         AktørIdLytter(rapid) { null }
 
-        assertThrows <IllegalArgumentException> {
+        assertThrows <IllegalStateException> {
             rapid.sendTestMessage(
                 """
             {

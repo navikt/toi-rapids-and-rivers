@@ -27,7 +27,7 @@ class AktørIdLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val aktørId = packet[aktørIdKey].asText()
-        val fødselsnummer = hentFødselsnummer(aktørId) ?: return
+        val fødselsnummer = hentFødselsnummer(aktørId) ?: throw IllegalStateException("Fødselsnummer ikke funnet for aktørId")
 
         packet[fødselsnummerKey] = fødselsnummer
         rapidsConnection.publish(aktørId, packet.toJson())
