@@ -74,9 +74,8 @@ class Testdata {
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             veileder: String? = veileder("123456789"),
             siste14avedtak: String? = siste14avedtak("123456789"),
-            aktørId: String = """
-            "aktørId": "123456789"
-        """.trimIndent(),
+            aktørId: String = """"aktørId": "123456789"""",
+            fnr: String = """"fodselsnummer": "987654321"""",
             kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "AVSLUTTET"),
             adressebeskyttelse: String? = adressebeskyttelse()
         ) =
@@ -87,10 +86,11 @@ class Testdata {
                 arbeidsmarkedCv = arbeidsmarkedCv,
                 participatingService = participatingService,
                 aktørId = aktørId,
+                fnr = fnr,
                 kvp = kvp,
                 veileder = veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak = siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
-                adressebeskyttelse = adressebeskyttelse
+                adressebeskyttelse = adressebeskyttelse,
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -145,6 +145,7 @@ class Testdata {
             arbeidsmarkedCv: String? = nullVerdiForKey("arbeidsmarkedCv"),
             participatingService: String? = participatingService("toi-sammenstille-kandidat"),
             aktørId: String? = """"aktørId": "123456789"""",
+            fnr: String? = """"fodselsnummer": "987654321"""",
             kvp: String? = nullVerdiForKey("kvp"),
             veileder: String? = nullVerdiForKey("veileder"),
             siste14avedtak: String? = nullVerdiForKey("siste14avedtak"),
@@ -160,6 +161,7 @@ class Testdata {
                 sisteOppfølgingsperiode ?: nullVerdiForKey("sisteOppfølgingsperiode"),
                 participatingService,
                 aktørId,
+                fnr,
                 kvp ?: nullVerdiForKey("kvp"),
                 veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
