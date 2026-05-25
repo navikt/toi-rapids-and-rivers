@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -28,40 +30,43 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1")
 }
 
+val isTechnicalLib = project.path.startsWith(":technical-libs:")
+val runtimeClasspath = configurations.named("runtimeClasspath")
+
+val copyRuntimeClasspathJars by tasks.registering(Sync::class) {
+    if (!isTechnicalLib) {
+        from(runtimeClasspath)
+        into(layout.buildDirectory.dir("libs"))
+    } else {
+        enabled = false
+    }
+}
 
 tasks {
     named<Jar>("jar") {
-        // Gjør det mulig å bygge hele prosjektet raskere på utviklermaskin med "./gradlew clean build --warning-mode fail --configuration-cache -Dorg.gradle.configuration-cache.parallel=true"
-        notCompatibleWithConfigurationCache("Jar task accesses runtime classpath which is not serializable")
-
-        if (!projectDir.absoluteFile.toString().contains("technical-libs")) {
+        if (!isTechnicalLib) {
             archiveBaseName.set("app")
 
-            manifest {
-                val stiTilApplicationClass = File("${projectDir}/src/main/kotlin")
-                    .walk()
-                    .find { it.name == "Application.kt" }
-                    ?.path?.removePrefix("${project.projectDir}/src/main/kotlin/")
-                    ?.replace("/", ".")
-                    ?.replace(".kt", "Kt")
-                    ?: throw Exception("Finner ingen Application.kt i prosjektet ${project.name}")
-                attributes["Main-Class"] = stiTilApplicationClass
-                attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-                    it.name
-                }
-            }
-        }
+            val stiTilApplicationClass = File("${projectDir}/src/main/kotlin")
+                .walk()
+                .find { it.name == "Application.kt" }
+                ?.path?.removePrefix("${project.projectDir}/src/main/kotlin/")
+                ?.replace("/", ".")
+                ?.replace(".kt", "Kt")
+                ?: throw Exception("Finner ingen Application.kt i prosjektet ${project.name}")
 
-        doLast {
-            configurations.runtimeClasspath.get().forEach {
-                val file = layout.buildDirectory.file("libs/${it.name}").get().asFile
-                if (!file.exists())
-                    it.copyTo(file)
-            }
+            manifest.attributes(
+                mapOf(
+                    "Main-Class" to stiTilApplicationClass,
+                    "Class-Path" to runtimeClasspath.get().joinToString(separator = " ") { it.name }
+                )
+            )
+
+            dependsOn(copyRuntimeClasspathJars)
         }
     }
 
-    tasks.withType<Test> {
+    withType<Test> {
         useJUnitPlatform()
         testLogging {
             events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
