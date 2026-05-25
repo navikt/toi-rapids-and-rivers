@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.Sync
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -33,10 +31,24 @@ dependencies {
 val isTechnicalLib = project.path.startsWith(":technical-libs:")
 val runtimeClasspath = configurations.named("runtimeClasspath")
 
-val copyRuntimeClasspathJars by tasks.registering(Sync::class) {
+val deleteStaleRuntimeJars by tasks.registering(Delete::class) {
+    if (!isTechnicalLib) {
+        // Delete all jar files in build/libs except app.jar to clean up stale dependencies
+        delete(fileTree(layout.buildDirectory.dir("libs")) {
+            include("*.jar")
+            exclude("app.jar")
+        })
+    } else {
+        enabled = false
+    }
+}
+
+val copyRuntimeClasspathJars by tasks.registering(Copy::class) {
     if (!isTechnicalLib) {
         from(runtimeClasspath)
         into(layout.buildDirectory.dir("libs"))
+        // deleteStaleRuntimeJars runs first to clean up, then Copy adds current dependencies
+        dependsOn(deleteStaleRuntimeJars)
     } else {
         enabled = false
     }
