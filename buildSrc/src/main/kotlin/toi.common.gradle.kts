@@ -31,6 +31,16 @@ dependencies {
 val isTechnicalLib = project.path.startsWith(":technical-libs:")
 val runtimeClasspath = configurations.named("runtimeClasspath")
 
+fun findApplicationClass(projectDir: File, projectName: String): String {
+    return File("${projectDir}/src/main/kotlin")
+        .walk()
+        .find { it.name == "Application.kt" }
+        ?.path?.removePrefix("${projectDir}/src/main/kotlin/")
+        ?.replace("/", ".")
+        ?.replace(".kt", "Kt")
+        ?: throw Exception("Finner ingen Application.kt i prosjektet $projectName")
+}
+
 val deleteStaleRuntimeJars by tasks.registering(Delete::class) {
     if (!isTechnicalLib) {
         // Delete all jar files in build/libs except app.jar to clean up stale dependencies
@@ -45,10 +55,10 @@ val deleteStaleRuntimeJars by tasks.registering(Delete::class) {
 
 val copyRuntimeClasspathJars by tasks.registering(Copy::class) {
     if (!isTechnicalLib) {
-        from(runtimeClasspath)
-        into(layout.buildDirectory.dir("libs"))
         // deleteStaleRuntimeJars runs first to clean up, then Copy adds current dependencies
         dependsOn(deleteStaleRuntimeJars)
+        from(runtimeClasspath)
+        into(layout.buildDirectory.dir("libs"))
     } else {
         enabled = false
     }
@@ -57,24 +67,15 @@ val copyRuntimeClasspathJars by tasks.registering(Copy::class) {
 tasks {
     named<Jar>("jar") {
         if (!isTechnicalLib) {
+            dependsOn(copyRuntimeClasspathJars)
             archiveBaseName.set("app")
-
-            val stiTilApplicationClass = File("${projectDir}/src/main/kotlin")
-                .walk()
-                .find { it.name == "Application.kt" }
-                ?.path?.removePrefix("${project.projectDir}/src/main/kotlin/")
-                ?.replace("/", ".")
-                ?.replace(".kt", "Kt")
-                ?: throw Exception("Finner ingen Application.kt i prosjektet ${project.name}")
-
+            val mainClass = findApplicationClass(projectDir, project.name)
+            val classPath = runtimeClasspath.get().joinToString(separator = " ") { it.name }
             manifest.attributes(
-                mapOf(
-                    "Main-Class" to stiTilApplicationClass,
-                    "Class-Path" to runtimeClasspath.get().joinToString(separator = " ") { it.name }
-                )
+                "Main-Class" to mainClass,
+                "Class-Path" to classPath
             )
 
-            dependsOn(copyRuntimeClasspathJars)
         }
     }
 
