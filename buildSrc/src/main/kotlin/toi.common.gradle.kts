@@ -31,6 +31,9 @@ dependencies {
 
 tasks {
     named<Jar>("jar") {
+        // Gjør det mulig å bygge hele prosjektet raskere på utviklermaskin med "./gradlew clean build --warning-mode fail --configuration-cache -Dorg.gradle.configuration-cache.parallel=true"
+        notCompatibleWithConfigurationCache("Jar task accesses runtime classpath which is not serializable")
+
         if (!projectDir.absoluteFile.toString().contains("technical-libs")) {
             archiveBaseName.set("app")
 
