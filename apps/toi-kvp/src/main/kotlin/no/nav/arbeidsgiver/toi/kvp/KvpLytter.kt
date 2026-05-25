@@ -7,12 +7,14 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 
 class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            precondition{
+            precondition {
                 it.requireKey("event")
                 it.requireKey("aktorId")
                 it.requireKey("startet")
@@ -25,6 +27,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         }.register(this)
     }
 
+    private val teamlog = teamlog(log)
+
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
@@ -34,8 +38,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         log.info("Mottok kvp event ${packet["event"].asText()}")
 
         if (packet["event"].isNull || (packet["event"].asText() != "STARTET" && packet["event"].asText() != "AVSLUTTET")) {
-            log.error("event er ikke startet eller avluttet, se secure-log")
-            //secureLog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+            log.error("event er ikke startet eller avluttet, se teamlog-log")
+            //teamlog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
             return
         }
 
@@ -47,8 +51,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
             "@event_name" to "kvp",
         )
 
-        //secureLog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
-        secureLog.info("Skal publisere kvp-melding med event ${packet["event"].asText()} (securelog verifikasjon)")
+        //teamlog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asText()} (securelog verifikasjon)")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
@@ -56,6 +60,6 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
 
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
-        log.error("noe mangler i kvp.melding, se secure-log")
+        log.error("noe mangler i kvp.melding, se teamlog-log")
     }
 }

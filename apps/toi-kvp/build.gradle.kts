@@ -3,4 +3,5 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
 }
