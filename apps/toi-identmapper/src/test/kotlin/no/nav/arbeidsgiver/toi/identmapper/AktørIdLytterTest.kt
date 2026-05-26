@@ -12,7 +12,7 @@ class AktørIdLytterTest {
         val rapid = TestRapid()
         val fnr = "12345678912"
         val aktørId = "123"
-        AktørIdLytter(rapid) { fnr }
+        AktørIdLytter(rapid, "test") { fnr }
 
         rapid.sendTestMessage(
             """
@@ -33,7 +33,7 @@ class AktørIdLytterTest {
     @Test
     fun `ignorerer melding uten whitelist-nøkkel`() {
         val rapid = TestRapid()
-        AktørIdLytter(rapid) { fail("Skal ikke hente fødselsnummer fra PDL") }
+        AktørIdLytter(rapid, "test") { fail("Skal ikke hente fødselsnummer fra PDL") }
 
         rapid.sendTestMessage(
             """
@@ -50,7 +50,7 @@ class AktørIdLytterTest {
     @Test
     fun `ignorerer melding som allerede har fødselsnummer`() {
         val rapid = TestRapid()
-        AktørIdLytter(rapid) { fail("Skal ikke hente fødselsnummer fra PDL") }
+        AktørIdLytter(rapid, "test") { fail("Skal ikke hente fødselsnummer fra PDL") }
 
         rapid.sendTestMessage(
             """
@@ -69,19 +69,19 @@ class AktørIdLytterTest {
     @Test
     fun `publiserer ikke når PDL ikke finner fødselsnummer`() {
         val rapid = TestRapid()
-        AktørIdLytter(rapid) { null }
+        AktørIdLytter(rapid, "test") { null }
 
-        assertThrows <IllegalStateException> {
-            rapid.sendTestMessage(
-                """
+        rapid.sendTestMessage(
+            """
             {
                 "aktørId": "123",
                 "synlighet": true,
                 "@event_name": "eventName"
             }
             """.trimIndent()
-            )
-        }
+        )
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
     }
 }
 

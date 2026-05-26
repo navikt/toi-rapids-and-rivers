@@ -45,6 +45,7 @@ fun startApp(
 
         AktørIdLytter(
             rapidsConnection = rapidsConnection,
+            cluster = "test",
             hentFødselsnummer = identCache::hentFødselsnummer,
         )
     }.start()

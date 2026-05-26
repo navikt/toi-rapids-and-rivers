@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry
 
 class AktørIdLytter(
     private val rapidsConnection: RapidsConnection,
+    private val cluster: String,
     private val hentFødselsnummer: (aktørId: String) -> String?,
 ) : River.PacketListener {
     private val aktørIdKey = "aktørId"
@@ -27,10 +28,16 @@ class AktørIdLytter(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val aktørId = packet[aktørIdKey].asText()
-        val fødselsnummer = hentFødselsnummer(aktørId) ?: throw IllegalStateException("Fødselsnummer ikke funnet for aktørId")
+        val fødselsnummer = hentFødselsnummer(aktørId)
 
-        packet[fødselsnummerKey] = fødselsnummer
-        rapidsConnection.publish(aktørId, packet.toJson())
+        if(fødselsnummer == null) {
+            if(cluster == "prod-gcp") {
+                throw IllegalStateException("Fødselsnummer ikke funnet for aktørId")
+            }
+        } else {
+            packet[fødselsnummerKey] = fødselsnummer
+            rapidsConnection.publish(aktørId, packet.toJson())
+        }
     }
 }
 
