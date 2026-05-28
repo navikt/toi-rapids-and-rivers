@@ -2,6 +2,10 @@ plugins {
     id("toi.app")
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.oppfolgingsperiode.ApplicationKt")
+}
+
 dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.0")
 

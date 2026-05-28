@@ -1,40 +1,33 @@
+import org.gradle.api.tasks.JavaExec
+import org.gradle.jvm.tasks.Jar
+import org.gradle.api.tasks.Sync
+
 plugins {
     id("toi.common")
     application
 }
 
-fun findApplicationClass(projectDir: File, projectName: String): String {
-    return File("${projectDir}/src/main/kotlin")
-        .walk()
-        .find { it.name == "Application.kt" }
-        ?.path?.removePrefix("${projectDir}/src/main/kotlin/")
-        ?.replace("/", ".")
-        ?.replace(".kt", "Kt")
-        ?: throw InvalidUserDataException("Finner ingen Application.kt i prosjektet $projectName")
-}
-
 val runtimeClasspath = configurations.named("runtimeClasspath")
+val jarTask = tasks.named<Jar>("jar")
 
-val deleteStaleRuntimeJars by tasks.registering(Delete::class) {
-    // Delete all jar files in build/libs except app.jar to clean up stale dependencies
-    delete(fileTree(layout.buildDirectory.dir("libs")) {
-        include("*.jar")
-        exclude("app.jar")
-    })
+jarTask.configure {
+    archiveBaseName.set("app")
 }
 
-val copyRuntimeClasspathJars by tasks.registering(Copy::class) {
-    // deleteStaleRuntimeJars runs first to clean up, then Copy adds current dependencies
-    dependsOn(deleteStaleRuntimeJars)
+val copyRuntimeClasspathJars by tasks.registering(Sync::class) {
+    /* Keep runtime dependencies in a dedicated directory so cleanup never touches the app jar.
+     Sync cleans stale jars in runtime-libs.
+     If both app.jar and it's dependency jars were in the same directory build/libs, Sync's cleanup could delete
+     app.jar and leave no runnable app artifact. */
     from(runtimeClasspath)
-    into(layout.buildDirectory.dir("libs"))
+    into(layout.buildDirectory.dir("runtime-libs"))
 }
 
 tasks.named<Jar>("jar") {
     dependsOn(copyRuntimeClasspathJars)
-    archiveBaseName.set("app")
-    val mainClass = findApplicationClass(projectDir, project.name)
-    val classPath = runtimeClasspath.get().joinToString(separator = " ") { it.name }
+    val mainClass = tasks.named<JavaExec>("run").flatMap { it.mainClass }
+    val classPath = runtimeClasspath.map { files -> files.joinToString(separator = " ") { "runtime-libs/${it.name}" } }
+
     manifest.attributes(
         "Main-Class" to mainClass,
         "Class-Path" to classPath

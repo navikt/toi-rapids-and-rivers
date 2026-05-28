@@ -3,6 +3,10 @@ plugins {
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.ApplicationKt")
+}
+
 dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
 
