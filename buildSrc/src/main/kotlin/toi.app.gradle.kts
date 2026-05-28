@@ -10,7 +10,7 @@ fun findApplicationClass(projectDir: File, projectName: String): String {
         ?.path?.removePrefix("${projectDir}/src/main/kotlin/")
         ?.replace("/", ".")
         ?.replace(".kt", "Kt")
-        ?: throw org.gradle.api.InvalidUserDataException("Finner ingen Application.kt i prosjektet $projectName")
+        ?: throw InvalidUserDataException("Finner ingen Application.kt i prosjektet $projectName")
 }
 
 val runtimeClasspath = configurations.named("runtimeClasspath")
