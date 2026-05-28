@@ -8,11 +8,6 @@ plugins {
 }
 
 val runtimeClasspath = configurations.named("runtimeClasspath")
-val jarTask = tasks.named<Jar>("jar")
-
-jarTask.configure {
-    archiveBaseName.set("app")
-}
 
 val copyRuntimeClasspathJars by tasks.registering(Sync::class) {
     /* Keep runtime dependencies in a dedicated directory so cleanup never touches the app jar.
@@ -25,6 +20,8 @@ val copyRuntimeClasspathJars by tasks.registering(Sync::class) {
 
 tasks.named<Jar>("jar") {
     dependsOn(copyRuntimeClasspathJars)
+
+    archiveBaseName.set("app")
     val mainClass = tasks.named<JavaExec>("run").flatMap { it.mainClass }
     val classPath = runtimeClasspath.map { files -> files.joinToString(separator = " ") { "runtime-libs/${it.name}" } }
 
