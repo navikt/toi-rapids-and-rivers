@@ -1,7 +1,8 @@
 plugins {
     id("toi.common")
+    `java-library`
 }
 
 dependencies {
-    implementation("org.slf4j:slf4j-api:2.0.18")
+    api("org.slf4j:slf4j-api")
 }
