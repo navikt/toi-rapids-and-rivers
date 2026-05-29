@@ -12,7 +12,7 @@ val runtimeClasspath = configurations.named("runtimeClasspath")
 val copyRuntimeClasspathJars by tasks.registering(Sync::class) {
     /* Keep runtime dependencies in a dedicated directory so cleanup never touches the app jar.
      Sync cleans stale jars in runtime-libs.
-     If both app.jar and it's dependency jars were in the same directory build/libs, Sync's cleanup could delete
+     If both app.jar and its dependency jars were in the same directory build/libs, Sync's cleanup could delete
      app.jar and leave no runnable app artifact. */
     from(runtimeClasspath)
     into(layout.buildDirectory.dir("runtime-libs"))
