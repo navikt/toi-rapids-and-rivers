@@ -3,6 +3,10 @@ plugins {
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.identmapper.ApplicationKt")
+}
+
 dependencies {
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
