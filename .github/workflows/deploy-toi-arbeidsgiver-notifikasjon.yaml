@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/endre_til_altinn3
+      deploy_dev_branch: refs/heads/test-filer-naar-bygger-alt
     secrets: inherit
     permissions:
       contents: read
