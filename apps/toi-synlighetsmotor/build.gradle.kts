@@ -2,6 +2,10 @@ plugins {
     id("toi.rapids-and-rivers")
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.ApplicationKt")
+}
+
 dependencies {
     implementation("org.postgresql:postgresql:42.7.11")
     implementation("org.flywaydb:flyway-core:11.1.0")

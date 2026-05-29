@@ -1,5 +1,8 @@
 rootProject.name = "toi-rapids-and-rivers"
 
+// https://docs.gradle.org/current/userguide/configuration_cache_enabling.html#config_cache:stable
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+
 include(
     "apps:asr-domain",
     "apps:toi-arbeidsgiver-notifikasjon",
