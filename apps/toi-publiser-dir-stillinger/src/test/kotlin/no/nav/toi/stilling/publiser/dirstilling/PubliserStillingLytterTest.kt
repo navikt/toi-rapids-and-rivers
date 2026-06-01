@@ -62,6 +62,13 @@ class PubliserStillingLytterTest {
             assertEquals("123e4567-e89b-12d3-a456-426614174001", it.stillingsinfo?.stillingsinfoid)
             assertEquals("123e4567-e89b-12d3-a456-426614174000", it.stillingsinfo?.stillingsid)
         }
+
+        stillingskategori = "REKRUTTERINGSTREFF_FORMIDLING"
+        jacksonMapper.readValue(rapidHendelse(), RapidHendelse::class.java).also {
+            assertEquals(Stillingskategori.REKRUTTERINGSTREFF_FORMIDLING, it.stillingsinfo?.stillingskategori)
+            assertEquals("123e4567-e89b-12d3-a456-426614174001", it.stillingsinfo?.stillingsinfoid)
+            assertEquals("123e4567-e89b-12d3-a456-426614174000", it.stillingsinfo?.stillingsid)
+        }
     }
 
     @Test
