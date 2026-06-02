@@ -2,7 +2,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("jvm")
-    application
 }
 
 kotlin {
@@ -28,37 +27,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1")
 }
 
-
 tasks {
-    named<Jar>("jar") {
-        if (!projectDir.absoluteFile.toString().contains("technical-libs")) {
-            archiveBaseName.set("app")
-
-            manifest {
-                val stiTilApplicationClass = File("${projectDir}/src/main/kotlin")
-                    .walk()
-                    .find { it.name == "Application.kt" }
-                    ?.path?.removePrefix("${project.projectDir}/src/main/kotlin/")
-                    ?.replace("/", ".")
-                    ?.replace(".kt", "Kt")
-                    ?: throw Exception("Finner ingen Application.kt i prosjektet ${project.name}")
-                attributes["Main-Class"] = stiTilApplicationClass
-                attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-                    it.name
-                }
-            }
-        }
-
-        doLast {
-            configurations.runtimeClasspath.get().forEach {
-                val file = layout.buildDirectory.file("libs/${it.name}").get().asFile
-                if (!file.exists())
-                    it.copyTo(file)
-            }
-        }
-    }
-
-    tasks.withType<Test> {
+    withType<Test> {
         useJUnitPlatform()
         testLogging {
             events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)

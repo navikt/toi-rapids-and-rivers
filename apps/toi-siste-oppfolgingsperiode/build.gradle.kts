@@ -1,5 +1,9 @@
 plugins {
-    id("toi.common")
+    id("toi.app")
+}
+
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.oppfolgingsperiode.ApplicationKt")
 }
 
 dependencies {
