@@ -42,7 +42,7 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
             "@event_name" to "sisteOppfølgingsperiode",
         )
 
-        val aktørId = packet["aktorId"].asText()
+        val aktørId = packet["aktorId"].asString()
         log.info("Skal publisere siste oppfølgingsperiodemelding for aktørid (se securelog)")
         secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
 

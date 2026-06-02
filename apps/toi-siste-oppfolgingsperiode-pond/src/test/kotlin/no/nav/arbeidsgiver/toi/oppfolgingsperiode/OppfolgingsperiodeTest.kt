@@ -29,8 +29,8 @@ class OppfolgingsperiodeTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("sisteOppfølgingsperiode")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingJson.get("@event_name").asString()).isEqualTo("sisteOppfølgingsperiode")
+        assertThat(meldingJson.get("aktørId").asString()).isEqualTo(aktørId)
 
         val oppfølgingsperiodeJson = meldingJson.get("sisteOppfølgingsperiode")
         assertThat(oppfølgingsperiodeJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
@@ -45,15 +45,15 @@ class OppfolgingsperiodeTest {
         )
 
         oppfølgingsperiodeJson.apply {
-            assertThat(get("kontor").get("kontorNavn").asText()).isEqualTo("Nav Asker")
-            assertThat(get("kontor").get("kontorId").asText()).isEqualTo("0220")
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("startTidspunkt").asText()).isEqualTo("2026-01-01T03:01:07.024557+01:00")
+            assertThat(get("kontor").get("kontorNavn").asString()).isEqualTo("Nav Asker")
+            assertThat(get("kontor").get("kontorId").asString()).isEqualTo("0220")
+            assertThat(get("aktorId").asString()).isEqualTo(aktørId)
+            assertThat(get("startTidspunkt").asString()).isEqualTo("2026-01-01T03:01:07.024557+01:00")
             assertThat(get("sluttTidspunkt").isNull).isTrue
-            assertThat(get("ident").asText()).isEqualTo("01234567890")
-            assertThat(get("sisteEndringsType").asText()).isEqualTo("OPPFOLGING_STARTET")
-            assertThat(get("oppfolgingsperiodeUuid").asText()).isEqualTo("11b016d9-37a0-4c5d-8296-62ccf90f9745")
-            assertThat(get("producerTimestamp").asText()).isEqualTo("2026-01-01T03:01:08.921369321+01:00")
+            assertThat(get("ident").asString()).isEqualTo("01234567890")
+            assertThat(get("sisteEndringsType").asString()).isEqualTo("OPPFOLGING_STARTET")
+            assertThat(get("oppfolgingsperiodeUuid").asString()).isEqualTo("11b016d9-37a0-4c5d-8296-62ccf90f9745")
+            assertThat(get("producerTimestamp").asString()).isEqualTo("2026-01-01T03:01:08.921369321+01:00")
         }
     }
 

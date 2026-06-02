@@ -131,7 +131,7 @@ class NeedSamleLytterTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding[felt].asText()).isEqualTo(expectedVerdi)
+        assertThat(melding[felt].asString()).isEqualTo(expectedVerdi)
         assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
