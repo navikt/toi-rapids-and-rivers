@@ -7,7 +7,7 @@ on:
       - .github/workflows/deploy-toi-publisering-til-arbeidsplassen.yaml
       - .github/workflows/deploy-toi-template.yaml
       - buildSrc/**
-      - technical-libs/testrapid
+      - technical-libs/testrapid/**
   workflow_dispatch:
 
 jobs:
