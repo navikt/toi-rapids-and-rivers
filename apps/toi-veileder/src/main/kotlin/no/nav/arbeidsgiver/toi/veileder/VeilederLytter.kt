@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.toi.veileder
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.JsonNodeFactory
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -30,9 +30,9 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection, private val
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktorId"].asText()
+        val aktørId = packet["aktorId"].asString()
         try {
-            val ident = packet["veilederId"].asText()
+            val ident = packet["veilederId"].asString()
             val veilederinformasjon = nomKlient.hentVeilederinformasjon(ident)
             packet["veilederinformasjon"] = veilederinformasjon?.toJsonNode() ?: JsonNodeFactory.instance.nullNode()
 

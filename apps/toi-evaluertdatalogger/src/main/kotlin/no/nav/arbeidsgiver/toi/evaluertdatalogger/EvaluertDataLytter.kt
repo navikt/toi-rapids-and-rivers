@@ -31,11 +31,11 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktørId"].asText()
-        val formidlingsgruppe = packet["oppfølgingsinformasjon.formidlingsgruppe"].asText()
-        val kvalifiseringsgruppe = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asText()
-        val rettighetsgruppe = packet["oppfølgingsinformasjon.rettighetsgruppe"].asText()
-        val hovedmaal = packet["oppfølgingsinformasjon.hovedmaal"].asText()
+        val aktørId = packet["aktørId"].asString()
+        val formidlingsgruppe = packet["oppfølgingsinformasjon.formidlingsgruppe"].asString()
+        val kvalifiseringsgruppe = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asString()
+        val rettighetsgruppe = packet["oppfølgingsinformasjon.rettighetsgruppe"].asString()
+        val hovedmaal = packet["oppfølgingsinformasjon.hovedmaal"].asString()
         secureLog.info("(secure) Synlig bruker med formidlingsgruppe $formidlingsgruppe kvalifiseringsgruppe $kvalifiseringsgruppe hovedmaal $hovedmaal rettighetsgruppe $rettighetsgruppe ($aktørId)")
     }
 }

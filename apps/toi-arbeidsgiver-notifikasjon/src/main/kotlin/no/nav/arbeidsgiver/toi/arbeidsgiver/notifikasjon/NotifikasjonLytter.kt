@@ -33,15 +33,15 @@ class NotifikasjonLytter(rapidsConnection: RapidsConnection, private val notifik
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
-        val notifikasjonsId = packet["notifikasjonsId"].asText()
-        val stillingsId = UUID.fromString(packet["stillingsId"].asText())
-        val virksomhetsnummer = packet["virksomhetsnummer"].asText()
-        val utførtAvVeilederFornavn = packet["utførtAvVeilederFornavn"].asText()
-        val utførtAvVeilederEtternavn = packet["utførtAvVeilederEtternavn"].asText()
-        val arbeidsgiversEpostadresser = packet["arbeidsgiversEpostadresser"].toList().map { it.asText() }
-        val tidspunktForHendelse = ZonedDateTime.parse(packet["tidspunktForHendelse"].asText())
-        val meldingTilArbeidsgiver = packet["meldingTilArbeidsgiver"].asText()
-        val stillingstittel = packet["stilling.stillingstittel"].asText()
+        val notifikasjonsId = packet["notifikasjonsId"].asString()
+        val stillingsId = UUID.fromString(packet["stillingsId"].asString())
+        val virksomhetsnummer = packet["virksomhetsnummer"].asString()
+        val utførtAvVeilederFornavn = packet["utførtAvVeilederFornavn"].asString()
+        val utførtAvVeilederEtternavn = packet["utførtAvVeilederEtternavn"].asString()
+        val arbeidsgiversEpostadresser = packet["arbeidsgiversEpostadresser"].toList().map { it.asString() }
+        val tidspunktForHendelse = ZonedDateTime.parse(packet["tidspunktForHendelse"].asString())
+        val meldingTilArbeidsgiver = packet["meldingTilArbeidsgiver"].asString()
+        val stillingstittel = packet["stilling.stillingstittel"].asString()
 
         notifikasjonKlient.sendNotifikasjon(
             notifikasjonsId = notifikasjonsId,

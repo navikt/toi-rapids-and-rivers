@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -42,7 +42,7 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
             "@event_name" to "sisteOppfølgingsperiode",
         )
 
-        val aktørId = packet["aktorId"].asText()
+        val aktørId = packet["aktorId"].asString()
         log.info("Skal publisere siste oppfølgingsperiodemelding for aktørid (se securelog)")
         secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
 

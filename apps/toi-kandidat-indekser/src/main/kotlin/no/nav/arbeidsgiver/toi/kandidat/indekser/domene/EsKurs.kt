@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Objects
@@ -37,7 +38,7 @@ class EsKurs(
                 arrangor = kursNode["utsteder"].asText(),
                 omfangEnhet = kursNode["varighetEnhet"]?.asText("") ?: "",
                 omfangVerdi = kursNode["varighet"]?.asInt(),
-                tilDato = kursNode["tidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() }
+                tilDato = kursNode["tidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() }
             )
         }
     }

@@ -20,7 +20,7 @@ class Siste14aVedtakTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "aktørId",
             "siste14avedtak",
@@ -30,11 +30,11 @@ class Siste14aVedtakTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("siste14avedtak")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørid)
+        assertThat(meldingJson.get("@event_name").asString()).isEqualTo("siste14avedtak")
+        assertThat(meldingJson.get("aktørId").asString()).isEqualTo(aktørid)
 
         val json = meldingJson.get("siste14avedtak")
-        assertThat(json.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(json.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
             "aktorId",
             "innsatsgruppe",
             "hovedmal",
@@ -43,11 +43,11 @@ class Siste14aVedtakTest {
         )
 
         meldingJson.get("siste14avedtak").apply {
-            assertThat(get("aktorId").asText()).isEqualTo(aktørid)
-            assertThat(get("innsatsgruppe").asText()).isEqualTo("STANDARD_INNSATS")
-            assertThat(get("hovedmal").asText()).isEqualTo("SKAFFE_ARBEID")
-            assertThat(get("fattetDato").asText()).isEqualTo("2021-09-08T09:29:20.398043+02:00")
-            assertThat(get("fraArena").asText()).isEqualTo("false")
+            assertThat(get("aktorId").asString()).isEqualTo(aktørid)
+            assertThat(get("innsatsgruppe").asString()).isEqualTo("STANDARD_INNSATS")
+            assertThat(get("hovedmal").asString()).isEqualTo("SKAFFE_ARBEID")
+            assertThat(get("fattetDato").asString()).isEqualTo("2021-09-08T09:29:20.398043+02:00")
+            assertThat(get("fraArena").asString()).isEqualTo("false")
 
 
         }

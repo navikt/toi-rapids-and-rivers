@@ -96,7 +96,7 @@ class OrganisasjonsenhetTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
+        assertThat(melding["organisasjonsenhetsnavn"].asString()).isEqualTo("Andre kontor")
         assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
@@ -171,7 +171,7 @@ class OrganisasjonsenhetTest {
 
         assertThat(inspektør.size).isEqualTo(1)
 
-        assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("Andre kontor")
+        assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asString()).isEqualTo("Andre kontor")
     }
 
     @Test
@@ -183,7 +183,7 @@ class OrganisasjonsenhetTest {
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asText()).isEqualTo("")
+        assertThat(inspektør.message(0)["organisasjonsenhetsnavn"].asString()).isEqualTo("")
     }
 
     @Test
