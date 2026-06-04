@@ -2,6 +2,10 @@ plugins {
     id("toi.rapids-and-rivers")
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon.ApplicationKt")
+}
+
 dependencies {
     implementation("io.javalin:javalin:7.2.0")
 

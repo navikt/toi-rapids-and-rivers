@@ -3,6 +3,10 @@ plugins {
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.arbeidsmarked.cv.ApplicationKt")
+}
+
 dependencies {
     implementation("io.confluent:kafka-avro-serializer:8.1.1")
     implementation("tools.jackson.core:jackson-databind:3.0.4")

@@ -14,7 +14,7 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        Lytter(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { aktørId }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -49,7 +49,7 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        Lytter(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { aktørId }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -66,7 +66,7 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        Lytter(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { aktørId }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -81,7 +81,7 @@ class IdentMapperTest {
         val rapid = TestRapid()
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { null }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { null }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, "123"))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -93,7 +93,7 @@ class IdentMapperTest {
         val aktørIdKey = "aktørId"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -105,7 +105,7 @@ class IdentMapperTest {
         val aktørIdKey = "aktorId"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -117,7 +117,7 @@ class IdentMapperTest {
         val aktørIdKey = "aktoerId"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -129,7 +129,7 @@ class IdentMapperTest {
         val aktørIdKey = "AKTORID"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)

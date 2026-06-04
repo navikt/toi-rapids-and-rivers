@@ -2,6 +2,10 @@ plugins {
     id("toi.rapids-and-rivers-deprekert-jackson2")
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.kandidat.indekser.ApplicationKt")
+}
+
 val pamAnsettelseskodeverkVersion = "1.18"
 dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
