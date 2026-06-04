@@ -1,10 +1,12 @@
 package no.nav.arbeidsgiver.toi.rest
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.javalin.http.Context
 import no.nav.arbeidsgiver.toi.Evaluering
 import no.nav.security.token.support.core.configuration.IssuerProperties
 
-private class EvalueringsRespons(val fnr: String)
+private class EvalueringsRespons @JsonCreator(mode = JsonCreator.Mode.PROPERTIES) constructor(@JsonProperty("fnr") val fnr: String)
 
 val evaluerKandidatFraContext: ((String) ->  Evaluering?, Map<Rolle,Pair<String, IssuerProperties>>) -> (Context) -> Unit = { hentMedFødselsnummer, issuerProperties ->
     { context ->
