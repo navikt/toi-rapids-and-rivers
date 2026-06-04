@@ -5,14 +5,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.UnauthorizedResponse
-import io.javalin.json.JsonMapper
+import io.javalin.json.JavalinJackson3
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import tools.jackson.module.kotlin.jacksonMapperBuilder
-import tools.jackson.module.kotlin.kotlinModule
-import java.io.InputStream
-import java.lang.reflect.Type
 
 class Republiserer(
     private val repository: Repository,
@@ -113,13 +109,4 @@ class Republiserer(
 
     data class RepubliseringBody(val passord: String)
     data class RepubliseringBodyMedListeAvKandidater(val passord: String, val aktorIder: List<String>)
-}
-
-private class JavalinJackson3() : JsonMapper {
-    private val mapper = jacksonMapperBuilder().addModule(kotlinModule()).build()
-    override fun toJsonString(obj: Any, type: Type): String = mapper.writeValueAsString(obj)
-    override fun <T : Any> fromJsonString(json: String, targetType: Type): T =
-        mapper.readValue(json, mapper.constructType(targetType))
-    override fun <T : Any> fromJsonStream(json: InputStream, targetType: Type): T =
-        mapper.readValue(json, mapper.constructType(targetType))
 }
