@@ -70,7 +70,9 @@ class KandidatlisteOpprettetLytterTest {
     @Test
     fun `Når vi mottar kandidatliste opprettet-melding på rapid skal vi trunkere tittel om den er mer enn 140 karakterer`() {
         val meldingMed140Karakterer = "Dette er en melding med 140 karakterer, derfor er den ganske lang. 140 karakterer er maks-gransen til notifikasjons-grensesnittet. Filler123"
+        Assertions.assertThat(meldingMed140Karakterer).hasSize(140)
         val ekstraKarakterer = "Dette er ekstra karakterer som skal trunkeres bort i kallet til notifikasjon."
+        Assertions.assertThat(ekstraKarakterer).isNotEmpty
         wiremock.stubNySak()
         testRapid.sendTestMessage(opprettetKandidatlisteMelding(tittel = meldingMed140Karakterer + ekstraKarakterer))
 
