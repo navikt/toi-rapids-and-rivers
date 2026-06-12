@@ -8,6 +8,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.OutgoingMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.SentMessage
 import tools.jackson.databind.cfg.DateTimeFeature
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class TestRapid(
     private val meterRegistry: io.micrometer.core.instrument.MeterRegistry = io.micrometer.core.instrument.simple.SimpleMeterRegistry(),
@@ -130,5 +132,20 @@ class TestRapid(
             requireNotNull(message(index).path(field).takeUnless { it.isMissingNode || it.isNull }) {
                 "Message does not contain field '$field'"
             }
+    }
+
+    fun waitForMessages(maxWaitDuration: Duration, returnOnNmberOfMessages: Int) {
+        val timeout = System.currentTimeMillis() + maxWaitDuration.inWholeMilliseconds
+        while (inspektør.size < returnOnNmberOfMessages && System.currentTimeMillis() < timeout) {
+            Thread.sleep(100)
+        }
+    }
+
+    fun waitForAllMessagesUntilTimeout(waitDuration: Duration = 5.seconds) {
+        return waitForMessages(waitDuration, Int.MAX_VALUE)
+    }
+
+    fun waitForFirstMessage(maxWaitDuration: Duration = 5.seconds) {
+        return waitForMessages(maxWaitDuration, 1)
     }
 }
