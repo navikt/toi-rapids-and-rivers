@@ -50,7 +50,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
             "@event_name" to "kvp",
         )
 
-        secureLog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)")
+        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
