@@ -38,7 +38,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         log.info("Mottok kvp event ${packet["event"].asString()}")
 
         if (packet["event"].isNull || (packet["event"].asString() != "STARTET" && packet["event"].asString() != "AVSLUTTET")) {
-            log.error("event er ikke startet eller avluttet, se teamlog") // TODO Are: Men det blir jo ikke logget not til teamlog?
+            log.error("event er ikke startet eller avsluttet, se teamlog") // TODO Are: Men det blir jo ikke logget not til teamlog?
             return
         }
 
