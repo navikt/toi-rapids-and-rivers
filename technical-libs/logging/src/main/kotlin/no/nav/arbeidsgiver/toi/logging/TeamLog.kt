@@ -9,19 +9,20 @@ val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
 
 /**
- *  Brukes i Kotlin-kode som ikke er inne i en klasse, typisk i en "top level function".
-
+ * Brukes i Kotlin-kode som ikke er inne i en klasse, typisk i en "top level function".
+ *
  * Kalles fra den filen du ønsker å logge i slik:
- *```
- * import no.nav.arbeidsgiver.toi.noClassLogger
+ * ```
+ * import no.nav.arbeidsgiver.toi.logging.noClassLogger
  * private val log = noClassLogger()
  * fun myToplevelFunction() {
- *      log.info("yada yada yada")
- *      ...
+ *     log.info("yada yada yada")
+ *     ...
  * }
- *```
- * @return`En Logger med samme navn som Kotlin-filen du logger fra, prefikset med pakkenavn.
- * */
+ * ```
+ *
+ * @return En Logger med samme navn som Kotlin-filen du logger fra, prefikset med pakkenavn.
+ */
 @Suppress("unused")
 fun noClassLogger(): Logger {
     val callerClassName = Throwable().stackTrace[1].className
