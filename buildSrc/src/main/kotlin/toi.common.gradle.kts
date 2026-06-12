@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     constraints {
-        implementation("org.slf4j:slf4j-api:2.0.18Bump ")
+        implementation("org.slf4j:slf4j-api:2.0.18")
         implementation("ch.qos.logback:logback-classic:1.5.23")
         implementation("net.logstash.logback:logstash-logback-encoder:9.0")
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
