@@ -52,7 +52,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         )
 
         //teamlog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
-        teamlog.info("Skal publisere kvp-melding med event ${packet[\"event\"].asText()} (teamlog verifikasjon)")
+        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asText()} (teamlog verifikasjon)")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
