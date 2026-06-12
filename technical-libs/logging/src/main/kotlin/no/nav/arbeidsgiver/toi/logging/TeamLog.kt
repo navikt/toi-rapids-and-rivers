@@ -18,8 +18,6 @@ fun noClassLogger(): Logger {
 
 @Suppress("unused")
 class TeamLogLogger private constructor(private val l: Logger) {
-    private val m = MarkerFactory.getMarker("TEAM_LOGS")
-
     fun info(msg: String) {
         l.info(m, msg)
     }
@@ -45,6 +43,8 @@ class TeamLogLogger private constructor(private val l: Logger) {
     }
 
     companion object {
+        private val m = MarkerFactory.getMarker("TEAM_LOGS")
+
         fun teamlog(l: Logger): TeamLogLogger = TeamLogLogger(l)
     }
 }
