@@ -13,7 +13,7 @@ private val teamlog = teamlog(log)
 
 fun main() {
     log.info("Starter app.")
-    teamlog.info("Starter app. Dette er ment å logges til Securelogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+    teamlog.info("Starter app. Dette er ment å logges til Teamlogs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
     RapidApplication.create(System.getenv()).also { rapidsConnection ->
         KvpLytter(rapidsConnection)
