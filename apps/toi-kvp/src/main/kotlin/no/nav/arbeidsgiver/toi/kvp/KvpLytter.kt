@@ -38,7 +38,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         log.info("Mottok kvp event ${packet["event"].asString()}")
 
         if (packet["event"].isNull || (packet["event"].asString() != "STARTET" && packet["event"].asString() != "AVSLUTTET")) {
-            log.error("event er ikke startet eller avluttet, se teamlog")
+            log.error("event er ikke startet eller avluttet, se teamlog") // TODO Are: Men det blir jo ikke logget not til teamlog?
             return
         }
 
@@ -50,7 +50,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
             "@event_name" to "kvp",
         )
 
-        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)")
+        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)") // TODO Are: Hva betyr "teamlog verifikasjon"? Det blir jo ikke logget noe til teamlog?
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
@@ -58,6 +58,6 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
 
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
-        log.error("noe mangler i kvp.melding, se teamlog")
+        log.error("noe mangler i kvp.melding, se teamlog") // TODO Are: Men det blir jo ikke logget noe til teamlog?
     }
 }
