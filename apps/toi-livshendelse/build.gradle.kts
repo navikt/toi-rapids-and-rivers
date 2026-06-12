@@ -13,7 +13,7 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
     implementation("io.javalin:javalin:7.2.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
+    implementation("tools.jackson.module:jackson-module-kotlin:3.1.3")
     implementation("no.nav.security:token-validation-core:5.0.14")
 
     testImplementation("no.nav.security:mock-oauth2-server:2.1.0")

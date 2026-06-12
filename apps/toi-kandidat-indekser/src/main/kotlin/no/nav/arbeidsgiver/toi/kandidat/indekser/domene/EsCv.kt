@@ -196,7 +196,8 @@ class EsCv(
     fun indekseringsnøkkel() = kandidatnr
 
     companion object {
-        private fun JsonNode.yyyymmddToLocalDate(): LocalDate {
+        fun JsonNode.yyyymmddToLocalDate(): LocalDate {
+            if(runCatching { LocalDate.parse(asText()) }.isSuccess) return LocalDate.parse(asText())
             val (year, month, day) = map { it.asInt() }
             return LocalDate.of(year, month, day)
         }
@@ -287,5 +288,3 @@ class EsCv(
                 .let { arbeidsmarkedCv[it] }["cv"]
     }
 }
-
-fun JsonNode.yyyyMMddTilLocalDate() = LocalDate.of(this[0].asInt(), this[1].asInt(), this[2].asInt())

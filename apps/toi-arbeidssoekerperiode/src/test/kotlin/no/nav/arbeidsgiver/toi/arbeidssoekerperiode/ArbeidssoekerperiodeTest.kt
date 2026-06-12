@@ -32,13 +32,13 @@ class ArbeidssoekerperiodeTest {
         produserArbeidssoekerperiodeMelding(consumer, melding)
         arbeidssoekerperiodeLytter.onReady(rapid)
 
-        Thread.sleep(800)
+        rapid.waitForFirstMessage()
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
 
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames()).containsExactlyInAnyOrder(
             "@event_name",
             "fodselsnummer",
             "arbeidssokerperiode",
@@ -88,5 +88,4 @@ class ArbeidssoekerperiodeTest {
         .setAvsluttet(null)
         .setIdentitetsnummer("01010012345")
         .build()
-
 }

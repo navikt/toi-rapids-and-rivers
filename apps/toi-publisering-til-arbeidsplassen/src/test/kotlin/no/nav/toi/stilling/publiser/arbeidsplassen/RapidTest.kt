@@ -1,20 +1,22 @@
 package no.nav.toi.stilling.publiser.arbeidsplassen
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import no.nav.toi.TestRapid
 import no.nav.toi.stilling.publiser.arbeidsplassen.dto.RapidHendelse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.cfg.EnumFeature
 
 class RapidTest {
 
-    private val jacksonMapper = jacksonObjectMapper()
+    private val jacksonMapper = JsonMapper.builder()
+        .addModule(kotlinModule())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .registerModule(JavaTimeModule())
+        .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+        .build()
 
 
     @Test

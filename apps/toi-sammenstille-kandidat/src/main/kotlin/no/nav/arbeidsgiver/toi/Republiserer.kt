@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.UnauthorizedResponse
+import io.javalin.json.JavalinJackson3
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -23,7 +24,8 @@ class Republiserer(
     private val javalin = Javalin.create { config ->
         with(config.routes)
         {
-            before(republiseringspath, ::autentiserPassord)
+            config.jsonMapper(JavalinJackson3())
+            before("$republiseringspath*", ::autentiserPassord)
             post(path = republiseringspath) { ctx ->
                 republiserAlleKandidater(ctx)
             }

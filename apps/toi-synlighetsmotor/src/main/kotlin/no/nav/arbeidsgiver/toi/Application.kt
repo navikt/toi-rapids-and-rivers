@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.javalin.Javalin
 import io.javalin.http.Context
+import io.javalin.json.JavalinJackson3
 import no.nav.arbeidsgiver.toi.rekrutteringstreff.SynlighetRekrutteringstreffLytter
 import no.nav.arbeidsgiver.toi.rest.Rolle
 import no.nav.arbeidsgiver.toi.rest.evaluerKandidatFraContext
@@ -25,6 +26,7 @@ fun startApp(
 ): AutoCloseable {
     val javalin = Javalin.create { config ->
         config.http.defaultContentType = "application/json"
+        config.jsonMapper(JavalinJackson3())
         with(config.routes) {
             get("/isalive", isAlive(rapidIsAlive))
             post("/evaluering", evaluerKandidatFraContext(repository::hentMedFnr, issuerProperties))

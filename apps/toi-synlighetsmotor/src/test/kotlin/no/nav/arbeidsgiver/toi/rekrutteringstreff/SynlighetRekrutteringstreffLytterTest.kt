@@ -84,7 +84,7 @@ class SynlighetRekrutteringstreffLytterTest {
             // Skal trigge adressebeskyttelse-behov
             assertThat(size).isEqualTo(1)
             val behov = field(0, "@behov")
-            assertThat(behov.map { it.asText() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
+            assertThat(behov.toList().map { it.asString() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
         }
     }
 
@@ -121,7 +121,7 @@ class SynlighetRekrutteringstreffLytterTest {
             // Skal trigge adressebeskyttelse-behov
             assertThat(size).isEqualTo(1)
             val behov = field(0, "@behov")
-            assertThat(behov.map { it.asText() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
+            assertThat(behov.toList().map { it.asString() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
         }
     }
 

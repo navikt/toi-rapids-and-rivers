@@ -1,10 +1,15 @@
 package no.nav.arbeidsgiver.toi
 
+import tools.jackson.module.kotlin.kotlinModule
+
+import tools.jackson.databind.json.JsonMapper
+
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import tools.jackson.databind.cfg.EnumFeature
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -87,15 +92,15 @@ data class Kandidat(
 
 
     companion object {
-        private val mapper = jacksonObjectMapper()
+        private val mapper = jacksonMapperBuilder()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .registerModule(JavaTimeModule())
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+            .build()
 
         fun fraJson(jsonMessage: JsonMessage): Kandidat {
             val json = mapper.readTree(jsonMessage.toJson())
             return Kandidat(
-                aktørId = json["aktørId"].asText(),
+                aktørId = json["aktørId"].asString(),
                 arbeidsmarkedCv = Synlighetsnode.fromJsonNode(json.path("arbeidsmarkedCv"), mapper),
                 oppfølgingsinformasjon = Synlighetsnode.fromJsonNode(json.path("oppfølgingsinformasjon"), mapper),
                 sisteOppfølgingsperiode = Synlighetsnode.fromJsonNode(json.path("sisteOppfølgingsperiode"), mapper),

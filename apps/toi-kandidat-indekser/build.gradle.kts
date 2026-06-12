@@ -1,5 +1,5 @@
 plugins {
-    id("toi.rapids-and-rivers")
+    id("toi.rapids-and-rivers-deprekert-jackson2")
 }
 
 application {

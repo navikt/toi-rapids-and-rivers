@@ -35,24 +35,22 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok kvp event ${packet["event"].asText()}")
+        log.info("Mottok kvp event ${packet["event"].asString()}")
 
-        if (packet["event"].isNull || (packet["event"].asText() != "STARTET" && packet["event"].asText() != "AVSLUTTET")) {
-            log.error("event er ikke startet eller avsluttet, se teamlog")
-            //teamlog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+        if (packet["event"].isNull || (packet["event"].asString() != "STARTET" && packet["event"].asString() != "AVSLUTTET")) {
+            log.error("event er ikke startet eller avluttet, se teamlog")
             return
         }
 
 
-        val aktørId = packet["aktorId"].asText()
+        val aktørId = packet["aktorId"].asString()
         val melding = mapOf(
             "aktørId" to aktørId,
             "kvp" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "kvp",
         )
 
-        //teamlog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
-        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asText()} (teamlog verifikasjon)")
+        secureLog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())

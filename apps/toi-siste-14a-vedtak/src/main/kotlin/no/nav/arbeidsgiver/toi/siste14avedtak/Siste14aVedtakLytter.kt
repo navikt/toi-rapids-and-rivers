@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi.siste14avedtak
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -38,8 +38,8 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
             "@event_name" to "siste14avedtak",
         )
 
-        log.info("Skal publisere siste14aVedtakmelding med aktørid (se securelog) og fattetDato ${packet["fattetDato"].asText()}")
-        secureLog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asText()} og fattetDato ${packet["fattetDato"].asText()}")
+        log.info("Skal publisere siste14aVedtakmelding med aktørid (se securelog) og fattetDato ${packet["fattetDato"].asString()}")
+        secureLog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asString()} og fattetDato ${packet["fattetDato"].asString()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
