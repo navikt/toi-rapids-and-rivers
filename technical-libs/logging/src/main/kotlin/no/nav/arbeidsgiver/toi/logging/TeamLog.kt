@@ -62,42 +62,42 @@ class TeamLogLogger private constructor(private val l: Logger) {
     }
 
     companion object {
-        private val m = MarkerFactory.getMarker("TEAM_LOGS")
+        private const val teamlogsMarkerName = "TEAM_LOGS"
+        private const val teamlogsAppenderName = "team-logs"
+        private val m = MarkerFactory.getMarker(teamlogsMarkerName)
 
         fun teamlog(l: Logger): TeamLogLogger {
             val inNaisCluster = System.getenv("NAIS_CLUSTER_NAME") != null
             val context = LoggerFactory.getILoggerFactory() as? LoggerContext
             val rootLogger = context?.getLogger(Logger.ROOT_LOGGER_NAME)
 
-            if (inNaisCluster) {
-                require(hasTeamLogsAppender(rootLogger)) {
-                    "logback.xml mangler ROOT-appender med navn 'team-logs' -- team logs vil ikke bli sendt"
-                }
-                require(hasTeamLogsMarkerFilterOnRootAppender(rootLogger)) {
-                    "logback.xml mangler TEAM_LOGS-filter på ROOT-appender 'team-logs' -- team logs kan havne feil"
-                }
-            }
+            validateTeamlogConfiguration(inNaisCluster, rootLogger)
             return TeamLogLogger(l)
         }
 
-        // TODO Are: Hva betyr nøkkelordet "internal"?
-        // TODO Are: Refaktorer slik at stringene "team-logs" og "TEAM_LOGS" deklareres bare en gang (og sendes som parametre)?
-        // TODO Are: Refaktorer nav på funksjoner
-        // TODO Are: Duplsiert kode "rootLogger?.iteratorForAppenders()?.asSequence()"
+        internal fun validateTeamlogConfiguration(inNaisCluster: Boolean, rootLogger: ch.qos.logback.classic.Logger?) {
+            if (!inNaisCluster) return
 
+            require(hasTeamLogsAppender(rootLogger)) {
+                "logback.xml mangler ROOT-appender med navn '$teamlogsAppenderName'. Ingenting kan logges til Team Logs."
+            }
+            require(hasTeamLogsMarkerFilterOnRootAppender(rootLogger)) {
+                "logback.xml mangler markerfilter på ROOT-appender '$teamlogsAppenderName': $teamlogsMarkerName. Loggmeldinger (med sensitive data) beregnet til Team Logs kan havne i feil logg."
+            }
+        }
 
         internal fun hasTeamLogsAppender(rootLogger: ch.qos.logback.classic.Logger?): Boolean {
             return rootLogger
                 ?.iteratorForAppenders()
                 ?.asSequence()
-                ?.any { it.name == "team-logs" } == true
+                ?.any { it.name == teamlogsAppenderName } == true
         }
 
         internal fun hasTeamLogsMarkerFilterOnRootAppender(rootLogger: ch.qos.logback.classic.Logger?): Boolean {
             val teamLogsAppender = rootLogger
                 ?.iteratorForAppenders()
                 ?.asSequence()
-                ?.firstOrNull { it.name == "team-logs" }
+                ?.firstOrNull { it.name == teamlogsAppenderName }
                 ?: return false
 
             val filterAttachable = teamLogsAppender as? FilterAttachable<ILoggingEvent> ?: return false
@@ -108,8 +108,8 @@ class TeamLogLogger private constructor(private val l: Logger) {
 
         private fun evaluatorFilterMatchesTeamLogs(filter: EvaluatorFilter<ILoggingEvent>): Boolean {
             val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return false
-            val teamLogsEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker("TEAM_LOGS")) }
-            val otherEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker("NOT_TEAM_LOGS")) } // TODO Are: Code smell: Er dette egentlig testkode somburde vært i en testklasse?
+            val teamLogsEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker(teamlogsMarkerName)) }
+            val otherEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker("NOT_TEAM_LOGS")) }
 
             val matchesTeamLogs = runCatching { evaluator.evaluate(teamLogsEvent) }.getOrDefault(false)
             val matchesOther = runCatching { evaluator.evaluate(otherEvent) }.getOrDefault(true)

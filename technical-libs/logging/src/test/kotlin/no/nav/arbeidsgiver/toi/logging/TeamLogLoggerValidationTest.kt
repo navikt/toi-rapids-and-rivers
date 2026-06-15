@@ -5,80 +5,63 @@ import ch.qos.logback.classic.boolex.OnMarkerEvaluator
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import ch.qos.logback.core.filter.EvaluatorFilter
-import org.assertj.core.api.Assertions.assertThat
+import ch.qos.logback.core.spi.FilterReply
+import org.assertj.core.api.Assertions.assertThatCode
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 
-class TeamLogLoggerValidationTest {
+class TeamLogConfigurationValidationTest {
 
     @Test
-    fun `hasTeamLogsAppender er false naar root logger ikke har team-logs appender`() {
-        val context = LoggerContext()
-        val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
+    fun `bruk av TeamLogLogger avvises når rootLogger mangler teamlog-appender`() {
+        val rootLogger = nyRootLogger()
 
-        val harTeamLogsAppender = TeamLogLogger.hasTeamLogsAppender(rootLogger)
-
-        assertThat(harTeamLogsAppender).isFalse()
+        assertThatThrownBy {
+            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = true, rootLogger = rootLogger)
+        }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("logback.xml mangler ROOT-appender")
     }
 
     @Test
-    fun `hasTeamLogsAppender er true naar root logger har appender med navn team-logs`() {
-        val context = LoggerContext()
-        val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
-        rootLogger.detachAndStopAllAppenders()
+    fun `bruk av TeamLogLogger avvises når teamlog-appender mangler TEAM_LOGS-filter`() {
+        val rootLogger = nyRootLogger().apply {
+            addAppender(nyTeamLogsAppender(context = loggerContext))
+        }
 
-        val teamLogsAppender = nyTeamLogsAppender(context)
-
-        rootLogger.addAppender(teamLogsAppender)
-
-        val harTeamLogsAppender = TeamLogLogger.hasTeamLogsAppender(rootLogger)
-
-        assertThat(harTeamLogsAppender).isTrue()
+        assertThatThrownBy {
+            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = true, rootLogger = rootLogger)
+        }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("logback.xml mangler markerfilter på ROOT-appender")
     }
 
     @Test
-    fun `hasTeamLogsMarkerFilterOnRootAppender er false naar team-logs mangler TEAM_LOGS filter`() {
-        val context = LoggerContext()
-        val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
-        rootLogger.detachAndStopAllAppenders()
+    fun `bruk av TeamLogLogger tillates når teamlog er konfigurert riktig`() {
+        val rootLogger = nyRootLogger().apply {
+            addAppender(
+                nyTeamLogsAppender(context = loggerContext).apply {
+                    addFilter(nyTeamLogsMarkerFilter(context = loggerContext))
+                }
+            )
+        }
 
-        val teamLogsAppender = nyTeamLogsAppender(context)
-        rootLogger.addAppender(teamLogsAppender)
-
-        val harFilter = TeamLogLogger.hasTeamLogsMarkerFilterOnRootAppender(rootLogger)
-
-        assertThat(harFilter).isFalse()
+        assertThatCode {
+            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = true, rootLogger = rootLogger)
+        }.doesNotThrowAnyException()
     }
 
     @Test
-    fun `hasTeamLogsMarkerFilterOnRootAppender er true naar team-logs har TEAM_LOGS filter`() {
-        val context = LoggerContext()
-        val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
-        rootLogger.detachAndStopAllAppenders()
+    fun `bruk av TeamLogLogger utenfor nais-cluster tillates uten teamlog-konfigurasjon`() {
+        val rootLogger = nyRootLogger()
 
-        val teamLogsAppender = nyTeamLogsAppender(context)
-        teamLogsAppender.addFilter(nyMarkerFilter(context, "TEAM_LOGS"))
-        rootLogger.addAppender(teamLogsAppender)
-
-        val harFilter = TeamLogLogger.hasTeamLogsMarkerFilterOnRootAppender(rootLogger)
-
-        assertThat(harFilter).isTrue()
+        assertThatCode {
+            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = false, rootLogger = rootLogger)
+        }.doesNotThrowAnyException()
     }
 
-    @Test
-    fun `hasTeamLogsMarkerFilterOnRootAppender er false naar filter matcher annen marker`() {
-        val context = LoggerContext()
-        val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
-        rootLogger.detachAndStopAllAppenders()
-
-        val teamLogsAppender = nyTeamLogsAppender(context)
-        teamLogsAppender.addFilter(nyMarkerFilter(context, "OTHER_MARKER"))
-        rootLogger.addAppender(teamLogsAppender)
-
-        val harFilter = TeamLogLogger.hasTeamLogsMarkerFilterOnRootAppender(rootLogger)
-
-        assertThat(harFilter).isFalse()
-    }
+    private fun nyRootLogger(): ch.qos.logback.classic.Logger = LoggerContext().getLogger(Logger.ROOT_LOGGER_NAME).apply { detachAndStopAllAppenders() }
 
     private fun nyTeamLogsAppender(context: LoggerContext): AppenderBase<ILoggingEvent> {
         return object : AppenderBase<ILoggingEvent>() {
@@ -90,16 +73,18 @@ class TeamLogLoggerValidationTest {
         }
     }
 
-    private fun nyMarkerFilter(context: LoggerContext, marker: String): EvaluatorFilter<ILoggingEvent> {
+    private fun nyTeamLogsMarkerFilter(context: LoggerContext): EvaluatorFilter<ILoggingEvent> {
         val evaluator = OnMarkerEvaluator().apply {
             this.context = context
-            addMarker(marker)
+            addMarker("TEAM_LOGS")
             start()
         }
 
         return EvaluatorFilter<ILoggingEvent>().apply {
             this.context = context
             this.evaluator = evaluator
+            this.onMatch = FilterReply.ACCEPT
+            this.onMismatch = FilterReply.DENY
             start()
         }
     }
