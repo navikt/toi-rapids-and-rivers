@@ -4,8 +4,8 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.boolex.OnMarkerEvaluator
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.spi.LoggingEvent
+import ch.qos.logback.core.Appender
 import ch.qos.logback.core.filter.EvaluatorFilter
-import ch.qos.logback.core.spi.FilterAttachable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
@@ -13,6 +13,7 @@ import org.slf4j.MarkerFactory
 @Suppress("unused")
 val Any.log: Logger
     get() = LoggerFactory.getLogger(this::class.java)
+
 
 /**
  * Brukes i Kotlin-kode som ikke er inne i en klasse, typisk i en "top level function".
@@ -34,6 +35,7 @@ fun noClassLogger(): Logger {
     val callerClassName = Throwable().stackTrace[1].className
     return LoggerFactory.getLogger(callerClassName)
 }
+
 
 @Suppress("unused")
 class TeamLogLogger private constructor(private val l: Logger) {
@@ -61,6 +63,7 @@ class TeamLogLogger private constructor(private val l: Logger) {
         l.error(m, msg, t)
     }
 
+
     companion object {
         private const val teamlogsMarkerName = "TEAM_LOGS"
         private const val teamlogsAppenderName = "team-logs"
@@ -72,11 +75,13 @@ class TeamLogLogger private constructor(private val l: Logger) {
             return TeamLogLogger(l)
         }
 
-        private fun rootLogger(): ch.qos.logback.classic.Logger { // TODO Ara: Bør være by lazy?
+
+        private fun rootLogger(): ch.qos.logback.classic.Logger {
             val context = LoggerFactory.getILoggerFactory() as? LoggerContext
                 ?: error("TeamLogLogger krever logback-classic som SLF4J-backend")
             return context.getLogger(Logger.ROOT_LOGGER_NAME)
         }
+
 
         /**
          * Validerer at det finnes en logback.xml konfigurasjon for logging til Secure Logs ved å bruke en Marker
@@ -92,27 +97,28 @@ class TeamLogLogger private constructor(private val l: Logger) {
             }
         }
 
-        internal fun hasTeamlogsAppender(rootLogger: ch.qos.logback.classic.Logger): Boolean {
-            return rootLogger
-                .iteratorForAppenders() // TODO Are: Duplisering
-                ?.asSequence()
-                ?.any { it.name == teamlogsAppenderName } == true
-        }
+
+        internal fun hasTeamlogsAppender(rootLogger: ch.qos.logback.classic.Logger) =
+            teamlogsAppender(rootLogger) != null
+
 
         internal fun hasTeamlogsMarkerFilterOnRootAppender(rootLogger: ch.qos.logback.classic.Logger): Boolean {
-            val teamLogsAppender = rootLogger
-                .iteratorForAppenders() // TODO Are: Duplisering
-                ?.asSequence()
-                ?.firstOrNull { it.name == teamlogsAppenderName }
-                ?: return false
+            val teamLogsAppender = teamlogsAppender(rootLogger) ?: return false
 
-            val filterAttachable = teamLogsAppender as? FilterAttachable<ILoggingEvent> ?: return false
-            return filterAttachable.copyOfAttachedFiltersList
-                .filterIsInstance<EvaluatorFilter<ILoggingEvent>>()
+            return teamLogsAppender
+                .copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
                 .any { filterMatchesTeamLogs(it) }
         }
 
-        private fun filterMatchesTeamLogs(filter: EvaluatorFilter<ILoggingEvent>): Boolean {
+
+        private fun teamlogsAppender(logger: ch.qos.logback.classic.Logger): Appender<ILoggingEvent?>? =
+            logger
+                .iteratorForAppenders()
+                ?.asSequence()
+                ?.firstOrNull { it.name == teamlogsAppenderName }
+
+
+        private fun filterMatchesTeamLogs(filter: EvaluatorFilter<*>): Boolean {
             val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return false
             val teamLogsEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker(teamlogsMarkerName)) }
             val otherEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker("NOT_TEAM_LOGS")) }
