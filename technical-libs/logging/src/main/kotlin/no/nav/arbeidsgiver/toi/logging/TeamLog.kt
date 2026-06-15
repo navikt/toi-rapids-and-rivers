@@ -68,34 +68,40 @@ class TeamLogLogger private constructor(private val l: Logger) {
 
         fun teamlog(l: Logger): TeamLogLogger {
             val inNaisCluster = System.getenv("NAIS_CLUSTER_NAME") != null
-            val context = LoggerFactory.getILoggerFactory() as? LoggerContext
-            val rootLogger = context?.getLogger(Logger.ROOT_LOGGER_NAME)
-
-            validateTeamlogConfiguration(inNaisCluster, rootLogger)
+            validateTeamlogConfiguration(inNaisCluster, rootLogger())
             return TeamLogLogger(l)
         }
 
-        internal fun validateTeamlogConfiguration(inNaisCluster: Boolean, rootLogger: ch.qos.logback.classic.Logger?) {
-            if (!inNaisCluster) return
+        private fun rootLogger(): ch.qos.logback.classic.Logger { // TODO Ara: Bør være by lazy?
+            val context = LoggerFactory.getILoggerFactory() as? LoggerContext
+                ?: error("TeamLogLogger krever logback-classic som SLF4J-backend")
+            return context.getLogger(Logger.ROOT_LOGGER_NAME)
+        }
 
-            require(hasTeamLogsAppender(rootLogger)) {
+        /**
+         * Validerer at det finnes en logback.xml konfigurasjon for logging til Secure Logs ved å bruke en Marker
+         */
+        internal fun validateTeamlogConfiguration(inNaisCluster: Boolean, rootLogger: ch.qos.logback.classic.Logger) {
+            if (!inNaisCluster) return // Krever ingen Team Logs konfigurasjon når vi ikke kjører i miljø
+
+            require(hasTeamlogsAppender(rootLogger)) {
                 "logback.xml mangler ROOT-appender med navn '$teamlogsAppenderName'. Ingenting kan logges til Team Logs."
             }
-            require(hasTeamLogsMarkerFilterOnRootAppender(rootLogger)) {
+            require(hasTeamlogsMarkerFilterOnRootAppender(rootLogger)) {
                 "logback.xml mangler markerfilter på ROOT-appender '$teamlogsAppenderName': $teamlogsMarkerName. Loggmeldinger (med sensitive data) beregnet til Team Logs kan havne i feil logg."
             }
         }
 
-        internal fun hasTeamLogsAppender(rootLogger: ch.qos.logback.classic.Logger?): Boolean {
+        internal fun hasTeamlogsAppender(rootLogger: ch.qos.logback.classic.Logger): Boolean {
             return rootLogger
-                ?.iteratorForAppenders()
+                .iteratorForAppenders() // TODO Are: Duplisering
                 ?.asSequence()
                 ?.any { it.name == teamlogsAppenderName } == true
         }
 
-        internal fun hasTeamLogsMarkerFilterOnRootAppender(rootLogger: ch.qos.logback.classic.Logger?): Boolean {
+        internal fun hasTeamlogsMarkerFilterOnRootAppender(rootLogger: ch.qos.logback.classic.Logger): Boolean {
             val teamLogsAppender = rootLogger
-                ?.iteratorForAppenders()
+                .iteratorForAppenders() // TODO Are: Duplisering
                 ?.asSequence()
                 ?.firstOrNull { it.name == teamlogsAppenderName }
                 ?: return false
@@ -103,16 +109,18 @@ class TeamLogLogger private constructor(private val l: Logger) {
             val filterAttachable = teamLogsAppender as? FilterAttachable<ILoggingEvent> ?: return false
             return filterAttachable.copyOfAttachedFiltersList
                 .filterIsInstance<EvaluatorFilter<ILoggingEvent>>()
-                .any { evaluatorFilterMatchesTeamLogs(it) }
+                .any { filterMatchesTeamLogs(it) }
         }
 
-        private fun evaluatorFilterMatchesTeamLogs(filter: EvaluatorFilter<ILoggingEvent>): Boolean {
+        private fun filterMatchesTeamLogs(filter: EvaluatorFilter<ILoggingEvent>): Boolean {
             val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return false
             val teamLogsEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker(teamlogsMarkerName)) }
             val otherEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker("NOT_TEAM_LOGS")) }
 
-            val matchesTeamLogs = runCatching { evaluator.evaluate(teamLogsEvent) }.getOrDefault(false)
-            val matchesOther = runCatching { evaluator.evaluate(otherEvent) }.getOrDefault(true)
+            val matchesTeamLogs =
+                runCatching { evaluator.evaluate(teamLogsEvent) }.getOrDefault(false) // Fail-safe: Count as non-match if exception
+            val matchesOther =
+                runCatching { evaluator.evaluate(otherEvent) }.getOrDefault(true) // Fail-open: Count as match if exception
             return matchesTeamLogs && !matchesOther
         }
     }
