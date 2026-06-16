@@ -19,6 +19,51 @@ class SynlighetBehovsLytterTest {
         testDatabase.slettAlt()
     }
 
+
+    @Test
+    fun `Det blir ikke evig loop om man legger på synlighet`() {
+        testProgramMedHendelse("""
+            {
+              "@event_name": "republisert",
+              "aktørId": "1000058142133",
+              "@behov": [
+                "arbeidsmarkedCv",
+                "veileder",
+                "oppfølgingsinformasjon",
+                "siste14avedtak",
+                "sisteOppfølgingsperiode",
+                "kvp",
+                "arbeidssokeropplysninger",
+                "synlighet"
+              ],
+              "arbeidsmarkedCv": null,
+              "veileder": null,
+              "oppfølgingsinformasjon": null,
+              "siste14avedtak": null,
+              "kvp": null,
+              "sisteOppfølgingsperiode": null,
+              "@forårsaket_av": {
+                "id": "c0040997-2fc1-4173-a0aa-eca26c5cd9e9",
+                "opprettet": "2026-06-16T12:00:50.029394731",
+                "event_name": "republisert",
+                "behov": [
+                  "arbeidsmarkedCv",
+                  "veileder",
+                  "oppfølgingsinformasjon",
+                  "siste14avedtak",
+                  "sisteOppfølgingsperiode",
+                  "kvp",
+                  "arbeidssokeropplysninger",
+                  "synlighet"
+                ]
+              },
+              "arbeidssokeropplysninger": null
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+        })
+    }
+
     @Test
     fun `skal ikke reagere på behov som allerede er løst`() {
         testProgramMedBehovHendelse(
