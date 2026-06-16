@@ -11,13 +11,13 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
 
 ## Steg
 
-1. **Utvid [PdlKlient.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/PdlKlient.kt)** med `hentFødselsnummer(aktørId: String): String?`. Spør PDL med `grupper: [FOLKEREGISTERIDENT]`, `historikk: false`. REST-klienten beholdes også etter PR 5 som fallback når `IdentCache` får miss (f.eks. aktørId som ennå ikke har kommet på `pdl-aktor-v2`-topic, eller etter restart før konsumenten har innhentet etterslepet).
+1. **Utvid [PdlKlient.kt](src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/PdlKlient.kt)** med `hentFødselsnummer(aktørId: String): String?`. Spør PDL med `grupper: [FOLKEREGISTERIDENT]`, `historikk: false`. REST-klienten beholdes også etter PR 5 som fallback når `IdentCache` får miss (f.eks. aktørId som ennå ikke har kommet på `pdl-aktor-v2`-topic, eller etter restart før konsumenten har innhentet etterslepet).
 
 2. **Rename `Repository.kt` → `IdentRepository.kt`** (klassenavn `IdentRepository`) og utvid. `identmapping(aktor_id, fnr, cachet_tidspunkt)` gjenbrukes, men det legges inn en DB-migrering som oppretter indeks på `aktor_id` for å støtte nye oppslag på `WHERE aktor_id = ?`.
    - Ny metode `hentIdentMappingerForAktørId(aktørId: String): List<IdentMapping>` (analogt med eksisterende `hentIdentMappinger(fnr)`).
    - Ny metode `lagreFødselsnummer(aktørId: String, fødselsnummer: String?)` som upserter på `(aktor_id, fnr)`: finnes raden allerede → oppdater `cachet_tidspunkt`, ellers insert. Gjenbruker unique constraint `uq_fnr_aktor_id`.
    - Generaliser gjerne eksisterende `lagreAktørId` og den nye til én felles privat upsert-funksjon siden logikken blir symmetrisk.
-   - Oppdater alle referanser i [Application.kt](apps/toi-identmapper/src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/Application.kt) og eksisterende tester.
+   - Oppdater alle referanser i [Application.kt](src/main/kotlin/no/nav/arbeidsgiver/toi/identmapper/Application.kt) og eksisterende tester.
 
 3. **Rename `AktorIdCache.kt` → `IdentCache.kt`** (klassenavn `IdentCache`) og utvid slik at den eksponerer både `hentAktørId(fødselsnummer: String): String?` og `hentFødselsnummer(aktørId: String): String?` med samme cache-først-så-PDL-mønster. Bevar negativ-caching-flagget (`cacheNårAktørIdErNull`) — vurder å gjøre det symmetrisk for begge retninger. Etter PR 5 forblir PDL REST fallback-veien når DB mangler rad; topic-konsumenten reduserer bare hvor ofte fallbacken trenger å kalles.
 
@@ -29,7 +29,7 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
    - Implementer som en precondition i `AktørIdLytter`, f.eks. `requireKey("synlighet")` (eller annet distinkt felt, se Videre vurderinger), slik at kun synlighetsmeldinger berikes.
    - Gjør whitelist-kriteriet konfigurerbart/utvidbart (liste av required-felt) så nye meldingstyper kan legges til uten kodeendring i lytteren.
 
-7. **Tilpass [SynlighetsgrunnlagLytter.kt](apps/toi-synlighetsmotor/src/main/kotlin/no/nav/arbeidsgiver/toi/SynlighetsgrunnlagLytter.kt)** slik at synlighetsmeldingen publiseres selv om fnr mangler — identmapperen vil da ta seg av berikelsen i neste hopp. Dette erstatter behovet for direkte DB-fallback i synlighetsmotor.
+7. **Tilpass [SynlighetsgrunnlagLytter.kt](../toi-synlighetsmotor/src/main/kotlin/no/nav/arbeidsgiver/toi/SynlighetsgrunnlagLytter.kt)** slik at synlighetsmeldingen publiseres selv om fnr mangler — identmapperen vil da ta seg av berikelsen i neste hopp. Dette erstatter behovet for direkte DB-fallback i synlighetsmotor.
 
 8. **Oppdater tester** i `toi-identmapper/src/test`:
    - Repository-test for den nye upserten (insert + oppdatert `cachet_tidspunkt`, ingen duplikater).
@@ -37,11 +37,11 @@ I denne planen navngis komponentene symmetrisk for begge retninger:
    - Lytter-test som verifiserer at synlighetsmelding uten fnr men med aktørId blir beriket, og at andre meldingstyper ignoreres av whitelist.
    - PDL-mock for `hentFødselsnummer`.
 
-9. **Ny PDL-topic-konsument `PdlAktorLytter` som supplement til PDL REST.** Identmapper har allerede avro-skjemaet [AktorV2.avdl](apps/toi-identmapper/src/main/avro/AktorV2.avdl) (namespace `no.nav.person.pdl.aktor.v2`) liggende ubrukt.
-   - Konsumer topic `pdl-aktor-v2` med Avro/Confluent-deserializer (samme mønster som [PDLLytter.kt](apps/toi-livshendelse/src/main/kotlin/no/nav/arbeidsgiver/toi/livshendelser/PDLLytter.kt) i `toi-livshendelse`, som allerede konsumerer `pdl.leesah-v1`).
+9. **Ny PDL-topic-konsument `PdlAktorLytter` som supplement til PDL REST.** Identmapper har allerede avro-skjemaet [AktorV2.avdl](src/main/avro/AktorV2.avdl) (namespace `no.nav.person.pdl.aktor.v2`) liggende ubrukt.
+   - Konsumer topic `pdl-aktor-v2` med Avro/Confluent-deserializer (samme mønster som [PDLLytter.kt](../toi-livshendelse/src/main/kotlin/no/nav/arbeidsgiver/toi/livshendelser/PDLLytter.kt) i `toi-livshendelse`, som allerede konsumerer `pdl.leesah-v1`).
    - For hver `Aktor`-hendelse: plukk `gjeldende` `FOLKEREGISTERIDENT` og `AKTORID` og upsert via `IdentRepository`. Håndter tombstones (slettede aktører) eksplisitt.
    - **Behold `PdlKlient` og `AccessTokenClient`** som fallback-vei i `IdentCache` når DB-oppslaget gir miss (ukjent aktørId, eller etterslep på topic). Topic-konsumenten holder dataene ferske; REST håndterer edge-cases og reduserer avhengigheten av et fullstendig backfill før go-live.
-   - NAIS-manifest ([nais-dev.yaml](apps/toi-identmapper/nais-dev.yaml) / [nais-prod.yaml](apps/toi-identmapper/nais-prod.yaml)): behold `PDL_URL`/`PDL_SCOPE`/Azure-PDL-scope, legg til Kafka-tilgang mot `pdl-aktor-v2` og schema-registry-credentials.
+   - NAIS-manifest ([nais-dev.yaml](nais-dev.yaml) / [nais-prod.yaml](nais-prod.yaml)): behold `PDL_URL`/`PDL_SCOPE`/Azure-PDL-scope, legg til Kafka-tilgang mot `pdl-aktor-v2` og schema-registry-credentials.
    - Tester: mapping `Aktor` → upsert, at ikke-gjeldende identifikatorer ignoreres, tombstone-håndtering, og at REST-fallback kalles når DB mangler raden.
 
 ## Relatert problemstilling: `/evaluering/{fnr}` i synlighetsmotor
