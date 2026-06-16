@@ -27,7 +27,7 @@ class AktørIdLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
-        val aktørId = packet[aktørIdKey].asText()
+        val aktørId = packet[aktørIdKey].asString()
         val fødselsnummer = hentFødselsnummer(aktørId)
 
         if(fødselsnummer == null) {
