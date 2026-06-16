@@ -18,7 +18,7 @@ class TeamLogConfigurationValidationTest {
         val rootLogger = nyRootLogger()
 
         assertThatThrownBy {
-            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = true, rootLogger = rootLogger)
+            TeamLogLogger.validateTeamlogConfiguration(rootLogger)
         }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("logback.xml mangler ROOT-appender")
@@ -27,11 +27,11 @@ class TeamLogConfigurationValidationTest {
     @Test
     fun `bruk av TeamLogLogger avvises når teamlog-appender mangler TEAM_LOGS-filter`() {
         val rootLogger = nyRootLogger().apply {
-            addAppender(nyTeamLogsAppender(context = loggerContext))
+            addAppender(nyTeamLogsAppender(loggerContext))
         }
 
         assertThatThrownBy {
-            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = true, rootLogger = rootLogger)
+            TeamLogLogger.validateTeamlogConfiguration(rootLogger)
         }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("logback.xml mangler markerfilter på ROOT-appender")
@@ -41,23 +41,23 @@ class TeamLogConfigurationValidationTest {
     fun `bruk av TeamLogLogger tillates når teamlog er konfigurert riktig`() {
         val rootLogger = nyRootLogger().apply {
             addAppender(
-                nyTeamLogsAppender(context = loggerContext).apply {
-                    addFilter(nyTeamLogsMarkerFilter(context = loggerContext))
+                nyTeamLogsAppender(loggerContext).apply {
+                    addFilter(nyTeamLogsMarkerFilter(loggerContext))
                 }
             )
         }
 
         assertThatCode {
-            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = true, rootLogger = rootLogger)
+            TeamLogLogger.validateTeamlogConfiguration(rootLogger)
         }.doesNotThrowAnyException()
     }
 
     @Test
-    fun `bruk av TeamLogLogger utenfor nais-cluster tillates uten teamlog-konfigurasjon`() {
-        val rootLogger = nyRootLogger()
+    fun `bruk av TeamLogLogger utenfor Nais-cluster tillates uten teamlog-konfigurasjon`() {
+        val logger = org.slf4j.LoggerFactory.getLogger("test")
 
         assertThatCode {
-            TeamLogLogger.validateTeamlogConfiguration(inNaisCluster = false, rootLogger = rootLogger)
+            TeamLogLogger.teamlog(logger)
         }.doesNotThrowAnyException()
     }
 

@@ -70,8 +70,10 @@ class TeamLogLogger private constructor(private val l: Logger) {
         private val m = MarkerFactory.getMarker(teamlogsMarkerName)
 
         fun teamlog(l: Logger): TeamLogLogger {
-            val inNaisCluster = System.getenv("NAIS_CLUSTER_NAME") != null
-            validateTeamlogConfiguration(inNaisCluster, rootLogger())
+            val isRunningInNaisCluster = System.getenv("NAIS_CLUSTER_NAME") != null
+            if (isRunningInNaisCluster) {
+                validateTeamlogConfiguration(rootLogger())
+            }
             return TeamLogLogger(l)
         }
 
@@ -84,16 +86,14 @@ class TeamLogLogger private constructor(private val l: Logger) {
 
 
         /**
-         * Validerer at det finnes en logback.xml konfigurasjon for logging til Secure Logs ved å bruke en Marker
+         * Validerer at det finnes en logback.xml konfigurasjon med routing til Team Logs.
          */
-        internal fun validateTeamlogConfiguration(inNaisCluster: Boolean, rootLogger: ch.qos.logback.classic.Logger) {
-            if (!inNaisCluster) return // Krever ingen Team Logs konfigurasjon når vi ikke kjører i miljø
-
+        internal fun validateTeamlogConfiguration(rootLogger: ch.qos.logback.classic.Logger) {
             require(hasTeamlogsAppender(rootLogger)) {
-                "logback.xml mangler ROOT-appender med navn '$teamlogsAppenderName'. Ingenting kan logges til Team Logs."
+                "Kan ikke logge til Team Logs. logback.xml mangler ROOT-appender med navn '$teamlogsAppenderName'."
             }
             require(hasTeamlogsMarkerFilterOnRootAppender(rootLogger)) {
-                "logback.xml mangler markerfilter på ROOT-appender '$teamlogsAppenderName': $teamlogsMarkerName. Loggmeldinger (med sensitive data) beregnet til Team Logs kan havne i feil logg."
+                "Loggmeldinger med potensielt sensitive data beregnet til Team Logs kan havne i feil logg. logback.xml mangler markerfilter på ROOT-appender '$teamlogsAppenderName'. Forventet marker-navn: $teamlogsMarkerName."
             }
         }
 
@@ -124,7 +124,7 @@ class TeamLogLogger private constructor(private val l: Logger) {
             val otherEvent = LoggingEvent().apply { addMarker(MarkerFactory.getMarker("NOT_TEAM_LOGS")) }
 
             val matchesTeamLogs =
-                runCatching { evaluator.evaluate(teamLogsEvent) }.getOrDefault(false) // Fail-safe: Count as non-match if exception
+                runCatching { evaluator.evaluate(teamLogsEvent) }.getOrDefault(false) // Fail-close: Count as non-match if exception
             val matchesOther =
                 runCatching { evaluator.evaluate(otherEvent) }.getOrDefault(true) // Fail-open: Count as match if exception
             return matchesTeamLogs && !matchesOther

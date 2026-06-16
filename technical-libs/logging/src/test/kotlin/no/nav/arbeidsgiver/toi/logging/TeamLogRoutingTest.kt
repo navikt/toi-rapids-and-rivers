@@ -8,6 +8,7 @@ import ch.qos.logback.core.AppenderBase
 import ch.qos.logback.core.filter.EvaluatorFilter
 import ch.qos.logback.core.spi.FilterReply
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 
 class TeamLogRoutingTest {
@@ -46,6 +47,16 @@ class TeamLogRoutingTest {
         logger.info("ikke-sensitiv info")
 
         assertThat(teamLogAppender.events).isEmpty()
+    }
+
+    @Test
+    fun `utenfor Nais-cluster logges teamlog-melding til ordinær applogg`() {
+        assumeTrue(System.getenv("NAIS_CLUSTER_NAME") == null, "Testen gjelder kun utenfor NAIS-cluster")
+        val (logger, ordinaryAppender) = nyLoggerMedKunOrdinæAppender()
+
+        TeamLogLogger.teamlog(logger).info("sensitiv info")
+
+        assertThat(ordinaryAppender.events.map { it.formattedMessage }).containsExactly("sensitiv info")
     }
 
     private fun nyLoggerMedAppenderoppsett(): Triple<Logger, InMemoryAppender, InMemoryAppender> {
@@ -99,5 +110,18 @@ class TeamLogRoutingTest {
         override fun append(eventObject: ILoggingEvent) {
             events.add(eventObject)
         }
+    }
+
+    private fun nyLoggerMedKunOrdinæAppender(): Pair<Logger, InMemoryAppender> {
+        val context = LoggerContext()
+        val ordinaryAppender = InMemoryAppender("ordinary-app-log", context)
+
+        val logger = context.getLogger(this::class.java)
+        logger.level = ch.qos.logback.classic.Level.INFO
+        logger.detachAndStopAllAppenders()
+        logger.isAdditive = false
+        logger.addAppender(ordinaryAppender)
+
+        return Pair(logger, ordinaryAppender)
     }
 }
