@@ -1,5 +1,9 @@
 plugins {
-    id("toi.rapids-and-rivers")
+    id("toi.rapids-and-rivers-deprekert-jackson2")
+}
+
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.kandidat.indekser.ApplicationKt")
 }
 
 val pamAnsettelseskodeverkVersion = "1.18"

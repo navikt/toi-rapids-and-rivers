@@ -29,13 +29,20 @@ class CvLytterTest {
         produserCvMelding(consumer, melding)
         cvLytter.onReady(rapid)
 
-        Thread.sleep(800)
-        val inspektør = rapid.inspektør
+        var inspektør: TestRapid.RapidInspector
+        val startTime = Instant.now()
+        do {
+            inspektør = rapid.inspektør
+            Thread.sleep(50)
+            if(Instant.now().isAfter(startTime.plusSeconds(30))) {
+                throw AssertionError("Forventet at minst 1 melding skulle være publisert på rapid innen et halvt minutt")
+            }
+        }while (inspektør.size < 1)
         Assertions.assertThat(inspektør.size).isEqualTo(1)
 
         val meldingJson = inspektør.message(0)
 
-        Assertions.assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        Assertions.assertThat(meldingJson.propertyNames().asSequence().toList()).containsExactlyInAnyOrder(
             "@event_name",
             "arbeidsmarkedCv",
             "aktørId",

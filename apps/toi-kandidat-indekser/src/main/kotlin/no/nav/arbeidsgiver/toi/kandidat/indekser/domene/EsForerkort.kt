@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.Objects
@@ -46,8 +47,8 @@ class EsForerkort(
         fun fraMelding(cvNode: JsonNode): List<EsForerkort> {
             return cvNode["foererkort"]["klasse"].map { forerkortNode ->
                 EsForerkort(
-                    fraDato = forerkortNode["fraTidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate().atStartOfDay().atZone(ZoneId.of("Europe/Oslo")).toOffsetDateTime() },
-                    tilDato = forerkortNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate().atStartOfDay().atZone(ZoneId.of("Europe/Oslo")).toOffsetDateTime() },
+                    fraDato = forerkortNode["fraTidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate().atStartOfDay().atZone(ZoneId.of("Europe/Oslo")).toOffsetDateTime() },
+                    tilDato = forerkortNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate().atStartOfDay().atZone(ZoneId.of("Europe/Oslo")).toOffsetDateTime() },
                     klasse = forerkortNode["klasse"].asText(null),
                     klassebeskrivelse = forerkortNode["klasseBeskrivelse"].asText(),
                 )

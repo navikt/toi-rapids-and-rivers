@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 
 /**
@@ -11,7 +11,7 @@ fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )
@@ -27,7 +27,7 @@ fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String
  * @return true hvis behovet ble lagt til, false hvis det allerede eksisterte
  */
 fun JsonMessage.leggTilBehov(behov: String): Boolean {
-    val eksisterendeBehov = this["@behov"].map(JsonNode::asText)
+    val eksisterendeBehov = this["@behov"].toList().map(JsonNode::asString)
     this["@behov"] = (listOf(behov) + (eksisterendeBehov.distinct()-behov))
     return true
 }

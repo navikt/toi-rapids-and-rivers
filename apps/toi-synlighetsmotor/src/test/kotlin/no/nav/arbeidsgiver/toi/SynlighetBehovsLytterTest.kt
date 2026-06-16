@@ -47,7 +47,7 @@ class SynlighetBehovsLytterTest {
         ) {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding["@behov"].map { it.asText() }).containsExactly(
+            assertThat(melding["@behov"].toList().map { it.asString() }).containsExactly(
                 "arbeidsmarkedCv",
                 "veileder",
                 "oppfølgingsinformasjon",

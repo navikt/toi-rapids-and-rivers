@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Objects
@@ -25,8 +26,8 @@ class EsGodkjenning(
             EsGodkjenning(
                 tittel = godkjenning["tittel"].asText(),
                 utsteder = godkjenning["utsteder"].asText(),
-                gjennomfoert = godkjenning["gjennomfoert"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
-                utloeper = godkjenning["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyyMMddTilLocalDate() },
+                gjennomfoert = godkjenning["gjennomfoert"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
+                utloeper = godkjenning["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
                 konseptId = godkjenning["konseptId"].asText(null),
             )
         }

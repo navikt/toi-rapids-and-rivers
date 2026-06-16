@@ -22,7 +22,7 @@ class SisteOppfolgingsperiodeBehovsLytterTest {
         val inspektør = rapid.inspektør
         assert(inspektør.size == 1)
         val mottattMelding = inspektør.message(0)
-        assert(mottattMelding["sisteOppfølgingsperiode"]["test"].asText() == "melding")
+        assert(mottattMelding["sisteOppfølgingsperiode"]["test"].asString() == "melding")
     }
 
     @Test

@@ -1,6 +1,10 @@
 plugins {
-    id("toi.rapids-and-rivers")
+    id("toi.rapids-and-rivers-deprekert-jackson2")
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
+}
+
+application {
+    mainClass.set("no.nav.toi.stilling.indekser.ApplicationKt")
 }
 
 dependencies {

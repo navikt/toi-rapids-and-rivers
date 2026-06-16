@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.NullNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.NullNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -33,7 +33,7 @@ class SisteOppfolgingsperiodeBehovsLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørid: String = packet["aktørId"].asText()
+        val aktørid: String = packet["aktørId"].asString()
 
         packet["sisteOppfølgingsperiode"] = meldingPerAktørid(aktørid)?.let(objectMapper::readTree) ?: NullNode.instance
 
@@ -45,7 +45,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

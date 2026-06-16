@@ -34,7 +34,7 @@ class StillingSlettetLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val stillingsId = UUID.fromString(packet["stillingsId"].asText())
+        val stillingsId = UUID.fromString(packet["stillingsId"].asString())
 
         notifikasjonKlient.slettSak(stillingsId)
     }

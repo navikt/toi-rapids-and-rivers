@@ -41,9 +41,9 @@ class CvLytter(
                         val cvMeldinger = records.map { behandleCv(it.value()) }
 
                         cvMeldinger.forEach {
+                            rapidsConnection.publish(it.aktørId, it.somJson())
                             log.info("Publiserer arbeidsmarkedCv for aktør på rapid, se securelog for aktørid")
                             secureLog.info("Publiserer arbeidsmarkedCv for ${it.aktørId} på rapid")
-                            rapidsConnection.publish(it.aktørId, it.somJson())
                         }
                         it.commitSync()
                     } catch (e: RetriableException) {

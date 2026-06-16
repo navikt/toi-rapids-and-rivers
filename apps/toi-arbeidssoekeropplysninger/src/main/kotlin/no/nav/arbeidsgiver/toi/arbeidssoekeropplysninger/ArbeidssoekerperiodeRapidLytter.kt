@@ -1,16 +1,17 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import tools.jackson.databind.cfg.EnumFeature
 
 /**
  * Lytter på rapiden etter arbeidssøkerperioder publisert av toi.arbeidssoekerperiode
@@ -19,10 +20,11 @@ import io.micrometer.core.instrument.MeterRegistry
  */
 class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository) : River.PacketListener {
     companion object {
-        private val jacksonMapper = jacksonObjectMapper()
-            .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+        private val jacksonMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .registerModule(JavaTimeModule())
+            .build()
     }
 
     init {

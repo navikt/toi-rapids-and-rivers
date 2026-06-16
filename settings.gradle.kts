@@ -1,5 +1,8 @@
 rootProject.name = "toi-rapids-and-rivers"
 
+// https://docs.gradle.org/current/userguide/configuration_cache_enabling.html#config_cache:stable
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+
 include(
     "apps:toi-arbeidsmarked-cv",
     "apps:toi-veileder",
@@ -25,6 +28,7 @@ include(
     "apps:toi-stilling-indekser",
     "apps:toi-publiser-dir-stillinger",
     "technical-libs:testrapid",
+    "technical-libs:testrapid-jackson2-deprekert",
     "apps:toi-kandidat-indekser",
     "apps:toi-geografi"
 )
