@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi.identmapper
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.fail
 
 class AktørIdLytterTest {
