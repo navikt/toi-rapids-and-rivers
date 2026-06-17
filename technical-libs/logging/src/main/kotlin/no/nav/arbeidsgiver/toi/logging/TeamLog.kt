@@ -165,25 +165,23 @@ class TeamLogLogger private constructor(private val l: Logger) {
             fun firstDecisiveReplyForTeamlogsMarker(appender: Appender<ILoggingEvent?>): FilterReply? =
                 appender.copyOfAttachedFiltersList
                     .filterIsInstance<EvaluatorFilter<*>>()
-                    .asSequence()
-                    .mapNotNull(::filterDecisionForTeamlogsMarker)
-                    .firstOrNull()
+                    .firstNotNullOfOrNull(::filterDecisionForTeamlogsMarker)
 
             fun appenderDeniesTeamlogsMarker(appender: Appender<ILoggingEvent?>): Boolean =
                 firstDecisiveReplyForTeamlogsMarker(appender) == FilterReply.DENY
 
-            return rootAppenders(rootLogger)
+            return appenders(rootLogger)
                 .filter(::isNonTeamlogsAppender)
                 .all(::appenderDeniesTeamlogsMarker)
         }
 
 
         private fun teamlogsAppender(logger: ch.qos.logback.classic.Logger): Appender<ILoggingEvent?>? =
-            rootAppenders(logger).firstOrNull { it.name == teamlogsAppenderName }
+            appenders(logger).firstOrNull { it.name == teamlogsAppenderName }
 
 
-        private fun rootAppenders(logger: ch.qos.logback.classic.Logger): Sequence<Appender<ILoggingEvent?>> =
-            logger.iteratorForAppenders()?.asSequence() ?: emptySequence()
+        private fun appenders(logger: ch.qos.logback.classic.Logger): List<Appender<ILoggingEvent?>> =
+            logger.iteratorForAppenders()?.asSequence()?.toList() ?: emptyList()
 
 
         private fun filterAcceptsOnlyTeamLogs(filter: EvaluatorFilter<*>): Boolean {
