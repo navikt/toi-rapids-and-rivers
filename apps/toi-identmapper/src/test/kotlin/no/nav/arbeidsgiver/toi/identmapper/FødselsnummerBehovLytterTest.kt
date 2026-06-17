@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
-class AktørIdLytterTest {
+class FødselsnummerBehovLytterTest {
     @Test
     fun `legg på fnr om første behov er fødselsnummer`() {
         val testRapid = TestRapid()
