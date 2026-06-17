@@ -12,6 +12,7 @@ class FødselsnummerBehovLytterTest {
         val testRapid = TestRapid()
         val fnr = "9876543210"
         FødselsnummerBehovLytter(testRapid, "test") { fnr }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(behovsMelding(behovListe = """["fodselsnummer"]"""))
 
@@ -34,6 +35,7 @@ class FødselsnummerBehovLytterTest {
     fun `ikke legg på svar om det finnes andre behov før fødselsnummer som ikke er løst`() {
         val testRapid = TestRapid()
         FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -51,6 +53,7 @@ class FødselsnummerBehovLytterTest {
         val testRapid = TestRapid()
         val fnr = "987654321"
         FødselsnummerBehovLytter(testRapid, "test") { fnr }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -72,6 +75,7 @@ class FødselsnummerBehovLytterTest {
         val testRapid = TestRapid()
         val fnr = "987654321"
         FødselsnummerBehovLytter(testRapid, "test") { fnr }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -92,6 +96,7 @@ class FødselsnummerBehovLytterTest {
     fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
         val testRapid = TestRapid()
         FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -109,6 +114,7 @@ class FødselsnummerBehovLytterTest {
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()
         FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
 
@@ -121,6 +127,7 @@ class FødselsnummerBehovLytterTest {
     fun `ikke legg på svar om svar allerede er lagt på`() {
         val testRapid = TestRapid()
         FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        AktørIdPopulator("fodselsnummer", testRapid, "test") { fail("AktørIdPopulator skal ikke trigges") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -138,6 +145,7 @@ class FødselsnummerBehovLytterTest {
     fun `publiserer null som svar når PDL ikke finner fødselsnummer i dev-gcp`() {
         val rapid = TestRapid()
         FødselsnummerBehovLytter(rapid, "dev-gcp") { null }
+        AktørIdPopulator("fodselsnummer", rapid, "dev-gcp") { fail("AktørIdPopulator skal ikke trigges") }
 
         rapid.sendTestMessage(
             behovsMelding(
@@ -154,6 +162,7 @@ class FødselsnummerBehovLytterTest {
     fun `kaster feil når PDL ikke finner fødselsnummer i prod-gcp`() {
         val rapid = TestRapid()
         FødselsnummerBehovLytter(rapid, "prod-gcp") { null }
+        AktørIdPopulator("fodselsnummer", rapid, "prod-gcp") { fail("AktørIdPopulator skal ikke trigges") }
 
         assertThrows<IllegalStateException> {
             rapid.sendTestMessage(

@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
 class IdentMapperTest {
@@ -14,6 +15,7 @@ class IdentMapperTest {
         val aktørId = "123456789"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -49,6 +51,7 @@ class IdentMapperTest {
         val aktørId = "123456789"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -66,6 +69,7 @@ class IdentMapperTest {
         val aktørId = "123456789"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -81,6 +85,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnummer"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { null }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, "123"))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -93,6 +98,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnummer"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -105,6 +111,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnummer"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -117,6 +124,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnummer"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -129,6 +137,7 @@ class IdentMapperTest {
         val fødselsnummerKey = "fodselsnummer"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
