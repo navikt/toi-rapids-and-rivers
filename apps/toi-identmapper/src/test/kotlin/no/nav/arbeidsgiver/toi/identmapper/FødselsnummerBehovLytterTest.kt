@@ -4,6 +4,7 @@ import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class FødselsnummerBehovLytterTest {
     @Test
@@ -12,16 +13,16 @@ class FødselsnummerBehovLytterTest {
         val fnr = "9876543210"
         FødselsnummerBehovLytter(testRapid, "test") { fnr }
 
-        testRapid.sendTestMessage(behovsMelding(behovListe = """["fødselsnummer"]"""))
+        testRapid.sendTestMessage(behovsMelding(behovListe = """["fodselsnummer"]"""))
 
         val inspektør = testRapid.inspektør
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["fødselsnummer"].asString()).isEqualTo(fnr)
+        assertThat(melding["fodselsnummer"].asString()).isEqualTo(fnr)
     }
 
-    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList(),) = """
+    private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList()) = """
         {
             "aktørId":"123",
             "@behov":$behovListe
@@ -36,7 +37,7 @@ class FødselsnummerBehovLytterTest {
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["noeannet", "fødselsnummer"]"""
+                behovListe = """["noeannet", "fodselsnummer"]"""
             )
         )
 
@@ -53,7 +54,7 @@ class FødselsnummerBehovLytterTest {
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["noeannet", "fødselsnummer"]""",
+                behovListe = """["noeannet", "fodselsnummer"]""",
                 løsninger = listOf("noeannet" to """{"noeannetsvar": 123}""")
             )
         )
@@ -62,7 +63,7 @@ class FødselsnummerBehovLytterTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["fødselsnummer"].asString()).isEqualTo(fnr)
+        assertThat(melding["fodselsnummer"].asString()).isEqualTo(fnr)
         assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
@@ -74,7 +75,7 @@ class FødselsnummerBehovLytterTest {
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["noeannet", "fødselsnummer"]""",
+                behovListe = """["noeannet", "fodselsnummer"]""",
                 løsninger = listOf("noeannet" to "null")
             )
         )
@@ -83,7 +84,7 @@ class FødselsnummerBehovLytterTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["fødselsnummer"].asString()).isEqualTo(fnr)
+        assertThat(melding["fodselsnummer"].asString()).isEqualTo(fnr)
         assertThat(melding["noeannet"].isNull).isTrue
     }
 
@@ -94,8 +95,8 @@ class FødselsnummerBehovLytterTest {
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["fødselsnummer"]""",
-                løsninger = listOf("fødselsnummer" to "null")
+                behovListe = """["fodselsnummer"]""",
+                løsninger = listOf("fodselsnummer" to "null")
             )
         )
 
@@ -123,8 +124,8 @@ class FødselsnummerBehovLytterTest {
 
         testRapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["fødselsnummer"]""",
-                løsninger = listOf("fødselsnummer" to """"svar"""")
+                behovListe = """["fodselsnummer"]""",
+                løsninger = listOf("fodselsnummer" to """"svar"""")
             )
         )
 
@@ -134,19 +135,34 @@ class FødselsnummerBehovLytterTest {
     }
 
     @Test
-    fun `publiserer null som svar når PDL ikke finner fødselsnummer`() {
+    fun `publiserer null som svar når PDL ikke finner fødselsnummer i dev-gcp`() {
         val rapid = TestRapid()
-        FødselsnummerBehovLytter(rapid, "test") { null }
+        FødselsnummerBehovLytter(rapid, "dev-gcp") { null }
 
         rapid.sendTestMessage(
             behovsMelding(
-                behovListe = """["fødselsnummer"]"""
+                behovListe = """["fodselsnummer"]"""
             )
         )
 
         assertThat(rapid.inspektør.size).isEqualTo(1)
         val melding = rapid.inspektør.message(0)
-        assertThat(melding["fødselsnummer"].isNull).isTrue
+        assertThat(melding["fodselsnummer"].isNull).isTrue
+    }
+
+    @Test
+    fun `kaster feil når PDL ikke finner fødselsnummer i prod-gcp`() {
+        val rapid = TestRapid()
+        FødselsnummerBehovLytter(rapid, "prod-gcp") { null }
+
+        assertThrows<IllegalStateException> {
+            rapid.sendTestMessage(
+                behovsMelding(
+                    behovListe = """["fodselsnummer"]"""
+                )
+            )
+        }
+
+        assertThat(rapid.inspektør.size).isEqualTo(0)
     }
 }
-
