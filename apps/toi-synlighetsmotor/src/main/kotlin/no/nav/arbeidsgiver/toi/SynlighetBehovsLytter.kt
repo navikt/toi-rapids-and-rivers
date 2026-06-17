@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import tools.jackson.databind.JsonNode
 
 private const val synlighetBehov = "synlighet"
 
@@ -30,6 +31,11 @@ class SynlighetBehovsLytter(
             precondition {
                 it.demandAtFørstkommendeUløsteBehovEr(synlighetBehov)
                 it.forbid(*requiredFieldsSynlighetsbehovUntattadressebeskyttelse().toTypedArray())
+                it.require("@behov") { behov ->
+                    if(!requiredFieldsSynlighetsbehovUntattadressebeskyttelse().any {
+                        it !in behov.toList<JsonNode>().map<JsonNode, String> { it.asString() }
+                    }) throw Exception("Ikke les melding der behov allerede er bedt om")
+                }
             }
             validate {
                 it.requireKey("aktørId")

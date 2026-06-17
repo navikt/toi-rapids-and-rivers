@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-import TestDatabase
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
