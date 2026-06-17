@@ -13,34 +13,41 @@ repositories {
     maven("https://packages.confluent.io/maven/")
 }
 
+val slf4jVersion = "2.0.18"
+val logbackVersion = "1.5.23"
+val logstashLogbackEncoderVersion = "9.0"
+val junitJupiterVersion = "5.9.1"
+val junitPlatformVersion = "1.9.1"
+val assertjVersion = "3.23.1"
+
 dependencies {
     constraints {
         // Alternativer til require er strictly og preferred.
         // Se https://docs.gradle.org/current/userguide/dependency_versions.html#sec:rich-version-constraints
 
         implementation("org.slf4j:slf4j-api") {
-            version { require("2.0.18") }
+            version { require(slf4jVersion) }
         }
         implementation("ch.qos.logback:logback-classic") {
-            version { require("1.5.23") }
+            version { require(logbackVersion) }
         }
         implementation("net.logstash.logback:logstash-logback-encoder") {
-            version { require("9.0") }
+            version { require(logstashLogbackEncoderVersion) }
         }
         testImplementation("org.junit.jupiter:junit-jupiter-api") {
-            version { require("5.9.1") }
+            version { require(junitJupiterVersion) }
         }
         testImplementation("org.junit.jupiter:junit-jupiter-params") {
-            version { require("5.9.1") }
+            version { require(junitJupiterVersion) }
         }
         testImplementation("org.assertj:assertj-core") {
-            version { require("3.23.1") }
+            version { require(assertjVersion) }
         }
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine") {
-            version { require("5.9.1") }
+            version { require(junitJupiterVersion) }
         }
         testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
-            version { require("1.9.1") }
+            version { require(junitPlatformVersion) }
         }
     }
 

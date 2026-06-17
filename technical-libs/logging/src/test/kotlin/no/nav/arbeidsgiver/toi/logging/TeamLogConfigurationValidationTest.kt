@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsAppenderN
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsMarkerName
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 
@@ -56,6 +57,7 @@ class TeamLogConfigurationValidationTest {
 
     @Test
     fun `bruk av TeamLogLogger utenfor Nais-cluster tillates uten teamlog-konfigurasjon`() {
+        assumeTrue(System.getenv("NAIS_CLUSTER_NAME") == null, "Testen gjelder kun utenfor NAIS-cluster")
         val logger = org.slf4j.LoggerFactory.getLogger("test")
 
         assertThatCode {
