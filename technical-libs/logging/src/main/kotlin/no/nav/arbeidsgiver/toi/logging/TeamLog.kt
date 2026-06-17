@@ -152,11 +152,11 @@ class TeamLogLogger private constructor(private val l: Logger) {
             fun isNonTeamlogsAppender(appender: Appender<ILoggingEvent?>): Boolean =
                 appender.name != teamlogsAppenderName
 
-            fun firstDecisiveReplyForTeamlogsMarker(appender: Appender<ILoggingEvent?>): FilterReply? =
-                filters(appender).map { decisionForMarker(it, teamlogsMarkerName) }.firstOrNull()
+            fun firstApplicableDecisionForTeamlogsMarker(appender: Appender<ILoggingEvent?>): FilterReply? =
+                filters(appender).firstNotNullOfOrNull { decisionForMarker(it, teamlogsMarkerName) }
 
             fun appenderDeniesTeamlogsMarker(appender: Appender<ILoggingEvent?>): Boolean =
-                firstDecisiveReplyForTeamlogsMarker(appender) == DENY
+                firstApplicableDecisionForTeamlogsMarker(appender) == DENY
 
             return appenders(rootLogger).filter(::isNonTeamlogsAppender).all(::appenderDeniesTeamlogsMarker)
         }
@@ -177,10 +177,10 @@ class TeamLogLogger private constructor(private val l: Logger) {
             appender.copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
 
 
-        private fun decisionForMarker(filter: EvaluatorFilter<*>, markerName: String): FilterReply {
-            val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return FilterReply.NEUTRAL
+        private fun decisionForMarker(filter: EvaluatorFilter<*>, markerName: String): FilterReply? {
+            val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return null
             val event = LoggingEvent().apply { addMarker(MarkerFactory.getMarker(markerName)) }
-            val isMatch = runCatching { evaluator.evaluate(event) }.getOrNull() ?: return FilterReply.NEUTRAL
+            val isMatch = runCatching { evaluator.evaluate(event) }.getOrNull() ?: return null
             return if (isMatch) filter.onMatch else filter.onMismatch
         }
     }
