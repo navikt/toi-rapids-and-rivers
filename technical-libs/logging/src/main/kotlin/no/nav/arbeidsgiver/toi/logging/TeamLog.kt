@@ -154,13 +154,27 @@ class TeamLogLogger private constructor(private val l: Logger) {
 
 
         internal fun allNonTeamlogsAppendersDenyTeamlogsMarker(rootLogger: ch.qos.logback.classic.Logger): Boolean {
+            fun isNonTeamlogsAppender(appender: Appender<ILoggingEvent?>): Boolean =
+                appender.name != teamlogsAppenderName
+
+            fun filterDecisionForTeamlogsMarker(filter: EvaluatorFilter<*>): FilterReply? {
+                val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return null
+                return filterDecisionForMarker(filter, evaluator, teamlogsMarkerName)
+            }
+
+            fun firstDecisiveReplyForTeamlogsMarker(appender: Appender<ILoggingEvent?>): FilterReply? =
+                appender.copyOfAttachedFiltersList
+                    .filterIsInstance<EvaluatorFilter<*>>()
+                    .asSequence()
+                    .mapNotNull(::filterDecisionForTeamlogsMarker)
+                    .firstOrNull()
+
+            fun appenderDeniesTeamlogsMarker(appender: Appender<ILoggingEvent?>): Boolean =
+                firstDecisiveReplyForTeamlogsMarker(appender) == FilterReply.DENY
+
             return rootAppenders(rootLogger)
-                .filter { it.name != teamlogsAppenderName }
-                .all { appender ->
-                    appender.copyOfAttachedFiltersList
-                        .filterIsInstance<EvaluatorFilter<*>>()
-                        .any { filterDeniesTeamLogs(it) }
-                }
+                .filter(::isNonTeamlogsAppender)
+                .all(::appenderDeniesTeamlogsMarker)
         }
 
 
@@ -177,12 +191,6 @@ class TeamLogLogger private constructor(private val l: Logger) {
             val replyForTeamLogs = filterDecisionForMarker(filter, evaluator, teamlogsMarkerName) ?: return false
             val replyForOtherMarkers = filterDecisionForMarker(filter, evaluator, "NOT_TEAM_LOGS") ?: return false
             return replyForTeamLogs == FilterReply.ACCEPT && replyForOtherMarkers == FilterReply.DENY
-        }
-
-
-        private fun filterDeniesTeamLogs(filter: EvaluatorFilter<*>): Boolean {
-            val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return false
-            return filterDecisionForMarker(filter, evaluator, teamlogsMarkerName) == FilterReply.DENY
         }
 
 
