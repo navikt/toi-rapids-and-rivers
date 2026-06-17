@@ -19,7 +19,8 @@ fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
     "sisteOppfølgingsperiode",
     "kvp",
-    "arbeidssokeropplysninger"
+    "arbeidssokeropplysninger",
+    "fodselsnummer"
 )
 
 private const val adressebeskyttelseFelt = "adressebeskyttelse"
@@ -55,21 +56,20 @@ class SynlighetsgrunnlagLytter(
         val synlighetsevaluering = kandidat.toEvaluering()
 
         if (synlighetsevaluering.erFerdigBeregnet) {
-            packet["synlighet"] = synlighetsevaluering.somSynlighet()
-            val fødselsnummer = kandidat.fødselsNummer()
-            if (fødselsnummer != null) {
-                packet["fodselsnummer"] = fødselsnummer
+            val fødselsnummer = packet["fodselsnummer"]
+            if(!fødselsnummer.isMissingNode) {
+                packet["synlighet"] = synlighetsevaluering.somSynlighet()
+                repository.lagre(
+                    evaluering = synlighetsevaluering,
+                    aktørId = kandidat.aktørId,
+                    fødselsnummer = fødselsnummer.stringValue(),
+                )
+                rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
-            repository.lagre(
-                evaluering = synlighetsevaluering,
-                aktørId = kandidat.aktørId,
-                fødselsnummer = fødselsnummer
-            )
-            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
             val behov = packet["@behov"].toList().map(JsonNode::asString)
             if (behov.containsAll(requiredFields)) {
-                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
+                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && !packet["fodselsnummer"].isMissingNode && adressebeskyttelseFelt !in behov) {
                     val extraBehov = listOf(adressebeskyttelseFelt)
                     packet["@behov"] = (extraBehov + behov).distinct()
                     rapidsConnection.publish(kandidat.aktørId, packet.toJson())

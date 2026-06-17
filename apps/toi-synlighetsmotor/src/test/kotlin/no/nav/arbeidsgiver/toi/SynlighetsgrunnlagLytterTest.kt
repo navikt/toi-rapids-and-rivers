@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.toi.Testdata.Companion.aktivSisteOppfølgingsperiode
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidsmarkedCv
 import no.nav.arbeidsgiver.toi.Testdata.Companion.arbeidssøkeropplysninger
 import no.nav.arbeidsgiver.toi.Testdata.Companion.avsluttetSisteOppfølgingsperiode
+import no.nav.arbeidsgiver.toi.Testdata.Companion.fødselsnummer
 import no.nav.arbeidsgiver.toi.Testdata.Companion.kvp
 import no.nav.arbeidsgiver.toi.Testdata.Companion.oppfølgingsinformasjon
 import org.assertj.core.api.Assertions.assertThat
@@ -27,14 +28,15 @@ class SynlighetsgrunnlagLytterTest {
         OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
         ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
-        SISTE_OPPFØLGINGSPERIODE("sisteOppfølgingsperiode", aktivSisteOppfølgingsperiode(), avsluttetSisteOppfølgingsperiode()),
+        SISTE_OPPFØLGINGSPERIODE("sisteOppfølgingsperiode", aktivSisteOppfølgingsperiode(), avsluttetSisteOppfølgingsperiode())
     }
 
     private val adressebeskyttelseFeltNavn = "adressebeskyttelse"
     private val adressebeskyttelseSynlig = adressebeskyttelse("UGRADERT")
     private val adressebeskyttelseIkkeSynlig = adressebeskyttelse("STRENGT_FORTROLIG")
+    private val fødselsnummerSvar = """"fodselsnummer": "12345678910""""
 
-    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak"
+    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak" + "fodselsnummer"
 
     @ParameterizedTest
     @MethodSource("felter")
@@ -144,6 +146,7 @@ class SynlighetsgrunnlagLytterTest {
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 ${oppfølgingsinformasjon(diskresjonskode = "6")},
                 $adressebeskyttelseIkkeSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -171,6 +174,7 @@ class SynlighetsgrunnlagLytterTest {
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
                 $adressebeskyttelseIkkeSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -197,6 +201,7 @@ class SynlighetsgrunnlagLytterTest {
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 ${oppfølgingsinformasjon(diskresjonskode = "6")},
                 $adressebeskyttelseSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -223,6 +228,7 @@ class SynlighetsgrunnlagLytterTest {
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
                 $adressebeskyttelseSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -240,12 +246,27 @@ class SynlighetsgrunnlagLytterTest {
     }
 
     @Test
+    fun `Om man har fått alt utenom adressebeskyttelse og fødselsnummer, og evalueringen så langt er synlig, skal man vente på fødselsnummer før man ber om adressebeskyttelse`() {
+        val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
+
+    @Test
     fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er synlig, skal man be om adressebeskyttelse`() {
         val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -266,6 +287,7 @@ class SynlighetsgrunnlagLytterTest {
             {
                 "aktørId": "$aktørId",
                 "@behov": ${(alleFelter+"synlighet").joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -286,6 +308,7 @@ class SynlighetsgrunnlagLytterTest {
             {
                 "aktørId": "$aktørId",
                 "@behov": ${(alleFelter+adressebeskyttelseFeltNavn).joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -302,6 +325,7 @@ class SynlighetsgrunnlagLytterTest {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
                 $alleFelterUntattEttSattTilÅGiSynligTrue,
+                $fødselsnummerSvar,
                 ${felt.skalGiSynligFalse}
             }
         """.trimIndent(), {
@@ -355,6 +379,22 @@ class SynlighetsgrunnlagLytterTest {
             {
                 "aktørId": "$aktørId",
                 "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
+
+    @Test
+    fun `om man får en melding med alle felter unntatt fodselsnummer utfylt så skal synlighetsmotor vente til man har fått svar på fodselsnummer også`() {
+        val alleFelterSattTilÅGiSynligTrue = Felt.entries.joinToString(transform = Felt::skalGiSynligTrue)
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                $adressebeskyttelseSynlig,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
