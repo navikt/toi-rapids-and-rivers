@@ -7,6 +7,8 @@ import ch.qos.logback.classic.spi.LoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.filter.EvaluatorFilter
 import ch.qos.logback.core.spi.FilterReply
+import ch.qos.logback.core.spi.FilterReply.ACCEPT
+import ch.qos.logback.core.spi.FilterReply.DENY
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
@@ -117,21 +119,14 @@ class TeamLogLogger private constructor(private val l: Logger) {
         }
 
 
-        private fun rootLogger(): ch.qos.logback.classic.Logger {
-            val context = LoggerFactory.getILoggerFactory() as? LoggerContext
-                ?: error("TeamLogLogger krever logback-classic som SLF4J-backend")
-            return context.getLogger(Logger.ROOT_LOGGER_NAME)
-        }
-
-
         /**
          * Validerer at det finnes en logback.xml konfigurasjon med routing til Team Logs.
          */
         internal fun validateTeamlogConfiguration(rootLogger: ch.qos.logback.classic.Logger) {
-            require(hasTeamlogsAppender(rootLogger)) {
+            val teamlogsAppender = requireNotNull(teamlogsAppender(rootLogger)) {
                 "Kan ikke logge til Team Logs. logback.xml mangler ROOT-appender med navn '$teamlogsAppenderName'."
             }
-            require(hasTeamlogsMarkerFilterOnRootAppender(rootLogger)) {
+            require(hasTeamlogsMarkerFilter(teamlogsAppender)) {
                 "Loggmeldinger med potensielt sensitive data beregnet til Team Logs kan havne i feil logg. logback.xml mangler markerfilter på ROOT-appender '$teamlogsAppenderName'. Forventet marker-navn: '$teamlogsMarkerName'."
             }
             require(allNonTeamlogsAppendersDenyTeamlogsMarker(rootLogger)) {
@@ -140,35 +135,37 @@ class TeamLogLogger private constructor(private val l: Logger) {
         }
 
 
-        internal fun hasTeamlogsAppender(rootLogger: ch.qos.logback.classic.Logger) =
-            teamlogsAppender(rootLogger) != null
-
-
-        internal fun hasTeamlogsMarkerFilterOnRootAppender(rootLogger: ch.qos.logback.classic.Logger): Boolean {
-            val teamLogsAppender = teamlogsAppender(rootLogger) ?: return false
-
-            return teamLogsAppender
-                .copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
-                .any { filterAcceptsOnlyTeamLogs(it) }
+        private fun rootLogger(): ch.qos.logback.classic.Logger {
+            val context = LoggerFactory.getILoggerFactory() as? LoggerContext
+                ?: error("TeamLogLogger krever logback-classic som SLF4J-backend")
+            return context.getLogger(Logger.ROOT_LOGGER_NAME)
         }
 
 
-        internal fun allNonTeamlogsAppendersDenyTeamlogsMarker(rootLogger: ch.qos.logback.classic.Logger): Boolean {
+        private fun hasTeamlogsMarkerFilter(appender: Appender<ILoggingEvent?>): Boolean {
+            fun acceptsOnlyTeamLogs(filter: EvaluatorFilter<*>): Boolean {
+                val replyForTeamLogs = decisionForMarker(filter, teamlogsMarkerName)
+                val replyForOtherMarkers = decisionForMarker(filter, "NOT_TEAM_LOGS")
+                return replyForTeamLogs == ACCEPT && replyForOtherMarkers == DENY
+            }
+
+            return filters(appender).any(::acceptsOnlyTeamLogs)
+        }
+
+
+        private fun filters(appender: Appender<ILoggingEvent?>): List<EvaluatorFilter<*>> =
+            appender.copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
+
+
+        private fun allNonTeamlogsAppendersDenyTeamlogsMarker(rootLogger: ch.qos.logback.classic.Logger): Boolean {
             fun isNonTeamlogsAppender(appender: Appender<ILoggingEvent?>): Boolean =
                 appender.name != teamlogsAppenderName
 
-            fun filterDecisionForTeamlogsMarker(filter: EvaluatorFilter<*>): FilterReply? {
-                val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return null
-                return filterDecisionForMarker(filter, evaluator, teamlogsMarkerName)
-            }
-
             fun firstDecisiveReplyForTeamlogsMarker(appender: Appender<ILoggingEvent?>): FilterReply? =
-                appender.copyOfAttachedFiltersList
-                    .filterIsInstance<EvaluatorFilter<*>>()
-                    .firstNotNullOfOrNull(::filterDecisionForTeamlogsMarker)
+                filters(appender).map { decisionForMarker(it, teamlogsMarkerName) }.firstOrNull()
 
             fun appenderDeniesTeamlogsMarker(appender: Appender<ILoggingEvent?>): Boolean =
-                firstDecisiveReplyForTeamlogsMarker(appender) == FilterReply.DENY
+                firstDecisiveReplyForTeamlogsMarker(appender) == DENY
 
             return appenders(rootLogger)
                 .filter(::isNonTeamlogsAppender)
@@ -184,21 +181,13 @@ class TeamLogLogger private constructor(private val l: Logger) {
             logger.iteratorForAppenders()?.asSequence()?.toList() ?: emptyList()
 
 
-        private fun filterAcceptsOnlyTeamLogs(filter: EvaluatorFilter<*>): Boolean {
-            val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return false
-            val replyForTeamLogs = filterDecisionForMarker(filter, evaluator, teamlogsMarkerName) ?: return false
-            val replyForOtherMarkers = filterDecisionForMarker(filter, evaluator, "NOT_TEAM_LOGS") ?: return false
-            return replyForTeamLogs == FilterReply.ACCEPT && replyForOtherMarkers == FilterReply.DENY
-        }
-
-
-        private fun filterDecisionForMarker(
+        private fun decisionForMarker(
             filter: EvaluatorFilter<*>,
-            evaluator: OnMarkerEvaluator,
             markerName: String,
-        ): FilterReply? {
+        ): FilterReply {
+            val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return FilterReply.NEUTRAL
             val event = LoggingEvent().apply { addMarker(MarkerFactory.getMarker(markerName)) }
-            val isMatch = runCatching { evaluator.evaluate(event) }.getOrNull() ?: return null
+            val isMatch = runCatching { evaluator.evaluate(event) }.getOrNull() ?: return FilterReply.NEUTRAL
             return if (isMatch) filter.onMatch else filter.onMismatch
         }
     }

@@ -7,6 +7,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import ch.qos.logback.core.filter.EvaluatorFilter
 import ch.qos.logback.core.spi.FilterReply
+import ch.qos.logback.core.spi.FilterReply.ACCEPT
+import ch.qos.logback.core.spi.FilterReply.DENY
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsAppenderName
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsMarkerName
 import org.assertj.core.api.Assertions.assertThat
@@ -63,10 +65,10 @@ class TeamLogRoutingTest {
         val context = LoggerContext()
 
         val ordinaryAppender = InMemoryAppender("ordinary-app-log", context)
-        ordinaryAppender.addFilter(nyTeamLogsFilter(context, onMatch = FilterReply.DENY, onMismatch = FilterReply.ACCEPT))
+        ordinaryAppender.addFilter(nyTeamLogsFilter(context, onMatch = DENY, onMismatch = ACCEPT))
 
         val teamLogAppender = InMemoryAppender(teamlogsAppenderName, context)
-        teamLogAppender.addFilter(nyTeamLogsFilter(context, onMatch = FilterReply.ACCEPT, onMismatch = FilterReply.DENY))
+        teamLogAppender.addFilter(nyTeamLogsFilter(context, onMatch = ACCEPT, onMismatch = DENY))
 
         val logger = context.getLogger(this::class.java)
         logger.level = ch.qos.logback.classic.Level.INFO
