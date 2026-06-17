@@ -7,7 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 
-class AktørIdLytter(
+class FødselsnummerBehovLytter(
     private val rapidsConnection: RapidsConnection,
     private val cluster: String,
     private val hentFødselsnummer: (aktørId: String) -> String?,

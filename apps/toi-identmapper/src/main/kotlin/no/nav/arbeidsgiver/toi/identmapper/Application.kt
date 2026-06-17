@@ -43,7 +43,7 @@ fun startApp(
             FødselsnummerLytter(fnrKey, rapidsConnection, cluster, identCache::hentAktørId)
         }
 
-        AktørIdLytter(
+        FødselsnummerBehovLytter(
             rapidsConnection = rapidsConnection,
             cluster = cluster,
             hentFødselsnummer = identCache::hentFødselsnummer,

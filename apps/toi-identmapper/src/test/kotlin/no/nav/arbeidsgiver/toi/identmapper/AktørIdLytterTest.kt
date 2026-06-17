@@ -1,18 +1,16 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class AktørIdLytterTest {
     @Test
     fun `legg på fnr om første behov er fødselsnummer`() {
         val testRapid = TestRapid()
         val fnr = "9876543210"
-        AktørIdLytter(testRapid, "test") { fnr }
+        FødselsnummerBehovLytter(testRapid, "test") { fnr }
 
         testRapid.sendTestMessage(behovsMelding(behovListe = """["fødselsnummer"]"""))
 
@@ -34,7 +32,7 @@ class AktørIdLytterTest {
     @Test
     fun `ikke legg på svar om det finnes andre behov før fødselsnummer som ikke er løst`() {
         val testRapid = TestRapid()
-        AktørIdLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -51,7 +49,7 @@ class AktørIdLytterTest {
     fun `legg på svar om behov nummer 2 er fødselsnummer, dersom første behov har en løsning`() {
         val testRapid = TestRapid()
         val fnr = "987654321"
-        AktørIdLytter(testRapid, "test") { fnr }
+        FødselsnummerBehovLytter(testRapid, "test") { fnr }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -72,7 +70,7 @@ class AktørIdLytterTest {
     fun `legg på svar om behov nummer 2 er fødselsnummer, dersom første behov har en løsning med null-verdi`() {
         val testRapid = TestRapid()
         val fnr = "987654321"
-        AktørIdLytter(testRapid, "test") { fnr }
+        FødselsnummerBehovLytter(testRapid, "test") { fnr }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -92,7 +90,7 @@ class AktørIdLytterTest {
     @Test
     fun `ikke legg på svar om svar allerede er lagt på med null-verdi`() {
         val testRapid = TestRapid()
-        AktørIdLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -109,7 +107,7 @@ class AktørIdLytterTest {
     @Test
     fun `ikke legg på svar om behov er en tom liste`() {
         val testRapid = TestRapid()
-        AktørIdLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
 
         testRapid.sendTestMessage(behovsMelding(behovListe = "[]"))
 
@@ -121,7 +119,7 @@ class AktørIdLytterTest {
     @Test
     fun `ikke legg på svar om svar allerede er lagt på`() {
         val testRapid = TestRapid()
-        AktørIdLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
+        FødselsnummerBehovLytter(testRapid, "test") { fail("PDL skal ikke kalles") }
 
         testRapid.sendTestMessage(
             behovsMelding(
@@ -138,7 +136,7 @@ class AktørIdLytterTest {
     @Test
     fun `publiserer null som svar når PDL ikke finner fødselsnummer`() {
         val rapid = TestRapid()
-        AktørIdLytter(rapid, "test") { null }
+        FødselsnummerBehovLytter(rapid, "test") { null }
 
         rapid.sendTestMessage(
             behovsMelding(
