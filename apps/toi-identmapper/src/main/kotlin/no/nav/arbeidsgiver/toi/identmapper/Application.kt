@@ -40,7 +40,7 @@ fun startApp(
         })
 
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
-            FødselsnummerLytter(fnrKey, rapidsConnection, cluster, identCache::hentAktørId)
+            AktørIdPopulator(fnrKey, rapidsConnection, cluster, identCache::hentAktørId)
         }
 
         FødselsnummerBehovLytter(

@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi.identmapper
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class IdentMapperTest {
 
@@ -14,7 +13,7 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { aktørId }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -49,7 +48,7 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { aktørId }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -66,7 +65,7 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { aktørId }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
@@ -81,7 +80,7 @@ class IdentMapperTest {
         val rapid = TestRapid()
         val fødselsnummerKey = "fodselsnummer"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { null }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { null }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, "123"))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -93,7 +92,7 @@ class IdentMapperTest {
         val aktørIdKey = "aktørId"
         val fødselsnummerKey = "fodselsnummer"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -105,7 +104,7 @@ class IdentMapperTest {
         val aktørIdKey = "aktorId"
         val fødselsnummerKey = "fodselsnummer"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -117,7 +116,7 @@ class IdentMapperTest {
         val aktørIdKey = "aktoerId"
         val fødselsnummerKey = "fodselsnummer"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -129,7 +128,7 @@ class IdentMapperTest {
         val aktørIdKey = "AKTORID"
         val fødselsnummerKey = "fodselsnummer"
 
-        FødselsnummerLytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
