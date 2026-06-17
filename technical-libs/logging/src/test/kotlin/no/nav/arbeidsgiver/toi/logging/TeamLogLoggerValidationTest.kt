@@ -6,6 +6,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import ch.qos.logback.core.filter.EvaluatorFilter
 import ch.qos.logback.core.spi.FilterReply
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsAppenderName
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsMarkerName
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -27,7 +29,7 @@ class TeamLogConfigurationValidationTest {
     @Test
     fun `bruk av TeamLogLogger avvises når teamlog-appender mangler TEAM_LOGS-filter`() {
         val rootLogger = nyRootLogger().apply {
-            addAppender(nyTeamLogsAppender(loggerContext))
+            addAppender(nyAppender(loggerContext, teamlogsAppenderName))
         }
 
         assertThatThrownBy {
@@ -41,8 +43,8 @@ class TeamLogConfigurationValidationTest {
     fun `bruk av TeamLogLogger tillates når teamlog er konfigurert riktig`() {
         val rootLogger = nyRootLogger().apply {
             addAppender(
-                nyTeamLogsAppender(loggerContext).apply {
-                    addFilter(nyTeamLogsMarkerFilter(loggerContext))
+                nyAppender(loggerContext, teamlogsAppenderName).apply {
+                    addFilter(nyTeamLogsAksepterendeFilter(loggerContext))
                 }
             )
         }
@@ -61,22 +63,61 @@ class TeamLogConfigurationValidationTest {
         }.doesNotThrowAnyException()
     }
 
-    private fun nyRootLogger(): ch.qos.logback.classic.Logger = LoggerContext().getLogger(Logger.ROOT_LOGGER_NAME).apply { detachAndStopAllAppenders() }
+    @Test
+    fun `bruk av TeamLogLogger avvises når ordinær appender mangler filter som avviser TEAM_LOGS`() {
+        val rootLogger = nyRootLogger().apply {
+            addAppender(
+                nyAppender(loggerContext, teamlogsAppenderName).apply {
+                    addFilter(nyTeamLogsAksepterendeFilter(loggerContext))
+                }
+            )
+            addAppender(nyAppender(loggerContext, "STDOUT_JSON"))
+        }
 
-    private fun nyTeamLogsAppender(context: LoggerContext): AppenderBase<ILoggingEvent> {
+        assertThatThrownBy {
+            TeamLogLogger.validateTeamlogConfiguration(rootLogger)
+        }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("Alle ROOT-appendere unntatt 'team-logs' må avvise marker 'TEAM_LOGS'")
+    }
+
+    @Test
+    fun `bruk av TeamLogLogger tillates når ordinær appender har filter som avviser TEAM_LOGS`() {
+        val rootLogger = nyRootLogger().apply {
+            addAppender(
+                nyAppender(loggerContext, teamlogsAppenderName).apply {
+                    addFilter(nyTeamLogsAksepterendeFilter(loggerContext))
+                }
+            )
+            addAppender(
+                nyAppender(loggerContext, "STDOUT_JSON").apply {
+                    addFilter(nyTeamLogsAvvisendeFilter(loggerContext))
+                }
+            )
+        }
+
+        assertThatCode {
+            TeamLogLogger.validateTeamlogConfiguration(rootLogger)
+        }.doesNotThrowAnyException()
+    }
+
+    private fun nyRootLogger(): ch.qos.logback.classic.Logger =
+        LoggerContext().getLogger(Logger.ROOT_LOGGER_NAME).apply { detachAndStopAllAppenders() }
+
+    private fun nyAppender(context: LoggerContext, navn: String): AppenderBase<ILoggingEvent> {
         return object : AppenderBase<ILoggingEvent>() {
             override fun append(eventObject: ILoggingEvent?) = Unit
         }.apply {
             this.context = context
-            this.name = "team-logs"
+            this.name = navn
             start()
         }
     }
 
-    private fun nyTeamLogsMarkerFilter(context: LoggerContext): EvaluatorFilter<ILoggingEvent> {
+    private fun nyTeamLogsAksepterendeFilter(context: LoggerContext): EvaluatorFilter<ILoggingEvent> {
         val evaluator = OnMarkerEvaluator().apply {
             this.context = context
-            addMarker("TEAM_LOGS")
+            addMarker(teamlogsMarkerName)
             start()
         }
 
@@ -85,6 +126,22 @@ class TeamLogConfigurationValidationTest {
             this.evaluator = evaluator
             this.onMatch = FilterReply.ACCEPT
             this.onMismatch = FilterReply.DENY
+            start()
+        }
+    }
+
+    private fun nyTeamLogsAvvisendeFilter(context: LoggerContext): EvaluatorFilter<ILoggingEvent> {
+        val evaluator = OnMarkerEvaluator().apply {
+            this.context = context
+            addMarker(teamlogsMarkerName)
+            start()
+        }
+
+        return EvaluatorFilter<ILoggingEvent>().apply {
+            this.context = context
+            this.evaluator = evaluator
+            this.onMatch = FilterReply.DENY
+            this.onMismatch = FilterReply.ACCEPT
             start()
         }
     }

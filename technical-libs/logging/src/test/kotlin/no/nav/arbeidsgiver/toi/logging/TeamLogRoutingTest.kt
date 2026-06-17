@@ -7,6 +7,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import ch.qos.logback.core.filter.EvaluatorFilter
 import ch.qos.logback.core.spi.FilterReply
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsAppenderName
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlogsMarkerName
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
@@ -65,7 +67,7 @@ class TeamLogRoutingTest {
         val ordinaryAppender = InMemoryAppender("ordinary-app-log", context)
         ordinaryAppender.addFilter(nyTeamLogsFilter(context, onMatch = FilterReply.DENY, onMismatch = FilterReply.ACCEPT))
 
-        val teamLogAppender = InMemoryAppender("team-logs", context)
+        val teamLogAppender = InMemoryAppender(teamlogsAppenderName, context)
         teamLogAppender.addFilter(nyTeamLogsFilter(context, onMatch = FilterReply.ACCEPT, onMismatch = FilterReply.DENY))
 
         val logger = context.getLogger(this::class.java)
@@ -85,7 +87,7 @@ class TeamLogRoutingTest {
     ): EvaluatorFilter<ILoggingEvent> {
         val evaluator = OnMarkerEvaluator().apply {
             this.context = context
-            addMarker("TEAM_LOGS")
+            addMarker(teamlogsMarkerName)
             start()
         }
 
