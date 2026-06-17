@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/test_jackson3Mapper
+      deploy_dev_branch: refs/heads/lib-for-logging
     secrets: inherit
     permissions:
       contents: read

@@ -7,12 +7,14 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 
 class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            precondition{
+            precondition {
                 it.requireKey("event")
                 it.requireKey("aktorId")
                 it.requireKey("startet")
@@ -25,6 +27,8 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         }.register(this)
     }
 
+    private val teamlog = teamlog(log)
+
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
@@ -34,7 +38,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         log.info("Mottok kvp event ${packet["event"].asString()}")
 
         if (packet["event"].isNull || (packet["event"].asString() != "STARTET" && packet["event"].asString() != "AVSLUTTET")) {
-            log.error("event er ikke startet eller avluttet, se secure-log")
+            log.error("event er ikke startet eller avsluttet, se teamlog") // TODO Are: Men det blir jo ikke logget not til teamlog?
             return
         }
 
@@ -46,7 +50,7 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
             "@event_name" to "kvp",
         )
 
-        secureLog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (securelog verifikasjon)")
+        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)") // TODO Are: Hva betyr "teamlog verifikasjon"? Det blir jo ikke logget noe til teamlog?
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
@@ -54,6 +58,6 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
 
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
-        log.error("noe mangler i kvp.melding, se secure-log")
+        log.error("noe mangler i kvp.melding, se teamlog") // TODO Are: Men det blir jo ikke logget noe til teamlog?
     }
 }
