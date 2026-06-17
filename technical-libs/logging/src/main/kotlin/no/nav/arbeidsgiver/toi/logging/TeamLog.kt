@@ -135,26 +135,17 @@ class TeamLogLogger private constructor(private val l: Logger) {
         }
 
 
-        private fun rootLogger(): ch.qos.logback.classic.Logger {
-            val context = LoggerFactory.getILoggerFactory() as? LoggerContext
-                ?: error("TeamLogLogger krever logback-classic som SLF4J-backend")
-            return context.getLogger(Logger.ROOT_LOGGER_NAME)
-        }
+        private fun teamlogsAppender(logger: ch.qos.logback.classic.Logger): Appender<ILoggingEvent?>? =
+            appenders(logger).firstOrNull { it.name == teamlogsAppenderName }
 
 
         private fun hasTeamlogsMarkerFilter(appender: Appender<ILoggingEvent?>): Boolean {
-            fun acceptsOnlyTeamLogs(filter: EvaluatorFilter<*>): Boolean {
-                val replyForTeamLogs = decisionForMarker(filter, teamlogsMarkerName)
-                val replyForOtherMarkers = decisionForMarker(filter, "NOT_TEAM_LOGS")
-                return replyForTeamLogs == ACCEPT && replyForOtherMarkers == DENY
-            }
+            fun acceptsOnlyTeamLogs(filter: EvaluatorFilter<*>): Boolean =
+                decisionForMarker(filter, teamlogsMarkerName) == ACCEPT &&
+                        decisionForMarker(filter, "NOT_TEAM_LOGS") == DENY
 
             return filters(appender).any(::acceptsOnlyTeamLogs)
         }
-
-
-        private fun filters(appender: Appender<ILoggingEvent?>): List<EvaluatorFilter<*>> =
-            appender.copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
 
 
         private fun allNonTeamlogsAppendersDenyTeamlogsMarker(rootLogger: ch.qos.logback.classic.Logger): Boolean {
@@ -167,24 +158,26 @@ class TeamLogLogger private constructor(private val l: Logger) {
             fun appenderDeniesTeamlogsMarker(appender: Appender<ILoggingEvent?>): Boolean =
                 firstDecisiveReplyForTeamlogsMarker(appender) == DENY
 
-            return appenders(rootLogger)
-                .filter(::isNonTeamlogsAppender)
-                .all(::appenderDeniesTeamlogsMarker)
+            return appenders(rootLogger).filter(::isNonTeamlogsAppender).all(::appenderDeniesTeamlogsMarker)
         }
 
 
-        private fun teamlogsAppender(logger: ch.qos.logback.classic.Logger): Appender<ILoggingEvent?>? =
-            appenders(logger).firstOrNull { it.name == teamlogsAppenderName }
+        private fun rootLogger(): ch.qos.logback.classic.Logger {
+            val context = LoggerFactory.getILoggerFactory() as? LoggerContext
+                ?: error("TeamLogLogger krever logback-classic som SLF4J-backend")
+            return context.getLogger(Logger.ROOT_LOGGER_NAME)
+        }
 
 
         private fun appenders(logger: ch.qos.logback.classic.Logger): List<Appender<ILoggingEvent?>> =
             logger.iteratorForAppenders()?.asSequence()?.toList() ?: emptyList()
 
 
-        private fun decisionForMarker(
-            filter: EvaluatorFilter<*>,
-            markerName: String,
-        ): FilterReply {
+        private fun filters(appender: Appender<ILoggingEvent?>): List<EvaluatorFilter<*>> =
+            appender.copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
+
+
+        private fun decisionForMarker(filter: EvaluatorFilter<*>, markerName: String): FilterReply {
             val evaluator = filter.evaluator as? OnMarkerEvaluator ?: return FilterReply.NEUTRAL
             val event = LoggingEvent().apply { addMarker(MarkerFactory.getMarker(markerName)) }
             val isMatch = runCatching { evaluator.evaluate(event) }.getOrNull() ?: return FilterReply.NEUTRAL
