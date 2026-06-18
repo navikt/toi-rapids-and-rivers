@@ -3,9 +3,9 @@ package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.jackson.responseObject
-import java.time.Instant
-import kotlin.RuntimeException
 import com.github.kittinunf.result.Result
+import no.nav.arbeidsgiver.toi.logging.log
+import java.time.Instant
 
 class AccessTokenClient(private val env: Map<String, String>) {
     private var tokenUtgår = Instant.ofEpochSecond(0)
@@ -38,12 +38,12 @@ class AccessTokenClient(private val env: Map<String, String>) {
             .responseObject<AccessTokenResponse>()
 
         when (result) {
-             is Result.Success -> {
-                 log.info("Fikk tak i access token med lengde ${result.get().access_token.length}")
-                 return result.get()
-             }
+            is Result.Success -> {
+                log.info("Fikk tak i access token med lengde ${result.get().access_token.length}")
+                return result.get()
+            }
 
-             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.error)
+            is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.error)
         }
     }
 }

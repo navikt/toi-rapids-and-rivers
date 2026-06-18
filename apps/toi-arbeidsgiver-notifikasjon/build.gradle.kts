@@ -13,4 +13,6 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
 
     testImplementation("org.wiremock:wiremock-standalone:3.13.2")
+
+    implementation(project(":technical-libs:logging"))
 }
