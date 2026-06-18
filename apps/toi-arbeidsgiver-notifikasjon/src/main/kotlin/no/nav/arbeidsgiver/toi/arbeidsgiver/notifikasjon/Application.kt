@@ -34,7 +34,7 @@ fun opprettJavalin(rapidIsAlive: () -> Boolean) {
 
 fun main() {
     log.info("Starter app.")
-    teamlog.info("Starter app. Dette er ment å logges til Team LogsBruk . Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
+    teamlog.info("Starter app. Dette er ment å logges til Team Logs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
     val env = System.getenv()
     val accessTokenClient = AccessTokenClient(env)
