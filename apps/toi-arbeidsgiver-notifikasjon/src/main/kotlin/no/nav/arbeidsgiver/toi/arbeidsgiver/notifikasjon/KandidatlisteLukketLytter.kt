@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.log
 import java.util.*
 
 class KandidatlisteLukketLytter(
@@ -15,7 +16,7 @@ class KandidatlisteLukketLytter(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            precondition{
+            precondition {
                 it.requireValue("@event_name", "kandidat_v2.LukketKandidatliste")
                 it.forbidValue("@slutt_av_hendelseskjede", true)
             }
@@ -25,7 +26,12 @@ class KandidatlisteLukketLytter(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry
+    ) {
         val stillingsId = UUID.fromString(packet["stillingsId"].asString())
 
         notifikasjonKlient.ferdigstillSak(stillingsId)
