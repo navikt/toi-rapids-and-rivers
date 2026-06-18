@@ -26,8 +26,9 @@ private const val synlighetRekrutteringstreffBehov = "synlighetRekrutteringstref
  * - Trigger adressebeskyttelse-behov hvis nødvendig og venter på svar
  * - Besvarer med synlighet når alle data er tilgjengelige
  *
- * Hvis personen ikke finnes i databasen eller allerede er usynlig,
- * besvares direkte uten å vente på adressebeskyttelse.
+ * Hvis personen ikke finnes i databasen, eller allerede er kjent sperret via kode 6/7,
+ * besvares direkte uten å vente på adressebeskyttelse. Ellers hentes adressebeskyttelse
+ * også for usynlige personer, slik at sperret blir korrekt satt.
  */
 class SynlighetRekrutteringstreffLytter(
     private val rapidsConnection: RapidsConnection,
@@ -57,18 +58,21 @@ class SynlighetRekrutteringstreffLytter(
 
         val evaluering = repository.hentMedFnr(fodselsnummer)
 
-        // Returner umiddelbart med usynlig hvis person ikke funnet eller ikke kan bli synlig
-        if (evaluering == null || !evaluering.kanBliSynlig()) {
-            besvarMedSynlighet(
-                packet,
-                fodselsnummer,
-                erSynlig = false,
-                ferdigBeregnet = evaluering?.erFerdigBeregnet ?: true
-            )
+        // Person finnes ikke - anta ikke sperret (kan ikke avgjøre adressebeskyttelse uten data)
+        if (evaluering == null) {
+            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = true, sperret = false)
             return
         }
 
-        // Alle andre felt er OK - sjekk adressebeskyttelse
+        // Allerede kjent sperret via kode 6/7 fra lagret evaluering - svar direkte
+        if (evaluering.sperret()) {
+            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = evaluering.erFerdigBeregnet, sperret = true)
+            return
+        }
+
+        // Adressebeskyttelse lagres ikke i synlighetsmotor og må hentes for å avgjøre sperret korrekt,
+        // også når personen er usynlig av andre grunner. Ellers risikerer vi å miste adressesperring
+        // for personer som er usynlige, men har PDL-adressebeskyttelse.
         if (adressebeskyttelseNode.isMissingNode) {
             // Adressebeskyttelse ikke hentet ennå - trigger behov for det
             if (packet.leggTilBehov(adressebeskyttelseFelt)) {
@@ -96,18 +100,20 @@ class SynlighetRekrutteringstreffLytter(
             komplettBeregningsgrunnlag = evaluering.erFerdigBeregnet
         )
 
-        besvarMedSynlighet(packet, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true)
+        besvarMedSynlighet(packet, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true, sperret = oppdatertEvaluering.sperret())
     }
 
     private fun besvarMedSynlighet(
         packet: JsonMessage,
         fodselsnummer: String,
         erSynlig: Boolean,
-        ferdigBeregnet: Boolean
+        ferdigBeregnet: Boolean,
+        sperret: Boolean
     ) {
         packet[synlighetRekrutteringstreffBehov] = mapOf(
             "erSynlig" to erSynlig,
-            "ferdigBeregnet" to ferdigBeregnet
+            "ferdigBeregnet" to ferdigBeregnet,
+            "sperret" to sperret
         )
         log.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: (se securelog)")
         secureLog.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: $fodselsnummer, erSynlig: $erSynlig")

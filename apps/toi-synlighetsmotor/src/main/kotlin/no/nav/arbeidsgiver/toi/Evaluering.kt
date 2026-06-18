@@ -58,6 +58,13 @@ class Evaluering(
     fun erSynlig() = harIkkeAdressebeskyttelse == True && kanBliSynlig() && erFerdigBeregnet
 
     /**
+     * Sperret = adressebeskyttelse (kode 6/7/19 fra Arena eller PDL-gradering).
+     * Brukes for å anonymisere navn i formidling og blokkere ny formidling.
+     * Ved manglende informasjon antas ikke sperret (fail-safe mot over-anonymisering).
+     */
+    fun sperret() = !erIkkeKode6eller7.default(true) || !harIkkeAdressebeskyttelse.default(true)
+
+    /**
      * Pre-sjekk: Returnerer false hvis noen felt er False (usynlig uansett adressebeskyttelse).
      * Brukes for å unngå unødvendig adressebeskyttelse-oppslag.
      */
@@ -90,7 +97,7 @@ class Evaluering(
 
         fun Evaluering?.somSynlighet() =
             lagEvalueringSomObfuskererKandidaterMedDiskresjonskode().let { obfuskertEvaluering ->
-                Synlighet(this?.erSynlig() ?: false, this?.erFerdigBeregnet ?: false, obfuskertEvaluering)
+                Synlighet(this?.erSynlig() ?: false, this?.erFerdigBeregnet ?: false, obfuskertEvaluering, this?.sperret() ?: false)
             }
     }
 
@@ -99,7 +106,8 @@ class Evaluering(
 data class Synlighet(
     val erSynlig: Boolean,
     val ferdigBeregnet: Boolean,
-    val evalueringUtenDiskresjonskode: EvalueringUtenDiskresjonskode
+    val evalueringUtenDiskresjonskode: EvalueringUtenDiskresjonskode,
+    val sperret: Boolean
 )
 
 data class EvalueringUtenDiskresjonskode(
