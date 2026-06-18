@@ -55,17 +55,16 @@ class SynlighetsgrunnlagLytter(
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
-        if (synlighetsevaluering.erFerdigBeregnet) {
-            val fødselsnummer = packet["fodselsnummer"]
-            if(!fødselsnummer.isMissingNode) {
-                packet["synlighet"] = synlighetsevaluering.somSynlighet()
-                repository.lagre(
-                    evaluering = synlighetsevaluering,
-                    aktørId = kandidat.aktørId,
-                    fødselsnummer = fødselsnummer.stringValue(),
-                )
-                rapidsConnection.publish(kandidat.aktørId, packet.toJson())
-            }
+        val fødselsnummer = packet["fodselsnummer"]
+
+        if (synlighetsevaluering.erFerdigBeregnet && !fødselsnummer.isMissingNode) {
+            packet["synlighet"] = synlighetsevaluering.somSynlighet()
+            repository.lagre(
+                evaluering = synlighetsevaluering,
+                aktørId = kandidat.aktørId,
+                fødselsnummer = fødselsnummer.stringValue(),
+            )
+            rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
             val behov = packet["@behov"].toList().map(JsonNode::asString)
             if (behov.containsAll(requiredFields)) {
@@ -79,7 +78,6 @@ class SynlighetsgrunnlagLytter(
                 packet["@behov"] = (behov + extraBehov).distinct()
                 rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
-
         }
     }
 }
