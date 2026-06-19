@@ -1,13 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import tools.jackson.module.kotlin.kotlinModule
-
-import tools.jackson.databind.json.JsonMapper
-
 import com.fasterxml.jackson.annotation.JsonProperty
-import tools.jackson.databind.DeserializationFeature
-import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.cfg.EnumFeature
 import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.time.Instant
@@ -110,11 +105,6 @@ data class Kandidat(
             )
         }
     }
-
-    fun fødselsNummer() =
-        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
-            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer
-            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer
 }
 
 data class CvMelding(

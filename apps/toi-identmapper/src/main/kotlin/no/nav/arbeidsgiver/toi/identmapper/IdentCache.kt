@@ -33,13 +33,13 @@ class IdentCache(
 
         if (cachetFødselsnummer.harHentetFraPdl) {
             log.info("Mappet fra aktørId til fødselsnummer, brukte cache")
-            secureLog.info("Mappet fra aktørId til fødselsnummer ${cachetFødselsnummer.verdi}, brukte cache")
+            secureLog.info("Mappet fra aktørId $aktørId til fødselsnummer ${cachetFødselsnummer.verdi}, brukte cache")
             return cachetFødselsnummer.verdi
         }
 
         return hentFødselsnummerFraPdl(aktørId).also { nyttFødselsnummer ->
             log.info("Mappet fra aktørId til fødselsnummer, hentet fra PDL")
-            secureLog.info("Mappet fra aktørId til fødselsnummer $nyttFødselsnummer, hentet fra PDL")
+            secureLog.info("Mappet fra aktørId $aktørId til fødselsnummer $nyttFødselsnummer, hentet fra PDL")
 
             if (nyttFødselsnummer != null) {
                 repository.lagreIdentMapping(aktørId = aktørId, fødselsnummer = nyttFødselsnummer)

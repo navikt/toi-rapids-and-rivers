@@ -34,6 +34,7 @@ class SynlighetBehovsLytterTest {
                 "sisteOppfølgingsperiode",
                 "kvp",
                 "arbeidssokeropplysninger",
+                "fodselsnummer",
                 "synlighet"
               ],
               "arbeidsmarkedCv": null,
@@ -42,22 +43,8 @@ class SynlighetBehovsLytterTest {
               "siste14avedtak": null,
               "kvp": null,
               "sisteOppfølgingsperiode": null,
-              "@forårsaket_av": {
-                "id": "c0040997-2fc1-4173-a0aa-eca26c5cd9e9",
-                "opprettet": "2026-06-16T12:00:50.029394731",
-                "event_name": "republisert",
-                "behov": [
-                  "arbeidsmarkedCv",
-                  "veileder",
-                  "oppfølgingsinformasjon",
-                  "siste14avedtak",
-                  "sisteOppfølgingsperiode",
-                  "kvp",
-                  "arbeidssokeropplysninger",
-                  "synlighet"
-                ]
-              },
-              "arbeidssokeropplysninger": null
+              "arbeidssokeropplysninger": null,
+              "fodselsnummer": null
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -100,6 +87,7 @@ class SynlighetBehovsLytterTest {
                 "sisteOppfølgingsperiode",
                 "kvp",
                 "arbeidssokeropplysninger",
+                "fodselsnummer",
                 "synlighet"
             )
         }
@@ -165,7 +153,7 @@ class SynlighetBehovsLytterTest {
     private fun behovMeldingMedAlleAndreBehovLøste(aktørId: String) = """
         {
             "@event_name": "behov",
-            "@behov": ["arbeidsmarkedCv","veileder","oppfølgingsinformasjon","siste14avedtak","sisteOppfølgingsperiode","kvp","arbeidssokeropplysninger", "synlighet"],
+            "@behov": ["arbeidsmarkedCv","veileder","oppfølgingsinformasjon","siste14avedtak","sisteOppfølgingsperiode","kvp","arbeidssokeropplysninger", "fodselsnummer", "synlighet"],
             "aktørId": "$aktørId",
             "arbeidsmarkedCv" : {},
             "veileder" : {},
