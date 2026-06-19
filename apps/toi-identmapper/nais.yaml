@@ -20,11 +20,10 @@ spec:
     max: {{ max_replicas }}
   resources:
     limits:
-      cpu: 3000m
-      memory: 2048Mi
+      memory: 512Mi
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 256Mi
   accessPolicy:
     outbound:
       rules:

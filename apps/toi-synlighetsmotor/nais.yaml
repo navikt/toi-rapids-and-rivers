@@ -28,11 +28,10 @@ spec:
     type: Recreate
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      memory: 768Mi
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 384Mi
   kafka:
     pool: {{ kafka_pool }}
   azure:
