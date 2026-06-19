@@ -30,5 +30,6 @@ include(
     "technical-libs:testrapid",
     "technical-libs:testrapid-jackson2-deprekert",
     "apps:toi-kandidat-indekser",
-    "apps:toi-geografi"
+    "apps:toi-geografi",
+    "technical-libs:logging"
 )
