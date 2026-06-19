@@ -89,13 +89,13 @@ class SynlighetRekrutteringstreffLytterTest {
     }
 
     @Test
-    fun `skal sette sperret true direkte for person med kode 6 eller 7 uten å hente adressebeskyttelse`() {
+    fun `skal sette sperret true når Arena-diskresjonskode 6 eller 7 er satt selv om PDL er ugradert`() {
         repository.lagre(
             Evaluering(
                 harAktivCv = true.tilBooleanVerdi(),
                 harOppfølging = true.tilBooleanVerdi(),
                 harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
-                erIkkeKode6eller7 = false.tilBooleanVerdi(), // kode 6/7 = sperret
+                erIkkeKode6eller7 = false.tilBooleanVerdi(), // Arena-diskresjonskode 6 eller 7
                 erIkkeSperretAnsatt = true.tilBooleanVerdi(),
                 erIkkeDoed = true.tilBooleanVerdi(),
                 erIkkeKvp = true.tilBooleanVerdi(),
@@ -108,7 +108,7 @@ class SynlighetRekrutteringstreffLytterTest {
         )
 
         testProgramMedBehovHendelse(
-            behovMelding("10828497311"),
+            behovMeldingMedAdressebeskyttelse("10828497311", "UGRADERT"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -246,6 +246,66 @@ class SynlighetRekrutteringstreffLytterTest {
             val synlighet = field(0, "synlighetRekrutteringstreff")
             assertThat(synlighet.get("erSynlig").asBoolean()).isFalse()
             assertThat(synlighet.get("ferdigBeregnet").asBoolean()).isTrue()
+            assertThat(synlighet.get("sperret").asBoolean()).isTrue()
+        }
+    }
+
+    @Test
+    fun `skal sette sperret true når adressebeskyttelse er STRENGT_FORTROLIG_UTLAND`() {
+        repository.lagre(
+            Evaluering(
+                harAktivCv = true.tilBooleanVerdi(),
+                harOppfølging = true.tilBooleanVerdi(),
+                harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
+                erIkkeKode6eller7 = true.tilBooleanVerdi(),
+                erIkkeSperretAnsatt = true.tilBooleanVerdi(),
+                erIkkeDoed = true.tilBooleanVerdi(),
+                erIkkeKvp = true.tilBooleanVerdi(),
+                harIkkeAdressebeskyttelse = BooleanVerdi.missing,
+                erArbeidssøker = true.tilBooleanVerdi(),
+                komplettBeregningsgrunnlag = true
+            ),
+            aktørId = "1234567890123",
+            fødselsnummer = "10828497311"
+        )
+
+        testProgramMedBehovHendelse(
+            behovMeldingMedAdressebeskyttelse("10828497311", "STRENGT_FORTROLIG_UTLAND"),
+            repository
+        ) {
+            assertThat(size).isEqualTo(1)
+            val synlighet = field(0, "synlighetRekrutteringstreff")
+            assertThat(synlighet.get("erSynlig").asBoolean()).isFalse()
+            assertThat(synlighet.get("sperret").asBoolean()).isTrue()
+        }
+    }
+
+    @Test
+    fun `skal sette sperret true når adressebeskyttelse er FORTROLIG`() {
+        repository.lagre(
+            Evaluering(
+                harAktivCv = true.tilBooleanVerdi(),
+                harOppfølging = true.tilBooleanVerdi(),
+                harRiktigFormidlingsgruppe = true.tilBooleanVerdi(),
+                erIkkeKode6eller7 = true.tilBooleanVerdi(),
+                erIkkeSperretAnsatt = true.tilBooleanVerdi(),
+                erIkkeDoed = true.tilBooleanVerdi(),
+                erIkkeKvp = true.tilBooleanVerdi(),
+                harIkkeAdressebeskyttelse = BooleanVerdi.missing,
+                erArbeidssøker = true.tilBooleanVerdi(),
+                komplettBeregningsgrunnlag = true
+            ),
+            aktørId = "1234567890123",
+            fødselsnummer = "10828497311"
+        )
+
+        testProgramMedBehovHendelse(
+            behovMeldingMedAdressebeskyttelse("10828497311", "FORTROLIG"),
+            repository
+        ) {
+            assertThat(size).isEqualTo(1)
+            val synlighet = field(0, "synlighetRekrutteringstreff")
+            assertThat(synlighet.get("erSynlig").asBoolean()).isFalse()
             assertThat(synlighet.get("sperret").asBoolean()).isTrue()
         }
     }

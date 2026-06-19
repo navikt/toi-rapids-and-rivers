@@ -26,9 +26,9 @@ private const val synlighetRekrutteringstreffBehov = "synlighetRekrutteringstref
  * - Trigger adressebeskyttelse-behov hvis nødvendig og venter på svar
  * - Besvarer med synlighet når alle data er tilgjengelige
  *
- * Hvis personen ikke finnes i databasen, eller allerede er kjent sperret via kode 6/7,
- * besvares direkte uten å vente på adressebeskyttelse. Ellers hentes adressebeskyttelse
- * også for usynlige personer, slik at sperret blir korrekt satt.
+ * Hvis personen ikke finnes i databasen, besvares det direkte med ikke synlig / ikke sperret.
+ * Ellers hentes alltid adressebeskyttelse fra PDL før svar, slik at både kode 6/7 og
+ * PDL-gradering fanges opp - også for personer som er usynlige av andre grunner.
  */
 class SynlighetRekrutteringstreffLytter(
     private val rapidsConnection: RapidsConnection,
@@ -58,21 +58,19 @@ class SynlighetRekrutteringstreffLytter(
 
         val evaluering = repository.hentMedFnr(fodselsnummer)
 
-        // Person finnes ikke - anta ikke sperret (kan ikke avgjøre adressebeskyttelse uten data)
+        // Person finnes ikke i synlighetsmotor - anta verken synlig eller sperret
         if (evaluering == null) {
             besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = true, sperret = false)
             return
         }
 
-        // Allerede kjent sperret via kode 6/7 fra lagret evaluering - svar direkte
-        if (evaluering.sperret()) {
-            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = evaluering.erFerdigBeregnet, sperret = true)
-            return
-        }
-
-        // Adressebeskyttelse lagres ikke i synlighetsmotor og må hentes for å avgjøre sperret korrekt,
-        // også når personen er usynlig av andre grunner. Ellers risikerer vi å miste adressesperring
-        // for personer som er usynlige, men har PDL-adressebeskyttelse.
+        // "sperret" avgjøres av to kilder:
+        //   1. Arena-diskresjonskode 6/7 (erIkkeKode6eller7) - ligger i synlighetsmotor-basen.
+        //   2. PDL-adressebeskyttelse / gradering, inkl. kode 19 strengt fortrolig utland
+        //      (harIkkeAdressebeskyttelse) - ligger IKKE i basen, må hentes via behov.
+        // Vi henter derfor alltid adressebeskyttelse fra PDL før vi svarer, så vi fanger begge
+        // kilder med én flyt. (En kode 6/7-person blir sperret uansett, men det å sjekke PDL for
+        // alle holder logikken enkel og hindrer at PDL-gradering blir oversett.)
         if (adressebeskyttelseNode.isMissingNode) {
             // Adressebeskyttelse ikke hentet ennå - trigger behov for det
             if (packet.leggTilBehov(adressebeskyttelseFelt)) {
