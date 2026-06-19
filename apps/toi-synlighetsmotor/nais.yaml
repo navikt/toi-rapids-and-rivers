@@ -12,6 +12,7 @@ spec:
     - {{ ingress }}
   liveness:
     path: /isalive
+    initialDelay: 20
   readiness:
     port: 8080
     path: /isready
