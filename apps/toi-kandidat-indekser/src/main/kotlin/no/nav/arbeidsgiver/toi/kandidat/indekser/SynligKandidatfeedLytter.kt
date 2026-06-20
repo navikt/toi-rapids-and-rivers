@@ -47,7 +47,7 @@ class SynligKandidatfeedLytter(
         val aktørId = packet["aktørId"].asText()
 
         esClient.lagreEsCv(EsCv.fraMelding(packet))
-        teamlog.info("Indekserte kandidat: $aktørId ")
+        teamlog.info("Indekserte kandidat: $aktørId")
         packet["@slutt_av_hendelseskjede"] = true
         context.publish(packet.toJson())
     }
