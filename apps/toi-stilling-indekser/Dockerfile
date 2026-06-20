@@ -5,7 +5,7 @@ WORKDIR /$APP_NAME
 COPY build/runtime-libs/*.jar ./runtime-libs/
 COPY build/libs/app.jar ./
 
-# Asume that logback.xml is located in the project/app root dir.
+# Assume that logback.xml is located in the project/app root dir.
 # The unconventional location is a signal to developers to make them aware that we use this file in an unconventional
 # way in the ENTRYPOINT command in this Dockerfile.
 COPY logback.xml /
