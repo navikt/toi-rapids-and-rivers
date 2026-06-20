@@ -7,6 +7,7 @@ application {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation("org.postgresql:postgresql:42.7.11")
     implementation("org.flywaydb:flyway-core:11.1.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.0")

@@ -11,11 +11,13 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.cfg.EnumFeature
 
 class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsConnection, private val repository: Repository)
     : River.PacketListener {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     companion object {
         private val jacksonMapper = JsonMapper.builder()
@@ -46,7 +48,7 @@ class ArbeidssoekeropplysningerBehovLytter(private val rapidsConnection: RapidsC
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(aktørId)
         val jsonInnhold = periodeOpplysninger?.let { jacksonMapper.valueToTree<JsonNode>(it) } ?: NullNode.instance
 
-        secureLog.info("Mottok og behov for arbeidssøkeropplysninger for aktørid: $aktørId")
+        teamlog.info("Mottok og behov for arbeidssøkeropplysninger for aktørid: $aktørId")
 
         packet["arbeidssokeropplysninger"] = jsonInnhold
         context.publish(aktørId, packet.toJson())

@@ -1,11 +1,5 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
-import tools.jackson.module.kotlin.kotlinModule
-
-import tools.jackson.databind.json.JsonMapper
-
-import tools.jackson.databind.DeserializationFeature
-import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -13,13 +7,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
 import tools.jackson.module.kotlin.jacksonMapperBuilder
-import tools.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.kotlinModule
 
 class HullICvLytter(rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     private val HullICv = "hullICv"
 
@@ -61,8 +59,8 @@ class HullICvLytter(rapidsConnection: RapidsConnection) :
         aktørid: String
     ): PerioderMedInaktivitet {
         if (packet["arbeidsmarkedCv"]["slettCv"]["cv"] == null) {
-            log.error("Hull i cv for aktørid (se securelog) har mottatt melding som ikke har cv")
-            secureLog.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har cv")
+            log.error("Hull i cv for aktørid (se teamlog) har mottatt melding som ikke har cv")
+            teamlog.error("Hull i cv for aktørid $aktørid har mottatt melding som ikke har cv")
         }
         return PerioderMedInaktivitet(null, emptyList())
     }

@@ -8,6 +8,7 @@ application {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation("org.apache.avro:avro:1.12.0")
     implementation("io.confluent:kafka-avro-serializer:7.8.0")
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")

@@ -8,6 +8,7 @@ on:
     - .github/workflows/deploy-toi-template.yaml
     - buildSrc/**
     - technical-libs/testrapid/**
+    - technical-libs/logging/**
   workflow_dispatch:
 
 jobs:
@@ -15,7 +16,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/fødselsnummer-lytter
+      deploy_dev_branch: refs/heads/loggelib-i-flere-apper
     secrets: inherit
     permissions:
       contents: read

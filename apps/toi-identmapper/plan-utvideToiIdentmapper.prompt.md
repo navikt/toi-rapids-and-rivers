@@ -90,7 +90,7 @@ Arbeidet deles i seks mindre PR-er som hver leverer verdi isolert, kan reviewere
 - Ny `AktørIdLytter.kt` som leser `aktørId`, krever fravær av `fodselsnummer`/`fnr`/`fodselsnr`, og har precondition som matcher whitelisten.
 - Whitelist implementert som konfigurerbar liste av required-felt (i PR 3 initialisert til `listOf("synlighet")`). Eksponer gjennom konstruktør så den er enkel å utvide.
 - Registrering i `Application.kt`.
-- Tester: beriker synlighetsmelding korrekt, ignorerer meldinger uten whitelist-match, ignorerer meldinger som allerede har fnr, håndterer miss i både cache og PDL (ingen publisering, logger i securelog).
+- Tester: beriker synlighetsmelding korrekt, ignorerer meldinger uten whitelist-match, ignorerer meldinger som allerede har fnr, håndterer miss i både cache og PDL (ingen publisering, logger i teamlog).
 **Leverer:** Identmapper vil nå berike synlighetsmeldinger uten fnr i prod, forutsatt at synlighetsmotor publiserer dem (skjer først i PR 4). Ingen skade hvis PR 4 forsinkes.
 **Risiko:** Middels. Må verifiseres i dev at whitelist-precondition ikke plukker uønskede meldinger. Rulles ut først i dev-gcp.
 

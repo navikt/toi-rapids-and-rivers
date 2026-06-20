@@ -6,6 +6,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.paw.arbeidssokerregisteret.api.v1.Periode
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -18,7 +20,7 @@ class ArbeidssoekerperiodeLytter(
     private val consumer: () -> Consumer<Long, Periode>,
     private val behandleArbeidssokerPeriode: (Periode) -> ArbeidssokerPeriode
 ) : CoroutineScope, RapidsConnection.StatusListener {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     val arbeidssokerperioderTopic = "paw.arbeidssokerperioder-v1"
 
@@ -46,13 +48,13 @@ class ArbeidssoekerperiodeLytter(
                     try {
                         val records: ConsumerRecords<Long, Periode> = consumer.poll(Duration.ofSeconds(5))
                         val arbeidssokerperioderMeldinger = records.map {
-                            secureLog.info("Mottok periodemelding fra asr: ${it.value()}")
+                            teamlog.info("Mottok periodemelding fra asr: ${it.value()}")
                             behandleArbeidssokerPeriode(it.value())
                         }
 
                         arbeidssokerperioderMeldinger.forEach { periode ->
-                            log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se securelog for identitetsnummer.")
-                            secureLog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
+                            log.info("Publiserer arbeidssokerperioder for identitetsnr på rapid, se teamlog for identitetsnummer.")
+                            teamlog.info("Publiserer arbeidssokerperioder for ${periode.identitetsnummer} på rapid: ${periode.somJsonNode()}")
 
                             val melding = mapOf(
                                 "fodselsnummer" to periode.identitetsnummer,

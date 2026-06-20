@@ -1,8 +1,5 @@
 package no.nav.arbeidsgiver.toi
 
-import tools.jackson.databind.JsonNode
-import tools.jackson.databind.node.ObjectNode
-import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -13,6 +10,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.toi.geografi.GeografiKlient
 import no.nav.arbeidsgiver.toi.geografi.PostDataKlient
+import no.nav.arbeidsgiver.toi.logging.log
+import tools.jackson.databind.JsonNode
 
 class GeografiLytter(private val geografiKlient: GeografiKlient, private val postDataKlient: PostDataKlient, rapidsConnection: RapidsConnection) :
     River.PacketListener {

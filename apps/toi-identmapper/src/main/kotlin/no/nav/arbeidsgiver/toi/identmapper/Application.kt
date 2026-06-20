@@ -2,8 +2,6 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 
 private val env = System.getenv()
@@ -52,6 +50,3 @@ fun startApp(
 }
 
 fun rapidsConnection() = RapidApplication.create(System.getenv())
-
-val Any.log: Logger
-    get() = LoggerFactory.getLogger(this::class.java)

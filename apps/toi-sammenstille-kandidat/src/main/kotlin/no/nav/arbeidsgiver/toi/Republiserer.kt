@@ -9,6 +9,8 @@ import io.javalin.json.JavalinJackson3
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 class Republiserer(
     private val repository: Repository,
@@ -19,7 +21,7 @@ class Republiserer(
 ) {
 
     private val republiseringspath = "republiser"
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     private val javalin = Javalin.create { config ->
         with(config.routes)
@@ -56,8 +58,8 @@ class Republiserer(
         if (kandidat == null) {
             context.status(404)
         } else {
-            log.info("Skal republisere aktør (se securelog)")
-            secureLog.info("Skal republisere $aktørId")
+            log.info("Skal republisere aktør (se teamlog)")
+            teamlog.info("Skal republisere $aktørId")
             val pakke = lagPakke(kandidat)
             rapidsConnection.publish(aktørId, pakke.toJson())
             context.status(200)
@@ -69,11 +71,11 @@ class Republiserer(
         body.aktorIder.forEach { aktørId ->
             val kandidat = repository.hentKandidat(aktørId)
             if (kandidat == null) {
-                log.error("Kandidat finnes ikke i databasen, og kan derfor ikke republiseres (se securelog)")
-                secureLog.error("Kandidat med aktørId $aktørId finnes ikke i databasen, og kan derfor ikke republiseres")
+                log.error("Kandidat finnes ikke i databasen, og kan derfor ikke republiseres (se teamlog)")
+                teamlog.error("Kandidat med aktørId $aktørId finnes ikke i databasen, og kan derfor ikke republiseres")
             } else {
-                log.info("Skal republisere aktør (se securelog)")
-                secureLog.info("Skal republisere $aktørId")
+                log.info("Skal republisere aktør (se teamlog)")
+                teamlog.info("Skal republisere $aktørId")
                 val pakke = lagPakke(kandidat)
                 rapidsConnection.publish(aktørId, pakke.toJson())
             }

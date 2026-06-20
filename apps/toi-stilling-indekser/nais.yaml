@@ -66,4 +66,6 @@ spec:
   accessPolicy:
     outbound:
       rules:
+        - application: logging
+          namespace: nais-system
         - application: rekrutteringsbistand-stilling-api

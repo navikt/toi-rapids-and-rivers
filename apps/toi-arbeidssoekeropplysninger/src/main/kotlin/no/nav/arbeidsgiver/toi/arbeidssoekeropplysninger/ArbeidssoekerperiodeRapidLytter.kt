@@ -11,6 +11,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.cfg.EnumFeature
 
 /**
@@ -47,7 +48,7 @@ class ArbeidssoekerperiodeRapidLytter(private val rapidsConnection: RapidsConnec
         meterRegistry: MeterRegistry
     ) {
         log.info("Mottok arbeidssøkerperiodemelding ${packet["@id"]}")
-        repository.lagreArbeidssøkerperiodemelding(packet.fjernMetadataOgKonverter());
+        repository.lagreArbeidssøkerperiodemelding(packet.fjernMetadataOgKonverter())
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {

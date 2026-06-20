@@ -10,9 +10,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 class VeilederLytter(private val rapidsConnection: RapidsConnection, private val nomKlient: NomKlient) :
     River.PacketListener {
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -46,12 +49,12 @@ class VeilederLytter(private val rapidsConnection: RapidsConnection, private val
             val nyPacket = JsonMessage.newMessage(melding)
 
 
-            log.info("Skal publisere veiledermelding for aktørId (se securelog)")
-            secureLog.info("Skal publisere veiledermelding for aktørId $aktørId ident $ident")
+            log.info("Skal publisere veiledermelding for aktørId (se teamlog)")
+            teamlog.info("Skal publisere veiledermelding for aktørId $aktørId ident $ident")
             rapidsConnection.publish(aktørId, nyPacket.toJson())
         } catch (t: Throwable) {
-            log.error("Feil i lesing av hendelse (se securelog)")
-            secureLog.error("Feil i lesing av hendelse for aktørId $aktørId", t)
+            log.error("Feil i lesing av hendelse (se teamlog)")
+            teamlog.error("Feil i lesing av hendelse for aktørId $aktørId", t)
             throw t
         }
     }

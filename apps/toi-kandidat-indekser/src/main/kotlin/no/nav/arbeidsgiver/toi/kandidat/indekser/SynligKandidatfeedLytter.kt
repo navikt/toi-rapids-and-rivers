@@ -7,6 +7,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 
 const val topicName = "toi.kandidat-3"
@@ -17,7 +19,7 @@ class SynligKandidatfeedLytter(
 ) :
     River.PacketListener {
 
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -45,7 +47,7 @@ class SynligKandidatfeedLytter(
         val aktørId = packet["aktørId"].asText()
 
         esClient.lagreEsCv(EsCv.fraMelding(packet))
-        secureLog.info("Indekserte kandidat: $aktørId ")
+        teamlog.info("Indekserte kandidat: $aktørId")
         packet["@slutt_av_hendelseskjede"] = true
         context.publish(packet.toJson())
     }
