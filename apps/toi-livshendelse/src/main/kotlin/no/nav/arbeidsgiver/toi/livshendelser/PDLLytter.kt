@@ -13,9 +13,14 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
 import java.time.Duration
+import java.util.concurrent.CancellationException
 import kotlin.coroutines.CoroutineContext
 
-class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
+class PDLLytter(
+    rapidsConnection: RapidsConnection,
+    private val consumer: () -> Consumer<String, Personhendelse>,
+    private val pdlKlient: PdlKlient
+) :
     CoroutineScope, RapidsConnection.StatusListener {
 
     init {
@@ -33,10 +38,19 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
     override fun onReady(rapidsConnection: RapidsConnection) {
         log.info("Pdl lytter klar")
 
-        job.invokeOnCompletion {
-            log.error("Shutting down Rapid (see teamlog)")
-            if (it == null) teamlog.error("Shutting down Rapid")
-            else teamlog.error("Shutting down Rapid", it)
+        job.invokeOnCompletion { cause ->
+            when (cause) {
+                null ->
+                    log.info("Shutting down Rapid. Job completed normally.")
+
+                is CancellationException ->
+                    log.info("Shutting down Rapid. Job cancelled normally.", cause)
+
+                else -> {
+                    log.error("Shutting down Rapid. Job failed. See teamlog for cause.")
+                    teamlog.error("Shutting down Rapid. Job failed.", cause)
+                }
+            }
             rapidsConnection.stop()
         }
 
@@ -63,8 +77,7 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
                     log.error("Jobb mottok en exception(se teamlog)")
                     teamlog.error("Jobb mottok en exception", e)
                     throw e
-                }
-                finally {
+                } finally {
                     log.error("Jobb stenges ned")
                 }
             }
