@@ -14,7 +14,7 @@ object AuditLogg {
     private val auditLogger: AuditLogger = AuditLoggerImpl()
     private val teamlog = teamlog(log)
 
-    private fun log(cefMessage: CefMessage) {
+    private fun auditlog(cefMessage: CefMessage) {
         val ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn = " "
         val auditlinje = "$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn
         auditLogger.log(auditlinje)
@@ -33,6 +33,6 @@ object AuditLogg {
             .timeEnded(System.currentTimeMillis())
             .extension("msg", "NAV-ansatt har sett hvorfor bruker ikke finnes i Rekrutteringsbistand")
             .build()
-        log(cefMessage)
+        auditlog(cefMessage)
     }
 }
