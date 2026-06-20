@@ -12,12 +12,13 @@ import no.nav.common.audit_log.log.AuditLoggerImpl
 object AuditLogg {
 
     private val auditLogger: AuditLogger = AuditLoggerImpl()
+    private val teamlog = teamlog(log)
 
     private fun log(cefMessage: CefMessage) {
         val ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn = " "
         val auditlinje = "$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn
         auditLogger.log(auditlinje)
-        teamlog(log).info("auditlogger: $auditlinje")
+        teamlog.info("auditlogger: $auditlinje")
     }
 
     fun loggSynlighetsoppslag(personident: String, authenticatedUser: AuthenticatedUser) {

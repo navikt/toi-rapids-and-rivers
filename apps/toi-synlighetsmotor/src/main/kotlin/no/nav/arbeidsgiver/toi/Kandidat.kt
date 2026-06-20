@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
+import no.nav.arbeidsgiver.toi.logging.noClassLogger
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.cfg.EnumFeature
 import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.time.Instant
 import java.time.ZonedDateTime
+
+private val log = noClassLogger()
+private val teamlog =
+    teamlog(log) // Top-level plassering for å unngå kostbar instansiering hver gang data class Kandidat instansieres
 
 data class Kandidat(
     val aktørId: String,
@@ -19,8 +24,6 @@ data class Kandidat(
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     private val adressebeskyttelse: Synlighetsnode<String>,
 ) {
-    private val teamlog = teamlog(log)
-
     private val erAAP: BooleanVerdi
         get() = oppfølgingsinformasjon.hvisIkkeNullOg(Oppfølgingsinformasjon::erAAP)
 

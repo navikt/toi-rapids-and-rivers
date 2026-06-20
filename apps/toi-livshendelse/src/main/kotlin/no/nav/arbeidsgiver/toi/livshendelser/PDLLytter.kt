@@ -34,7 +34,7 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
         log.info("Pdl lytter klar")
 
         job.invokeOnCompletion {
-            log.error("Shutting down Rapid(se teamlog")
+            log.error("Shutting down Rapid (see teamlog)")
             if (it == null) teamlog.error("Shutting down Rapid")
             else teamlog.error("Shutting down Rapid", it)
             rapidsConnection.stop()
