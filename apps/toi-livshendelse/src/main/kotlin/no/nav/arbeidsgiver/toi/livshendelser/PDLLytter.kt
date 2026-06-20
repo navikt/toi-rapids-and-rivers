@@ -78,7 +78,7 @@ class PDLLytter(
                     teamlog.error("Jobb mottok en exception", e)
                     throw e
                 } finally {
-                    log.error("Jobb stenges ned")
+                    log.info("Jobb stenges ned")
                 }
             }
         }
