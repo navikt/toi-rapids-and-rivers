@@ -34,6 +34,11 @@ spec:
       value: toi.rapid-1
     - name: KAFKA_CONSUMER_GROUP_ID
       value: toi-helseapp-rapidconsumer-1
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
   observability:
     logging:
       destinations:

@@ -36,6 +36,11 @@ spec:
       value: "toi.dir-stilling-ekstern-v1"
     - name: KAFKA_RESET_POLICY
       value: "latest"
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
   observability:
     logging:
       destinations:
