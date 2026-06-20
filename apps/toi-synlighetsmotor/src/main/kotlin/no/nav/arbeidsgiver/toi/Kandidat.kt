@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.toi
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
-import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.arbeidsgiver.toi.logging.noClassLogger
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.cfg.EnumFeature
