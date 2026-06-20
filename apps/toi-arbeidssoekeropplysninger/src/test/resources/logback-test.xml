@@ -22,7 +22,7 @@
         </filter>
     </appender>
 
-    <root level="TRACE">
+    <root level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="team-logs-test"/>
     </root>

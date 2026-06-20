@@ -41,7 +41,7 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
         )
 
         log.info("Skal publisere siste14aVedtakmelding med aktørid (se teamlog) og fattetDato ${packet["fattetDato"].asString()}")
-        teamlog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asString()} og fattedato ${packet["fattetDato"].asString()}")
+        teamlog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asString()} og fattetDato ${packet["fattetDato"].asString()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())
