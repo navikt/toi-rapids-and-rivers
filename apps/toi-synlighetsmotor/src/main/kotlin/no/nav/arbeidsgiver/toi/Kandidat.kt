@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.toi
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.cfg.EnumFeature
 import tools.jackson.module.kotlin.jacksonMapperBuilder
@@ -17,6 +19,8 @@ data class Kandidat(
     private val arbeidssøkeropplysninger: Synlighetsnode<Arbeidssøkeropplysninger>,
     private val adressebeskyttelse: Synlighetsnode<String>,
 ) {
+    private val teamlog = teamlog(log)
+
     private val erAAP: BooleanVerdi
         get() = oppfølgingsinformasjon.hvisIkkeNullOg(Oppfølgingsinformasjon::erAAP)
 
@@ -62,12 +66,12 @@ data class Kandidat(
         sluttDatoOppfølging: Instant?
     ) {
         if (startDatoOppfølging.isAfter(now)) {
-            log.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
-            secureLog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
+            log.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se teamlog")
+            teamlog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
         if (sluttDatoOppfølging?.isAfter(now) == true) {
-            log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
-            secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
+            log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se teamlog")
+            teamlog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
     }
 

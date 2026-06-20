@@ -6,9 +6,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListener {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -36,6 +38,6 @@ class EvaluertDataLytter(rapidsConnection: RapidsConnection): River.PacketListen
         val kvalifiseringsgruppe = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asString()
         val rettighetsgruppe = packet["oppfølgingsinformasjon.rettighetsgruppe"].asString()
         val hovedmaal = packet["oppfølgingsinformasjon.hovedmaal"].asString()
-        secureLog.info("(secure) Synlig bruker med formidlingsgruppe $formidlingsgruppe kvalifiseringsgruppe $kvalifiseringsgruppe hovedmaal $hovedmaal rettighetsgruppe $rettighetsgruppe ($aktørId)")
+        teamlog.info("Synlig bruker med formidlingsgruppe $formidlingsgruppe kvalifiseringsgruppe $kvalifiseringsgruppe hovedmaal $hovedmaal rettighetsgruppe $rettighetsgruppe ($aktørId)")
     }
 }

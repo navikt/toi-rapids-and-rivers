@@ -7,6 +7,8 @@ import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.cfg.DateTimeFeature
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.kotlinModule
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
@@ -18,7 +20,7 @@ import javax.sql.DataSource
 
 class Repository(private val datasource: DataSource) {
     companion object {
-        private val secureLog = SecureLog(log)
+        private val teamlog = teamlog(log)
         private val objectMapper: ObjectMapper = JsonMapper.builder()
             .addModule(kotlinModule())
             .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -30,7 +32,7 @@ class Repository(private val datasource: DataSource) {
 
     fun lagreArbeidssøkerperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
-        secureLog.info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
+        teamlog.info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
             "Start ${periode.startet} avslutt: ${periode.avsluttet}")
 
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid

@@ -4,15 +4,12 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
 
-    <appender name="secureLog" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="team-logs-test" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <logger name="secureLog" level="TRACE" additivity="false">
-        <appender-ref ref="secureLog"/>
-    </logger>
-
-    <root level="INFO">
+    <root level="TRACE">
         <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="team-logs-test"/>
     </root>
 </configuration>

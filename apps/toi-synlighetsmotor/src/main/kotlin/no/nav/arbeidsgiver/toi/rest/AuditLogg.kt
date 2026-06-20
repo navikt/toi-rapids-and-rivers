@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.rest
 
-import no.nav.arbeidsgiver.toi.secureLog
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.common.audit_log.cef.AuthorizationDecision
 import no.nav.common.audit_log.cef.CefMessage
 import no.nav.common.audit_log.cef.CefMessageEvent
@@ -14,8 +15,9 @@ object AuditLogg {
 
     private fun log(cefMessage: CefMessage) {
         val ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn = " "
-        auditLogger.log("$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn)
-        secureLog.info("auditlogger: {}", "$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn)
+        val auditlinje = "$cefMessage" + ekstraSpaceSidenAuditloggerInnimellomKutterSisteTegn
+        auditLogger.log(auditlinje)
+        teamlog(log).info("auditlogger: $auditlinje")
     }
 
     fun loggSynlighetsoppslag(personident: String, authenticatedUser: AuthenticatedUser) {

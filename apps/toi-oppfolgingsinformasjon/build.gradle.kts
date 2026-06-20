@@ -7,4 +7,5 @@ application {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
 }

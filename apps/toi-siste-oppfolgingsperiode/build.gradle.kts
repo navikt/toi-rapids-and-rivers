@@ -7,6 +7,7 @@ application {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation("tools.jackson.module:jackson-module-kotlin:3.1.3")
 
     implementation("org.apache.kafka:kafka-streams:4.2.0")

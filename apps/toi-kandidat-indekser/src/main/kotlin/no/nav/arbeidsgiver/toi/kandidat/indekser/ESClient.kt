@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import org.apache.hc.client5.http.auth.AuthScope
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials

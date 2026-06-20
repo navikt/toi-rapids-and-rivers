@@ -5,12 +5,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
-import org.slf4j.LoggerFactory
 import java.time.Duration
 import kotlin.coroutines.CoroutineContext
 
@@ -21,7 +22,7 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
         rapidsConnection.register(this)
     }
 
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     private val leesahTopic = "pdl.leesah-v1"
 
@@ -33,8 +34,9 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
         log.info("Pdl lytter klar")
 
         job.invokeOnCompletion {
-            log.error("Shutting down Rapid(se securelog")
-            secureLog.error("Shutting down Rapid", it)
+            log.error("Shutting down Rapid(se teamlog")
+            if (it == null) teamlog.error("Shutting down Rapid")
+            else teamlog.error("Shutting down Rapid", it)
             rapidsConnection.stop()
         }
 
@@ -53,13 +55,13 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
                             personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
                             it.commitSync()
                         } catch (e: RetriableException) {
-                            secureLog.warn("Fikk en retriable exception, prøver på nytt", e)
-                            log.warn("Fikk en retriable exception, prøver på nytt(se securelog)")
+                            teamlog.warn("Fikk en retriable exception, prøver på nytt", e)
+                            log.warn("Fikk en retriable exception, prøver på nytt(se teamlog)")
                         }
                     }
                 } catch (e: Exception) {
-                    log.error("Jobb mottok en exception(se securelog)")
-                    secureLog.error("Jobb mottok en exception", e)
+                    log.error("Jobb mottok en exception(se teamlog)")
+                    teamlog.error("Jobb mottok en exception", e)
                     throw e
                 }
                 finally {

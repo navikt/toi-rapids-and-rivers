@@ -10,9 +10,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import org.slf4j.LoggerFactory
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -43,8 +45,8 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
         )
 
         val aktørId = packet["aktorId"].asString()
-        log.info("Skal publisere siste oppfølgingsperiodemelding for aktørid (se securelog)")
-        secureLog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
+        log.info("Skal publisere siste oppfølgingsperiodemelding for aktørid (se teamlog)")
+        teamlog.info("Skal publisere siste oppfølgingsperiodemelding for $aktørId")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
@@ -52,7 +54,7 @@ class SisteOppfolgingsperiodeLytter(private val rapidsConnection: RapidsConnecti
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
         log.error(problems.toString())
-        secureLog.error(problems.toExtendedReport())
+        teamlog.error(problems.toExtendedReport())
     }
 
     private fun JsonMessage.fjernMetadataOgKonverter(): JsonNode {
