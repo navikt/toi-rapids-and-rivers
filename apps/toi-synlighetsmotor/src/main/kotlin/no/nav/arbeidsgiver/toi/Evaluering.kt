@@ -62,7 +62,11 @@ class Evaluering(
      * Brukes for å anonymisere navn i formidling og blokkere ny formidling.
      * Ved manglende informasjon antas ikke sperret (fail-safe mot over-anonymisering).
      */
-    fun sperret() = !erIkkeKode6eller7.default(true) || !harIkkeAdressebeskyttelse.default(true)
+    fun sperret(): Boolean {
+        val harKode6eller7 = !erIkkeKode6eller7
+        val harAdressebeskyttelse = !harIkkeAdressebeskyttelse
+        return harKode6eller7.default(false) || harAdressebeskyttelse.default(false)
+    }
 
     /**
      * Pre-sjekk: Returnerer false hvis noen felt er False (usynlig uansett adressebeskyttelse).

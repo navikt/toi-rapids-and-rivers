@@ -39,7 +39,7 @@ class SynlighetsgrunnlagLytter(
                 it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
                 // Ignorer meldinger fra rekrutteringstreff-flyten - de håndteres av SynlighetRekrutteringstreffLytter
-                it.forbidBehovIListe("synlighetRekrutteringstreff")
+                it.forbidBehovIListe("synlighetRekrutteringstreff") // TODO: Stygt
             }
         }.register(this)
     }
