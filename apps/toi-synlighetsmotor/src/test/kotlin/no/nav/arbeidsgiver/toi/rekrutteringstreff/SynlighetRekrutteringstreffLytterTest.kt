@@ -144,6 +144,7 @@ class SynlighetRekrutteringstreffLytterTest {
         ) {
             // Skal trigge adressebeskyttelse-behov
             assertThat(size).isEqualTo(1)
+            assertThat(key(0)).isEqualTo("1234567890123")
             val behov = field(0, "@behov")
             assertThat(behov.toList().map { it.asString() }).isEqualTo(listOf("adressebeskyttelse", "synlighetRekrutteringstreff"))
         }
@@ -212,6 +213,7 @@ class SynlighetRekrutteringstreffLytterTest {
             repository
         ) {
             assertThat(size).isEqualTo(1)
+            assertThat(key(0)).isEqualTo("1234567890123")
             val synlighet = field(0, "synlighetRekrutteringstreff")
             assertThat(synlighet.get("erSynlig").asBoolean()).isTrue()
             assertThat(synlighet.get("ferdigBeregnet").asBoolean()).isTrue()

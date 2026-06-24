@@ -55,14 +55,15 @@ class SynlighetRekrutteringstreffLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        val aktørId = packet["aktørId"].asString()
         val fodselsnummer = packet["fodselsnummer"].asString()
         val adressebeskyttelseNode = packet[adressebeskyttelseFelt]
 
-        val evaluering = repository.hentMedFnr(fodselsnummer)
+        val evaluering = repository.hentMedAktørid(aktørId)
 
         // Person finnes ikke i synlighetsmotor - anta verken synlig eller sperret
         if (evaluering == null) {
-            besvarMedSynlighet(packet, fodselsnummer, erSynlig = false, ferdigBeregnet = true, sperret = false)
+            besvarMedSynlighet(packet, aktørId, fodselsnummer, erSynlig = false, ferdigBeregnet = true, sperret = false)
             return
         }
 
@@ -78,7 +79,7 @@ class SynlighetRekrutteringstreffLytter(
             if (packet.leggTilBehov(adressebeskyttelseFelt)) {
                 log.info("Trigger adressebeskyttelse-behov for synlighetRekrutteringstreff (fødselsnummer i teamlog)")
                 teamlog.info("Trigger adressebeskyttelse-behov for fødselsnummer: $fodselsnummer")
-                context.publish(fodselsnummer, packet.toJson())
+                context.publish(aktørId, packet.toJson())
             }
             return
         }
@@ -100,11 +101,12 @@ class SynlighetRekrutteringstreffLytter(
             komplettBeregningsgrunnlag = evaluering.erFerdigBeregnet
         )
 
-        besvarMedSynlighet(packet, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true, sperret = oppdatertEvaluering.sperret())
+        besvarMedSynlighet(packet, aktørId, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true, sperret = oppdatertEvaluering.sperret())
     }
 
     private fun besvarMedSynlighet(
         packet: JsonMessage,
+        aktørId: String,
         fodselsnummer: String,
         erSynlig: Boolean,
         ferdigBeregnet: Boolean,
@@ -117,7 +119,7 @@ class SynlighetRekrutteringstreffLytter(
         )
         log.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: (se teamlog)")
         teamlog.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: $fodselsnummer, erSynlig: $erSynlig")
-        rapidsConnection.publish(fodselsnummer, packet.toJson())
+        rapidsConnection.publish(aktørId, packet.toJson())
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
