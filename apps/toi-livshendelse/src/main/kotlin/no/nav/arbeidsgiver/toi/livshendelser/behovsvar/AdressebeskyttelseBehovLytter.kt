@@ -21,6 +21,8 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
             precondition{
                 it.interestedIn("@event_name")
                 it.demandAtFørstkommendeUløsteBehovEr("adressebeskyttelse")
+            }
+            validate {
                 it.requireKey("aktørId")
             }
         }.register(this)

@@ -40,6 +40,7 @@ class SynlighetRekrutteringstreffLytter(
         River(rapidsConnection).apply {
             precondition {
                 it.demandAtFørstkommendeUløsteBehovEr(synlighetRekrutteringstreffBehov)
+                it.requireKey("aktørId")
             }
             validate {
                 it.requireKey("fodselsnummer")

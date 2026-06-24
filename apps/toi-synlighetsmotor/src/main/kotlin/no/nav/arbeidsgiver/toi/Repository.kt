@@ -66,10 +66,10 @@ class Repository(private val dataSource: DataSource) {
             } else null
         }
 
-    fun hentMedFnr(aktorId: String): Evaluering? =
+    fun hentMedFnr(fødselsnummer: String): Evaluering? =
         dataSource.connection.use {
             val resultset = it.prepareStatement("select * from $tabell where $fødselsnummerKolonne = ?").apply {
-                setString(1, aktorId)
+                setString(1, fødselsnummer)
             }.executeQuery()
             if (resultset.next()) {
                 return evalueringFraDB(resultset)

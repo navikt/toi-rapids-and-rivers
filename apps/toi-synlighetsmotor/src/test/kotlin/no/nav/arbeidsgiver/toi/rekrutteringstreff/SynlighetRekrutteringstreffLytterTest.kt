@@ -174,7 +174,8 @@ class SynlighetRekrutteringstreffLytterTest {
                 {
                     "@event_name": "behov",
                     "@behov": ["synlighetRekrutteringstreff", "adressebeskyttelse"],
-                    "fodselsnummer": "10828497311"
+                    "fodselsnummer": "10828497311",
+                    "aktørId": "1234567890123"
                 }
             """.trimIndent(),
             repository
@@ -324,6 +325,22 @@ class SynlighetRekrutteringstreffLytterTest {
     }
 
     @Test
+    fun `skal ignorere behov uten aktørId i stillhet siden toi-identmapper beriker meldingen med aktørId først`() {
+        testProgramMedBehovHendelse(
+            """
+            {
+                "@event_name": "behov",
+                "@behov": ["synlighetRekrutteringstreff"],
+                "fodselsnummer": "10828497311"
+            }
+            """.trimIndent(),
+            repository
+        ) {
+            assertThat(size).isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `skal ikke reagere på behov som allerede er løst`() {
         testProgramMedBehovHendelse(
             behovMeldingMedLøsning("10828497311"),
@@ -367,7 +384,8 @@ class SynlighetRekrutteringstreffLytterTest {
         {
             "@event_name": "behov",
             "@behov": ["synlighetRekrutteringstreff"],
-            "fodselsnummer": "$fodselsnummer"
+            "fodselsnummer": "$fodselsnummer",
+            "aktørId": "1234567890123"
         }
     """.trimIndent()
 
@@ -376,6 +394,7 @@ class SynlighetRekrutteringstreffLytterTest {
             "@event_name": "behov",
             "@behov": ["synlighetRekrutteringstreff"],
             "fodselsnummer": "$fodselsnummer",
+            "aktørId": "1234567890123",
             "adressebeskyttelse": "$adressebeskyttelse"
         }
     """.trimIndent()
