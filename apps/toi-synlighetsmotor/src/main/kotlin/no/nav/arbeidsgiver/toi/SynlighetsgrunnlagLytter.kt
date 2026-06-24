@@ -40,7 +40,7 @@ class SynlighetsgrunnlagLytter(
                 it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
                 // Ignorer meldinger fra rekrutteringstreff-flyten - de håndteres av SynlighetRekrutteringstreffLytter
-                it.forbidBehovIListe("synlighetRekrutteringstreff")
+                it.forbidBehovIListe("synlighetRekrutteringstreff") // TODO: Vi burde ha en bedre måte å hindre duplikatmeldinger på. Denne linjen er her fordi vi ikke vil at dette needet skal trigge at melding også går inn her.
             }
         }.register(this)
     }

@@ -26,8 +26,9 @@ private const val synlighetRekrutteringstreffBehov = "synlighetRekrutteringstref
  * - Trigger adressebeskyttelse-behov hvis nødvendig og venter på svar
  * - Besvarer med synlighet når alle data er tilgjengelige
  *
- * Hvis personen ikke finnes i databasen eller allerede er usynlig,
- * besvares direkte uten å vente på adressebeskyttelse.
+ * Hvis personen ikke finnes i databasen, besvares det direkte med ikke synlig / ikke sperret.
+ * Ellers hentes alltid adressebeskyttelse fra PDL før svar, slik at både kode 6/7 og
+ * PDL-gradering fanges opp - også for personer som er usynlige av andre grunner.
  */
 class SynlighetRekrutteringstreffLytter(
     private val rapidsConnection: RapidsConnection,
@@ -39,6 +40,7 @@ class SynlighetRekrutteringstreffLytter(
         River(rapidsConnection).apply {
             precondition {
                 it.demandAtFørstkommendeUløsteBehovEr(synlighetRekrutteringstreffBehov)
+                it.requireKey("aktørId")
             }
             validate {
                 it.requireKey("fodselsnummer")
@@ -53,29 +55,31 @@ class SynlighetRekrutteringstreffLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        val aktørId = packet["aktørId"].asString()
         val fodselsnummer = packet["fodselsnummer"].asString()
         val adressebeskyttelseNode = packet[adressebeskyttelseFelt]
 
-        val evaluering = repository.hentMedFnr(fodselsnummer)
+        val evaluering = repository.hentMedAktørid(aktørId)
 
-        // Returner umiddelbart med usynlig hvis person ikke funnet eller ikke kan bli synlig
-        if (evaluering == null || !evaluering.kanBliSynlig()) {
-            besvarMedSynlighet(
-                packet,
-                fodselsnummer,
-                erSynlig = false,
-                ferdigBeregnet = evaluering?.erFerdigBeregnet ?: true
-            )
+        // Person finnes ikke i synlighetsmotor - anta verken synlig eller sperret
+        if (evaluering == null) {
+            besvarMedSynlighet(packet, aktørId, fodselsnummer, erSynlig = false, ferdigBeregnet = true, sperret = false)
             return
         }
 
-        // Alle andre felt er OK - sjekk adressebeskyttelse
+        // "sperret" avgjøres av to kilder:
+        //   1. Arena-diskresjonskode 6/7 (erIkkeKode6eller7) - ligger i synlighetsmotor-basen.
+        //   2. PDL-adressebeskyttelse / gradering, inkl. kode 19 strengt fortrolig utland
+        //      (harIkkeAdressebeskyttelse) - ligger IKKE i basen, må hentes via behov.
+        // Vi henter derfor alltid adressebeskyttelse fra PDL før vi svarer, så vi fanger begge
+        // kilder med én flyt. (En kode 6/7-person blir sperret uansett, men det å sjekke PDL for
+        // alle holder logikken enkel og hindrer at PDL-gradering blir oversett.)
         if (adressebeskyttelseNode.isMissingNode) {
             // Adressebeskyttelse ikke hentet ennå - trigger behov for det
             if (packet.leggTilBehov(adressebeskyttelseFelt)) {
                 log.info("Trigger adressebeskyttelse-behov for synlighetRekrutteringstreff (fødselsnummer i teamlog)")
                 teamlog.info("Trigger adressebeskyttelse-behov for fødselsnummer: $fodselsnummer")
-                context.publish(fodselsnummer, packet.toJson())
+                context.publish(aktørId, packet.toJson())
             }
             return
         }
@@ -97,22 +101,25 @@ class SynlighetRekrutteringstreffLytter(
             komplettBeregningsgrunnlag = evaluering.erFerdigBeregnet
         )
 
-        besvarMedSynlighet(packet, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true)
+        besvarMedSynlighet(packet, aktørId, fodselsnummer, oppdatertEvaluering.erSynlig(), ferdigBeregnet = true, sperret = oppdatertEvaluering.sperret())
     }
 
     private fun besvarMedSynlighet(
         packet: JsonMessage,
+        aktørId: String,
         fodselsnummer: String,
         erSynlig: Boolean,
-        ferdigBeregnet: Boolean
+        ferdigBeregnet: Boolean,
+        sperret: Boolean
     ) {
         packet[synlighetRekrutteringstreffBehov] = mapOf(
             "erSynlig" to erSynlig,
-            "ferdigBeregnet" to ferdigBeregnet
+            "ferdigBeregnet" to ferdigBeregnet,
+            "sperret" to sperret
         )
         log.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: (se teamlog)")
         teamlog.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: $fodselsnummer, erSynlig: $erSynlig")
-        rapidsConnection.publish(fodselsnummer, packet.toJson())
+        rapidsConnection.publish(aktørId, packet.toJson())
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
