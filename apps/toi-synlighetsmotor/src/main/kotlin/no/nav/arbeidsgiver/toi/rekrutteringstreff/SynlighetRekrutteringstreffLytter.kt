@@ -11,8 +11,8 @@ import no.nav.arbeidsgiver.toi.Evaluering
 import no.nav.arbeidsgiver.toi.Repository
 import no.nav.arbeidsgiver.toi.demandAtFørstkommendeUløsteBehovEr
 import no.nav.arbeidsgiver.toi.leggTilBehov
-import no.nav.arbeidsgiver.toi.log
-import no.nav.arbeidsgiver.toi.secureLog
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.arbeidsgiver.toi.tilBooleanVerdi
 
 private const val adressebeskyttelseFelt = "adressebeskyttelse"
@@ -34,6 +34,7 @@ class SynlighetRekrutteringstreffLytter(
     private val rapidsConnection: RapidsConnection,
     private val repository: Repository
 ) : River.PacketListener {
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -74,8 +75,8 @@ class SynlighetRekrutteringstreffLytter(
         if (adressebeskyttelseNode.isMissingNode) {
             // Adressebeskyttelse ikke hentet ennå - trigger behov for det
             if (packet.leggTilBehov(adressebeskyttelseFelt)) {
-                log.info("Trigger adressebeskyttelse-behov for synlighetRekrutteringstreff (fødselsnummer i securelog)")
-                secureLog.info("Trigger adressebeskyttelse-behov for fødselsnummer: $fodselsnummer")
+                log.info("Trigger adressebeskyttelse-behov for synlighetRekrutteringstreff (fødselsnummer i teamlog)")
+                teamlog.info("Trigger adressebeskyttelse-behov for fødselsnummer: $fodselsnummer")
                 context.publish(fodselsnummer, packet.toJson())
             }
             return
@@ -113,8 +114,8 @@ class SynlighetRekrutteringstreffLytter(
             "ferdigBeregnet" to ferdigBeregnet,
             "sperret" to sperret
         )
-        log.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: (se securelog)")
-        secureLog.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: $fodselsnummer, erSynlig: $erSynlig")
+        log.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: (se teamlog)")
+        teamlog.info("Besvarer synlighetRekrutteringstreff-behov for fødselsnummer: $fodselsnummer, erSynlig: $erSynlig")
         rapidsConnection.publish(fodselsnummer, packet.toJson())
     }
 

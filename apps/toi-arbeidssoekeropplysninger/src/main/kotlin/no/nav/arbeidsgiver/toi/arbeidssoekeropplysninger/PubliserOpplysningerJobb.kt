@@ -8,6 +8,8 @@ import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.cfg.DateTimeFeature
 import java.time.Duration
 import java.util.*
@@ -19,7 +21,7 @@ class PubliserOpplysningerJobb(
     private val leaderElector: LeaderElector,
     private val meterRegistry: MeterRegistry
 ) {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     companion object {
         private val objectMapper: ObjectMapper = JsonMapper.builder()
@@ -56,7 +58,7 @@ class PubliserOpplysningerJobb(
                 opplysninger.forEach { opplysning ->
                     publiserArbeidssøkeropplysning(opplysning)
                     repository.behandlePeriodeOpplysning(opplysning.periodeId)
-                    secureLog.info("""
+                    teamlog.info("""
                         Publiserte opplysning om ${opplysning.identitetsnummer} start: ${opplysning.periodeStartet}
                         stopp ${opplysning.periodeAvsluttet} 
                         """.trimIndent()

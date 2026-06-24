@@ -9,9 +9,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -38,8 +40,8 @@ class Siste14aVedtakLytter(private val rapidsConnection: RapidsConnection) : Riv
             "@event_name" to "siste14avedtak",
         )
 
-        log.info("Skal publisere siste14aVedtakmelding med aktørid (se securelog) og fattetDato ${packet["fattetDato"].asString()}")
-        secureLog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asString()} og fattetDato ${packet["fattetDato"].asString()}")
+        log.info("Skal publisere siste14aVedtakmelding med aktørid (se teamlog) og fattetDato ${packet["fattetDato"].asString()}")
+        teamlog.info("Skal publisere siste14aVedtakmelding med aktørid ${packet["aktorId"].asString()} og fattetDato ${packet["fattetDato"].asString()}")
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(nyPacket.toJson())

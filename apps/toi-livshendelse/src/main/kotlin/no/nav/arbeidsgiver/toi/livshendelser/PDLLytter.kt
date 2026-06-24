@@ -5,23 +5,29 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.person.pdl.leesah.Personhendelse
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.common.errors.RetriableException
-import org.slf4j.LoggerFactory
 import java.time.Duration
+import java.util.concurrent.CancellationException
 import kotlin.coroutines.CoroutineContext
 
-class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> Consumer<String, Personhendelse>, private val pdlKlient: PdlKlient) :
+class PDLLytter(
+    rapidsConnection: RapidsConnection,
+    private val consumer: () -> Consumer<String, Personhendelse>,
+    private val pdlKlient: PdlKlient
+) :
     CoroutineScope, RapidsConnection.StatusListener {
 
     init {
         rapidsConnection.register(this)
     }
 
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     private val leesahTopic = "pdl.leesah-v1"
 
@@ -32,9 +38,19 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
     override fun onReady(rapidsConnection: RapidsConnection) {
         log.info("Pdl lytter klar")
 
-        job.invokeOnCompletion {
-            log.error("Shutting down Rapid(se securelog")
-            secureLog.error("Shutting down Rapid", it)
+        job.invokeOnCompletion { cause ->
+            when (cause) {
+                null ->
+                    log.info("Shutting down Rapid. Job completed normally.")
+
+                is CancellationException ->
+                    log.info("Shutting down Rapid. Job cancelled normally.", cause)
+
+                else -> {
+                    log.error("Shutting down Rapid. Job failed. See teamlog for cause.")
+                    teamlog.error("Shutting down Rapid. Job failed.", cause)
+                }
+            }
             rapidsConnection.stop()
         }
 
@@ -53,17 +69,16 @@ class PDLLytter(rapidsConnection: RapidsConnection, private val consumer: () -> 
                             personhendelseService.håndter(records.map(ConsumerRecord<String, Personhendelse>::value))
                             it.commitSync()
                         } catch (e: RetriableException) {
-                            secureLog.warn("Fikk en retriable exception, prøver på nytt", e)
-                            log.warn("Fikk en retriable exception, prøver på nytt(se securelog)")
+                            teamlog.warn("Fikk en retriable exception, prøver på nytt", e)
+                            log.warn("Fikk en retriable exception, prøver på nytt(se teamlog)")
                         }
                     }
                 } catch (e: Exception) {
-                    log.error("Jobb mottok en exception(se securelog)")
-                    secureLog.error("Jobb mottok en exception", e)
+                    log.error("Jobb mottok en exception(se teamlog)")
+                    teamlog.error("Jobb mottok en exception", e)
                     throw e
-                }
-                finally {
-                    log.error("Jobb stenges ned")
+                } finally {
+                    log.info("Jobb stenges ned")
                 }
             }
         }

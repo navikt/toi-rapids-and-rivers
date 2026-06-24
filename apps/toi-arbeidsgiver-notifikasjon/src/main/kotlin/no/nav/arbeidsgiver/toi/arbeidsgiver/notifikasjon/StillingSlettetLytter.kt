@@ -7,7 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.helse.rapids_rivers.*
+import no.nav.arbeidsgiver.toi.logging.log
 import java.util.*
 
 class StillingSlettetLytter(
@@ -16,7 +16,7 @@ class StillingSlettetLytter(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            precondition{
+            precondition {
                 it.requireValue("@event_name", "kandidat_v2.SlettetStillingOgKandidatliste")
                 it.forbidValue("@slutt_av_hendelseskjede", true)
             }

@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.oppfolgingsperiode
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.processor.StateRestoreListener
+import no.nav.arbeidsgiver.toi.logging.log
 
 class StateRestoreListener(private val kafkaState: () -> KafkaStreams.State): StateRestoreListener {
 

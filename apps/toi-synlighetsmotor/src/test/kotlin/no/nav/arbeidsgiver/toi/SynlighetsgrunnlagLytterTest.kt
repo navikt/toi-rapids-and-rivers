@@ -27,14 +27,16 @@ class SynlighetsgrunnlagLytterTest {
         OPPFØLGINGSINFORMASJON("oppfølgingsinformasjon", oppfølgingsinformasjon(), oppfølgingsinformasjon(erDoed = true)),
         KVP("kvp", kvp(event = "AVSLUTTET"), kvp(event = "STARTET")),
         ARBEIDSSOKEROPPLYSNINGER("arbeidssokeropplysninger", arbeidssøkeropplysninger(), arbeidssøkeropplysninger()),
-        SISTE_OPPFØLGINGSPERIODE("sisteOppfølgingsperiode", aktivSisteOppfølgingsperiode(), avsluttetSisteOppfølgingsperiode()),
+        SISTE_OPPFØLGINGSPERIODE("sisteOppfølgingsperiode", aktivSisteOppfølgingsperiode(), avsluttetSisteOppfølgingsperiode())
     }
 
     private val adressebeskyttelseFeltNavn = "adressebeskyttelse"
     private val adressebeskyttelseSynlig = adressebeskyttelse("UGRADERT")
     private val adressebeskyttelseIkkeSynlig = adressebeskyttelse("STRENGT_FORTROLIG")
+    private val fodselsnummerFeltNavn = "fodselsnummer"
+    private val fødselsnummerSvar = """"fodselsnummer": "12345678910""""
 
-    private val alleFelter = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak"
+    private val alleFelterUnntattAdressebeskyttelse = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak" + "fodselsnummer"
 
     @ParameterizedTest
     @MethodSource("felter")
@@ -49,7 +51,7 @@ class SynlighetsgrunnlagLytterTest {
             val melding = message(0)
             assertThat(melding.path(felt.navn).isMissingNode).isFalse()
             assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
-                .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+                .containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -67,7 +69,7 @@ class SynlighetsgrunnlagLytterTest {
             val melding = message(0)
             assertThat(melding.path(felt.navn).isMissingNode).isFalse()
             assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
-                .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+                .containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -78,7 +80,7 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
                 ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
@@ -92,15 +94,15 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(alleFelter.subList(0, Felt.entries.size-3)).joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${(alleFelterUnntattAdressebeskyttelse.subList(0, Felt.entries.size-3)).joinToString(",","[","]"){""""$it""""}},
                 ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
-                .containsExactlyInAnyOrder(*alleFelter.toTypedArray())
-            assertThat(melding.path("@behov").asIterable()).hasSize(alleFelter.size)
+                .containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
+            assertThat(melding.path("@behov").asIterable()).hasSize(alleFelterUnntattAdressebeskyttelse.size)
         })
     }
 
@@ -111,15 +113,15 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(alleFelter.subList(0, Felt.entries.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${(alleFelterUnntattAdressebeskyttelse.subList(0, Felt.entries.size-3) + annetBehov).joinToString(",","[","]"){""""$it""""}},
                 ${felt.skalGiSynligTrue}
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
             assertThat(melding.path("@behov").asIterable().map(JsonNode::asString))
-                .containsExactlyInAnyOrder(*(alleFelter + annetBehov).toTypedArray())
-            assertThat(melding.path("@behov").asIterable()).hasSize(alleFelter.size+1)
+                .containsExactlyInAnyOrder(*(alleFelterUnntattAdressebeskyttelse + annetBehov).toTypedArray())
+            assertThat(melding.path("@behov").asIterable()).hasSize(alleFelterUnntattAdressebeskyttelse.size+1)
         })
     }
 
@@ -141,9 +143,10 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
                 ${oppfølgingsinformasjon(diskresjonskode = "6")},
                 $adressebeskyttelseIkkeSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -152,7 +155,7 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -168,9 +171,10 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
                 ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
                 $adressebeskyttelseIkkeSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -179,7 +183,7 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -194,9 +198,10 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
                 ${oppfølgingsinformasjon(diskresjonskode = "6")},
                 $adressebeskyttelseSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -205,7 +210,7 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -220,9 +225,10 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
                 ${Felt.OPPFØLGINGSINFORMASJON.skalGiSynligTrue},
                 $adressebeskyttelseSynlig,
+                $fødselsnummerSvar,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
@@ -231,7 +237,7 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isTrue()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -240,13 +246,28 @@ class SynlighetsgrunnlagLytterTest {
     }
 
     @Test
-    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er synlig, skal man be om adressebeskyttelse`() {
-        val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+    fun `Om man har fått alt utenom adressebeskyttelse og fødselsnummer, og evalueringen så langt er synlig, skal man vente på fødselsnummer før man ber om adressebeskyttelse`() {
+        val alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
-                $alleFelterSattTilÅGiSynligTrue
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
+                $alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
+
+    @Test
+    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er synlig, skal man be om adressebeskyttelse`() {
+        val alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
+                $alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -254,19 +275,42 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*(alleFelter.toTypedArray() + adressebeskyttelseFeltNavn))
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*(alleFelterUnntattAdressebeskyttelse.toTypedArray() + adressebeskyttelseFeltNavn))
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
 
     @Test
-    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er synlig, skal man be om adressebeskyttelse, selv om det ligger andre behov på meldingen`() {
-        val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+    fun `Om man har bedt om og fått alt utenom fødselsnummer, og evalueringen så langt er synlig, skal man be om fødselsnummer`() {
+        val alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(alleFelter+"synlighet").joinToString(",","[","]"){""""$it""""}},
-                $alleFelterSattTilÅGiSynligTrue
+                "@behov": ${(alleFelterUnntattAdressebeskyttelse - fodselsnummerFeltNavn + adressebeskyttelseFeltNavn).joinToString(",","[","]"){""""$it""""}},
+                $alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue,
+                $adressebeskyttelseSynlig
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+            val melding = message(0)
+            (Felt.entries.map(Felt::navn) + adressebeskyttelseFeltNavn).forEach { feltNavn ->
+                assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
+            }
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*(alleFelterUnntattAdressebeskyttelse.toTypedArray() + adressebeskyttelseFeltNavn))
+            assertThat(melding.path("synlighet").isMissingNode).isTrue()
+            assertThat(melding.path(fodselsnummerFeltNavn).isMissingNode).isTrue()
+        })
+    }
+
+    @Test
+    fun `Om man har fått alt utenom adressebeskyttelse, og evalueringen så langt er synlig, skal man be om adressebeskyttelse, selv om det ligger andre behov på meldingen`() {
+        val alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${(alleFelterUnntattAdressebeskyttelse+"synlighet").joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
+                $alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
@@ -274,19 +318,20 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactly(adressebeskyttelseFeltNavn,*(alleFelter.toTypedArray()),"synlighet")
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactly(adressebeskyttelseFeltNavn,*(alleFelterUnntattAdressebeskyttelse.toTypedArray()),"synlighet")
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
 
     @Test
     fun `Om man har fått alt utenom adressebeskyttelse, og bedt om adressebeskyttelse, skal man ignorere melding`() {
-        val alleFelterSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
+        val alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue = Felt.entries.map(Felt::skalGiSynligTrue).joinToString()
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${(alleFelter+adressebeskyttelseFeltNavn).joinToString(",","[","]"){""""$it""""}},
-                $alleFelterSattTilÅGiSynligTrue
+                "@behov": ${(alleFelterUnntattAdressebeskyttelse+adressebeskyttelseFeltNavn).joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
+                $alleSynlighetsFelterUnntattAdressebeskyttelseSattTilÅGiSynligTrue
             }
         """.trimIndent(), {
             assertThat(size).isEqualTo(0)
@@ -300,8 +345,9 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
                 $alleFelterUntattEttSattTilÅGiSynligTrue,
+                $fødselsnummerSvar,
                 ${felt.skalGiSynligFalse}
             }
         """.trimIndent(), {
@@ -310,7 +356,7 @@ class SynlighetsgrunnlagLytterTest {
             (Felt.entries.map(Felt::navn)).forEach { feltNavn ->
                 assertThat(feltNavn in melding.propertyNames().asSequence().toList()).isTrue()
             }
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             melding.path("synlighet").apply {
                 assertThat(path("erSynlig").asBoolean()).isFalse()
                 assertThat(path("ferdigBeregnet").asBoolean()).isTrue()
@@ -328,7 +374,7 @@ class SynlighetsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -343,7 +389,7 @@ class SynlighetsgrunnlagLytterTest {
         """.trimIndent(), {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelter.toTypedArray())
+            assertThat(melding.path("@behov").toList().map(JsonNode::asString)).containsExactlyInAnyOrder(*alleFelterUnntattAdressebeskyttelse.toTypedArray())
             assertThat(melding.path("synlighet").isMissingNode).isTrue()
         })
     }
@@ -354,7 +400,23 @@ class SynlighetsgrunnlagLytterTest {
         testProgramMedHendelse("""
             {
                 "aktørId": "$aktørId",
-                "@behov": ${alleFelter.joinToString(",","[","]"){""""$it""""}},
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
+                $fødselsnummerSvar,
+                $alleFelterSattTilÅGiSynligTrue
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(0)
+        })
+    }
+
+    @Test
+    fun `om man får en melding med alle felter unntatt fodselsnummer utfylt så skal synlighetsmotor vente til man har fått svar på fodselsnummer også`() {
+        val alleFelterSattTilÅGiSynligTrue = Felt.entries.joinToString(transform = Felt::skalGiSynligTrue)
+        testProgramMedHendelse("""
+            {
+                "aktørId": "$aktørId",
+                "@behov": ${alleFelterUnntattAdressebeskyttelse.joinToString(",","[","]"){""""$it""""}},
+                $adressebeskyttelseSynlig,
                 $alleFelterSattTilÅGiSynligTrue
             }
         """.trimIndent(), {

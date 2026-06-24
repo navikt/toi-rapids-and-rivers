@@ -1,17 +1,18 @@
 package no.nav.arbeidsgiver.toi
 
-import tools.jackson.module.kotlin.kotlinModule
-
-import tools.jackson.databind.json.JsonMapper
-
 import com.fasterxml.jackson.annotation.JsonProperty
-import tools.jackson.databind.DeserializationFeature
-import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.noClassLogger
+import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.cfg.EnumFeature
 import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.time.Instant
 import java.time.ZonedDateTime
+
+private val log = noClassLogger()
+private val teamlog =
+    teamlog(log) // Top-level plassering for å unngå kostbar instansiering hver gang data class Kandidat instansieres
 
 data class Kandidat(
     val aktørId: String,
@@ -67,12 +68,12 @@ data class Kandidat(
         sluttDatoOppfølging: Instant?
     ) {
         if (startDatoOppfølging.isAfter(now)) {
-            log.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
-            secureLog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
+            log.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se teamlog")
+            teamlog.error("startdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
         if (sluttDatoOppfølging?.isAfter(now) == true) {
-            log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se secure log")
-            secureLog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
+            log.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: se teamlog")
+            teamlog.error("sluttdato for oppfølgingsperiode er frem i tid. Det håndterer vi ikke, vi har ingen egen trigger. Aktørid: ${kandidat.aktørId}")
         }
     }
 
@@ -110,11 +111,6 @@ data class Kandidat(
             )
         }
     }
-
-    fun fødselsNummer() =
-        arbeidsmarkedCv.verdiEllerNull()?.opprettCv?.cv?.fodselsnummer
-            ?: arbeidsmarkedCv.verdiEllerNull()?.endreCv?.cv?.fodselsnummer
-            ?: oppfølgingsinformasjon.verdiEllerNull()?.fodselsnummer
 }
 
 data class CvMelding(

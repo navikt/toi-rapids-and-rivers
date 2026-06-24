@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
+import no.nav.arbeidsgiver.toi.logging.log
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
     fun hentAktørId(fødselsnummer: String): String? {
@@ -39,7 +40,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
     private fun behandleErrorFraPDL(errors: List<Error>?): String? {
         log.warn("Klarte ikke å hente identer fra PDL-respons: $errors")
 
-        return null;
+        return null
     }
 
     private fun lagGraphQLSpørring(ident: String, gruppe: String): String {

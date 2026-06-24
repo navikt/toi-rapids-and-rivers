@@ -27,6 +27,9 @@ spec:
       memory: 512Mi
   accessPolicy:
     outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
       external:
         - host: {{ ontologi_host }}
   kafka:

@@ -6,8 +6,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
-class FødselsnummerLytter(
+class AktørIdPopulator(
     private val fnrKey: String,
     private val rapidsConnection: RapidsConnection,
     private val cluster: String,
@@ -15,7 +17,7 @@ class FødselsnummerLytter(
 ) : River.PacketListener {
     private val aktørIdKey = "aktørId"
 
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -32,8 +34,8 @@ class FødselsnummerLytter(
         if (aktørId == null) {
             if (cluster == "prod-gcp") {
                 val identtype = if (erDnr(packet[fnrKey].asString())) "D-nummer" else "fødselsnummer"
-                log.info("Fant ikke gitt person i PDL, klarte ikke å mappe identtype (se securelog) til aktørId")
-                secureLog.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
+                log.info("Fant ikke gitt person i PDL, klarte ikke å mappe identtype (se teamlog) til aktørId")
+                teamlog.info("Fant ikke gitt person i PDL, klarte ikke å mappe $identtype til aktørId")
             }
         } else {
             log.info("Publiserer melding som har fødselsnummer ($fnrKey), som manglet aktørid")

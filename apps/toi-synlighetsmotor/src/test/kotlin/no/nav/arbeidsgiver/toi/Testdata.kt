@@ -53,7 +53,8 @@ fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "sisteOppfølgingsperiode",
             "kvp",
-            "arbeidssokeropplysninger"
+            "arbeidssokeropplysninger",
+            "fodselsnummer"
         ))
     }
 
@@ -78,7 +79,8 @@ class Testdata {
             "aktørId": "123456789"
         """.trimIndent(),
             kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "AVSLUTTET"),
-            adressebeskyttelse: String? = adressebeskyttelse()
+            adressebeskyttelse: String? = adressebeskyttelse(),
+            fødselsnummer: String? = nullVerdiForKey("fodselsnummer")
         ) =
             hendelseEtterBehovsHenting(
                 sisteOppfølgingsperiode = sisteOppfølgingsperiode,
@@ -90,7 +92,8 @@ class Testdata {
                 kvp = kvp,
                 veileder = veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak = siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
-                adressebeskyttelse = adressebeskyttelse
+                adressebeskyttelse = adressebeskyttelse,
+                fødselsnummer = fødselsnummer
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -148,7 +151,8 @@ class Testdata {
             kvp: String? = nullVerdiForKey("kvp"),
             veileder: String? = nullVerdiForKey("veileder"),
             siste14avedtak: String? = nullVerdiForKey("siste14avedtak"),
-            adressebeskyttelse: String? = nullVerdiForKey("adressebeskyttelse")
+            adressebeskyttelse: String? = nullVerdiForKey("adressebeskyttelse"),
+            fødselsnummer: String? = nullVerdiForKey("fodselsnummer"),
         ) = """
             {
                 ${
@@ -165,7 +169,8 @@ class Testdata {
                 siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
                 adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse"),
                 arbeidssøkerperiode ?: nullVerdiForKey("arbeidssokerperiode"),
-                arbeidssøkeropplysninger ?: nullVerdiForKey("arbeidssokeropplysninger")
+                arbeidssøkeropplysninger ?: nullVerdiForKey("arbeidssokeropplysninger"),
+                fødselsnummer ?: nullVerdiForKey("fodselsnummer")
             ).joinToString()
         }
             }
@@ -218,6 +223,11 @@ class Testdata {
               "producerTimestamp": "2026-02-16T00:32:08.292395515+01:00"
             }
         """.trimIndent()
+
+        fun fødselsnummer() =
+            """
+                "fodselsnummer": "123456789"
+            """.trimIndent()
 
         fun arbeidssøkeropplysninger(aktiv: Boolean = true) :String {
             val avsluttet = if (aktiv) "null" else "\"2020-10-31T14:15:38+01:00\""

@@ -3,18 +3,19 @@ package no.nav.arbeidsgiver.toi.livshendelser
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.jackson.responseObject
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
-import org.slf4j.LoggerFactory
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     fun hentGraderingPerAktørId(ident: String): Map<String, String> {
         val accessToken = accessTokenClient.hentAccessToken()
         val graphql = lagGraphQLSpørring(ident)
 
         val (_, _, result) = com.github.kittinunf.fuel.Fuel.post(pdlUrl)
-            .header(com.github.kittinunf.fuel.core.Headers.Companion.CONTENT_TYPE, "application/json")
+            .header(com.github.kittinunf.fuel.core.Headers.CONTENT_TYPE, "application/json")
             .header("Tema", "GEN")
             .header("Behandlingsnummer", "B346")
             .authentication().bearer(accessToken)
@@ -38,8 +39,8 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
                     ?: behandleErrorFraPDL(result.get().errors, ident)
             }
             is com.github.kittinunf.result.Result.Failure -> {
-                log.error("Noe feil skjedde ved henting av diskresjonskode for ident(se securelog)")
-                secureLog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message} ${result.error.message} ${result.error.response.statusCode}")
+                log.error("Noe feil skjedde ved henting av diskresjonskode for ident(se teamlog)")
+                teamlog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${result.getException().message} ${result.error.message} ${result.error.response.statusCode}")
                 throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", result.getException())
             }
         }
@@ -55,11 +56,11 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
     private fun behandleErrorFraPDL(errors: List<Error>?, ident: String): Map<String, String> {
 
         return if (errors?.all { it.message == "Fant ikke person" } == true) {
-            secureLog.info("Fant ikke person: $ident")
+            teamlog.info("Fant ikke person: $ident")
             mapOf(ident to "UKJENT")
         } else {
-            log.error("Klarte ikke å hente gradering fra PDL-respons: se securelog")
-            secureLog.error("Klarte ikke å hente gradering fra PDL-respons for $ident: $errors")
+            log.error("Klarte ikke å hente gradering fra PDL-respons: se teamlog")
+            teamlog.error("Klarte ikke å hente gradering fra PDL-respons for $ident: $errors")
             throw Exception("Klarte ikke å hente gradering fra PDL-respons")
         }
     }

@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.rest
 
-import no.nav.arbeidsgiver.toi.noClassLogger
+import no.nav.arbeidsgiver.toi.logging.noClassLogger
 import no.nav.security.token.support.core.configuration.IssuerProperties
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration
 import no.nav.security.token.support.core.validation.JwtTokenValidationHandler

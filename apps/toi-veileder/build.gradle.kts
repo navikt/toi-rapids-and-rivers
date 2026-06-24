@@ -7,6 +7,7 @@ application {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
     implementation("no.nav.security:token-client-core:2.1.0")

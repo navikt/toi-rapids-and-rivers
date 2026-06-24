@@ -7,5 +7,6 @@ application {
 }
 
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation("org.apache.kafka:kafka-streams:4.2.0")
 }
