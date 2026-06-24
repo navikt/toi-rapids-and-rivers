@@ -14,6 +14,7 @@ spec:
     path: /isready
   prometheus:
     enabled: true
+    port: 9000
     path: /metrics
   replicas:
     min: {{ min_replicas }}
