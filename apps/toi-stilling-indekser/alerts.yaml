@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-stilling-indekser
           expr: kube_deployment_status_replicas_available{deployment="toi-stilling-indekser"} == 0
-          for: 2m
+          for: 7m
           annotations:
             summary: Appen er nede
             action: "https://logs.az.nav.no/goto/d05cc135b21fe297b41e00361ce1d599?security_tenant=navlogs"
