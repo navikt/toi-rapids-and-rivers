@@ -51,7 +51,7 @@ val epostTemplate = """
                             <li>Skriv «Rekrutteringssaker og CV-er fra Nav», så vil alternativet komme opp som et valg. Velg «Rekrutteringssaker og CV-er fra Nav».</li>
                             <li>Bekreft</li>
                         </ol>
-                        <p>Denne enkeltrettigheten gir <i>kun</i> tilgang til å motta oversendte CV-er fra Nav på &quot;Min side – arbeidsgiver&quot; på <a href="https://www.nav.no/arbeidsgiver">nav.no</a>. Arbeidsgiver kan derfor være trygg på at de ansatte som får denne enkeltrettigheten ikke får tilgang til noe annet.</p>
+                        <p>Denne enkeltrettigheten gir <i>kun</i> tilgang til å motta oversendte CV-er fra Nav på &quot;Min side – arbeidsgiver&quot; på Nav sitt nettsted. Arbeidsgiver kan derfor være trygg på at de ansatte som får denne enkeltrettigheten ikke får tilgang til noe annet.</p>
                         <p><b>Ga ikke Altinn deg muligheten til å gi tilgang?</b></p>
                         <p>Du kan gi tilgang hvis du har en av disse rollene:</p>
                         <ul style='line-height: 24px'>
