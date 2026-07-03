@@ -57,7 +57,7 @@ val epostTemplate = """
                         <ul style='line-height: 24px'>
                             <li>Du er registrert i Enhetsregisteret som daglig leder, styrets leder, bestyrende reder eller innehaver.</li>
                             <li>Du er registert som hovedadministrator i Altinn.</li>
-                            <li>Du har tilgangen som heter «Tilgangsstyrer» i Altinn, og har den tilgangen du ønsker å delegere: enten enkeltrettigheten «Rekrutteringssaker og CV-er fra Nav», eller tilgangspakken «Ansettelsesforhold».</li>
+                            <li>Du har tilgangen som heter «Tilgangsstyrer» i Altinn, og har den tilgangen du ønsker å delegere: enkeltrettigheten «Rekrutteringssaker og CV-er fra Nav». Dersom du har tilgangspakken «Ansettelsesforhold» kan du også delegere enkeltrettigheten «Rekrutteringssaker og CV-er fra Nav».</li>
                         </ul>
                     </div>
                 </div>
