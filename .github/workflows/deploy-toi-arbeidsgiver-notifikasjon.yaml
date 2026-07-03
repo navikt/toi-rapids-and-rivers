@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/tekstendring-epost
+      deploy_dev_branch: refs/heads/epost-tekstendring
     secrets: inherit
     permissions:
       contents: read
