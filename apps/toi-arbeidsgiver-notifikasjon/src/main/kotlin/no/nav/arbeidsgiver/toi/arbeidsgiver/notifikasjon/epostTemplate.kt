@@ -31,7 +31,7 @@ val epostTemplate = """
 
             <h2 style='font-size: 16px; margin-top: 40px; margin-bottom: 16px'>Mangler du tilgang til Min Side for Arbeidsgiver hos Nav?</h2>
             <div style='border: 24px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5'>
-                <p style='margin-top: 0'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
+                <p style='margin-top: 0'>Tilgangen til Nav sine rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
                 <p>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
                 <p>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
                 <p style='margin-bottom: 16px; border-bottom: 16px solid #f2f3f5;'>Kopier den gjerne og send den til vedkommende:</p>
