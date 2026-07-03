@@ -34,7 +34,7 @@ val epostTemplate = """
                 <p style='margin-top: 0'>Tilgangen til NAVs rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
                 <p>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
                 <p>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
-                <p style='margin-bottom: 0; border-bottom: 16px solid #f2f3f5;'>Kopier den gjerne og send den til vedkommende:</p>
+                <p style='margin-bottom: 16px; border-bottom: 16px solid #f2f3f5;'>Kopier den gjerne og send den til vedkommende:</p>
 
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
                     <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
@@ -51,13 +51,13 @@ val epostTemplate = """
                             <li>Skriv «Rekrutteringssaker og CV-er fra Nav», så vil alternativet komme opp som et valg. Velg «Rekrutteringssaker og CV-er fra Nav».</li>
                             <li>Bekreft</li>
                         </ol>
-                        <p>Denne enkeltrettigheten gir kun tilgang til å bruke Nav sine rekrutteringstjenester: publisere stillingsannonser og holde videomøter for stillinger på Arbeidsplassen, og motta CV-er fra Nav på &quot;Min side - arbeidsgiver&quot; på Nav sitt nettsted.</p>
+                        <p>Denne enkeltrettigheten gir <i>kun</i> tilgang til å motta oversendte CV-er fra Nav på &quot;Min side – arbeidsgiver&quot; på <a href="https://www.nav.no/arbeidsgiver">nav.no</a>. Arbeidsgiver kan derfor være trygg på at de ansatte som får denne enkeltrettigheten ikke får tilgang til noe annet.</p>
                         <p><b>Ga ikke Altinn deg muligheten til å gi tilgang?</b></p>
                         <p>Du kan gi tilgang hvis du har en av disse rollene:</p>
                         <ul style='line-height: 24px'>
                             <li>Du er registrert i Enhetsregisteret som daglig leder, styrets leder, bestyrende reder eller innehaver.</li>
                             <li>Du er registert som hovedadministrator i Altinn.</li>
-                            <li>Du er «Tilgangsstyrer» i Altinn og har én, eller flere av rollene: «Rekrutteringssaker og CV-er fra Nav», «Lønn og personalmedarbeider», eller «Utfyller/innsender».</li>
+                            <li>Du har tilgangen som heter «Tilgangsstyrer» i Altinn, og har den tilgangen du ønsker å delegere: enten enkeltrettigheten «Rekrutteringssaker og CV-er fra Nav», eller tilgangspakken «Ansettelsesforhold».</li>
                         </ul>
                     </div>
                 </div>
