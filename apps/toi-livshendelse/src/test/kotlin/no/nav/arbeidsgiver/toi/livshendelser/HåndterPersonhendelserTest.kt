@@ -281,6 +281,30 @@ class HåndterPersonhendelserTest {
             .hasMessageContaining("Klarte ikke å hente gradering fra PDL-respons")
     }
 
+    @Test
+    fun `sjekk at strengeste adressebeskyttelse velges når personen har flere graderinger`() {
+        val ident = "333333333"
+        stubOAtuh()
+        wiremock.stubMedFlereGraderinger(
+            ident = ident,
+            graderinger = listOf("FORTROLIG", "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG")
+        )
+        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
+        assertThat(resultat).containsEntry(ident, Gradering.STRENGT_FORTROLIG_UTLAND.name)
+    }
+
+    @Test
+    fun `sjekk at strengeste velges når kun graderte verdier finnes`() {
+        val ident = "444444444"
+        stubOAtuh()
+        wiremock.stubMedFlereGraderinger(
+            ident = ident,
+            graderinger = listOf("UGRADERT", "FORTROLIG")
+        )
+        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
+        assertThat(resultat).containsEntry(ident, Gradering.FORTROLIG.name)
+    }
+
     private fun stubPdlPersonNotFound(ident: String = "12312312312") {
         val pesostegn = "$"
         wiremock.stubFor(

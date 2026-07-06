@@ -24,7 +24,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
 
         return when (result) {
             is com.github.kittinunf.result.Result.Success -> {
-                val gradering = result.get().data?.hentPerson?.hentEnesteAdressebeskyttelsenSomFinnes()
+                val gradering = result.get().data?.hentPerson?.strengesteAdressebeskyttelse()
                     ?.gradering?.name
 
                 if (gradering == null) {
@@ -99,16 +99,20 @@ private data class Identer(
 private data class HentPerson(
     val adressebeskyttelse: List<Adressebeskyttelse>
 ) {
-    fun hentEnesteAdressebeskyttelsenSomFinnes() = adressebeskyttelse.firstOrNull()
-        .apply {
-            if (adressebeskyttelse.size > 1) {
-                if (erDev) {
-                    log.warn("For mange adressebeskyttelser (${adressebeskyttelse.size}) på person")
-                } else {
-                    throw IndexOutOfBoundsException("For mange adressebeskyttelser (${adressebeskyttelse.size}) på person")
-                }
-            }
-        } ?: Adressebeskyttelse(Gradering.UGRADERT)
+    fun strengesteAdressebeskyttelse(): Adressebeskyttelse {
+        if (adressebeskyttelse.size > 1) {
+            log.warn("Fant ${adressebeskyttelse.size} adressebeskyttelser på person, velger strengeste")
+        }
+        return adressebeskyttelse.maxByOrNull { strenghet(it.gradering) }
+            ?: Adressebeskyttelse(Gradering.UGRADERT)
+    }
+
+    private fun strenghet(gradering: Gradering) = when (gradering) {
+        Gradering.STRENGT_FORTROLIG_UTLAND -> 3
+        Gradering.STRENGT_FORTROLIG -> 2
+        Gradering.FORTROLIG -> 1
+        Gradering.UGRADERT -> 0
+    }
 }
 
 private data class Adressebeskyttelse(
