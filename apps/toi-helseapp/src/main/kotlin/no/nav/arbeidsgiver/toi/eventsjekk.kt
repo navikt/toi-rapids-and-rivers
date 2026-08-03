@@ -123,9 +123,13 @@ class SisteEvent(private val eventName: String, private val duration: Duration) 
 
         private fun justertGrenseverdiForAlarm(duration: Duration): Duration {
             val now = LocalDate.now()
-            return if (now.month == JULY) duration.plus(duration)
-            else if (now.month == DECEMBER && now.dayOfMonth >= 22) duration.plus(duration)
-            else duration
+            return when (now.month) {
+                JULY -> Duration.ofDays(1) + duration.plus(duration) + if(now.dayOfWeek == MONDAY) Duration.ofDays(2) else Duration.ofDays(0)
+                AUGUST if now.dayOfMonth < 15 -> Duration.ofDays(1) + duration.plus(duration) + if(now.dayOfWeek == MONDAY) Duration.ofDays(2) else Duration.ofDays(0)
+                JUNE if now.dayOfMonth >= 16 -> Duration.ofDays(1) + duration.plus(duration) + if(now.dayOfWeek == MONDAY) Duration.ofDays(2) else Duration.ofDays(0)
+                DECEMBER if now.dayOfMonth >= 22 -> duration.plus(duration)
+                else -> duration
+            }
         }
     }
 }
