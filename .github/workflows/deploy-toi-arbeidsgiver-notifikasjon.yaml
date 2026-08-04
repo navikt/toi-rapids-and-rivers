@@ -17,7 +17,6 @@ jobs:
     with:
       app_name: ${{ github.workflow }}
       deploy_dev_branch: refs/heads/epost-tekstendring
-    secrets: inherit
     permissions:
       contents: read
       id-token: write
