@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - endre_versjon_opensearch
+      - bruk-zizmor-paa-workflows
     paths:
       - apps/toi-stilling-indekser/opensearch.yaml
       - .github/workflows/deploy-opensearch-stilling-dev.yml
@@ -15,9 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: deploy to dev
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@fc3eae3edebabdf67f7592102ae16176d5ba3b5f # v2
         env:
           CLUSTER: dev-gcp
           RESOURCE: apps/toi-stilling-indekser/opensearch.yaml
