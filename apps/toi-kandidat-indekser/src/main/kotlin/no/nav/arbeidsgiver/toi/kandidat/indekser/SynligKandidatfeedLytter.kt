@@ -32,7 +32,7 @@ class SynligKandidatfeedLytter(
             }
             validate {
                 it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet", "arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder", "geografi.geografi")
-                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn")
+                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn", "sisteOppfølgingsperiode.kontor.kontorNavn", "sisteOppfølgingsperiode.kontor.kontorId")
             }
         }.register(this)
     }
@@ -45,6 +45,19 @@ class SynligKandidatfeedLytter(
         meterRegistry: MeterRegistry
     ) {
         val aktørId = packet["aktørId"].asText()
+
+        val oppfølgingsenhet = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
+        val kontorId = packet["sisteOppfølgingsperiode.kontor.kontorId"].asText()
+        if(oppfølgingsenhet != kontorId) {
+            log.warn("Forskjellige oppfølgingsenhet/kontorId")
+            teamlog.warn("Forskjellige oppfølgingsenhet/kontorId: $oppfølgingsenhet / $kontorId")
+        }
+        val organisasjonsenhetsnavn = packet["organisasjonsenhetsnavn"].asText()
+        val kontorNavn = packet["sisteOppfølgingsperiode.kontor.kontorNavn"].asText()
+        if(organisasjonsenhetsnavn != kontorNavn) {
+            log.warn("organisasjonsenhetsnavn/kontorNavn")
+            teamlog.warn("Forskjellige organisasjonsenhetsnavn/kontorNavn: $organisasjonsenhetsnavn / $kontorNavn")
+        }
 
         esClient.lagreEsCv(EsCv.fraMelding(packet))
         teamlog.info("Indekserte kandidat: $aktørId")
