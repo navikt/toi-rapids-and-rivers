@@ -46,19 +46,6 @@ class SynligKandidatfeedLytter(
     ) {
         val aktørId = packet["aktørId"].asText()
 
-        val oppfølgingsenhet = packet["oppfølgingsinformasjon.oppfolgingsenhet"].asText()
-        val kontorId = packet["sisteOppfølgingsperiode.kontor.kontorId"].asText()
-        if(oppfølgingsenhet != kontorId) {
-            log.warn("Forskjellige oppfølgingsenhet/kontorId")
-            teamlog.warn("Forskjellige oppfølgingsenhet/kontorId: $oppfølgingsenhet / $kontorId")
-        }
-        val organisasjonsenhetsnavn = packet["organisasjonsenhetsnavn"].asText()
-        val kontorNavn = packet["sisteOppfølgingsperiode.kontor.kontorNavn"].asText()
-        if(organisasjonsenhetsnavn != kontorNavn) {
-            log.warn("organisasjonsenhetsnavn/kontorNavn")
-            teamlog.warn("Forskjellige organisasjonsenhetsnavn/kontorNavn: $organisasjonsenhetsnavn / $kontorNavn")
-        }
-
         esClient.lagreEsCv(EsCv.fraMelding(packet))
         teamlog.info("Indekserte kandidat: $aktørId")
         packet["@slutt_av_hendelseskjede"] = true
