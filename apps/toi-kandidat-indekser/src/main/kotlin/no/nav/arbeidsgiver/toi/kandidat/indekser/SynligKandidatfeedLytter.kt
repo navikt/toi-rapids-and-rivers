@@ -51,12 +51,13 @@ class SynligKandidatfeedLytter(
         if(oppfølgingsenhet != kontorId) {
             log.warn("Forskjellige oppfølgingsenhet/kontorId")
             teamlog.warn("Forskjellige oppfølgingsenhet/kontorId: $oppfølgingsenhet / $kontorId")
-        }
-        val organisasjonsenhetsnavn = packet["organisasjonsenhetsnavn"].asText()
-        val kontorNavn = packet["sisteOppfølgingsperiode.kontor.kontorNavn"].asText()
-        if(organisasjonsenhetsnavn != kontorNavn) {
-            log.warn("organisasjonsenhetsnavn/kontorNavn")
-            teamlog.warn("Forskjellige organisasjonsenhetsnavn/kontorNavn: $organisasjonsenhetsnavn / $kontorNavn")
+        } else {
+            val organisasjonsenhetsnavn = packet["organisasjonsenhetsnavn"].asText()
+            val kontorNavn = packet["sisteOppfølgingsperiode.kontor.kontorNavn"].asText()
+            if (organisasjonsenhetsnavn != kontorNavn) {
+                log.warn("Forskjellige organisasjonsenhetsnavn/kontorNavn")
+                teamlog.warn("Forskjellige organisasjonsenhetsnavn/kontorNavn: $organisasjonsenhetsnavn / $kontorNavn")
+            }
         }
 
         esClient.lagreEsCv(EsCv.fraMelding(packet))
