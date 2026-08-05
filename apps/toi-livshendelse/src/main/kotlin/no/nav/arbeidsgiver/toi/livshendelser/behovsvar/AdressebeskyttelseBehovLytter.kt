@@ -1,4 +1,4 @@
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -6,15 +6,15 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
 import no.nav.arbeidsgiver.toi.livshendelser.PersonhendelseService
-import no.nav.arbeidsgiver.toi.livshendelser.log
-import org.slf4j.LoggerFactory
 
 class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rapidsConnection: RapidsConnection) :
     River.PacketListener {
 
-    private val secureLog = LoggerFactory.getLogger("secureLog")
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -35,7 +35,7 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
         meterRegistry: MeterRegistry
     ) {
         //Mulige Koder:  "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG", "FORTROLIG", "UGRADERT", null(mappes til UKJENT)
-        val aktørid: String = packet["aktørId"].asText()
+        val aktørid: String = packet["aktørId"].asString()
 
 
         val personhendelseService = PersonhendelseService(rapidsConnection, pdlKlient)
@@ -45,10 +45,10 @@ class AdressebeskyttelseLytter(private val pdlKlient: PdlKlient, private val rap
         // Kun til testbruk dersom vi vil skru av livshendelsesjekk på grunn av at det går for tregt, erstatter da koden ovenfor.
         //packet["adressebeskyttelse"] = "CHECK_DISABLED"
 
-        log.info("Sender løsning på behov for aktørid: (se securelog)")
-        secureLog.info("Sender løsning på behov for aktørid: $aktørid")
+        log.info("Sender løsning på behov for aktørid: (se teamlog)")
+        teamlog.info("Sender løsning på behov for aktørid: $aktørid")
         if(gradering != null && gradering != "UGRADERT" ) {
-            secureLog.info("Adressebeskyttelse  ${aktørid} $gradering ${packet["@event_name"].asText()}")
+            teamlog.info("Adressebeskyttelse  ${aktørid} $gradering ${packet["@event_name"].asString()}")
         }
 
         context.publish(aktørid, packet.toJson())
@@ -63,7 +63,7 @@ private fun JsonMessage.demandAtFørstkommendeUløsteBehovEr(informasjonsElement
     require("@behov") { behovNode ->
         if (behovNode
                 .toList()
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .onEach { interestedIn(it) }
                 .first { this[it].isMissingNode } != informasjonsElement
         )

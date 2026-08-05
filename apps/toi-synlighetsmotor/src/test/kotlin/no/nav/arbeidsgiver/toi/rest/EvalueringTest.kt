@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi.rest
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.authentication
 import io.javalin.Javalin
@@ -50,15 +50,16 @@ class EvalueringTest {
 
     @Test
     fun `POST mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
+        val fødselsnummer = "12345678912"
 
-        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fødselsnummer = """"fodselsnummer": "$fødselsnummer""""))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
         val response = Fuel.post("http://localhost:8301/evaluering")
             .authentication().bearer(token.serialize())
-            .body("""{"fnr": "12345678912"}""")
+            .body("""{"fnr": "$fødselsnummer"}""")
             .response().second
 
         Assertions.assertThat(response.statusCode).isEqualTo(200)
@@ -70,13 +71,14 @@ class EvalueringTest {
 
     @Test
     fun `Deprekert til fordel for post GET mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
+        val fnr = "123456789"
 
-        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
+        rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fødselsnummer = """"fodselsnummer": "$fnr""""))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
-        val response = Fuel.get("http://localhost:8301/evaluering/12345678912")
+        val response = Fuel.get("http://localhost:8301/evaluering/$fnr")
             .authentication().bearer(token.serialize())
             .response().second
 
@@ -89,14 +91,16 @@ class EvalueringTest {
 
     @Test // TODO bruk noe annet enn frkas til å flippe status
     fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
+        val fødselsnummer = "12345678912"
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
                 arbeidssøkeropplysninger = Testdata.arbeidssøkeropplysninger(aktiv = true),
+                fødselsnummer = """"fodselsnummer": "$fødselsnummer""""
             )
         )
 
@@ -117,20 +121,22 @@ class EvalueringTest {
 
     @Test
     fun `Deprekert til fordel for post GET mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
-        val objectmapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
+        val fnr = "123456789"
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
         rapid.sendTestMessage(
             komplettHendelseSomFørerTilSynlighetTrue(
                 arbeidssøkeropplysninger = Testdata.arbeidssøkeropplysninger(aktiv = true),
+                fødselsnummer = """"fodselsnummer": "$fnr""""
             )
         )
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
 
-        val response = Fuel.get("http://localhost:8301/evaluering/12345678912")
+        val response = Fuel.get("http://localhost:8301/evaluering/$fnr")
             .authentication().bearer(token.serialize())
             .response().second
 

@@ -6,11 +6,20 @@ import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
+import no.nav.arbeidsgiver.toi.logging.log
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
     fun hentAktørId(fødselsnummer: String): String? {
+        return hentIdent(ident = fødselsnummer, gruppe = "AKTORID")
+    }
+
+    fun hentFødselsnummer(aktørId: String): String? {
+        return hentIdent(ident = aktørId, gruppe = "FOLKEREGISTERIDENT")
+    }
+
+    private fun hentIdent(ident: String, gruppe: String): String? {
         val accessToken = accessTokenClient.hentAccessToken()
-        val graphql = lagGraphQLSpørring(fødselsnummer)
+        val graphql = lagGraphQLSpørring(ident = ident, gruppe = gruppe)
 
         val (_, _, result) = Fuel.post(pdlUrl)
             .header(Headers.CONTENT_TYPE, "application/json")
@@ -31,16 +40,16 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
     private fun behandleErrorFraPDL(errors: List<Error>?): String? {
         log.warn("Klarte ikke å hente identer fra PDL-respons: $errors")
 
-        return null;
+        return null
     }
 
-    private fun lagGraphQLSpørring(fødselsnummer: String): String {
+    private fun lagGraphQLSpørring(ident: String, gruppe: String): String {
         val pesostegn = "$"
 
         return """
             {
-                "query": "query( ${pesostegn}ident: ID!) { hentIdenter(ident: ${pesostegn}ident, grupper: [AKTORID], historikk: false) { identer { ident }}}",
-                "variables":{"ident":"$fødselsnummer"}
+                "query": "query( ${pesostegn}ident: ID!) { hentIdenter(ident: ${pesostegn}ident, grupper: [$gruppe], historikk: false) { identer { ident }}}",
+                "variables":{"ident":"$ident"}
             }
         """.trimIndent()
     }

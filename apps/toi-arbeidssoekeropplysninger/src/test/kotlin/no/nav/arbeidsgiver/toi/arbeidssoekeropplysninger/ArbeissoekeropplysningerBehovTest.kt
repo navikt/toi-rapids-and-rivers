@@ -1,9 +1,12 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.kotlinModule
+
+import tools.jackson.databind.json.JsonMapper
+
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.toi.TestRapid
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
@@ -41,10 +44,10 @@ class ArbeissoekeropplysningerBehovTest {
 
     lateinit var repository: Repository
 
-    private val jacksonMapper = jacksonObjectMapper()
-        .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+    private val jacksonMapper = JsonMapper.builder()
+        .addModule(kotlinModule())
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .registerModule(JavaTimeModule())
+        .build()
 
     @BeforeAll
     fun init() {
@@ -176,7 +179,7 @@ class ArbeissoekeropplysningerBehovTest {
 }
 
 private fun JsonNode.assertHarArbeidssokeropplysninger() {
-    assertThat(fieldNames().asSequence().toList()).contains("arbeidssokeropplysninger")
+    assertThat(propertyNames()).contains("arbeidssokeropplysninger")
 }
 
 private fun behovsMelding(

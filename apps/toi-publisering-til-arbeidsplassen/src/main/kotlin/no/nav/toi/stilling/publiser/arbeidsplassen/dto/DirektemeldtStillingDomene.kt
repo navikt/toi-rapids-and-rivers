@@ -1,9 +1,10 @@
 package no.nav.toi.stilling.publiser.arbeidsplassen.dto
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import tools.jackson.databind.cfg.EnumFeature
 import java.util.*
 
 data class RapidHendelse(
@@ -11,10 +12,12 @@ data class RapidHendelse(
     val direktemeldtStilling: DirektemeldtStilling
 ) {
     companion object {
-        private val mapper = jacksonObjectMapper()
+        private val mapper = JsonMapper.builder()
+            .addModule(kotlinModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .registerModule(JavaTimeModule())
+            .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+
+            .build()
 
         fun fraJson(jsonMessage: JsonMessage): RapidHendelse = mapper.readValue(jsonMessage.toJson(), RapidHendelse::class.java)
     }

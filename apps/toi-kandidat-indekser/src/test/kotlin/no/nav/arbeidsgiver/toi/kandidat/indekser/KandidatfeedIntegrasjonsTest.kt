@@ -179,10 +179,17 @@ class KandidatfeedIntegrasjonsTest {
         assertThat(testrapid.inspektør.message(0).get("@slutt_av_hendelseskjede").booleanValue()).isEqualTo(true)
     }
 
-
+    @Test
+    fun `Mapping fungerer rett på escv når datoer er formaterte som localdate`() {
+        mappingFungerer(true)
+    }
 
     @Test
     fun `Mapping fungerer rett på escv`() {
+        mappingFungerer(false)
+    }
+
+    fun mappingFungerer(yyyymmddTilLocalDate: Boolean) {
         assertIngenIIndekser()
         val expectedKandidatnr = "CG133310"
         val expectedAktorId = "987654321"
@@ -451,6 +458,7 @@ class KandidatfeedIntegrasjonsTest {
             arbeidstidsordningJobbonsker = listOf(expectedArbeidstidsordningJobbonskerArbeidstidsordningKode),
             arbeidsdagerJobbonsker = listOf(expectedArbeidsdagerJobbonskerArbeidsdagerKode),
             arbeidstidJobbonsker = listOf(expectedArbeidstidJobbonskerArbeidstidKode),
+            yyyymmddTilLocalDate = yyyymmddTilLocalDate
         )
 
         val testrapid = TestRapid()

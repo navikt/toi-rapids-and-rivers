@@ -1,9 +1,14 @@
 plugins {
-    id("toi.rapids-and-rivers")
+    id("toi.rapids-and-rivers-deprekert-jackson2")
+}
+
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.kandidat.indekser.ApplicationKt")
 }
 
 val pamAnsettelseskodeverkVersion = "1.18"
 dependencies {
+    implementation(project(":technical-libs:logging"))
     testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:testcontainers-elasticsearch")

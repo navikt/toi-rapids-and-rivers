@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.veileder
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.toi.TestRapid
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -88,13 +88,13 @@ class VeilederTest {
     private fun performCommonAssertions(inspektør: TestRapid.RapidInspector, aktørId: String, veilederId: String, tilordnet: String) {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
-        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
-        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["@event_name"].asString()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asString()).isEqualTo(aktørId)
 
         val veilederJson = meldingJson["veileder"]
-        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
-        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
-        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(veilederJson["aktorId"].asString()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asString()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asString()).isEqualTo(tilordnet)
     }
 
     @Test
@@ -157,13 +157,13 @@ class VeilederTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
-        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["@event_name"].asString()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asString()).isEqualTo(aktørId)
 
         val veilederJson = meldingJson["veileder"]
-        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
-        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
-        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(veilederJson["aktorId"].asString()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asString()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asString()).isEqualTo(tilordnet)
         assertThat(veilederJson["veilederinformasjon"].isNull).isTrue()
     }
 
@@ -201,13 +201,13 @@ class VeilederTest {
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
-        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
-        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["@event_name"].asString()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asString()).isEqualTo(aktørId)
 
         val veilederJson = meldingJson["veileder"]
-        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
-        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
-        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(veilederJson["aktorId"].asString()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asString()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asString()).isEqualTo(tilordnet)
         assertThat(
             jacksonObjectMapper().treeToValue(
                 veilederJson["veilederinformasjon"],
@@ -321,13 +321,13 @@ class VeilederTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson["@event_name"].asText()).isEqualTo("veileder")
-        assertThat(meldingJson["aktørId"].asText()).isEqualTo(aktørId)
+        assertThat(meldingJson["@event_name"].asString()).isEqualTo("veileder")
+        assertThat(meldingJson["aktørId"].asString()).isEqualTo(aktørId)
 
         val veilederJson = meldingJson["veileder"]
-        assertThat(veilederJson["aktorId"].asText()).isEqualTo(aktørId)
-        assertThat(veilederJson["veilederId"].asText()).isEqualTo(veilederId)
-        assertThat(veilederJson["tilordnet"].asText()).isEqualTo(tilordnet)
+        assertThat(veilederJson["aktorId"].asString()).isEqualTo(aktørId)
+        assertThat(veilederJson["veilederId"].asString()).isEqualTo(veilederId)
+        assertThat(veilederJson["tilordnet"].asString()).isEqualTo(tilordnet)
         assertThat(
             jacksonObjectMapper().treeToValue(
                 veilederJson["veilederinformasjon"],

@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet

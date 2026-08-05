@@ -2,8 +2,6 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 
 private val env = System.getenv()
@@ -25,8 +23,13 @@ fun startApp(
         val accessTokenClient = AccessTokenClient(env)
 
         val pdlKlient = PdlKlient(pdlUrl, accessTokenClient)
-        val repository = Repository(dataSource)
-        val aktørIdCache = AktorIdCache(repository, cluster == "dev-gcp", pdlKlient::hentAktørId)
+        val repository = IdentRepository(dataSource)
+        val identCache = IdentCache(
+            repository,
+            cluster == "dev-gcp",
+            pdlKlient::hentAktørId,
+            pdlKlient::hentFødselsnummer,
+        )
 
         rapidsConnection.register(object: RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
@@ -35,12 +38,15 @@ fun startApp(
         })
 
         listOf("fnr", "fodselsnr", "fodselsnummer").forEach { fnrKey ->
-            Lytter(fnrKey, rapidsConnection, cluster, aktørIdCache::hentAktørId)
+            AktørIdPopulator(fnrKey, rapidsConnection, cluster, identCache::hentAktørId)
         }
+
+        FødselsnummerBehovLytter(
+            rapidsConnection = rapidsConnection,
+            cluster = cluster,
+            hentFødselsnummer = identCache::hentFødselsnummer,
+        )
     }.start()
 }
 
 fun rapidsConnection() = RapidApplication.create(System.getenv())
-
-val Any.log: Logger
-    get() = LoggerFactory.getLogger(this::class.java)

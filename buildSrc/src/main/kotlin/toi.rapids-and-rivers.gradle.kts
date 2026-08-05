@@ -1,5 +1,5 @@
 plugins {
-    id("toi.common")
+    id("toi.app")
 }
 
 repositories {
@@ -8,6 +8,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:2026031212461773315969.b17173a21e7b")
+    implementation("com.github.navikt:rapids-and-rivers:2026043009341777534451")
     testImplementation(project(":technical-libs:testrapid"))
 }

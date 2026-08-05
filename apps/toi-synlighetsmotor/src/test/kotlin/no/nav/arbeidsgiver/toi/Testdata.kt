@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.rest.Rolle
 import no.nav.security.token.support.core.configuration.IssuerProperties
@@ -34,7 +34,7 @@ fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
 ): TestRapid.RapidInspector.() -> Unit =
     {
         Assertions.assertThat(size).isEqualTo(1)
-        Assertions.assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
+        Assertions.assertThat(field(0, "@event_name").asString()).isEqualTo("hendelse")
         field(0, "synlighet").apply {
             Assertions.assertThat(get("erSynlig").asBoolean()).apply { if (synlighet) isTrue else isFalse }
             Assertions.assertThat(get("ferdigBeregnet").asBoolean()).apply { if (ferdigBeregnet) isTrue else isFalse }
@@ -44,16 +44,17 @@ fun enHendelseErPublisertMedSynlighetsverdiOgFerdigBeregnet(
 fun enHendelseErPublisertMedBehov(): TestRapid.RapidInspector.() -> Unit =
     {
         Assertions.assertThat(size).isEqualTo(1)
-        Assertions.assertThat(field(0, "@event_name").asText()).isEqualTo("hendelse")
+        Assertions.assertThat(field(0, "@event_name").asString()).isEqualTo("hendelse")
         Assertions.assertThat(message(0).path("synlighet").isMissingNode).isTrue()
-        Assertions.assertThat(field(0, "@behov").map(JsonNode::asText)).isEqualTo(listOf(
+        Assertions.assertThat(field(0, "@behov").toList().map(JsonNode::asString)).isEqualTo(listOf(
             "arbeidsmarkedCv",
             "veileder",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "oppfølgingsinformasjon",
             "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
             "sisteOppfølgingsperiode",
             "kvp",
-            "arbeidssokeropplysninger"
+            "arbeidssokeropplysninger",
+            "fodselsnummer"
         ))
     }
 
@@ -78,7 +79,8 @@ class Testdata {
             "aktørId": "123456789"
         """.trimIndent(),
             kvp: String? = kvp("2023-06-22T12:21:18.895143217+02:00", null, "AVSLUTTET"),
-            adressebeskyttelse: String? = adressebeskyttelse()
+            adressebeskyttelse: String? = adressebeskyttelse(),
+            fødselsnummer: String? = nullVerdiForKey("fodselsnummer")
         ) =
             hendelseEtterBehovsHenting(
                 sisteOppfølgingsperiode = sisteOppfølgingsperiode,
@@ -90,7 +92,8 @@ class Testdata {
                 kvp = kvp,
                 veileder = veileder ?: nullVerdiForKey("veileder"),
                 siste14avedtak = siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
-                adressebeskyttelse = adressebeskyttelse
+                adressebeskyttelse = adressebeskyttelse,
+                fødselsnummer = fødselsnummer
             )
 
         fun oppfølgingsinformasjonHendelseMedParticipatingService(
@@ -148,7 +151,8 @@ class Testdata {
             kvp: String? = nullVerdiForKey("kvp"),
             veileder: String? = nullVerdiForKey("veileder"),
             siste14avedtak: String? = nullVerdiForKey("siste14avedtak"),
-            adressebeskyttelse: String? = nullVerdiForKey("adressebeskyttelse")
+            adressebeskyttelse: String? = nullVerdiForKey("adressebeskyttelse"),
+            fødselsnummer: String? = nullVerdiForKey("fodselsnummer"),
         ) = """
             {
                 ${
@@ -165,7 +169,8 @@ class Testdata {
                 siste14avedtak ?: nullVerdiForKey("siste14avedtak"),
                 adressebeskyttelse ?: nullVerdiForKey("adressebeskyttelse"),
                 arbeidssøkerperiode ?: nullVerdiForKey("arbeidssokerperiode"),
-                arbeidssøkeropplysninger ?: nullVerdiForKey("arbeidssokeropplysninger")
+                arbeidssøkeropplysninger ?: nullVerdiForKey("arbeidssokeropplysninger"),
+                fødselsnummer ?: nullVerdiForKey("fodselsnummer")
             ).joinToString()
         }
             }
@@ -218,6 +223,11 @@ class Testdata {
               "producerTimestamp": "2026-02-16T00:32:08.292395515+01:00"
             }
         """.trimIndent()
+
+        fun fødselsnummer() =
+            """
+                "fodselsnummer": "123456789"
+            """.trimIndent()
 
         fun arbeidssøkeropplysninger(aktiv: Boolean = true) :String {
             val avsluttet = if (aktiv) "null" else "\"2020-10-31T14:15:38+01:00\""

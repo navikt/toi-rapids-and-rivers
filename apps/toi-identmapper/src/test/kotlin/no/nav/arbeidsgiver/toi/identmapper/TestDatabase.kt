@@ -1,6 +1,7 @@
+package no.nav.arbeidsgiver.toi.identmapper
+
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.arbeidsgiver.toi.identmapper.IdentMapping
 import java.sql.Timestamp
 import javax.sql.DataSource
 

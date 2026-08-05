@@ -1,8 +1,7 @@
 package no.nav.arbeidsgiver.toi.hullicv
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.toi.TestRapid
@@ -306,7 +305,7 @@ class HullCvLytterTest {
 
         assertThat(meldingLengsteErfaringFørst.sluttdatoerForInaktivePerioder).containsExactly(startdato1.minusDays(1))
         assertThat(meldingLengsteErfaringFørst.førsteDagIInneværendeInaktivePeriode).isEqualTo(sluttdato1.plusDays(1))
-        assertThat(meldingKortesteErfaringFørst.asText()).isEqualTo(meldingLengsteErfaringFørst.asText())
+        assertThat(meldingKortesteErfaringFørst["hullICv"].toPrettyString()).isEqualTo(meldingLengsteErfaringFørst["hullICv"].toPrettyString())
     }
 
     @Test
@@ -391,7 +390,7 @@ class HullCvLytterTest {
 
         assertThat(meldingTomSluttdatoSist.sluttdatoerForInaktivePerioder).containsExactly(startdato1.minusDays(1))
         assertThat(meldingTomSluttdatoSist.førsteDagIInneværendeInaktivePeriode).isNull()
-        assertThat(meldingTomSluttdatoSist.asText()).isEqualTo(meldingTomSluttdatoFørst.asText())
+        assertThat(meldingTomSluttdatoSist["hullICv"].toPrettyString()).isEqualTo(meldingTomSluttdatoFørst["hullICv"].toPrettyString())
     }
 
     @Test
@@ -591,7 +590,7 @@ class HullCvLytterTest {
         }
     """.trimIndent()
 
-    private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+    private val objectMapper = jacksonObjectMapper()
 
     private fun List<Any>.tilJsonString() = joinToString(
         prefix = "[",
@@ -599,7 +598,7 @@ class HullCvLytterTest {
         transform = objectMapper::writeValueAsString
     )
 
-    private val JsonNode.sluttdatoerForInaktivePerioder get() = this["hullICv"]["sluttdatoerForInaktivePerioder"].map { it.asLocalDate() }
+    private val JsonNode.sluttdatoerForInaktivePerioder get() = this["hullICv"]["sluttdatoerForInaktivePerioder"].toList().map { it.asLocalDate() }
     private val JsonNode.førsteDagIInneværendeInaktivePeriode
         get() = this["hullICv"]["førsteDagIInneværendeInaktivePeriode"].let {
             if (it.isNull) null else it.asLocalDate()

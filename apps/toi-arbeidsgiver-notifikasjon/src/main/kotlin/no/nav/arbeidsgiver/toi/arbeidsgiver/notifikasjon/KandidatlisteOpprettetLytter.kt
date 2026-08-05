@@ -26,9 +26,9 @@ class KandidatlisteOpprettetLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
-        val stillingsId = UUID.fromString(packet["stillingsId"].asText())
-        val stillingstittel = packet["stilling.stillingstittel"].asText()
-        val organisasjonsnummer = packet["stilling.organisasjonsnummer"].asText()
+        val stillingsId = UUID.fromString(packet["stillingsId"].asString())
+        val stillingstittel = packet["stilling.stillingstittel"].asString()
+        val organisasjonsnummer = packet["stilling.organisasjonsnummer"].asString()
 
         notifikasjonKlient.opprettSak(
             stillingsId = stillingsId,

@@ -477,6 +477,7 @@ fun rapidMelding(
     arbeidstidJobbonsker: List<String> = listOf(),
     cvEksisterer: Boolean = true,
     jobbprofilEksisterer: Boolean = true,
+    yyyymmddTilLocalDate: Boolean = false
 ): String = """
         {
           "@event_name": "arbeidsmarked-cv",
@@ -503,11 +504,11 @@ fun rapidMelding(
               "cv": {
                 "opprettet": $opprettetCv,
                 "fodselsnummer": "$fødselsnummer",
-                "foedselsdato": [
+                "foedselsdato": ${if (yyyymmddTilLocalDate) """"$fødselsdato"""" else """[
                   ${fødselsdato.year},
                   ${fødselsdato.monthValue},
                     ${fødselsdato.dayOfMonth}
-                ],
+                ]"""},
                 "fornavn": "$fornavn",
                 "etternavn": "$etternavn",
                 "epost": "$epostadresse",
@@ -522,9 +523,15 @@ fun rapidMelding(
                         """
                         {
                             "klasse": "${it.klasse}",
-                            "utloeper": ${it.utloeper?.let { "[${it.year}, ${it.monthValue}, ${it.dayOfMonth}]" }},
+                            "utloeper": ${it.utloeper?.let {
+                            if (yyyymmddTilLocalDate) """"$it"""" 
+                            else """[${it.year},${it.monthValue},${it.dayOfMonth}]""" 
+                                                           }},
                             "klasseBeskrivelse": "${it.klasseBeskrivelse}",
-                            "fraTidspunkt": ${it.fraTidspunkt?.let { "[${it.year}, ${it.monthValue}, ${it.dayOfMonth}]" }}
+                            "fraTidspunkt": ${it.fraTidspunkt?.let {
+                            if (yyyymmddTilLocalDate) """"$it""""
+                            else """[${it.year},${it.monthValue},${it.dayOfMonth}]"""
+                        }}
                         }
                         """.trimIndent()
                     }
@@ -574,8 +581,14 @@ fun rapidMelding(
                         {
                             "tittel": "${it.tittel}",
                             "utsteder": "${it.utsteder}",
-                            "gjennomfoert": ${it.gjennomfoert.let { "[${it.year}, ${it.monthValue}, ${it.dayOfMonth}]" }},
-                            "utloeper": ${it.utloeper?.let { "[${it.year}, ${it.monthValue}, ${it.dayOfMonth}]" }},
+                            "gjennomfoert": ${it.gjennomfoert.let {
+                            if (yyyymmddTilLocalDate) """"$it""""
+                            else """[${it.year},${it.monthValue},${it.dayOfMonth}]"""
+                        }},
+                            "utloeper": ${it.utloeper?.let {
+                            if (yyyymmddTilLocalDate) """"$it""""
+                            else """[${it.year},${it.monthValue},${it.dayOfMonth}]"""
+                        }},
                             "konseptId": "${it.konseptId}"
                           }
                         """.trimIndent()
@@ -585,10 +598,9 @@ fun rapidMelding(
                         {
                             "tittel": "${it.tittel}",
                             "utsteder": "${it.utsteder}",
-                            "tidspunkt": ${it.tidspunkt?.let { 
-                                """
-                                [${it.year}, ${it.monthValue}, ${it.dayOfMonth}]
-                                """.trimIndent()
+                            "tidspunkt": ${it.tidspunkt?.let {
+                            if (yyyymmddTilLocalDate) """"$it""""
+                            else """[${it.year},${it.monthValue},${it.dayOfMonth}]"""
                         }},
                             "varighet": ${it.varighet},
                             "varighetEnhet": "${it.varighetEnhet}"
@@ -603,12 +615,15 @@ fun rapidMelding(
                             "sertifikatnavnFritekst": ${it.sertifikatnavnFritekst?.let { "\"$it\"" }},
                             "konseptId": ${it.konseptId?.let { "\"$it\"" }},
                             "utsteder": "${it.utsteder}",
-                            "gjennomfoert": [
+                            "gjennomfoert": ${ if(yyyymmddTilLocalDate) """"${it.gjennomfoert}"""" else """[
                                 ${it.gjennomfoert.year},
                                 ${it.gjennomfoert.monthValue},
                                 ${it.gjennomfoert.dayOfMonth}
-                            ],
-                            "utloeper": ${it.utloeper?.let { """[${it.year},${it.monthValue},${it.dayOfMonth}]""" }}
+                            ]"""},
+                            "utloeper": ${it.utloeper?.let {
+                            if (yyyymmddTilLocalDate) """"$it""""
+                            else """[${it.year},${it.monthValue},${it.dayOfMonth}]"""
+                        }}
                         }
                         """.trimIndent()
                     }

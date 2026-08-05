@@ -22,7 +22,7 @@ class KvpTest {
         assertThat(inspektør.size).isEqualTo(1)
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames()).containsExactlyInAnyOrder(
             "@event_name",
             "kvp",
             "aktørId",
@@ -32,11 +32,11 @@ class KvpTest {
             "system_participating_services"
         )
 
-        assertThat(meldingJson.get("@event_name").asText()).isEqualTo("kvp")
-        assertThat(meldingJson.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingJson.get("@event_name").asString()).isEqualTo("kvp")
+        assertThat(meldingJson.get("aktørId").asString()).isEqualTo(aktørId)
 
         val kvp = meldingJson.get("kvp")
-        assertThat(kvp.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(kvp.propertyNames()).containsExactlyInAnyOrder(
             "event",
             "aktorId",
             "enhetId",
@@ -45,11 +45,11 @@ class KvpTest {
         )
 
         meldingJson.get("kvp").apply {
-            assertThat(get("event").asText()).isEqualTo("AVSLUTTET")
-            assertThat(get("aktorId").asText()).isEqualTo(aktørId)
-            assertThat(get("enhetId").asText()).isEqualTo("0123")
-            assertThat(get("startet").get("opprettetDato").asText()).isEqualTo("2023-01-03T09:44:23.394628+01:00")
-            assertThat(get("avsluttet").get("avsluttetDato").asText()).isEqualTo("2023-01-03T09:44:48.891877+01:00")
+            assertThat(get("event").asString()).isEqualTo("AVSLUTTET")
+            assertThat(get("aktorId").asString()).isEqualTo(aktørId)
+            assertThat(get("enhetId").asString()).isEqualTo("0123")
+            assertThat(get("startet").get("opprettetDato").asString()).isEqualTo("2023-01-03T09:44:23.394628+01:00")
+            assertThat(get("avsluttet").get("avsluttetDato").asString()).isEqualTo("2023-01-03T09:44:48.891877+01:00")
         }
     }
 

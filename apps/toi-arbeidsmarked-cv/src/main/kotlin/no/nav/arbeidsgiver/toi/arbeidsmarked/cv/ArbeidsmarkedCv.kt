@@ -1,12 +1,11 @@
 package no.nav.arbeidsgiver.toi.arbeidsmarked.cv
 
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeid.cv.avro.Melding
 
 class ArbeidsmarkedCv(melding: Melding) {
@@ -20,9 +19,10 @@ class ArbeidsmarkedCv(melding: Melding) {
 
 }
 
-private val objectMapper = ObjectMapper()
-    .registerModule(JavaTimeModule())
+private val objectMapper = JsonMapper.builder()
+    .addModule(kotlinModule())
     .addMixIn(Object::class.java, AvroMixIn::class.java)
+    .build()
 
 abstract class AvroMixIn {
     @JsonIgnore

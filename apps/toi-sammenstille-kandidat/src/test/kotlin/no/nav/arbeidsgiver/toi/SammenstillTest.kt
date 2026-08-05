@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import org.assertj.core.api.Assertions.assertThat

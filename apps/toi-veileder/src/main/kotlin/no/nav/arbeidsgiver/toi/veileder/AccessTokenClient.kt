@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.veileder
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.jackson.responseObject
+import no.nav.arbeidsgiver.toi.logging.log
 import java.time.Instant
 import kotlin.RuntimeException
 import com.github.kittinunf.result.Result

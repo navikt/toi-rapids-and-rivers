@@ -1,12 +1,14 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.cfg.DateTimeFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
@@ -18,17 +20,19 @@ import javax.sql.DataSource
 
 class Repository(private val datasource: DataSource) {
     companion object {
-        private val secureLog = SecureLog(log)
-        private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        private val teamlog = teamlog(log)
+        private val objectMapper: ObjectMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .build()
     }
 
     fun lagreArbeidssøkerperiodemelding(rapidOppfølgingsperiode: JsonNode): Long {
         val periode = objectMapper.treeToValue<Periode>(rapidOppfølgingsperiode, Periode::class.java)
-        secureLog.info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
+        teamlog.info("Mottok arbeidssøkerperiode ${periode.periodeId} for ${periode.aktørId}. " +
             "Start ${periode.startet} avslutt: ${periode.avsluttet}")
 
         // Ved konflikt/update så setter vi behandlet_dato=null for å sikre at ny komplett melding blir sendt på rapid

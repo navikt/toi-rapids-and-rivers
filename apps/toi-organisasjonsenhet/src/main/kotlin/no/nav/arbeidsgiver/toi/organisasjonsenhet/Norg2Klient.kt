@@ -3,12 +3,15 @@ package no.nav.arbeidsgiver.toi.organisasjonsenhet
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 private typealias OrgenhetNummer = String
 private typealias OrgenhetNavn = String
 private typealias OrgenhetCache = MutableMap<OrgenhetNummer, OrgenhetNavn>
 
 class Norg2Klient(private val norg2Url: String) {
+    private val teamlog = teamlog(log)
     private val cache = populerCache()
 
     private fun populerCache(): OrgenhetCache {
@@ -24,8 +27,8 @@ class Norg2Klient(private val norg2Url: String) {
 
     private fun hentOrgenhetsnavnFraCache(nummer: OrgenhetNummer) =
         cache[nummer]?.also {
-            log.info("Hentet orgenhetsnavn (se securelog) fra cache for orgenhetsnummer: (se securelog)")
-            secureLog.info("Hentet orgenhetsnavn $it fra cache for orgenhetsnummer: $nummer")
+            log.info("Hentet orgenhetsnavn (se teamlog) fra cache for orgenhetsnummer: (se teamlog)")
+            teamlog.info("Hentet orgenhetsnavn $it fra cache for orgenhetsnummer: $nummer")
         }
 
     private fun hentOrgenhetNavnFraNorg2(nummer: OrgenhetNummer): OrgenhetNavn? {

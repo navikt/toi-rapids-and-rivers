@@ -7,12 +7,14 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 
 class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            precondition{
+            precondition {
                 it.requireKey("event")
                 it.requireKey("aktorId")
                 it.requireKey("startet")
@@ -25,30 +27,30 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
         }.register(this)
     }
 
+    private val teamlog = teamlog(log)
+
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok kvp event ${packet["event"].asText()}")
+        log.info("Mottok kvp event ${packet["event"].asString()}")
 
-        if (packet["event"].isNull || (packet["event"].asText() != "STARTET" && packet["event"].asText() != "AVSLUTTET")) {
-            log.error("event er ikke startet eller avluttet, se secure-log")
-            //secureLog.error("ugyldig verdi for event: ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
+        if (packet["event"].isNull || (packet["event"].asString() != "STARTET" && packet["event"].asString() != "AVSLUTTET")) {
+            log.error("event er ikke startet eller avsluttet, se teamlog") // TODO Are: Men det blir jo ikke logget not til teamlog?
             return
         }
 
 
-        val aktørId = packet["aktorId"].asText()
+        val aktørId = packet["aktorId"].asString()
         val melding = mapOf(
             "aktørId" to aktørId,
             "kvp" to packet.fjernMetadataOgKonverter(),
             "@event_name" to "kvp",
         )
 
-        //secureLog.info("Skal publisere kvp-opprettet-melding med startet ${packet["startet"]} og avsluttet ${packet["avsluttet"]} og event ${packet["event"].asText()} for aktørid ${packet["aktorId"].asText()}")
-        secureLog.info("Skal publisere kvp-melding med event ${packet["event"].asText()} (securelog verifikasjon)")
+        teamlog.info("Skal publisere kvp-melding med event ${packet["event"].asString()} (teamlog verifikasjon)") // TODO Are: Hva betyr "teamlog verifikasjon"? Det blir jo ikke logget noe til teamlog?
 
         val nyPacket = JsonMessage.newMessage(melding)
         rapidsConnection.publish(aktørId, nyPacket.toJson())
@@ -56,6 +58,6 @@ class KvpLytter(private val rapidsConnection: RapidsConnection) : River.PacketLi
 
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
-        log.error("noe mangler i kvp.melding, se secure-log")
+        log.error("noe mangler i kvp.melding, se teamlog") // TODO Are: Men det blir jo ikke logget noe til teamlog?
     }
 }

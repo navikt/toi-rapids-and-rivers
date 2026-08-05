@@ -137,10 +137,10 @@ class GeografiTest {
         assertThat(inspektør.size).isEqualTo(1)
 
         val geografi = inspektør.message(0)["geografi"]
-        assertThat(geografi["postkode"].asText()).isEqualTo("5380")
-        assertThat(geografi["fylke"]["korrigertNavn"].asText()).isEqualTo("Vestland")
-        assertThat(geografi["kommune"]["kommunenummer"].asText()).isEqualTo("4626")
-        assertThat(geografi["kommune"]["korrigertNavn"].asText()).isEqualTo("Øygarden")
+        assertThat(geografi["postkode"].asString()).isEqualTo("5380")
+        assertThat(geografi["fylke"]["korrigertNavn"].asString()).isEqualTo("Vestland")
+        assertThat(geografi["kommune"]["kommunenummer"].asString()).isEqualTo("4626")
+        assertThat(geografi["kommune"]["korrigertNavn"].asString()).isEqualTo("Øygarden")
     }
 
     @Test
@@ -173,8 +173,8 @@ class GeografiTest {
         val geografi = inspektør.message(0)["geografi"]["geografi"]
 
         assertThat(geografi.size()).isEqualTo(2)
-        assertThat(geografi["NO39.3909"].asText()).isEqualTo("Larvik")
-        assertThat(geografi["NO32"].asText()).isEqualTo("Akershus")
+        assertThat(geografi["NO39.3909"].asString()).isEqualTo("Larvik")
+        assertThat(geografi["NO32"].asString()).isEqualTo("Akershus")
     }
 
     private fun startTestApp(testRapid: TestRapid) {

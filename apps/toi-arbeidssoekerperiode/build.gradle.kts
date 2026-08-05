@@ -3,7 +3,12 @@ plugins {
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.arbeidssoekerperiode.ApplicationKt")
+}
+
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation(project(":apps:asr-domain"))
     implementation("org.apache.avro:avro:1.12.0")
     implementation("io.confluent:kafka-avro-serializer:7.8.0")

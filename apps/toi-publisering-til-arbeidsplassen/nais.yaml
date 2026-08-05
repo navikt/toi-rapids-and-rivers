@@ -41,6 +41,8 @@ spec:
   accessPolicy:
     outbound:
       rules:
+        - application: logging
+          namespace: nais-system
         - application: pam-import-api
           namespace: teampam
   observability:

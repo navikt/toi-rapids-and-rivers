@@ -10,13 +10,15 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 
 class UferdigKandidatLytter(
     rapidsConnection: RapidsConnection
 ) :
     River.PacketListener {
 
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     init {
         River(rapidsConnection).apply {
@@ -61,8 +63,8 @@ class UferdigKandidatLytter(
         leggTilOntologiBehovFelt(packet, cvMelding, jobbMelding)
         leggTilGeografiBehovFelter(packet, cvMelding, jobbMelding)
 
-        log.info("Sender behov for aktørid (se securelog)")
-        secureLog.info("Sender behov for $aktørId")
+        log.info("Sender behov for aktørid (se teamlog)")
+        teamlog.info("Sender behov for $aktørId")
         context.publish(aktørId, packet.toJson())
     }
 

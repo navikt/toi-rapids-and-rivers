@@ -1,9 +1,10 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import org.slf4j.LoggerFactory
+import tools.jackson.databind.cfg.EnumFeature
 import java.net.InetAddress
 import java.net.URI
 import java.net.http.HttpClient
@@ -21,11 +22,11 @@ class LeaderElector(private val electorPath: String, private val httpClient: Htt
 
     companion object {
         private val LOG = LoggerFactory.getLogger(LeaderElector::class.java)
-        private val jacksonMapper = jacksonObjectMapper()
-            .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+        private val jacksonMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .registerModule(JavaTimeModule())
-
+            .build()
     }
 
     fun isLeader(): Boolean {

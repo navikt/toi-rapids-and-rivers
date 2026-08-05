@@ -1,10 +1,12 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Response
 import erGyldigEpostadresse
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -15,7 +17,7 @@ class NotifikasjonKlient(
     val url: String,
     val hentAccessToken: () -> String,
 ) {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
@@ -40,8 +42,8 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            secureLog.info("Svar fra opprettSak ${stillingsId}: $json")
-            val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asText()
+            teamlog.info("Svar fra opprettSak ${stillingsId}: $json")
+            val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asString()
 
             when (notifikasjonsSvar) {
                 NySakSvar.NySakVellykket.name -> {
@@ -62,8 +64,8 @@ class NotifikasjonKlient(
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId}: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId} $query", e)
+            log.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId}: (se teamlog)")
+            teamlog.error("Uventet feil i kall til notifikasjon-api med body ${stillingsId} $query", e)
             throw e
         }
     }
@@ -111,8 +113,8 @@ class NotifikasjonKlient(
 
 
         if (erDev) {
-            log.info("graphqlmelding (bør ikke vises i prod), se securelog for detaljer")
-            secureLog.info("graphqlmelding (bør ikke vises i prod) ${query}")
+            log.info("graphqlmelding (bør ikke vises i prod), se teamlog for detaljer")
+            teamlog.info("graphqlmelding (bør ikke vises i prod) ${query}")
         } else if (erLokal) {
             println("query: $query")
         }
@@ -126,7 +128,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asText()
+            val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asString()
 
             when (notifikasjonsSvar) {
                 NyBeskjedSvar.DuplikatEksternIdOgMerkelapp.name -> {
@@ -142,8 +144,8 @@ class NotifikasjonKlient(
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se teamlog)")
+            teamlog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
@@ -162,7 +164,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asText()
+            val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asString()
 
             when (svar) {
                 NyStatusSakSvar.NyStatusSakVellykket.name -> {
@@ -182,8 +184,8 @@ class NotifikasjonKlient(
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se teamlog)")
+            teamlog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
@@ -202,7 +204,7 @@ class NotifikasjonKlient(
                 .responseString()
 
             val json = jacksonObjectMapper().readTree(result.get())
-            val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asText()
+            val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asString()
 
             when (svar) {
                 SlettSakSvar.HardDeleteSakVellykket.name -> {
@@ -218,8 +220,8 @@ class NotifikasjonKlient(
                 }
             }
         } catch (e: Throwable) {
-            log.error("Uventet feil i kall til notifikasjon-api med body: (se secureLog)")
-            secureLog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
+            log.error("Uventet feil i kall til notifikasjon-api med body: (se teamlog)")
+            teamlog.error("Uventet feil i kall til notifikasjon-api med body: $query", e)
             throw e
         }
     }
@@ -229,8 +231,8 @@ class NotifikasjonKlient(
         response: Response,
         body: String,
     ) {
-        log.error("Feilet kall til notifikasjon-api med følgende body: (se securelog)")
-        secureLog.error("Feilet kall til notifikasjon-api med følgende body: $body")
+        log.error("Feilet kall til notifikasjon-api med følgende body: (se teamlog)")
+        teamlog.error("Feilet kall til notifikasjon-api med følgende body: $body")
         val errors = json["errors"]
         if (errors != null && errors.size() > 0) {
             log.error("Feil fra notifikasjon api, errors: $errors}")

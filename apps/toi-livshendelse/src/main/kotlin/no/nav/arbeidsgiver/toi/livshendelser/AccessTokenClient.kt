@@ -4,11 +4,12 @@ package no.nav.arbeidsgiver.toi.livshendelser
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
-import org.slf4j.LoggerFactory
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import java.time.Instant
 
 class AccessTokenClient(private val env: Map<String, String>) {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     private var tokenUtgår = Instant.ofEpochSecond(0)
     private var cachedToken = AccessTokenResponse("uinitialisert", 0)
@@ -31,7 +32,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
             env["AZURE_APP_CLIENT_ID"] == null ||
             env["PDL_SCOPE"] == null
         ) {
-            secureLog.info("Access token kall mangler data")
+            teamlog.info("Access token kall mangler data")
         }
         val url = env.variable("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
 

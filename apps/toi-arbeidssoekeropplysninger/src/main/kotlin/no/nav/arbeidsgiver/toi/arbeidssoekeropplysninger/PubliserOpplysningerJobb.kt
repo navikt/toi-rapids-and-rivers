@@ -1,14 +1,16 @@
 package no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
+import tools.jackson.databind.cfg.DateTimeFeature
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.thread
@@ -19,14 +21,16 @@ class PubliserOpplysningerJobb(
     private val leaderElector: LeaderElector,
     private val meterRegistry: MeterRegistry
 ) {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     companion object {
-        private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        private val objectMapper: ObjectMapper = JsonMapper.builder()
+            .addModule(kotlinModule())
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+            .build()
     }
 
 
@@ -54,7 +58,7 @@ class PubliserOpplysningerJobb(
                 opplysninger.forEach { opplysning ->
                     publiserArbeidssøkeropplysning(opplysning)
                     repository.behandlePeriodeOpplysning(opplysning.periodeId)
-                    secureLog.info("""
+                    teamlog.info("""
                         Publiserte opplysning om ${opplysning.identitetsnummer} start: ${opplysning.periodeStartet}
                         stopp ${opplysning.periodeAvsluttet} 
                         """.trimIndent()

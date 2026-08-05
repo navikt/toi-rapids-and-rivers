@@ -29,7 +29,7 @@ class PubliserOpplysningerJobbTest {
 
         val meldingJson = inspektør.message(0)
 
-        assertThat(meldingJson.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingJson.propertyNames()).containsExactlyInAnyOrder(
             "@event_name",
             "arbeidssokeropplysninger",
             "fodselsnummer",

@@ -159,7 +159,7 @@ fun queryOpprettNySak(
     return opprettQuery(query, mapOf(
         "grupperingsid" to stillingsId.toString(),
         "virksomhetsnummer" to organisasjonsnummer,
-        "tittel" to stillingstittel.escapeJson(),
+        "tittel" to stillingstittel.take(140).escapeJson(),
         "lenke" to lenkeTilStilling,
         "merkelapp" to SAK_MERKELAPP,
         "initiellStatus" to "MOTTATT",

@@ -67,6 +67,46 @@ fun WireMockServer.stubPdl(
             ))
 }
 
+fun WireMockServer.stubMedFlereGraderinger(
+    ident: String = "12312312312",
+    identSvar: String = """
+        {
+            "ident" : "$ident"
+        }
+    """.trimIndent(),
+    graderinger: List<String>,
+    token: String? = "mockedAccessToken"
+) {
+    val graderingerJson = graderinger.joinToString(",") {
+        """
+            {
+                "gradering" : "$it"
+            }
+        """.trimIndent()
+    }
+    stubMedSvar(token, ident,
+        WireMock.aResponse()
+            .withStatus(200)
+            .withBody(
+                """
+                            {
+                                "data": {
+                                    "hentPerson": {
+                                            "adressebeskyttelse": [
+                                                $graderingerJson
+                                            ]
+                                    },
+                                    "hentIdenter": {
+                                        "identer": [
+                                            $identSvar
+                                        ]
+                                    }
+                                }
+                            }
+                        """.trimIndent()
+            ))
+}
+
 private fun WireMockServer.stubMedSvar(
     token: String?,
     ident: String,

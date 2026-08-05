@@ -11,7 +11,12 @@ plugins {
     id("toi.rapids-and-rivers")
 }
 
+application {
+    mainClass.set("no.nav.arbeidsgiver.toi.ApplicationKt")
+}
+
 dependencies {
+    implementation(project(":technical-libs:logging"))
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")

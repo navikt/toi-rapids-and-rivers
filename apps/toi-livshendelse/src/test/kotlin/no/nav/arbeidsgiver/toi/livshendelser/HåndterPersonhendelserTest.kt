@@ -67,9 +67,9 @@ class HåndterPersonhendelserTest {
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
 
-        assertThat(melding["@event_name"].asText()).isEqualTo("adressebeskyttelse")
-        assertThat(melding["aktørId"].asText()).isEqualTo(aktørId)
-        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
+        assertThat(melding["@event_name"].asString()).isEqualTo("adressebeskyttelse")
+        assertThat(melding["aktørId"].asString()).isEqualTo(aktørId)
+        assertThat(melding["adressebeskyttelse"].asString()).isEqualTo(Gradering.STRENGT_FORTROLIG.name)
     }
 
     @Test
@@ -130,9 +130,9 @@ class HåndterPersonhendelserTest {
         val keys = listOf(0, 1).map(inspektør::key)
         assertThat(keys).containsExactlyInAnyOrder("987654321", "987654322")
 
-        meldinger.map { assertThat(it["@event_name"].asText()).isEqualTo("adressebeskyttelse") }
-        meldinger.map { assertThat(it["adressebeskyttelse"].asText()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString()) }
-        assertThat(meldinger.map { it["aktørId"].asText() }).containsExactlyInAnyOrder("987654321", "987654322")
+        meldinger.map { assertThat(it["@event_name"].asString()).isEqualTo("adressebeskyttelse") }
+        meldinger.map { assertThat(it["adressebeskyttelse"].asString()).isEqualTo(Gradering.STRENGT_FORTROLIG.toString()) }
+        assertThat(meldinger.map { it["aktørId"].asString() }).containsExactlyInAnyOrder("987654321", "987654322")
     }
 
     @Test
@@ -166,7 +166,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val message = inspektør.message(0)
-        assertThat(message["adressebeskyttelse"].asText()).isEqualTo("STRENGT_FORTROLIG")
+        assertThat(message["adressebeskyttelse"].asString()).isEqualTo("STRENGT_FORTROLIG")
     }
 
     @Test
@@ -200,7 +200,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo("STRENGT_FORTROLIG")
+        assertThat(melding["adressebeskyttelse"].asString()).isEqualTo("STRENGT_FORTROLIG")
         assertThat(melding["noeannet"]["noeannetsvar"].asInt()).isEqualTo(123)
     }
 
@@ -245,7 +245,7 @@ class HåndterPersonhendelserTest {
 
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["adressebeskyttelse"].asText()).isEqualTo("STRENGT_FORTROLIG")
+        assertThat(melding["adressebeskyttelse"].asString()).isEqualTo("STRENGT_FORTROLIG")
         assertThat(melding["noeannet"].isNull).isTrue
     }
 
@@ -279,6 +279,30 @@ class HåndterPersonhendelserTest {
         stubPdlOtherError(ident)
         assertThatThrownBy { pdlKlient.hentGraderingPerAktørId(ident) }
             .hasMessageContaining("Klarte ikke å hente gradering fra PDL-respons")
+    }
+
+    @Test
+    fun `sjekk at strengeste adressebeskyttelse velges når personen har flere graderinger`() {
+        val ident = "333333333"
+        stubOAtuh()
+        wiremock.stubMedFlereGraderinger(
+            ident = ident,
+            graderinger = listOf("FORTROLIG", "STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG")
+        )
+        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
+        assertThat(resultat).containsEntry(ident, Gradering.STRENGT_FORTROLIG_UTLAND.name)
+    }
+
+    @Test
+    fun `sjekk at strengeste velges når kun graderte verdier finnes`() {
+        val ident = "444444444"
+        stubOAtuh()
+        wiremock.stubMedFlereGraderinger(
+            ident = ident,
+            graderinger = listOf("UGRADERT", "FORTROLIG")
+        )
+        val resultat = pdlKlient.hentGraderingPerAktørId(ident)
+        assertThat(resultat).containsEntry(ident, Gradering.FORTROLIG.name)
     }
 
     private fun stubPdlPersonNotFound(ident: String = "12312312312") {

@@ -423,7 +423,7 @@ Berikerne bruker en felles valideringsfunksjon som avgjør om de skal reagere p�
 fun demandAtFørstkommendeUløsteBehovEr(informasjonsElement: String) {
     require("@behov") { behovNode ->
         val førsteManglendeElement = behovNode
-            .map(JsonNode::asText)         // ["arbeidsmarkedCv", "veileder", ...]
+            .map(JsonNode::asString)         // ["arbeidsmarkedCv", "veileder", ...]
             .onEach { interestedIn(it) }   // Registrer interesse i alle felter
             .first { this[it].isMissingNode } // Finn det første feltet som mangler
 

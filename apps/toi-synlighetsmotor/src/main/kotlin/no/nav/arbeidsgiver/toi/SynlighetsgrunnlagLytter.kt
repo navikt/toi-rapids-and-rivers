@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.toi
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -19,7 +19,8 @@ fun requiredFieldsSynlighetsbehovUntattadressebeskyttelse() = listOf(
     "siste14avedtak",     // TODO: synlighetsmotor har ikke behov for denne. flytt need til kandidatfeed
     "sisteOppfølgingsperiode",
     "kvp",
-    "arbeidssokeropplysninger"
+    "arbeidssokeropplysninger",
+    "fodselsnummer"
 )
 
 private const val adressebeskyttelseFelt = "adressebeskyttelse"
@@ -39,7 +40,7 @@ class SynlighetsgrunnlagLytter(
                 it.requireAny(requiredFields + "adressebeskyttelse")
                 it.requireKey("aktørId")
                 // Ignorer meldinger fra rekrutteringstreff-flyten - de håndteres av SynlighetRekrutteringstreffLytter
-                it.forbidBehovIListe("synlighetRekrutteringstreff")
+                it.forbidBehovIListe("synlighetRekrutteringstreff") // TODO: Vi burde ha en bedre måte å hindre duplikatmeldinger på. Denne linjen er her fordi vi ikke vil at dette needet skal trigge at melding også går inn her.
             }
         }.register(this)
     }
@@ -54,22 +55,20 @@ class SynlighetsgrunnlagLytter(
 
         val synlighetsevaluering = kandidat.toEvaluering()
 
-        if (synlighetsevaluering.erFerdigBeregnet) {
+        val fødselsnummer = packet["fodselsnummer"]
+
+        if (synlighetsevaluering.erFerdigBeregnet && !fødselsnummer.isMissingNode) {
             packet["synlighet"] = synlighetsevaluering.somSynlighet()
-            val fødselsnummer = kandidat.fødselsNummer()
-            if (fødselsnummer != null) {
-                packet["fodselsnummer"] = fødselsnummer
-            }
             repository.lagre(
                 evaluering = synlighetsevaluering,
                 aktørId = kandidat.aktørId,
-                fødselsnummer = fødselsnummer
+                fødselsnummer = fødselsnummer.stringValue(),
             )
             rapidsConnection.publish(kandidat.aktørId, packet.toJson())
         } else {
-            val behov = packet["@behov"].map(JsonNode::asText)
+            val behov = packet["@behov"].toList().map(JsonNode::asString)
             if (behov.containsAll(requiredFields)) {
-                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && adressebeskyttelseFelt !in behov) {
+                if (synlighetsevaluering.harAltBortsettFraAdressebeskyttelse && !packet["fodselsnummer"].isMissingNode && adressebeskyttelseFelt !in behov) {
                     val extraBehov = listOf(adressebeskyttelseFelt)
                     packet["@behov"] = (extraBehov + behov).distinct()
                     rapidsConnection.publish(kandidat.aktørId, packet.toJson())
@@ -79,7 +78,6 @@ class SynlighetsgrunnlagLytter(
                 packet["@behov"] = (behov + extraBehov).distinct()
                 rapidsConnection.publish(kandidat.aktørId, packet.toJson())
             }
-
         }
     }
 }
@@ -101,7 +99,7 @@ private fun JsonMessage.forbidBehovIListe(behov: String) {
     interestedIn("@behov")
     val behovNode = this["@behov"]
     if (!behovNode.isMissingNode && behovNode.isArray) {
-        val behovListe = behovNode.toList().map(JsonNode::asText)
+        val behovListe = behovNode.toList().map(JsonNode::asString)
         if (behov in behovListe) {
             throw MessageProblems.MessageException(MessageProblems(toJson()).apply { error("Meldingen tilhører $behov-flyten - ignorerer") })
         }

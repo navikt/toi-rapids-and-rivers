@@ -19,6 +19,38 @@ class SynlighetBehovsLytterTest {
         testDatabase.slettAlt()
     }
 
+
+    @Test
+    fun `Det blir ikke evig loop om man legger på synlighet`() {
+        testProgramMedHendelse("""
+            {
+              "@event_name": "republisert",
+              "aktørId": "1000058142133",
+              "@behov": [
+                "arbeidsmarkedCv",
+                "veileder",
+                "oppfølgingsinformasjon",
+                "siste14avedtak",
+                "sisteOppfølgingsperiode",
+                "kvp",
+                "arbeidssokeropplysninger",
+                "fodselsnummer",
+                "synlighet"
+              ],
+              "arbeidsmarkedCv": null,
+              "veileder": null,
+              "oppfølgingsinformasjon": null,
+              "siste14avedtak": null,
+              "kvp": null,
+              "sisteOppfølgingsperiode": null,
+              "arbeidssokeropplysninger": null,
+              "fodselsnummer": null
+            }
+        """.trimIndent(), {
+            assertThat(size).isEqualTo(1)
+        })
+    }
+
     @Test
     fun `skal ikke reagere på behov som allerede er løst`() {
         testProgramMedBehovHendelse(
@@ -47,7 +79,7 @@ class SynlighetBehovsLytterTest {
         ) {
             assertThat(size).isEqualTo(1)
             val melding = message(0)
-            assertThat(melding["@behov"].map { it.asText() }).containsExactly(
+            assertThat(melding["@behov"].toList().map { it.asString() }).containsExactly(
                 "arbeidsmarkedCv",
                 "veileder",
                 "oppfølgingsinformasjon",
@@ -55,6 +87,7 @@ class SynlighetBehovsLytterTest {
                 "sisteOppfølgingsperiode",
                 "kvp",
                 "arbeidssokeropplysninger",
+                "fodselsnummer",
                 "synlighet"
             )
         }
@@ -120,7 +153,7 @@ class SynlighetBehovsLytterTest {
     private fun behovMeldingMedAlleAndreBehovLøste(aktørId: String) = """
         {
             "@event_name": "behov",
-            "@behov": ["arbeidsmarkedCv","veileder","oppfølgingsinformasjon","siste14avedtak","sisteOppfølgingsperiode","kvp","arbeidssokeropplysninger", "synlighet"],
+            "@behov": ["arbeidsmarkedCv","veileder","oppfølgingsinformasjon","siste14avedtak","sisteOppfølgingsperiode","kvp","arbeidssokeropplysninger", "fodselsnummer", "synlighet"],
             "aktørId": "$aktørId",
             "arbeidsmarkedCv" : {},
             "veileder" : {},

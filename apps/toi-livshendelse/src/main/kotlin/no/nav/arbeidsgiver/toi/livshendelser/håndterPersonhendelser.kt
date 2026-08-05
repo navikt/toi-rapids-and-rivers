@@ -1,12 +1,12 @@
 package no.nav.arbeidsgiver.toi.livshendelser
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
+import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.person.pdl.leesah.Personhendelse
-import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering
-import org.slf4j.LoggerFactory
 
 class PersonhendelseService(private val rapidsConnection: RapidsConnection, private val pdlKlient: PdlKlient) {
-    private val secureLog = SecureLog(log)
+    private val teamlog = teamlog(log)
 
     fun håndter(personHendelser: List<Personhendelse>) {
 
@@ -14,7 +14,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
 
         if(personHendelser.isNotEmpty()) {
             val opplysningstyper = personHendelser.map{it.opplysningstype}.distinct()
-            secureLog.info("Håndterer hendelser med typer: $opplysningstyper")
+            teamlog.info("Håndterer hendelser med typer: $opplysningstyper")
         }
 
         personHendelser
@@ -22,7 +22,7 @@ class PersonhendelseService(private val rapidsConnection: RapidsConnection, priv
             .mapNotNull {
                 it.personidenter?.firstOrNull()
             }
-            .flatMap{ it -> pdlKlient.diskresjonsHendelseForIdent(it) }
+            .flatMap{ pdlKlient.diskresjonsHendelseForIdent(it) }
             .forEach{ it.publiserTilRapids(rapidsConnection::publish) }
 
         if(personHendelser.isEmpty()) {

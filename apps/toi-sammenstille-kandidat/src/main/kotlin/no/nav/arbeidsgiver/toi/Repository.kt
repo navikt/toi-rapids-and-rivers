@@ -1,8 +1,12 @@
 package no.nav.arbeidsgiver.toi
 
+import tools.jackson.module.kotlin.kotlinModule
+
+import tools.jackson.databind.json.JsonMapper
+
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.zaxxer.hikari.HikariConfig
@@ -110,7 +114,7 @@ data class Kandidat(
         private val objectMapper = jacksonObjectMapper()
         fun fraJson(json: String): Kandidat = fraJson(objectMapper.readTree(json))
         fun fraJson(json: JsonNode) = Kandidat(
-            aktørId = json["aktørId"].asText(),
+            aktørId = json["aktørId"].asString(),
             arbeidsmarkedCv = json["arbeidsmarkedCv"],
             veileder = json["veileder"],
             oppfølgingsinformasjon = json["oppfølgingsinformasjon"],
@@ -120,7 +124,7 @@ data class Kandidat(
     }
 
     private fun somJsonUtenNullFelt(): String {
-        val objectMapper = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        val objectMapper = JsonMapper.builder().addModule(kotlinModule()).changeDefaultPropertyInclusion { it.withValueInclusion(JsonInclude.Include.NON_NULL) }.build()
         return objectMapper.writeValueAsString(this)
     }
 
@@ -130,7 +134,7 @@ data class Kandidat(
     fun toJson() = jacksonObjectMapper().writeValueAsString(this)
     fun populerMelding(packet: JsonMessage): JsonMessage {
         val jsonObjekt = jacksonObjectMapper().valueToTree<JsonNode>(this)
-        jsonObjekt.fieldNames().forEach { feltNavn ->
+        jsonObjekt.propertyNames().forEach { feltNavn ->
             packet[feltNavn] = jsonObjekt.get(feltNavn)
         }
         return packet

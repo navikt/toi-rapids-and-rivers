@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.toi.identmapper
 
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class IdentMapperTest {
 
@@ -14,14 +14,15 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        Lytter(fødselsnummerKey, rapid, "test") { aktørId }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
         val meldingPåRapid = inspektør.message(0)
 
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(meldingPåRapid.fieldNames().asSequence().toList()).containsExactlyInAnyOrder(
+        assertThat(meldingPåRapid.propertyNames()).containsExactlyInAnyOrder(
             "fodselsnummer",
             "aktørId",
             "etAnnetFelt",
@@ -33,10 +34,10 @@ class IdentMapperTest {
             "system_participating_services"
         )
 
-        assertThat(meldingPåRapid.get(fødselsnummerKey).asText()).isEqualTo(fødselsnummer)
-        assertThat(meldingPåRapid.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingPåRapid.get(fødselsnummerKey).asString()).isEqualTo(fødselsnummer)
+        assertThat(meldingPåRapid.get("aktørId").asString()).isEqualTo(aktørId)
         assertThat(meldingPåRapid.get("etAnnetFelt").asBoolean()).isFalse
-        assertThat(meldingPåRapid.get("etObjekt").fieldNames().asSequence().toList()).containsExactly("enListe")
+        assertThat(meldingPåRapid.get("etObjekt").propertyNames()).containsExactly("enListe")
         assertThat(
             meldingPåRapid.get("etObjekt").get("enListe").asIterable().toList()
                 .map { it.intValue() }).containsExactly(1, 2, 3, 4)
@@ -49,14 +50,15 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        Lytter(fødselsnummerKey, rapid, "test") { aktørId }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
         val meldingPåRapid = inspektør.message(0)
 
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(meldingPåRapid.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingPåRapid.get("aktørId").asString()).isEqualTo(aktørId)
     }
 
     @Test
@@ -66,14 +68,15 @@ class IdentMapperTest {
         val fødselsnummer = "12345678912"
         val aktørId = "123456789"
 
-        Lytter(fødselsnummerKey, rapid, "test") { aktørId }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, fødselsnummer))
 
         val inspektør = rapid.inspektør
         val meldingPåRapid = inspektør.message(0)
 
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(meldingPåRapid.get("aktørId").asText()).isEqualTo(aktørId)
+        assertThat(meldingPåRapid.get("aktørId").asString()).isEqualTo(aktørId)
     }
 
     @Test
@@ -81,7 +84,8 @@ class IdentMapperTest {
         val rapid = TestRapid()
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { null }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { null }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingUtenAktørId(fødselsnummerKey, "123"))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -93,7 +97,8 @@ class IdentMapperTest {
         val aktørIdKey = "aktørId"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -105,7 +110,8 @@ class IdentMapperTest {
         val aktørIdKey = "aktorId"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -117,7 +123,8 @@ class IdentMapperTest {
         val aktørIdKey = "aktoerId"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
@@ -129,7 +136,8 @@ class IdentMapperTest {
         val aktørIdKey = "AKTORID"
         val fødselsnummerKey = "fodselsnummer"
 
-        Lytter(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        AktørIdPopulator(fødselsnummerKey, rapid, "test") { "dummyAktørId" }
+        FødselsnummerBehovLytter(rapid, "test") { fail("FødselsnummerBehovLytter skal ikke trigges") }
         rapid.sendTestMessage(meldingMedAktørId(aktørIdKey))
 
         assertThat(rapid.inspektør.size).isEqualTo(0)
