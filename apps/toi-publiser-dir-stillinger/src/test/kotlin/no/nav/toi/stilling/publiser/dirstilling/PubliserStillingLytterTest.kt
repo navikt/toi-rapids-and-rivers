@@ -140,7 +140,10 @@ class PubliserStillingLytterTest {
                             "orgnr": "123456789",
                             "parentOrgnr": "987654321",
                             "publicName": "Testarbeidsgiver AS",
-                            "orgform": "AS"
+                            "orgform": "AS",
+                            "properties": {
+                                "nace2": null
+                            }
                         },
                         "locationList": [
                             {
