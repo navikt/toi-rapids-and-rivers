@@ -41,8 +41,7 @@ class KandidatFeedTest {
         val melding = rapidMelding(
             synlighetJson = synlighet(erSynlig = false, ferdigBeregnet = false),
             hullICv = null,
-            ontologi = null,
-            organisasjonsenhetsnavn = null
+            ontologi = null
         )
 
         rapid.sendTestMessage(melding)
@@ -71,7 +70,6 @@ class KandidatFeedTest {
         val rapid = nyRapidMedLyttere(esClient)
         val melding = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
             sluttAvHendelseskjede = true
         )
@@ -121,7 +119,6 @@ class KandidatFeedTest {
         val rapid = nyRapidMedLyttere(esClient)
         val rapidMeldingMedSlutt = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
             sluttAvHendelseskjede = true
         )
@@ -142,8 +139,7 @@ class KandidatFeedTest {
         val melding = rapidMelding(
             synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
             ontologi = ontologiDel(),
-            geografi = geografiDel(),
-            organisasjonsenhetsnavn = "NAV et kontor"
+            geografi = geografiDel()
         )
 
         rapid.sendTestMessage(melding)
@@ -181,7 +177,6 @@ class KandidatFeedTest {
             synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
             ontologi = ontologiDel(),
             geografi = geografiDel(),
-            organisasjonsenhetsnavn = "Nav kontor",
             jobbprofilEksisterer = false
         )
 

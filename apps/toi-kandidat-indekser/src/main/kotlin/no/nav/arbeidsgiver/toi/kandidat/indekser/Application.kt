@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.noClassLogger
 import no.nav.helse.rapids_rivers.RapidApplication
 
-val behovsListe = listOf("organisasjonsenhetsnavn", "hullICv", "ontologi", "geografi")
+val behovsListe = listOf("hullICv", "ontologi", "geografi")
 
 private val log = noClassLogger()
 private val teamlog = teamlog(log)

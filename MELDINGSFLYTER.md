@@ -27,7 +27,7 @@ Rapids-and-rivers-biblioteket støtter en `KAFKA_EXTRA_TOPIC`-konfigurasjon (sat
 | **Identmapper** | Slår opp aktørId fra fødselsnummer via PDL og beriker meldingen | toi-identmapper |
 | **Aggregator** | Samler kandidatdata fra alle kilder i en database og svarer på behov | toi-sammenstille-kandidat |
 | **Synlighetsmotor** | Evaluerer om en kandidat skal være synlig i søk | toi-synlighetsmotor |
-| **Berikere** | Svarer på `@behov` med tilleggsdata fra eksterne tjenester | toi-organisasjonsenhet, toi-hull-i-cv, toi-ontologitjeneste, toi-geografi, toi-arbeidssoekeropplysninger, toi-siste-oppfolgingsperiode-pond, toi-livshendelse |
+| **Berikere** | Svarer på `@behov` med tilleggsdata fra eksterne tjenester | toi-hull-i-cv, toi-ontologitjeneste, toi-geografi, toi-arbeidssoekeropplysninger, toi-siste-oppfolgingsperiode-pond, toi-livshendelse |
 | **Indekserer** | Indekserer ferdig berikede kandidater i OpenSearch | toi-kandidat-indekser |
 
 ---
@@ -84,7 +84,6 @@ flowchart TD
 
     subgraph Indekseringsberikere
         direction LR
-        toi-organisasjonsenhet
         toi-hull-i-cv
         toi-ontologitjeneste
         toi-geografi
@@ -154,8 +153,7 @@ flowchart TD
     toi-synlighetsmotor -->|"synlighet.erSynlig=false"| toi-kandidat-indekser-usynlig
 
     %% UferdigKandidatLytter legger til @behov for indekseringsberikere
-    toi-kandidat-indekser-uferdig -->|"@behov: organisasjonsenhetsnavn,<br/>hullICv, ontologi, geografi"| toi-organisasjonsenhet
-    toi-organisasjonsenhet -->|"+ organisasjonsenhetsnavn"| toi-hull-i-cv
+    toi-kandidat-indekser-uferdig -->|"@behov: hullICv, ontologi, geografi<br/>(NAV-kontor fra sisteOppfølgingsperiode.kontor)"| toi-hull-i-cv
     toi-hull-i-cv -->|"+ hullICv"| toi-ontologitjeneste
     toi-ontologitjeneste -->|"+ ontologi"| toi-geografi
     toi-geografi -->|"+ geografi"| toi-kandidat-indekser-synlig
@@ -183,7 +181,6 @@ sequenceDiagram
     participant SYN as toi-synlighetsmotor
     participant SAM2 as toi-sammenstille-kandidat<br/>(NeedLytter)
     participant UFERDIG as toi-kandidat-indekser<br/>(UferdigKandidatLytter)
-    participant ORG as toi-organisasjonsenhet
     participant HULL as toi-hull-i-cv
     participant ONT as toi-ontologitjeneste
     participant GEO as toi-geografi
@@ -206,10 +203,8 @@ sequenceDiagram
     end
     alt Synlig kandidat
         SYN-->>UFERDIG: synlighet.erSynlig=true,<br/>synlighet.ferdigBeregnet=true
-        UFERDIG->>UFERDIG: Legger til @behov:<br/>organisasjonsenhetsnavn, hullICv,<br/>ontologi, geografi
-        UFERDIG-->>ORG: @behov[0]=organisasjonsenhetsnavn
-        ORG->>ORG: Slår opp NAV-kontornavn i NORG2
-        ORG-->>HULL: + organisasjonsenhetsnavn
+        UFERDIG->>UFERDIG: Legger til @behov:<br/>hullICv, ontologi, geografi<br/>(NAV-kontor hentes fra<br/>sisteOppfølgingsperiode.kontor)
+        UFERDIG-->>HULL: @behov[0]=hullICv
         HULL->>HULL: Beregner hull i CV
         HULL-->>ONT: + hullICv
         ONT->>ONT: Slår opp synonymer for<br/>kompetanser og stillingstitler
@@ -515,7 +510,7 @@ flowchart LR
 |-------------|----------------------|
 | **Document Message** | Hele kandidatprofilen sendes som ett JSON-dokument som berikes underveis |
 | **Content-Based Router** | `demandAtFørstkommendeUløsteBehovEr()` fungerer som en implisitt router — det er meldingsinnholdet (hvilke felter som mangler) som avgjør hvem som plukker opp |
-| **Content Enricher** | Hver beriker (organisasjonsenhet, hull-i-cv, geografi, etc.) legger til data fra eksterne kilder |
+| **Content Enricher** | Hver beriker (hull-i-cv, geografi, etc.) legger til data fra eksterne kilder |
 | **Pipes and Filters** | Meldingen flyter sekvensielt gjennom berikere, der hver fungerer som et filter som beriker dokumentet |
 | **Claim Check** | `toi-sammenstille-kandidat` fungerer delvis som et Claim Check — den lagrer data i en database og henter den tilbake når behovet oppstår, i stedet for at all data må være i meldingen fra starten |
 
@@ -561,14 +556,13 @@ Etter at synlighet er beregnet, legger `UferdigKandidatLytter` i toi-kandidat-in
 
 ```mermaid
 flowchart LR
-    A["@behov: organisasjonsenhetsnavn,<br/>hullICv, ontologi, geografi"]
-    B["toi-organisasjonsenhet<br/>→ + organisasjonsenhetsnavn"]
-    C["toi-hull-i-cv<br/>→ + hullICv"]
-    D["toi-ontologitjeneste<br/>→ + ontologi"]
-    E["toi-geografi<br/>→ + geografi"]
-    F["Alle behov løst ✓"]
+    A["@behov: hullICv, ontologi, geografi<br/>(NAV-kontor fra sisteOppfølgingsperiode.kontor)"]
+    B["toi-hull-i-cv<br/>→ + hullICv"]
+    C["toi-ontologitjeneste<br/>→ + ontologi"]
+    D["toi-geografi<br/>→ + geografi"]
+    E["Alle behov løst ✓"]
 
-    A --> B --> C --> D --> E --> F
+    A --> B --> C --> D --> E
 ```
 
 ---

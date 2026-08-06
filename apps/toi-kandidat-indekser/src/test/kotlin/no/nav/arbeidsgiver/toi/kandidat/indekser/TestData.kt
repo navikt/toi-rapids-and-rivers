@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser
 
 import java.time.LocalDate
 
+private fun String?.tilJsonStreng() = this?.let { "\"$it\"" } ?: "null"
+
 fun synlighet(erSynlig: Boolean = true, ferdigBeregnet: Boolean = true) = """
         "synlighet": {
             "erSynlig": $erSynlig,
@@ -171,7 +173,6 @@ fun geografiDel(
 fun rapidMelding(
     synlighetJson: String?,
     behovsListe: List<String>? = null,
-    organisasjonsenhetsnavn: String? = null,
     hullICv: String? = """
         {
             "førsteDagIInneværendeInaktivePeriode": "2022-05-10",
@@ -184,6 +185,8 @@ fun rapidMelding(
     kandidatnr: String = "CG133309",
     aktørId: String = "123",
     oppfølgingsenhet: String = "1234",
+    kontorNavn: String? = "NAV et kontor",
+    kontorId: String? = "1234",
     formidlingsgruppe: String = "ARBS",
     kvalifiseringsgruppe: String = "IVURD",
     oppfølgingsinformasjonHovedmaal: String = "SKAFFEA",
@@ -712,7 +715,7 @@ fun rapidMelding(
         ) { """"$it"""" }
     },"""
 }
-          ${organisasjonsenhetsnavn?.let { """"organisasjonsenhetsnavn": "$it",""" } ?: ""}
+          ${if (kontorNavn == null && kontorId == null) "" else """"sisteOppfølgingsperiode": {"kontor": {"kontorNavn": ${kontorNavn.tilJsonStreng()}, "kontorId": ${kontorId.tilJsonStreng()}}},"""}
           ${hullICv?.let { """"hullICv": $it,""" } ?: ""}
           ${ontologi?.let { """"ontologi": $it,""" } ?: ""}
           ${geografi?.let { """"geografi": $it,""" } ?: ""}

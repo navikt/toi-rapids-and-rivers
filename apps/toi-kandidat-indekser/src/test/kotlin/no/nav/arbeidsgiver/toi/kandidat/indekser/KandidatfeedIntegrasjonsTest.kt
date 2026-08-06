@@ -67,7 +67,6 @@ class KandidatfeedIntegrasjonsTest {
         val expectedKandidatnr = "CG133310"
         val meldingSynlig = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
             geografi = geografiDel(),
             kandidatnr = expectedKandidatnr
@@ -88,7 +87,6 @@ class KandidatfeedIntegrasjonsTest {
         val expectedKandidatnr = "CG133310"
         val meldingSynlig = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
             geografi = """
                 {
@@ -121,14 +119,12 @@ class KandidatfeedIntegrasjonsTest {
         val expectedKandidatnr = "CG133310"
         val meldingSynlig = rapidMelding(
             synlighet(erSynlig = true, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
             geografi = geografiDel(),
             kandidatnr = expectedKandidatnr
         )
         val meldingUsynlig = rapidMelding(
             synlighet(erSynlig = false, ferdigBeregnet = true),
-            organisasjonsenhetsnavn = "NAV et kontor",
             ontologi = ontologiDel(),
             geografi = geografiDel(),
             kandidatnr = expectedKandidatnr
@@ -166,7 +162,7 @@ class KandidatfeedIntegrasjonsTest {
     fun `SynligKandidatfeedLytter legger tilbake melding med slutt_av_hendelseskjede satt til true`() {
         assertIngenIIndekser()
         val rapidMelding =
-            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), organisasjonsenhetsnavn = "NAV et kontor", ontologi = ontologiDel(), geografi = geografiDel())
+            rapidMelding(synlighet(erSynlig = true, ferdigBeregnet = true), ontologi = ontologiDel(), geografi = geografiDel())
 
         val testrapid = TestRapid()
 
@@ -347,8 +343,9 @@ class KandidatfeedIntegrasjonsTest {
             oppfølgingsinformasjonHovedmaal = expectedHovedmaalkode,
             siste14AvedtakHovedmaal = expectedHovedmal,
             siste14AInnsatsgruppe = expectedInnsatsgruppe,
-            organisasjonsenhetsnavn = expectedNavkontor,
-            oppfølgingsenhet = expectedOrgenhet,
+            kontorNavn = expectedNavkontor,
+            kontorId = expectedOrgenhet,
+            oppfølgingsenhet = "Deprekert oppfølgingsenhet",
             fritattKandidatsok = expectedFritattKandidatsok,
             synligForArbeidsgiver = expectedSynligForArbeidsgiverSok,
             synligForVeileder = expectedSynligForVeilederSok,
