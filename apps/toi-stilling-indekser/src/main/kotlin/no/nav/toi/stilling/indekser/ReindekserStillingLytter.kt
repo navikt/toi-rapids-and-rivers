@@ -52,7 +52,7 @@ class ReindekserStillingLytter(private val rapidsConnection: RapidsConnection,
         val kandidatlisteInfoBehov = JsonMessage.newMessage(
             mapOf(
                 "stillingsId" to stillingsId,
-                "@event_name" to "kandidatlisteInfoBehov",
+                "@event_name" to "indekserKandidatlisteInfo",
                 "@behov" to listOf("kandidatlisteInfo"),
             )
         )

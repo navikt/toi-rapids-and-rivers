@@ -75,11 +75,11 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
             if (reindekserEnabled && reindekserIndeks != indeks) {
                 log.info("Reindeksering av alle stillinger starter på indeks $reindekserIndeks")
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(reindekserIndeks, env))
-                val reindekserStillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
+                val reindekserStillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient, rapidsConnection)
 
                 val versjonTilGammelConsumer = openSearchService.hentGjeldendeIndeksversjon() ?: kanIkkeStarteReindeksering()
                 val gammelKafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilGammelConsumer, env))
-                val gammelStillingConsumer = EksternStillingLytter(gammelKafkaConsumer, openSearchService, stillingsinfoClient)
+                val gammelStillingConsumer = EksternStillingLytter(gammelKafkaConsumer, openSearchService, stillingsinfoClient, rapidsConnection)
 
                 // Startet lytting på reindekseringsmeldinger fra rapid og les ekstern-topic fra start
                 thread(name = "reindekserStillingConsumer") {
@@ -101,7 +101,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 log.info("Starter indeksering av stillinger på indeks $indeks")
                 val versjonTilStillingConsumer = openSearchService.hentVersjonFraNaisConfig()
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilStillingConsumer, env))
-                val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
+                val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient, rapidsConnection)
 
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
