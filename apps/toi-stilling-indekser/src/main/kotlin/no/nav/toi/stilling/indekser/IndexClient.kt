@@ -1,6 +1,5 @@
 package no.nav.toi.stilling.indekser
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
 import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import org.opensearch.client.opensearch.OpenSearchClient

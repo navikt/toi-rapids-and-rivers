@@ -60,7 +60,7 @@ class EksternStillingLytterTest {
     }
 
     @Test
-    fun `Publiserer med stillingsId som Kafka-nokkel`() {
+    fun `Publiserer med stillingsId som Kafka-nøkkel`() {
         val rapid = TestRapid()
         val uuid = UUID.randomUUID().toString()
 
@@ -70,7 +70,7 @@ class EksternStillingLytterTest {
     }
 
     @Test
-    fun `Publiserer ingen behov nar det bare finnes DIR-stillinger`() {
+    fun `Publiserer ingen behov når det bare finnes DIR-stillinger`() {
         val rapid = TestRapid()
         val openSearchService = mockk<OpenSearchService>(relaxed = true)
 
