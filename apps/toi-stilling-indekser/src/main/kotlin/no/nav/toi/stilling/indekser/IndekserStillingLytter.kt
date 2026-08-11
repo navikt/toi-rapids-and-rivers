@@ -50,6 +50,9 @@ class IndekserStillingLytter(private val rapidsConnection: RapidsConnection,
         log.info("Mottok direktemeldt stilling for indeksering: ${direktemeldtStilling.stillingsId} $direktemeldtStilling")
 
         val stillingsId = direktemeldtStilling.stillingsId.toString()
+
+        openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
+
         val kandidatlisteInfoBehov = JsonMessage.newMessage(
             mapOf(
                 "stillingsId" to stillingsId,
@@ -59,7 +62,5 @@ class IndekserStillingLytter(private val rapidsConnection: RapidsConnection,
         )
         rapidsConnection.publish(stillingsId, kandidatlisteInfoBehov.toJson())
         log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
-
-        openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
     }
 }
