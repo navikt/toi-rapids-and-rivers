@@ -32,11 +32,7 @@ fun main() {
 fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
 
 fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>) {
-    val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+    val objectMapper = JacksonConfig.objectMapper
 
     val httpClient: HttpClient = HttpClient.newBuilder()
         .followRedirects(HttpClient.Redirect.ALWAYS)
