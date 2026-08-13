@@ -34,10 +34,6 @@ class UferdigKandidatLytter(
                     "arbeidsmarkedCv.endreJobbprofil"
                 )
             }
-            validate {
-                it.requireKey("oppfølgingsinformasjon.oppfolgingsenhet")
-
-            }
         }.register(this)
     }
 
