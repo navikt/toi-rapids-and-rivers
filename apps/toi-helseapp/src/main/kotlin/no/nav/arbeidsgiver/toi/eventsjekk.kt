@@ -27,7 +27,7 @@ private val uinteressanteHendelser = listOf(
     "rekrutteringstreffSvarOgStatus"    // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
-private val hendelserSomIkkeSendesLenger = listOf<String>("aktivitetskort-feil")
+private val hendelserSomIkkeSendesLenger = listOf<String>()
 private val objectMapper = jacksonObjectMapper()
 
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
