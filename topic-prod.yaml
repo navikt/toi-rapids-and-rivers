@@ -112,3 +112,6 @@ spec:
     - team: toi
       application: toi-siste-oppfolgingsperiode-pond
       access: readwrite
+    - team: toi
+      application: toi-deling-av-cv-api
+      access: readwrite
