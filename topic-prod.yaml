@@ -41,9 +41,6 @@ spec:
       application: toi-kafkamanager
       access: readwrite
     - team: toi
-      application: toi-organisasjonsenhet
-      access: readwrite
-    - team: toi
       application: toi-helseapp
       access: readwrite
     - team: toi
@@ -114,4 +111,7 @@ spec:
       access: readwrite
     - team: toi
       application: toi-siste-oppfolgingsperiode-pond
+      access: readwrite
+    - team: toi
+      application: toi-deling-av-cv-api
       access: readwrite

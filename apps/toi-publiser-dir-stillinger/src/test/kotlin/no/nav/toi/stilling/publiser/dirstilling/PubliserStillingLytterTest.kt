@@ -85,6 +85,41 @@ class PubliserStillingLytterTest {
         assertEquals("STILLING", stilling.properties["direktemeldtStillingskategori"])
     }
 
+    @Test
+    fun `Nøkler med null-verdi i employer properties filtreres bort`() {
+        val hendelse = jacksonMapper.readValue(rapidHendelse(), RapidHendelse::class.java)
+        val direktemeldtStilling = hendelse.direktemeldtStilling
+        val stillingsinfo = hendelse.stillingsinfo
+
+        assertTrue(direktemeldtStilling.innhold.employer?.properties?.containsKey("nace2") ?: false,
+            "employer.properties skal inneholde 'nace2' før filtrering")
+
+        val stilling = direktemeldtStilling.konverterTilStilling(stillingsinfo?.stillingskategori, stillingsinfo!!)
+
+        assertFalse(stilling.employer?.properties?.containsKey("nace2") ?: false,
+            "employer.properties skal ikke inneholde nøkler med null-verdi etter konvertering")
+    }
+
+    @Test
+    fun `Nøkler med null-verdi i innhold properties filtreres bort`() {
+        val hendelseJson = rapidHendelse().replace(
+            """"sector": "Privat"""",
+            """"sector": "Privat", "nullverdi": null"""
+        )
+        val hendelse = jacksonMapper.readValue(hendelseJson, RapidHendelse::class.java)
+        val direktemeldtStilling = hendelse.direktemeldtStilling
+        val stillingsinfo = hendelse.stillingsinfo
+
+        assertTrue(direktemeldtStilling.innhold.properties.containsKey("nullverdi"),
+            "innhold.properties skal inneholde 'nullverdi' før filtrering")
+
+        val stilling = direktemeldtStilling.konverterTilStilling(stillingsinfo?.stillingskategori, stillingsinfo!!)
+
+        assertFalse(stilling.properties.containsKey("nullverdi"),
+            "innhold.properties skal ikke inneholde nøkler med null-verdi etter konvertering")
+        assertEquals("Privat", stilling.properties["sector"])
+    }
+
     private fun testProgramMedHendelse(
         hendelse: String,
         assertion: TestRapid.RapidInspector.() -> Unit,
@@ -140,7 +175,10 @@ class PubliserStillingLytterTest {
                             "orgnr": "123456789",
                             "parentOrgnr": "987654321",
                             "publicName": "Testarbeidsgiver AS",
-                            "orgform": "AS"
+                            "orgform": "AS",
+                            "properties": {
+                                "nace2": null
+                            }
                         },
                         "locationList": [
                             {

@@ -38,9 +38,6 @@ spec:
       application: toi-synlighetsmotor
       access: readwrite
     - team: toi
-      application: toi-organisasjonsenhet
-      access: readwrite
-    - team: toi
       application: toi-kafkamanager
       access: readwrite
     - team: toi
@@ -111,4 +108,7 @@ spec:
       access: read
     - team: toi
       application: toi-siste-oppfolgingsperiode-pond
+      access: readwrite
+    - team: toi
+      application: toi-deling-av-cv-api
       access: readwrite
