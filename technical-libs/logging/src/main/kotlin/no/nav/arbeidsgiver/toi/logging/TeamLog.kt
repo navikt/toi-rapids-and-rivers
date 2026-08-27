@@ -6,6 +6,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.spi.LoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.filter.EvaluatorFilter
+import ch.qos.logback.core.spi.AppenderAttachable
 import ch.qos.logback.core.spi.FilterReply
 import ch.qos.logback.core.spi.FilterReply.ACCEPT
 import ch.qos.logback.core.spi.FilterReply.DENY
@@ -136,7 +137,7 @@ class TeamLogLogger private constructor(private val l: Logger) {
 
 
         private fun teamlogsAppender(logger: ch.qos.logback.classic.Logger): Appender<ILoggingEvent?>? =
-            appenders(logger).firstOrNull { it.name == teamlogsAppenderName }
+            appenders(logger).firstOrNull { it.name.startsWith(teamlogsAppenderName) }
 
 
         private fun hasTeamlogsMarkerFilter(appender: Appender<ILoggingEvent?>): Boolean {
@@ -150,7 +151,7 @@ class TeamLogLogger private constructor(private val l: Logger) {
 
         private fun allNonTeamlogsAppendersDenyTeamlogsMarker(rootLogger: ch.qos.logback.classic.Logger): Boolean {
             fun isNonTeamlogsAppender(appender: Appender<ILoggingEvent?>): Boolean =
-                appender.name != teamlogsAppenderName
+                !appender.name.startsWith(teamlogsAppenderName)
 
             fun firstApplicableDecisionForTeamlogsMarker(appender: Appender<ILoggingEvent?>): FilterReply? =
                 filters(appender).firstNotNullOfOrNull { decisionForMarker(it, teamlogsMarkerName) }
@@ -173,8 +174,20 @@ class TeamLogLogger private constructor(private val l: Logger) {
             logger.iteratorForAppenders()?.asSequence()?.toList() ?: emptyList()
 
 
-        private fun filters(appender: Appender<ILoggingEvent?>): List<EvaluatorFilter<*>> =
-            appender.copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
+        @Suppress("UNCHECKED_CAST")
+        private fun filters(appender: Appender<ILoggingEvent?>): List<EvaluatorFilter<*>> {
+            val egneFiltre = appender.copyOfAttachedFiltersList.filterIsInstance<EvaluatorFilter<*>>()
+            // Wrapper-appendere (f.eks. OpenTelemetryAppender for OTEL-MDC) videresender til en
+            // innpakket appender via AppenderAttachable. Markerfilteret kan ligge på den innpakkede
+            // appenderen i stedet for på selve wrapperen, så vi må se rekursivt gjennom disse.
+            val innpakkedeFiltre = (appender as? AppenderAttachable<ILoggingEvent?>)
+                ?.iteratorForAppenders()
+                ?.asSequence()
+                ?.flatMap { filters(it).asSequence() }
+                ?.toList()
+                ?: emptyList()
+            return egneFiltre + innpakkedeFiltre
+        }
 
 
         private fun decisionForMarker(filter: EvaluatorFilter<*>, markerName: String): FilterReply? {

@@ -10,3 +10,5 @@ allow_localhost_any = true
 [propose.allow]
 ports = [5432]
 
+# The following are machine-specific — add to ~/.config/cplt/config.toml:
+# allow.read = ["~/.gradle/gradle.properties"]  # in personal config
