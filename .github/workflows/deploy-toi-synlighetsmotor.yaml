@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/adressesperring-formidling
+      deploy_dev_branch: refs/heads/teamlogs-sync-med-rekrutteringstreff
     permissions:
       contents: read
       id-token: write
