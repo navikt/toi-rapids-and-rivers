@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.eksternLytter.EksternStillingLytter
 import no.nav.toi.stilling.indekser.eksternLytter.consumerConfig
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.KandidatlisteInfoLytter
 import no.nav.toi.stilling.indekser.stillingsinfo.StillingsinfoClient
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
@@ -85,11 +86,19 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 }
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
-                KandidatlisteInfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                KandidatlisteInfoLytter(
+                    rapidsConnection = rapid,
+                    openSearchService = openSearchService,
+                    indeks = indeks
+                )
 
                 // passer på at oppdateringer på kandidatlisteInfo og Stillingsinfo blir oppdatert i den nye indeksen
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = reindekserIndeks)
-                KandidatlisteInfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = reindekserIndeks)
+                KandidatlisteInfoLytter(
+                    rapidsConnection = rapid,
+                    openSearchService = openSearchService,
+                    indeks = reindekserIndeks
+                )
             } else {
                 // Initiell indeksering av stillinger, samt kontinuerlig lesing av oppdateringer på rapid og ekstern-topic
                 log.info("Starter indeksering av stillinger på indeks $indeks")
@@ -99,7 +108,11 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
 
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
-                KandidatlisteInfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                KandidatlisteInfoLytter(
+                    rapidsConnection = rapid,
+                    openSearchService = openSearchService,
+                    indeks = indeks
+                )
 
                 thread(name = "indekserStillingConsumer" ) {
                     Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)

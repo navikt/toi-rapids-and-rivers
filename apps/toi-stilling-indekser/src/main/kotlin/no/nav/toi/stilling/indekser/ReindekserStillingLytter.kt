@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.toi.stilling.indekser.dto.Melding
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.lagKandidatlisteInfoMelding
 
 class ReindekserStillingLytter(private val rapidsConnection: RapidsConnection,
                                private val openSearchService: OpenSearchService,
@@ -52,14 +53,8 @@ class ReindekserStillingLytter(private val rapidsConnection: RapidsConnection,
 
         openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
 
-        val kandidatlisteInfoBehov = JsonMessage.newMessage(
-            mapOf(
-                "stillingsId" to stillingsId,
-                "@event_name" to "indekserKandidatlisteInfo",
-                "@behov" to listOf("kandidatlisteInfo"),
-            )
-        )
-        rapidsConnection.publish(stillingsId, kandidatlisteInfoBehov.toJson())
+        val kandidatlisteInfoBehov = lagKandidatlisteInfoMelding(stillingsId)
+        context.publish(stillingsId, kandidatlisteInfoBehov.toJson())
         log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
     }
 }

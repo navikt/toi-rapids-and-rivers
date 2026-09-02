@@ -4,6 +4,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.*
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.lagKandidatlisteInfoMelding
 import no.nav.toi.stilling.indekser.stillingsinfo.KunneIkkeHenteStillingsinsinfoException
 import no.nav.toi.stilling.indekser.stillingsinfo.StillingsinfoClient
 import org.apache.hc.core5.http.ConnectionClosedException
@@ -86,13 +87,7 @@ class EksternStillingLytter(
 
             rekrutteringsbistandStillinger.forEach { rekrutteringsbistandStilling ->
                 val stillingsId = rekrutteringsbistandStilling.stilling.uuid.toString()
-                val kandidatlisteInfoBehov = JsonMessage.newMessage(
-                    mapOf(
-                        "stillingsId" to stillingsId,
-                        "@event_name" to "indekserKandidatlisteInfo",
-                        "@behov" to listOf("kandidatlisteInfo"),
-                    )
-                )
+                val kandidatlisteInfoBehov = lagKandidatlisteInfoMelding(stillingsId)
                 rapidsConnection.publish(stillingsId, kandidatlisteInfoBehov.toJson())
                 log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
             }

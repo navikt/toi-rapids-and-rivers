@@ -1,4 +1,4 @@
-package no.nav.toi.stilling.indekser
+package no.nav.toi.stilling.indekser.kandidatlisteInfo
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
@@ -6,7 +6,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.indekser.JacksonConfig
+import no.nav.toi.stilling.indekser.OpenSearchService
 import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
+import no.nav.toi.stilling.indekser.log
 import java.util.UUID
 
 class KandidatlisteInfoLytter(rapidsConnection: RapidsConnection,
@@ -38,7 +41,7 @@ class KandidatlisteInfoLytter(rapidsConnection: RapidsConnection,
 
         try {
             kandidatlisteInfo = JacksonConfig.objectMapper.readValue(kandidatlisteInfoPacket.toString(), KandidatlisteInfo::class.java)
-            stillingsId = JacksonConfig.objectMapper.readValue(stillingsIdPacket.toString(), UUID::class.java)
+            stillingsId = UUID.fromString(stillingsIdPacket.asText())
         } catch (e: Exception) {
             log.error("Gå forbi feil format på melding", e)
             return

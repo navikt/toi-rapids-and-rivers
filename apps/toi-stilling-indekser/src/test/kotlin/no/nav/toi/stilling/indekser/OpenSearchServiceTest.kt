@@ -12,6 +12,7 @@ import io.mockk.runs
 import io.mockk.verify
 import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
 import no.nav.toi.stilling.indekser.dto.Stillingsinfo
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.KandidatlisteInfoLytter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.opensearch.client.opensearch.OpenSearchClient
