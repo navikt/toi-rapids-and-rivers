@@ -1,6 +1,5 @@
 package no.nav.toi.stilling.indekser.eksternLytter
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.*
