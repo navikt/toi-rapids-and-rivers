@@ -1,11 +1,19 @@
 package no.nav.toi.stilling.indekser
 
+import no.nav.toi.stilling.indekser.dto.Contact
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingAdministration
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingArbeidsgiver
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingKategori
+import no.nav.toi.stilling.indekser.dto.Geografi
+import no.nav.toi.stilling.indekser.dto.KandidatlisteInfo
+import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import java.time.LocalDateTime
 import java.util.*
 
 data class RekrutteringsbistandStilling(
     val stilling: Stilling,
-    val stillingsinfo: Stillingsinfo?
+    val stillingsinfo: Stillingsinfo?,
+    val kandidatlisteInfo: KandidatlisteInfo? = null
 )
 
 data class Stilling(

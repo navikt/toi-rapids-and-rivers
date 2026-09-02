@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - bruk-zizmor-paa-workflows
     paths:
       - .github/workflows/deploy-topic-to-dev.yaml
       - topic-dev.yaml

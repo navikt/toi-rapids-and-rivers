@@ -1,5 +1,12 @@
 package no.nav.toi.stilling.indekser
 
+import no.nav.toi.stilling.indekser.dto.Contact
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStilling
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingAdministration
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingArbeidsgiver
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingInnhold
+import no.nav.toi.stilling.indekser.dto.DirektemeldtStillingKategori
+import no.nav.toi.stilling.indekser.dto.Geografi
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.time.ZonedDateTime

@@ -1,7 +1,9 @@
 package no.nav.toi.stilling.indekser.eksternLytter
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.*
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.lagKandidatlisteInfoMelding
 import no.nav.toi.stilling.indekser.stillingsinfo.KunneIkkeHenteStillingsinsinfoException
 import no.nav.toi.stilling.indekser.stillingsinfo.StillingsinfoClient
 import org.apache.hc.core5.http.ConnectionClosedException
@@ -15,7 +17,8 @@ import java.time.Duration
 class EksternStillingLytter(
     private val consumer: Consumer<String, Ad>,
     private val openSearchService: OpenSearchService,
-    private val stillingsinfoClient: StillingsinfoClient
+    private val stillingsinfoClient: StillingsinfoClient,
+    private val rapidsConnection: RapidsConnection,
 ) : Closeable {
 
     fun start(indeks: String) {
@@ -80,6 +83,14 @@ class EksternStillingLytter(
         if(arbeidsplassenStillinger.isNotEmpty()) {
             openSearchService.indekser(stillinger = rekrutteringsbistandStillinger, indeks = indeks)
             log.info("Indekserte ${arbeidsplassenStillinger.size} eksterne stillinger i indeks '$indeks'. UUIDer: ${arbeidsplassenStillinger.map { it.uuid }}")
+
+            rekrutteringsbistandStillinger.forEach { rekrutteringsbistandStilling ->
+                val stillingsId = rekrutteringsbistandStilling.stilling.uuid.toString()
+                val kandidatlisteInfoBehov = lagKandidatlisteInfoMelding(stillingsId)
+                rapidsConnection.publish(stillingsId, kandidatlisteInfoBehov.toJson())
+                log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
+            }
+
         }
     }
 

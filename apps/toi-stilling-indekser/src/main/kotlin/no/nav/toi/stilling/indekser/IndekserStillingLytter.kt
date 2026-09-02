@@ -6,8 +6,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.toi.stilling.indekser.dto.Melding
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.lagKandidatlisteInfoMelding
 
-class IndekserStillingLytter(rapidsConnection: RapidsConnection,
+class IndekserStillingLytter(private val rapidsConnection: RapidsConnection,
                              private val openSearchService: OpenSearchService,
                              private val indeks: String
 ) : River.PacketListener {
@@ -31,7 +33,7 @@ class IndekserStillingLytter(rapidsConnection: RapidsConnection,
     ) {
         val melding: Melding
         try {
-            melding = Melding.fraJson(packet)
+            melding = JacksonConfig.objectMapper.readValue(packet.toJson(), Melding::class.java)
         }catch (e: Exception) {
             log.error("Gå forbi feil format på melding", e)
             return
@@ -48,6 +50,12 @@ class IndekserStillingLytter(rapidsConnection: RapidsConnection,
 
         log.info("Mottok direktemeldt stilling for indeksering: ${direktemeldtStilling.stillingsId} $direktemeldtStilling")
 
+        val stillingsId = direktemeldtStilling.stillingsId.toString()
+
         openSearchService.indekserStilling(rekrutteringsbistandStilling, indeks)
+
+        val kandidatlisteInfoBehov = lagKandidatlisteInfoMelding(stillingsId)
+        context.publish(stillingsId, kandidatlisteInfoBehov.toJson())
+        log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
     }
 }

@@ -1,21 +1,16 @@
 package no.nav.toi.stilling.indekser
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.toi.stilling.indekser.eksternLytter.EksternStillingLytter
 import no.nav.toi.stilling.indekser.eksternLytter.consumerConfig
+import no.nav.toi.stilling.indekser.kandidatlisteInfo.KandidatlisteInfoLytter
 import no.nav.toi.stilling.indekser.stillingsinfo.StillingsinfoClient
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.http.HttpClient
-import java.util.*
 import kotlin.concurrent.thread
 
 private val log = noClassLogger()
@@ -32,11 +27,7 @@ fun main() {
 fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
 
 fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>) {
-    val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+    val objectMapper = JacksonConfig.objectMapper
 
     val httpClient: HttpClient = HttpClient.newBuilder()
         .followRedirects(HttpClient.Redirect.ALWAYS)
@@ -44,7 +35,7 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
         .build()
 
     val openSearchClient = OpenSearchConfig(env, objectMapper).openSearchClient()
-    val indexClient = IndexClient(openSearchClient, objectMapper)
+    val indexClient = IndexClient(openSearchClient)
     val accessTokenClient = AccessTokenClient(env, httpClient, objectMapper)
     val stillingApiClient = StillingApiClient(env, httpClient, accessTokenClient)
     val openSearchService = OpenSearchService(indexClient, env)
@@ -75,11 +66,11 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
             if (reindekserEnabled && reindekserIndeks != indeks) {
                 log.info("Reindeksering av alle stillinger starter på indeks $reindekserIndeks")
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(reindekserIndeks, env))
-                val reindekserStillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
+                val reindekserStillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient, rapidsConnection)
 
                 val versjonTilGammelConsumer = openSearchService.hentGjeldendeIndeksversjon() ?: kanIkkeStarteReindeksering()
                 val gammelKafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilGammelConsumer, env))
-                val gammelStillingConsumer = EksternStillingLytter(gammelKafkaConsumer, openSearchService, stillingsinfoClient)
+                val gammelStillingConsumer = EksternStillingLytter(gammelKafkaConsumer, openSearchService, stillingsinfoClient, rapidsConnection)
 
                 // Startet lytting på reindekseringsmeldinger fra rapid og les ekstern-topic fra start
                 thread(name = "reindekserStillingConsumer") {
@@ -95,15 +86,33 @@ fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>
                 }
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                KandidatlisteInfoLytter(
+                    rapidsConnection = rapid,
+                    openSearchService = openSearchService,
+                    indeks = indeks
+                )
+
+                // passer på at oppdateringer på kandidatlisteInfo og Stillingsinfo blir oppdatert i den nye indeksen
+                IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = reindekserIndeks)
+                KandidatlisteInfoLytter(
+                    rapidsConnection = rapid,
+                    openSearchService = openSearchService,
+                    indeks = reindekserIndeks
+                )
             } else {
                 // Initiell indeksering av stillinger, samt kontinuerlig lesing av oppdateringer på rapid og ekstern-topic
                 log.info("Starter indeksering av stillinger på indeks $indeks")
                 val versjonTilStillingConsumer = openSearchService.hentVersjonFraNaisConfig()
                 val kafkaConsumer = KafkaConsumer<String, Ad>(consumerConfig(versjonTilStillingConsumer, env))
-                val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient)
+                val stillingConsumer = EksternStillingLytter(kafkaConsumer, openSearchService, stillingsinfoClient, rapidsConnection)
 
                 IndekserStillingLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
                 IndekserStillingsinfoLytter(rapidsConnection = rapid, openSearchService = openSearchService, indeks = indeks)
+                KandidatlisteInfoLytter(
+                    rapidsConnection = rapid,
+                    openSearchService = openSearchService,
+                    indeks = indeks
+                )
 
                 thread(name = "indekserStillingConsumer" ) {
                     Thread.currentThread().setUncaughtExceptionHandler(::uncaughtExceptionHandler)
