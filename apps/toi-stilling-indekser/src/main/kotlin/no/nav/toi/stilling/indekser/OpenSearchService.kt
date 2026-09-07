@@ -50,7 +50,8 @@ class OpenSearchService(private val client: IndexClient, private val env: Mutabl
             log.info("Oppdaterer kandidatlisteInfo for stilling $stillingsId i indeks $indeks")
             client.oppdaterKandidatlisteInfo(stillingsId = stillingsId, kandidatlisteInfo = kandidatlisteInfo, indeks = indeks)
         } else {
-            log.warn("Kan ikke oppdatere kandidatlisteInfo for stilling $stillingsId i indeks $indeks fordi stillingen ikke finnes")
+            // Forventet feilsituasjon under opprettelse av etterregistreringer på grunn av rekkefølge
+            log.info("Kan ikke oppdatere kandidatlisteInfo for stilling $stillingsId i indeks $indeks fordi stillingen ikke finnes")
             return
         }
     }
