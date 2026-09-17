@@ -15,7 +15,7 @@ class OntologiTest {
     @BeforeAll
     fun setup() {
         wireMock.stubFor(
-            get(urlEqualTo("/stilling/?stillingstittel=IT-sjef")).willReturn(
+            get(urlEqualTo("/stilling?stillingstittel=IT-sjef")).willReturn(
                 aResponse().withBody(
                     """
                     {
@@ -43,7 +43,7 @@ class OntologiTest {
             )
         )
         wireMock.stubFor(
-            get(urlEqualTo("/kompetanse/?kompetansenavn=Sentralbord")).willReturn(
+            get(urlEqualTo("/kompetanse?kompetansenavn=Sentralbord")).willReturn(
                 aResponse().withBody(
                     """
                     {
@@ -67,11 +67,11 @@ class OntologiTest {
             )
         )
         wireMock.stubFor(
-            get(urlEqualTo("/kompetanse/?kompetansenavn=FeilendeKall")).willReturn(aResponse().withStatus(500))
+            get(urlEqualTo("/kompetanse?kompetansenavn=FeilendeKall")).willReturn(aResponse().withStatus(500))
         )
 
         wireMock.stubFor(
-            get(urlEqualTo("/kompetanse/?kompetansenavn=Collective%5Bi%5D")).willReturn(
+            get(urlEqualTo("/kompetanse?kompetansenavn=Collective%5Bi%5D")).willReturn(
                 aResponse().withBody(
                     """
                     {
@@ -92,7 +92,7 @@ class OntologiTest {
         )
 
         wireMock.stubFor(
-            get(urlEqualTo("/stilling/?stillingstittel=Collective%5Bi%5D")).willReturn(
+            get(urlEqualTo("/stilling?stillingstittel=Collective%5Bi%5D")).willReturn(
                 aResponse().withBody(
                     """
                     {
