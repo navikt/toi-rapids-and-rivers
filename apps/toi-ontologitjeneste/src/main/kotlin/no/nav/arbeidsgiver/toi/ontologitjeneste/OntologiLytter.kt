@@ -22,8 +22,8 @@ class OntologiLytter(private val ontologiUrl: String, rapidsConnection: RapidsCo
 
     init {
         val cacheHjelper = CacheHjelper()
-        kompetanseCache = cacheHjelper.lagCache { ontologiRelasjoner("/kompetanse/?kompetansenavn=${it.encodeURLPathPart()}") }
-        stillingstittelCache = cacheHjelper.lagCache { ontologiRelasjoner("/stilling/?stillingstittel=${it.encodeURLPathPart()}") }
+        kompetanseCache = cacheHjelper.lagCache { ontologiRelasjoner("/kompetanse?kompetansenavn=${it.encodeURLPathPart()}") }
+        stillingstittelCache = cacheHjelper.lagCache { ontologiRelasjoner("/stilling?stillingstittel=${it.encodeURLPathPart()}") }
         River(rapidsConnection).apply {
             precondition{
                 it.demandAtFørstkommendeUløsteBehovEr("ontologi")
