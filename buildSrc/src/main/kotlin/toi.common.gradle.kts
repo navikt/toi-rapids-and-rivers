@@ -13,12 +13,11 @@ repositories {
     maven("https://packages.confluent.io/maven/")
 }
 
-val slf4jVersion = "2.0.18"
-val logbackVersion = "1.5.23"
+val slf4jVersion = "2.0.19"
+val logbackVersion = "1.6.3"
 val logstashLogbackEncoderVersion = "9.0"
-val junitJupiterVersion = "5.9.1"
-val junitPlatformVersion = "1.9.1"
-val assertjVersion = "3.23.1"
+val junitJupiterVersion = "6.1.3"
+val assertjVersion = "3.27.7"
 
 dependencies {
     constraints {
@@ -47,7 +46,7 @@ dependencies {
             version { require(junitJupiterVersion) }
         }
         testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
-            version { require(junitPlatformVersion) }
+            version { require(junitJupiterVersion) }
         }
     }
 
