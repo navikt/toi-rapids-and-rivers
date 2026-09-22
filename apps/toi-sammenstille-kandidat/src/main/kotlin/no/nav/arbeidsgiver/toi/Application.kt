@@ -30,6 +30,7 @@ fun startRapid(
             NeedLytter(rapid, repository, "siste14avedtak")
             NeedLytter(rapid, repository, "kvp")
         }.start()
+        log.info("Avslutter applikasjonen")
     } catch (t: Throwable) {
         log.error("Rapid-applikasjonen krasjet: ${t.message}", t)
     }
