@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import no.nav.arbeidsgiver.toi.log
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.noClassLogger
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -30,7 +31,7 @@ fun startRapid(
             NeedLytter(rapid, repository, "kvp")
         }.start()
     } catch (t: Throwable) {
-        LoggerFactory.getLogger("Applikasjon").error("Rapid-applikasjonen krasjet: ${t.message}", t)
+        log.error("Rapid-applikasjonen krasjet: ${t.message}", t)
     }
 }
 
