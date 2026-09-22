@@ -5,8 +5,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.log
 
 class NeedLytter(
     private val rapidsConnection: RapidsConnection,
@@ -28,9 +30,15 @@ class NeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
+        log.info("Mottok need-melding")
         val aktørId = packet["aktørId"].asString()
         val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
         kandidat.populerMelding(packet).toJson().also { rapidsConnection.publish(aktørId, it) }
+        log.info("Svarte på need-melding")
+    }
+
+    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
+        log.error("Feil i Need-lytter: $problems")
     }
 }
 
