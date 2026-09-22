@@ -8,6 +8,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
 
 class NeedLytter(
@@ -30,11 +31,17 @@ class NeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        log.info("Mottok need-melding")
-        val aktørId = packet["aktørId"].asString()
-        val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
-        kandidat.populerMelding(packet).toJson().also { rapidsConnection.publish(aktørId, it) }
-        log.info("Svarte på need-melding")
+        try {
+            log.info("Mottok need-melding")
+            val aktørId = packet["aktørId"].asString()
+            val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId)
+            kandidat.populerMelding(packet).toJson().also { rapidsConnection.publish(aktørId, it) }
+            log.info("Svarte på need-melding")
+        } catch (e: Exception) {
+            log.error("Feil ved behandling av need-melding")
+            teamlog(log).error("Feil ved behandling av need-melding: ${e.message}", e)
+            throw e
+        }
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {

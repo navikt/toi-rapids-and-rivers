@@ -7,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
 
 class SamleLytter(
@@ -30,13 +31,19 @@ class SamleLytter(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
-        log.info("Mottok kandidat-melding")
-        val aktørId = packet["aktørId"].asString()
+        try {
+            log.info("Mottok kandidat-melding")
+            val aktørId = packet["aktørId"].asString()
 
-        val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
-        val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
-        repository.lagreKandidat(oppdatertKandidat)
-        log.info("Lagret kandidat-melding")
+            val kandidat = repository.hentKandidat(aktørId) ?: Kandidat(aktørId = aktørId)
+            val oppdatertKandidat = oppdaterKandidat(kandidat, packet)
+            repository.lagreKandidat(oppdatertKandidat)
+            log.info("Lagret kandidat-melding")
+        } catch (e: Exception) {
+            log.error("Feil ved lagring av kandidat-melding")
+            teamlog(log).error("Feil ved lagring av kandidat-melding: ${e.message}", e)
+            throw e
+        }
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
