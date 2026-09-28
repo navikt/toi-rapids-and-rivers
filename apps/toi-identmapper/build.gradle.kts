@@ -13,8 +13,8 @@ dependencies {
     implementation(project(":technical-libs:logging"))
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
-    implementation("org.apache.avro:avro:1.12.0")
-    implementation("io.confluent:kafka-avro-serializer:7.8.0")
+    implementation("org.apache.avro:avro:1.12.2")
+    implementation("io.confluent:kafka-avro-serializer:7.8.11")
 
     // Database
     implementation("org.postgresql:postgresql:42.7.11")
