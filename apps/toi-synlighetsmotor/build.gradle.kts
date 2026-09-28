@@ -6,11 +6,13 @@ application {
     mainClass.set("no.nav.arbeidsgiver.toi.ApplicationKt")
 }
 
+private val flywayVersion = "13.7.0"
+
 dependencies {
     implementation(project(":technical-libs:logging"))
     implementation("org.postgresql:postgresql:42.7.11")
-    implementation("org.flywaydb:flyway-core:11.1.0")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.0")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation("io.javalin:javalin:7.2.0")
     implementation("tools.jackson.module:jackson-module-kotlin:3.1.3")

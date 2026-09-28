@@ -7,6 +7,8 @@ application {
     mainClass.set("no.nav.arbeidsgiver.toi.arbeidssoekeropplysninger.ApplicationKt")
 }
 
+private val flywayVersion = "13.7.0"
+
 dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
 
@@ -15,8 +17,8 @@ dependencies {
     implementation("org.apache.avro:avro:1.12.0")
     implementation("io.confluent:kafka-avro-serializer:7.8.0")
 
-    implementation("org.flywaydb:flyway-core:11.3.4")
-    implementation("org.flywaydb:flyway-database-postgresql:11.3.4")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("org.postgresql:postgresql:42.7.11")
     implementation("com.zaxxer:HikariCP:6.2.1")
 
