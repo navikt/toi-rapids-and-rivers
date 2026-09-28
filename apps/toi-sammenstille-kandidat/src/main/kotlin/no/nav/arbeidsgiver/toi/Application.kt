@@ -18,6 +18,7 @@ fun startRapid(
     repository: Repository,
 ) {
     try {
+        log.info("Starter lytterne")
         rapidsConnection.also { rapid ->
             SamleLytter(rapid, repository, "arbeidsmarked-cv", "arbeidsmarkedCv")
             SamleLytter(rapid, repository, "veileder")
