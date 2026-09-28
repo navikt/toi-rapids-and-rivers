@@ -23,7 +23,6 @@ dependencies {
     implementation("com.zaxxer:HikariCP:6.2.1")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
