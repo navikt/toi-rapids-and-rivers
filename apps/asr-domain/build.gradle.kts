@@ -11,8 +11,8 @@ version = "0.1"
 //group = "no.nav.toi.rapids"
 
 dependencies {
-  implementation("org.apache.avro:avro:1.12.2")
-  implementation("io.confluent:kafka-avro-serializer:7.8.11")
+  implementation("org.apache.avro:avro:1.12.0")
+  implementation("io.confluent:kafka-avro-serializer:7.8.0")
 }
 
 repositories {

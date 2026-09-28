@@ -14,8 +14,8 @@ dependencies {
 
     implementation(project(":technical-libs:logging"))
     implementation(project(":apps:asr-domain"))
-    implementation("org.apache.avro:avro:1.12.2")
-    implementation("io.confluent:kafka-avro-serializer:7.8.11")
+    implementation("org.apache.avro:avro:1.12.0")
+    implementation("io.confluent:kafka-avro-serializer:7.8.0")
 
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")

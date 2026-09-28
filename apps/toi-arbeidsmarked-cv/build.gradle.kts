@@ -9,7 +9,7 @@ application {
 
 dependencies {
     implementation(project(":technical-libs:logging"))
-    implementation("io.confluent:kafka-avro-serializer:8.1.6")
+    implementation("io.confluent:kafka-avro-serializer:8.1.1")
     implementation("tools.jackson.core:jackson-databind:3.0.4")
-    implementation("org.apache.avro:avro:1.12.2")
+    implementation("org.apache.avro:avro:1.12.0")
 }
