@@ -18,7 +18,7 @@ Bygging på Github styres av en workflow-fil for hver app i katalogen `.github/w
 ### Automatisk oppdatering av Docker run-time base-image
 
 Hver aktiv app har en scheduled workflow `oppdater-docker-baseimage-toi-<app>.yaml` som potensielt bygger og deployer appen til prod ukentlig, uten manuelle trinn.
-Henskten med det er å få med nye patcher av sikkerhets-issues i appens Docker run-time base-image.
+Hensikten med det er å få med nye patcher av sikkerhets-issues i appens Docker run-time base-image.
 
 ## Kode generert av GitHub Copilot
 
