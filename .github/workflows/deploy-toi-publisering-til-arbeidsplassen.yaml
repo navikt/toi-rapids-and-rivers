@@ -19,7 +19,7 @@ jobs:
     with:
       app_name: ${{ github.workflow }}
       baseimage-tagged-ref: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
-      deploy_dev_branch: refs/heads/loggelib-i-flere-apper
+      deploy_dev_branch: refs/heads/autobump-docker-baseimage
     permissions:
       contents: read
       id-token: write
