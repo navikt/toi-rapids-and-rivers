@@ -64,7 +64,7 @@ jobs:
             echo "::error::baseimage-tagged-ref må være en full image-referanse med tag, uten digest"
             exit 1
           fi
-          baseimage_digest=$(docker buildx imagetools inspect "$BASEIMAGE_TAGGED_REF" --format '{{json .Manifest}}' | jq -er '.digest')
+          baseimage_digest=$(docker buildx imagetools inspect "$BASEIMAGE_TAGGED_REF" --format '{{.Digest}}')
           if [[ ! "$baseimage_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
             echo "::error::Fant ingen gyldig SHA-256-digest for runtime-baseimaget"
             exit 1
