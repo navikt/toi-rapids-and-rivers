@@ -15,15 +15,6 @@ Bygging kan gjøres f.eks. ved å stå i hovedkatalogen og kjøre
 ### På Github
 Bygging på Github styres av en workflow-fil for hver app i katalogen `.github/workflows`. De gjenbruker filen `deploy-toi-template.yaml` **med unntak av deploy-toi-helseapp**.yaml som har sin egen byggkonfig.
 
-## Trivy security scan
-Resulatene/issuene fra scans av alle appene i dette Github-repoet vises sammen i [samme liste](https://github.com/navikt/toi-rapids-and-rivers/security/code-scanning).
-
-Vi har ikke noen kjøring av [Trivy security scan](https://sikkerhet.nav.no/docs/verktoy/trivy) som starter regelmessig og uavhengig av om appen har blitt endret (scheduled trigger). Det betyr at hvis det oppdages en ny sikkerhetsissue der ute i verden som legges inn i Trivy sin database så får vi ikke sjekket appen vår for denne issuen uten å gjøre en endring i appen. For å utløse en Trivy scan i alle appene - med unntak av toi-helseapp - gjør en triviell, ikke-funksjonell endring i en fil de har felles gjennom Github workflow konfigurasjonen sin, som er:
-```
-- .github/workflows/deploy-toi-template.yaml
-- buildSrc/**
-```
-
 ## Kode generert av GitHub Copilot
 
 Dette repoet bruker GitHub Copilot til å generere kode.
