@@ -10,10 +10,10 @@ env:
 on:
   push:
     paths:
-    - apps/toi-helseapp/**
-    - .github/workflows/deploy-toi-helseapp.yaml
-    - buildSrc/**
-    - technical-libs/testrapid/**
+      - apps/toi-helseapp/**
+      - .github/workflows/deploy-toi-helseapp.yaml
+      - buildSrc/**
+      - technical-libs/testrapid/**
   workflow_dispatch:
 
 permissions:
@@ -55,20 +55,26 @@ jobs:
           DOCKERFILE: apps/${{ env.APP_NAME }}/Dockerfile
         run: |
           set -euo pipefail
+
+          # Unngå at argumentet vi skal sende til Dockerfile blir ignorert, f.eks. fordi Dockerfile hardkoder baseimage,
+          # som vil føre til at vi lagrer en annen digest enn den som ble deployet
           runtime_from=$(awk 'toupper($1) == "FROM" { image = $2 ~ /^--platform=/ ? $3 : $2 } END { print image }' "$DOCKERFILE")
           if [[ "$runtime_from" != '$BASE_IMAGE_DIGEST_PINNED_REF' && "$runtime_from" != '${BASE_IMAGE_DIGEST_PINNED_REF}' ]]; then
             echo "::error::Siste FROM i Dockerfile må bruke BASE_IMAGE_DIGEST_PINNED_REF som build-argument"
             exit 1
           fi
+
           if [[ ! "$BASEIMAGE_TAGGED_REF" =~ ^[^[:space:]@]+:[^[:space:]@]+$ ]]; then
             echo "::error::baseimage-tagged-ref må være en full image-referanse med tag, uten digest"
             exit 1
           fi
-          baseimage_digest=$(docker buildx imagetools inspect "$BASEIMAGE_TAGGED_REF" --format '{{.Digest}}')
-          if [[ ! "$baseimage_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
-            echo "::error::Fant ingen gyldig SHA-256-digest for runtime-baseimaget"
+
+          baseimage_digest=$( docker buildx imagetools inspect "$BASEIMAGE_TAGGED_REF" | awk '$1 == "Digest:" && !found { print $2; found = 1 }' )
+          if [[ -z "$baseimage_digest" || ! "$baseimage_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::Fant ingen gyldig SHA-256-digest for runtime-baseimaget: $BASEIMAGE_TAGGED_REF" >&2
             exit 1
           fi
+
           echo "baseimage-tagged-ref=$BASEIMAGE_TAGGED_REF" >> "$GITHUB_OUTPUT"
           echo "baseimage-digest=$baseimage_digest" >> "$GITHUB_OUTPUT"
           echo "baseimage-digest-pinned-ref=$BASEIMAGE_TAGGED_REF@$baseimage_digest" >> "$GITHUB_OUTPUT"
@@ -104,11 +110,11 @@ jobs:
           VAR: image=${{ needs.build-and-publish.outputs.image }}
 
   call-lagre-docker-baseimage-digest:
-    needs: [build-and-publish, deploy-to-prod-gcp]
+    needs: [ build-and-publish, deploy-to-prod-gcp ]
     if: github.ref == 'refs/heads/main'
     uses: navikt/toi-github-actions-workflows/.github/workflows/lagre-docker-baseimage-digest.yaml@v16
     with:
       app-navn: toi-helseapp
       baseimage-tagged-ref: ${{ needs.build-and-publish.outputs.baseimage-tagged-ref }}
       baseimage-digest: ${{ needs.build-and-publish.outputs.baseimage-digest }}
-    permissions: {}
+    permissions: { }
