@@ -1,7 +1,11 @@
 name: toi-helseapp
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   APP_NAME: ${{ github.workflow }}
+  BASEIMAGE_TAGGED_REF: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
 
 on:
   push:
@@ -20,6 +24,8 @@ jobs:
     name: Build, test, and publish
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
+      baseimage-tagged-ref: ${{ steps.baseimage.outputs.baseimage-tagged-ref }}
+      baseimage-digest: ${{ steps.baseimage.outputs.baseimage-digest }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,6 +46,32 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew :apps:${APP_NAME}:test :apps:${APP_NAME}:build
+      - uses: nais/login@bb6c3e1e14e53d40d69d0d092bd2fce2e39ae3bf # v0
+        with:
+          team: toi
+      - name: Finn digest for runtime-baseimage
+        id: baseimage
+        env:
+          DOCKERFILE: apps/${{ env.APP_NAME }}/Dockerfile
+        run: |
+          set -euo pipefail
+          runtime_from=$(awk 'toupper($1) == "FROM" { image = $2 ~ /^--platform=/ ? $3 : $2 } END { print image }' "$DOCKERFILE")
+          if [[ "$runtime_from" != '$BASE_IMAGE_DIGEST_PINNED_REF' && "$runtime_from" != '${BASE_IMAGE_DIGEST_PINNED_REF}' ]]; then
+            echo "::error::Siste FROM i Dockerfile må bruke BASE_IMAGE_DIGEST_PINNED_REF som build-argument"
+            exit 1
+          fi
+          if [[ ! "$BASEIMAGE_TAGGED_REF" =~ ^[^[:space:]@]+:[^[:space:]@]+$ ]]; then
+            echo "::error::baseimage-tagged-ref må være en full image-referanse med tag, uten digest"
+            exit 1
+          fi
+          baseimage_digest=$(docker buildx imagetools inspect "$BASEIMAGE_TAGGED_REF" --format '{{json .Manifest}}' | jq -er '.digest')
+          if [[ ! "$baseimage_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::Fant ingen gyldig SHA-256-digest for runtime-baseimaget"
+            exit 1
+          fi
+          echo "baseimage-tagged-ref=$BASEIMAGE_TAGGED_REF" >> "$GITHUB_OUTPUT"
+          echo "baseimage-digest=$baseimage_digest" >> "$GITHUB_OUTPUT"
+          echo "baseimage-digest-pinned-ref=$BASEIMAGE_TAGGED_REF@$baseimage_digest" >> "$GITHUB_OUTPUT"
       - name: Push docker image to GAR
         uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
         id: docker-build-push
@@ -51,6 +83,7 @@ jobs:
           tag: ${{ github.ref == 'refs/heads/main' && 'latest' || github.sha }}
           build_args: |
             APP_NAME=${{ env.APP_NAME }}
+            BASE_IMAGE_DIGEST_PINNED_REF=${{ steps.baseimage.outputs.baseimage-digest-pinned-ref }}
 
   deploy-to-prod-gcp:
     name: Deploy to prod-gcp
@@ -69,6 +102,16 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: apps/${{ env.APP_NAME }}/nais.yaml,apps/${{ env.APP_NAME }}/alerts.yaml
           VAR: image=${{ needs.build-and-publish.outputs.image }}
+
+  call-lagre-docker-baseimage-digest:
+    needs: [build-and-publish, deploy-to-prod-gcp]
+    if: github.ref == 'refs/heads/main'
+    uses: navikt/toi-github-actions-workflows/.github/workflows/lagre-docker-baseimage-digest.yaml@v16
+    with:
+      app-navn: toi-helseapp
+      baseimage-tagged-ref: ${{ needs.build-and-publish.outputs.baseimage-tagged-ref }}
+      baseimage-digest: ${{ needs.build-and-publish.outputs.baseimage-digest }}
+    permissions: {}
 
   call-trivy-security-scan:
     needs: build-and-publish

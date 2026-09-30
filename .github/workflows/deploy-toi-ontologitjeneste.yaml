@@ -1,4 +1,7 @@
 name: toi-ontologitjeneste
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 on:
   push:
@@ -15,6 +18,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
+      baseimage-tagged-ref: europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25
       deploy_dev_branch: refs/heads/fiks_trailing_slash_ontologi
     permissions:
       contents: read

@@ -15,6 +15,11 @@ Bygging kan gjøres f.eks. ved å stå i hovedkatalogen og kjøre
 ### På Github
 Bygging på Github styres av en workflow-fil for hver app i katalogen `.github/workflows`. De gjenbruker filen `deploy-toi-template.yaml` **med unntak av deploy-toi-helseapp**.yaml som har sin egen byggkonfig.
 
+### Automatisk oppdatering av Docker run-time base-image
+
+Hver aktiv app har en scheduled workflow `oppdater-docker-baseimage-toi-<app>.yaml` som potensielt bygger og deployer appen til prod ukentlig, uten manuelle trinn.
+Henskten med det er å få med nye patcher av sikkerhets-issues i appens Docker run-time base-image.
+
 ## Trivy security scan
 Resulatene/issuene fra scans av alle appene i dette Github-repoet vises sammen i [samme liste](https://github.com/navikt/toi-rapids-and-rivers/security/code-scanning).
 
