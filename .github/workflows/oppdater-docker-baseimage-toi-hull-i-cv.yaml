@@ -1,7 +1,7 @@
 name: 'Oppdater Docker baseimage: toi-hull-i-cv'
 on:
   schedule:
-    - cron: '37 5 * * 2'
+    - cron: '40 5 * * 1'
   workflow_dispatch:
 jobs:
   call-oppdater-docker-baseimage:

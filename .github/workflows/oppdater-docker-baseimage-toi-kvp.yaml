@@ -1,7 +1,7 @@
 name: 'Oppdater Docker baseimage: toi-kvp'
 on:
   schedule:
-    - cron: '13 7 * * 2'
+    - cron: '52 5 * * 1'
   workflow_dispatch:
 jobs:
   call-oppdater-docker-baseimage:

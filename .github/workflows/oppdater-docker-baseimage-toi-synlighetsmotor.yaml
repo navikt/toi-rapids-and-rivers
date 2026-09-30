@@ -1,7 +1,7 @@
 name: 'Oppdater Docker baseimage: toi-synlighetsmotor'
 on:
   schedule:
-    - cron: '13 6 * * 5'
+    - cron: '36 6 * * 1'
   workflow_dispatch:
 jobs:
   call-oppdater-docker-baseimage:

@@ -1,7 +1,7 @@
 name: 'Oppdater Docker baseimage: toi-siste-oppfolgingsperiode'
 on:
   schedule:
-    - cron: '37 6 * * 4'
+    - cron: '24 6 * * 1'
   workflow_dispatch:
 jobs:
   call-oppdater-docker-baseimage:

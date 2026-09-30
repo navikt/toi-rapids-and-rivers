@@ -1,7 +1,7 @@
 name: 'Oppdater Docker baseimage: toi-identmapper'
 on:
   schedule:
-    - cron: '13 6 * * 2'
+    - cron: '44 5 * * 1'
   workflow_dispatch:
 jobs:
   call-oppdater-docker-baseimage:
