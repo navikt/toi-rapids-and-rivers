@@ -1,0 +1,14 @@
+name: 'Oppdater Docker baseimage: toi-synlighetsmotor'
+on:
+  schedule:
+    - cron: '36 6 * * 1'
+  workflow_dispatch:
+jobs:
+  call-oppdater-docker-baseimage:
+    uses: navikt/toi-github-actions-workflows/.github/workflows/oppdater-docker-baseimage.yaml@v16
+    with:
+      app-navn: toi-synlighetsmotor
+      deploy-workflow-filnavn: deploy-toi-synlighetsmotor.yaml
+    permissions:
+      id-token: write
+      actions: write

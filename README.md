@@ -15,6 +15,11 @@ Bygging kan gjøres f.eks. ved å stå i hovedkatalogen og kjøre
 ### På Github
 Bygging på Github styres av en workflow-fil for hver app i katalogen `.github/workflows`. De gjenbruker filen `deploy-toi-template.yaml` **med unntak av deploy-toi-helseapp**.yaml som har sin egen byggkonfig.
 
+### Automatisk oppdatering av Docker run-time base-image
+
+Hver aktiv app har en scheduled workflow `oppdater-docker-baseimage-toi-<app>.yaml` som potensielt bygger og deployer appen til prod ukentlig, uten manuelle trinn.
+Hensikten med det er å få med nye patcher av sikkerhets-issues i appens Docker run-time base-image.
+
 ## Kode generert av GitHub Copilot
 
 Dette repoet bruker GitHub Copilot til å generere kode.
