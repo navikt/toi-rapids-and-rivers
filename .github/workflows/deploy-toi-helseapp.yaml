@@ -111,7 +111,6 @@ jobs:
 
   call-lagre-docker-baseimage-digest:
     needs: [ build-and-publish, deploy-to-prod-gcp ]
-    if: github.ref == 'refs/heads/main'
     uses: navikt/toi-github-actions-workflows/.github/workflows/lagre-docker-baseimage-digest.yaml@v16
     with:
       app-navn: toi-helseapp
