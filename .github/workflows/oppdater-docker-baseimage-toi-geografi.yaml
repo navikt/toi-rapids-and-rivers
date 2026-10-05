@@ -1,7 +1,7 @@
 name: 'Oppdater Docker baseimage: toi-geografi'
 on:
   schedule:
-    - cron: '32 5 * * 1'
+    - cron: '32 3 * * *'
   workflow_dispatch:
 jobs:
   call-oppdater-docker-baseimage:
