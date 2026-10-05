@@ -12,7 +12,7 @@ import java.util.Objects
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsSertifikat(
-    @field:JsonProperty private val fraDato: LocalDate,
+    @field:JsonProperty private val fraDato: LocalDate?,
     @field:JsonProperty private val tilDato: LocalDate?,
     @field:JsonProperty private val sertifikatKode: String?,
     @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val sertifikatKodeNavn: String?,
@@ -49,7 +49,7 @@ class EsSertifikat(
     companion object {
         fun fraMelding(cvNode: JsonNode) = cvNode["sertifikat"].map { sertifikatNode ->
             EsSertifikat(
-                fraDato = sertifikatNode["gjennomfoert"].yyyymmddToLocalDate(),
+                fraDato = sertifikatNode["gjennomfoert"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
                 tilDato = sertifikatNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
                 sertifikatKode = sertifikatNode["konseptId"].asText(null),
                 sertifikatKodeNavn = sertifikatNode["sertifikatnavn"].asText(null),
