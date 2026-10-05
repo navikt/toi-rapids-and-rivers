@@ -9,8 +9,9 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 private val log = noClassLogger()
 private val teamlog = teamlog(log)
 
-
 fun main() {
+    configureAvroSecurityWhitelist()
+
     log.info("Starter app.")
     teamlog.info("Starter app. Dette er ment å logges til Team Logs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
@@ -23,4 +24,8 @@ fun main() {
         val cvLytter = CvLytter(consumer, behandleCv)
         register(cvLytter)
     }.start()
+}
+
+internal fun configureAvroSecurityWhitelist() {
+    System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES", "no.nav.arbeid.cv.avro")
 }

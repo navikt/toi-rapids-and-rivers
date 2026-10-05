@@ -19,6 +19,7 @@ fun startApp(
     dataSource: DataSource,
     rapidsConnection: RapidsConnection
 ) {
+    configureAvroSecurityWhitelist()
     rapidsConnection.also {
         val accessTokenClient = AccessTokenClient(env)
 
@@ -50,3 +51,7 @@ fun startApp(
 }
 
 fun rapidsConnection() = RapidApplication.create(System.getenv())
+
+internal fun configureAvroSecurityWhitelist() {
+    System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES", "no.nav.person.pdl.aktor.v2")
+}

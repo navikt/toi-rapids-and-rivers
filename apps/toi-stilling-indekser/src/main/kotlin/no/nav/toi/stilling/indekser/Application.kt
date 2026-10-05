@@ -27,6 +27,8 @@ fun main() {
 fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
 
 fun startApp(rapidsConnection: RapidsConnection, env: MutableMap<String, String>) {
+    configureAvroSecurityWhitelist()
+
     val objectMapper = JacksonConfig.objectMapper
 
     val httpClient: HttpClient = HttpClient.newBuilder()
@@ -169,4 +171,8 @@ val Any.log: Logger
 fun noClassLogger(): Logger {
     val callerClassName = Throwable().stackTrace[1].className
     return LoggerFactory.getLogger(callerClassName)
+}
+
+internal fun configureAvroSecurityWhitelist() {
+    System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES", "no.nav.pam.stilling.ext.avro")
 }
