@@ -19,11 +19,7 @@ val epostTemplate = """
             <p style='white-space: pre-wrap; margin-top: 32px; margin-bottom: 32px' id='tekst'>$TEKST</p>
             <h3 style='font-size: 16px'>For å se kandidatene dine</h3>
             <div style='border: 16px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5;'>
-                <ol style='margin: 0px; padding-left: 24px; line-height: 24px; background-color: #f2f3f5;'>
-                    <li>På Nav sitt nettsted, under arkfanen &quot;Arbeidsgiver&quot;, velg &quot;Min side – arbeidsgiver&quot;.</li>
-                    <li><b>Logg inn</b></li>
-                    <li>Finn <b>varslene dine</b> oppe til høyre på siden, og trykk deg inn på meldingen, eller finn lenken i kortet med teksten <b>Kandidater til mine stillinger</b> lenger ned på siden.</li>
-                </ol>
+                <p style='margin-top: 0'>For å se oversendte CV-er må du logge inn på &quot;Min side – arbeidsgiver&quot; på Nav sin nettside. Finn kandidater for dine stillinger der.  </p>
             </div>
             <p style='margin-top: 24px; margin-bottom: 40px;'>Vennlig hilsen <span id='avsender'>$AVSENDER</span></p>
 
@@ -33,31 +29,25 @@ val epostTemplate = """
             <div style='border: 24px solid #f2f3f5; border-radius: 12px; background-color: #f2f3f5'>
                 <p style='margin-top: 0'>Tilgangen til Nav sine rekrutteringstjenester styrer arbeidsgivere selv i <b>Altinn</b>.</p>
                 <p>For å få tilgang må du kontakte den som styrer tilgangene til virksomheten din. Det kan være noen i HR, en leder, mellomleder, eller noen på eiersiden i virksomheten.</p>
-                <p>Vi har lagd en oppskrift du kan dele med vedkommende for å gjøre det enklere for dem å gi deg tilgang.</p>
+                <p>Vi har lagd en enkel forklaring du kan dele med vedkommende for å gjøre det enklere for hen å gi deg tilgang.</p>
                 <p style='margin-bottom: 16px; border-bottom: 16px solid #f2f3f5;'>Kopier den gjerne og send den til vedkommende:</p>
 
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
                     <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
                         <p style='margin-top: 0;'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra Nav på vegne av virksomheten din.</p>
-                        <p><b>Gi tilganger til CV-er fra Nav:</b></p>
-                        <ol style='line-height: 24px'>
+                        <p><b>Sli kan du delegere tilgang til oversendte CV-er fra Nav:</b></p>
+                        <ul style='line-height: 24px'>
                             <li>Logg inn i Altinn</li>
-                            <li>Velg virksomheten din under «Alle dine aktører»</li>
-                            <li>Trykk på knappen «Profil» øverst i menyen</li>
-                            <li>Trykk på «Andre med rettigheter til virksomheten»</li>
-                            <li>Velg «Legge til ny person eller virksomhet»</li>
-                            <li>Legg inn personnummeret og etternavnet til personen som skal ha tilgang</li>
-                            <li>Velg «Gi tilgang til enkelttjenester»</li>
-                            <li>Skriv «Rekrutteringssaker og CV-er fra Nav», så vil alternativet komme opp som et valg. Velg «Rekrutteringssaker og CV-er fra Nav».</li>
-                            <li>Bekreft</li>
-                        </ol>
-                        <p>Denne enkeltrettigheten gir <i>kun</i> tilgang til å motta oversendte CV-er fra Nav på &quot;Min side – arbeidsgiver&quot; på Nav sitt nettsted. Arbeidsgiver kan derfor være trygg på at de ansatte som får denne enkeltrettigheten ikke får tilgang til noe annet.</p>
+                            <li>Velg virksomheten din og finn tilgangsstyring </li>
+                            <li>Velg &quot;Enkelttjenester&quot;, og velg den enkelttjenesten som heter &quot;Rekrutteringssaker og CV-er fra Nav&quot; og oppgi den personen som skal få det tildelt</li>
+                        </ul>
+                        <p>Denne enkelttjenesten gir <i>kun</i> tilgang til å motta oversendte CV-er fra Nav på &quot;Min side – arbeidsgiver&quot; på Nav sitt nettsted. Arbeidsgiver kan derfor være trygg på at de ansatte som får denne enkelttjenesten ikke får tilgang til noe annet.</p>
                         <p><b>Ga ikke Altinn deg muligheten til å gi tilgang?</b></p>
                         <p>Du kan gi tilgang hvis du har en av disse rollene:</p>
                         <ul style='line-height: 24px'>
                             <li>Du er registrert i Enhetsregisteret som daglig leder, styrets leder, bestyrende reder eller innehaver.</li>
-                            <li>Du er registrert som hovedadministrator i Altinn.</li>
-                            <li>Du har tilgang som heter «Tilgangsstyrer» i Altinn, og har den tilgangen du ønsker å delegere: enkeltrettigheten «Rekrutteringssaker og CV-er fra Nav». Dersom du har tilgangspakken «Ansettelsesforhold», kan du også delegere enkeltrettigheten «Rekrutteringssaker og CV-er fra Nav».</li>
+                            <li>Du har rollen &quot;Hovedadministrator&quot; i Altinn.</li>
+                            <li>Du har tilgang som heter &quot;Tilgangsstyrer&quot; i Altinn, i tillegg til at du har den tilgangen du ønsker å delegere: enkelttjenesten &quot;Rekrutteringssaker og CV-er fra Nav&quot;. Dersom du både har &quot;Tilgangsstyrer&quot; og tilgangspakken &quot;Ansettelsesforhold&quot;, har du også autorisasjon til å delegere enkelttjenesten &quot;Rekrutteringssaker og CV-er fra Nav&quot;.</li>
                         </ul>
                     </div>
                 </div>
