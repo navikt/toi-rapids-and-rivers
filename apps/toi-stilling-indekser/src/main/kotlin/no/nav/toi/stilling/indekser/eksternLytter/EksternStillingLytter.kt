@@ -13,6 +13,7 @@ import org.apache.kafka.common.errors.RetriableException
 import org.apache.kafka.common.errors.WakeupException
 import java.io.Closeable
 import java.time.Duration
+import java.time.LocalDateTime
 
 class EksternStillingLytter(
     private val consumer: Consumer<String, Ad>,
@@ -71,26 +72,43 @@ class EksternStillingLytter(
         val alleMeldinger = ads.map { konverterTilStilling(it) }
         val stillinger = beholdSisteMeldingPerStilling(alleMeldinger)
 
-        val arbeidsplassenStillinger = stillinger.filter { it.source != "DIR" }
-        val stillingsinfo = stillingsinfoClient.hentStillingsinfo(arbeidsplassenStillinger.map { it.uuid.toString() })
+        val nå = LocalDateTime.now()
+        val grenseForUpdated = nå.minusYears(5)
+        val grenseForUpdatedUtenStillingsinfo = nå.minusYears(1)
 
-        val rekrutteringsbistandStillinger = arbeidsplassenStillinger.map { stilling ->
+        val (utdaterteStillinger, stillingerNyereEnnFemÅr) = stillinger.partition { it.updated.isBefore(grenseForUpdated) }
+        if (utdaterteStillinger.isNotEmpty()) {
+            log.info("Filtrerer bort ${utdaterteStillinger.size} eksterne stillinger med updated eldre enn fem år. UUIDer: ${utdaterteStillinger.map { it.uuid }}")
+        }
+
+        val arbeidsplassenStillinger = stillingerNyereEnnFemÅr.filter { it.source != "DIR" }
+        val (upubliserteStillinger, publiserteStillinger) = arbeidsplassenStillinger.partition { it.publishedByAdmin == null }
+        if (upubliserteStillinger.isNotEmpty()) {
+            log.info("Filtrerer bort ${upubliserteStillinger.size} eksterne stillinger som ikke er publisert. UUIDer: ${upubliserteStillinger.map { it.uuid }}")
+        }
+
+        val stillingsinfo = stillingsinfoClient.hentStillingsinfo(publiserteStillinger.map { it.uuid.toString() })
+
+        val (utdaterteUtenStillingsinfo, stillingerSomSkalIndekseres) = publiserteStillinger.map { stilling ->
             RekrutteringsbistandStilling(
                 stilling = stilling,
                 stillingsinfo = stillingsinfo.find { info -> info.stillingsid == stilling.uuid.toString() }
             )
+        }.partition { it.stillingsinfo == null && it.stilling.updated.isBefore(grenseForUpdatedUtenStillingsinfo) }
+        if (utdaterteUtenStillingsinfo.isNotEmpty()) {
+            log.info("Filtrerer bort ${utdaterteUtenStillingsinfo.size} eksterne stillinger uten stillingsinfo med updated eldre enn ett år. UUIDer: ${utdaterteUtenStillingsinfo.map { it.stilling.uuid }}")
         }
-        if(arbeidsplassenStillinger.isNotEmpty()) {
-            openSearchService.indekser(stillinger = rekrutteringsbistandStillinger, indeks = indeks)
-            log.info("Indekserte ${arbeidsplassenStillinger.size} eksterne stillinger i indeks '$indeks'. UUIDer: ${arbeidsplassenStillinger.map { it.uuid }}")
 
-            rekrutteringsbistandStillinger.forEach { rekrutteringsbistandStilling ->
+        if (stillingerSomSkalIndekseres.isNotEmpty()) {
+            openSearchService.indekser(stillinger = stillingerSomSkalIndekseres, indeks = indeks)
+            log.info("Indekserte ${stillingerSomSkalIndekseres.size} eksterne stillinger i indeks '$indeks'. UUIDer: ${stillingerSomSkalIndekseres.map { it.stilling.uuid }}")
+
+            stillingerSomSkalIndekseres.forEach { rekrutteringsbistandStilling ->
                 val stillingsId = rekrutteringsbistandStilling.stilling.uuid.toString()
                 val kandidatlisteInfoBehov = lagKandidatlisteInfoMelding(stillingsId)
                 rapidsConnection.publish(stillingsId, kandidatlisteInfoBehov.toJson())
                 log.info("Sendt behov om å få kandidatlisteInfo for stilling med stillingsId $stillingsId")
             }
-
         }
     }
 
