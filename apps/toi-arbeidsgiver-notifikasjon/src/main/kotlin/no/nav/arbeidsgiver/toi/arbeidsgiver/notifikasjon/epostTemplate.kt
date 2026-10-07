@@ -35,7 +35,7 @@ val epostTemplate = """
                 <div style='border: 3px dashed #cbcfd5; border-radius: 12px;'>
                     <div style='border: 24px solid #ffffff; border-radius: 8px; background-color: #ffffff;'>
                         <p style='margin-top: 0;'>Du får denne meldingen fordi avsender ønsker å få tilgang til CV-er fra Nav på vegne av virksomheten din.</p>
-                        <p><b>Sli kan du delegere tilgang til oversendte CV-er fra Nav:</b></p>
+                        <p><b>Slik kan du delegere tilgang til oversendte CV-er fra Nav:</b></p>
                         <ul style='line-height: 24px'>
                             <li>Logg inn i Altinn</li>
                             <li>Velg virksomheten din og finn tilgangsstyring </li>
