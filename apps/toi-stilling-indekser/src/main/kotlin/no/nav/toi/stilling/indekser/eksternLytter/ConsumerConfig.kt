@@ -9,7 +9,7 @@ import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.*
 
-const val stillingstopic = "toi.rekrutteringsbistand-stilling-1"
+const val stillingstopic = "teampam.stilling-ekstern-1"
 
 fun consumerConfig(versjon: String, env: Map<String, String>) = Properties().apply {
     val trustStorePath = env.variable("KAFKA_TRUSTSTORE_PATH")
