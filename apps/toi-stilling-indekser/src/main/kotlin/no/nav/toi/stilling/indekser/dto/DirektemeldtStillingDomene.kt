@@ -146,7 +146,9 @@ data class Geografi(
     val postalCode: String?,
     val county: String?,
     val municipalCode: String?,
-    val countyCode: String? = municipalCode?.substring(0,2),
+    val countyCode: String? = municipalCode
+        ?.takeIf { it.length >= 2 }
+        ?.substring(0, 2),
     val municipal: String?,
     val city: String?,
     val country: String?,
