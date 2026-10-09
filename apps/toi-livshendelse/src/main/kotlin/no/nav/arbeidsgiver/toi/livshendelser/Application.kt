@@ -25,6 +25,8 @@ fun main() {
     log.info("Starter app.")
     teamlog.info("Starter app. Dette er ment å logges til Team Logs. Hvis du ser dette i den ordinære apploggen er noe galt, og sensitive data kan havne i feil logg.")
 
+    configureAvroSecurityWhitelist()
+
     try {
         lateinit var rapidIsAlive: () -> Boolean
         val rapidsConnection =
@@ -90,3 +92,7 @@ private val isAlive: (() -> Boolean) -> (Context) -> Unit = { isAlive ->
 }
 
 val erDev: Boolean = System.getenv()["NAIS_CLUSTER_NAME"]?.equals("dev-gcp") ?: false
+
+internal fun configureAvroSecurityWhitelist() {
+    System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES", "no.nav.person.pdl.leesah")
+}
