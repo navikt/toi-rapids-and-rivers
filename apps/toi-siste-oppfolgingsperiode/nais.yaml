@@ -22,7 +22,6 @@ spec:
     type: Recreate # Recreate sørger for at det ikke er flere instanser av appen som kjører samtidig, og dermed unngår at eldre meldinger kan pushes til nytt topic, etter nye.
   resources:
     limits:
-      cpu: 500m
       memory: 4096Mi
     requests:
       cpu: 100m
