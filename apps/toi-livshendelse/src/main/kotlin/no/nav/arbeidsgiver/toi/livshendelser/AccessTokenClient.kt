@@ -18,7 +18,7 @@ private val timeout = Duration.ofSeconds(15)
 
 private val httpClient: HttpClient = HttpClient.newBuilder()
     .version(HttpClient.Version.HTTP_1_1)
-    .followRedirects(HttpClient.Redirect.NORMAL)
+    .followRedirects(HttpClient.Redirect.NEVER)
     .connectTimeout(timeout)
     .build()
 
@@ -78,6 +78,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
             }
             return objectMapper.readValue<AccessTokenResponse>(response.body())
         } catch (e: Exception) {
+            if (e is InterruptedException) Thread.currentThread().interrupt()
             throw RuntimeException("Noe feil skjedde ved henting av access_token: ", e)
         }
     }

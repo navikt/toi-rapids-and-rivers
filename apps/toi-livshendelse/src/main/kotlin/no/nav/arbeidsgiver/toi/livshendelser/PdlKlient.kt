@@ -16,7 +16,7 @@ private val timeout = Duration.ofSeconds(15)
 
 private val httpClient: HttpClient = HttpClient.newBuilder()
     .version(HttpClient.Version.HTTP_1_1)
-    .followRedirects(HttpClient.Redirect.NORMAL)
+    .followRedirects(HttpClient.Redirect.NEVER)
     .connectTimeout(timeout)
     .build()
 
@@ -49,6 +49,7 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         } catch (e: Exception) {
             log.error("Noe feil skjedde ved henting av diskresjonskode for ident(se teamlog)")
             teamlog.error("Noe feil skjedde ved henting av diskresjonskode for ident ${e.message}")
+            if (e is InterruptedException) Thread.currentThread().interrupt()
             throw RuntimeException("Noe feil skjedde ved henting av diskresjonskode: ", e)
         }
 
