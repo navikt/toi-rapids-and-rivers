@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
@@ -10,7 +9,7 @@ import java.util.*
 @JsonIgnoreProperties(ignoreUnknown = true)
 class EsYrkeJobbonsker(
     @field:JsonProperty private val styrkKode: String?,
-    @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val styrkBeskrivelse: String,
+    @field:JsonProperty private val styrkBeskrivelse: String,
     @field:JsonProperty private val primaertJobbonske: Boolean,
     sokeTitler: List<String>
 ) {

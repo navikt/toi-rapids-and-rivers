@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -15,7 +14,7 @@ class EsForerkort(
     @field:JsonProperty private val fraDato: OffsetDateTime?,
     @field:JsonProperty private val tilDato: OffsetDateTime?,
     @field:JsonProperty private val forerkortKode: String?,
-    @field:JsonProperty @JsonInclude(JsonInclude.Include.NON_EMPTY) private val forerkortKodeKlasse: String,
+    @field:JsonProperty private val forerkortKodeKlasse: String,
     @field:JsonProperty private val alternativKlasse: String?,
     @field:JsonProperty private val utsteder: String?
 ) {
