@@ -8,12 +8,15 @@ import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 import java.time.Instant
 import kotlin.RuntimeException
 
 class AccessTokenClient(private val env: Map<String, String>) {
     private val objectMapper = jacksonObjectMapper()
-    private val httpClient = HttpClient.newHttpClient()
+    private val httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(15))
+        .build()
 
     private var tokenUtgår = Instant.ofEpochSecond(0)
     private var cachedToken = AccessTokenResponse("uinitialisert", 0)
@@ -43,6 +46,7 @@ class AccessTokenClient(private val env: Map<String, String>) {
         val request = HttpRequest.newBuilder()
             .uri(URI(url))
             .header("Content-Type", "application/x-www-form-urlencoded")
+            .timeout(Duration.ofSeconds(15))
             .POST(HttpRequest.BodyPublishers.ofString(formData.toFormData()))
             .build()
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())

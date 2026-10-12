@@ -11,14 +11,17 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
 class NomKlient(
     private val url: String,
-    private val httpClient: HttpClient = HttpClient.newHttpClient(),
     private val hentAccessToken: () -> String,
 ) {
     private val teamlog = teamlog(log)
     private val objectMapper = jacksonObjectMapper()
+    private val httpClient: HttpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(15))
+        .build()
 
     fun hentVeilederinformasjon(ident: String): Veilederinformasjon? {
         val spørring = spørringForCvDeltMedArbeidsgiver(listOf(ident))
@@ -40,6 +43,7 @@ class NomKlient(
             .uri(URI.create(url))
             .header("Content-type", "application/json")
             .header("Authorization", "Bearer ${hentAccessToken()}")
+            .timeout(Duration.ofSeconds(15))
             .POST(HttpRequest.BodyPublishers.ofString(spørring))
             .build()
 
