@@ -14,7 +14,7 @@ repositories {
 }
 
 val slf4jVersion = "2.0.20"
-val logbackVersion = "1.6.4"
+val logbackVersion = "1.6.5"
 val logstashLogbackEncoderVersion = "9.0"
 val junitJupiterVersion = "6.1.3"
 val assertjVersion = "3.27.7"

@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import java.time.OffsetDateTime
@@ -11,7 +10,6 @@ import java.util.Objects
 class EsSprak(
     @field:JsonProperty private val fraDato: OffsetDateTime?,
     @field:JsonProperty private val sprakKode: String?,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @field:JsonProperty private val sprakKodeTekst: String,
     @field:JsonProperty private val alternativTekst: String,
     @field:JsonProperty private val beskrivelse: String,
