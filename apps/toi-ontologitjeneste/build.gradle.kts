@@ -1,5 +1,6 @@
 plugins {
     id("toi.rapids-and-rivers")
+    id("io.github.ben-manes.versions") version "0.64.0"
 }
 
 application {
@@ -7,8 +8,6 @@ application {
 }
 
 dependencies {
-    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
-    implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
-    implementation("org.ehcache:ehcache:3.10.8")
-    testImplementation("com.github.tomakehurst:wiremock:2.27.2")
+    implementation("org.ehcache:ehcache:3.12.0")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 }
