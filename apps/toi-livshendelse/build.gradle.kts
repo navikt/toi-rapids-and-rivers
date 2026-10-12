@@ -19,4 +19,12 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:6.0.5")
     testImplementation("org.wiremock:wiremock-standalone:3.13.2")
     testImplementation("org.apache.avro:avro-compiler:1.12.2")
+
+    // Sårbare transitive avhengigheter fra rapids-and-rivers og Confluent
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.3"))
+    implementation(platform("io.micrometer:micrometer-bom:1.16.7"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.67.0"))
+    constraints {
+        implementation("at.yawk.lz4:lz4-java:1.11.4")
+    }
 }
