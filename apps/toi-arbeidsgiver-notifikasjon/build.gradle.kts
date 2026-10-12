@@ -1,5 +1,6 @@
 plugins {
     id("toi.rapids-and-rivers")
+    id("io.github.ben-manes.versions") version "0.64.0"
 }
 
 application {
@@ -7,10 +8,7 @@ application {
 }
 
 dependencies {
-    implementation("io.javalin:javalin:7.2.0")
-
-    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
-    implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
+    implementation("io.javalin:javalin:7.2.3")
 
     testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 
