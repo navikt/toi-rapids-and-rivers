@@ -1,12 +1,14 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import tools.jackson.databind.JsonNode
-import tools.jackson.module.kotlin.jacksonObjectMapper
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Response
 import erGyldigEpostadresse
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
@@ -18,6 +20,25 @@ class NotifikasjonKlient(
     val hentAccessToken: () -> String,
 ) {
     private val teamlog = teamlog(log)
+
+    private val httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(15))
+        .build()
+
+    private fun post(query: String): HttpResponse<String> {
+        val request = HttpRequest.newBuilder(URI.create(url))
+            .timeout(Duration.ofSeconds(15))
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer ${hentAccessToken()}")
+            .POST(HttpRequest.BodyPublishers.ofString(query))
+            .build()
+
+        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() !in 200..299) {
+            throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode()}")
+        }
+        return response
+    }
 
     private val startDatoForNotifikasjoner =
         ZonedDateTime.of(LocalDateTime.of(2023, Month.JANUARY, 27, 13, 45), ZoneId.of("Europe/Oslo"))
@@ -34,14 +55,8 @@ class NotifikasjonKlient(
         )
 
         try {
-            val (_, response, result) = Fuel
-                .post(path = url)
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(query)
-                .responseString()
-
-            val json = jacksonObjectMapper().readTree(result.get())
+            val response = post(query)
+            val json = objectMapper.readTree(response.body())
             teamlog.info("Svar fra opprettSak ${stillingsId}: $json")
             val notifikasjonsSvar = json["data"]?.get("nySak")?.get("__typename")?.asString()
 
@@ -120,14 +135,8 @@ class NotifikasjonKlient(
         }
 
         try {
-            val (_, response, result) = Fuel
-                .post(path = url)
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(query)
-                .responseString()
-
-            val json = jacksonObjectMapper().readTree(result.get())
+            val response = post(query)
+            val json = objectMapper.readTree(response.body())
             val notifikasjonsSvar = json["data"]?.get("nyBeskjed")?.get("__typename")?.asString()
 
             when (notifikasjonsSvar) {
@@ -156,14 +165,8 @@ class NotifikasjonKlient(
         )
 
         try {
-            val (_, response, result) = Fuel
-                .post(path = url)
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(query)
-                .responseString()
-
-            val json = jacksonObjectMapper().readTree(result.get())
+            val response = post(query)
+            val json = objectMapper.readTree(response.body())
             val svar = json["data"]?.get("nyStatusSakByGrupperingsid")?.get("__typename")?.asString()
 
             when (svar) {
@@ -196,14 +199,8 @@ class NotifikasjonKlient(
         )
 
         try {
-            val (_, response, result) = Fuel
-                .post(path = url)
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer ${hentAccessToken()}")
-                .body(query)
-                .responseString()
-
-            val json = jacksonObjectMapper().readTree(result.get())
+            val response = post(query)
+            val json = objectMapper.readTree(response.body())
             val svar = json["data"]?.get("hardDeleteSakByGrupperingsid")?.get("__typename")?.asString()
 
             when (svar) {
@@ -228,7 +225,7 @@ class NotifikasjonKlient(
 
     private fun håndterFeil(
         json: JsonNode,
-        response: Response,
+        response: HttpResponse<String>,
         body: String,
     ) {
         log.error("Feilet kall til notifikasjon-api med følgende body: (se teamlog)")
@@ -237,8 +234,7 @@ class NotifikasjonKlient(
         if (errors != null && errors.size() > 0) {
             log.error("Feil fra notifikasjon api, errors: $errors}")
         }
-        throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode}")
-    }
+        throw RuntimeException("Kall mot notifikasjon-api feilet, statuskode: ${response.statusCode()}")    }
 
     enum class NyBeskjedSvar {
         NyBeskjedVellykket,

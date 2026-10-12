@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
-import com.github.kittinunf.fuel.Fuel
-import org.assertj.core.api.Assertions
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import org.assertj.core.api.Assertions.assertThat
 
 import org.junit.jupiter.api.Test
@@ -14,11 +16,13 @@ class EpostTemplateTest {
     fun `GET-kall mot template returnerer en statisk HTML-mal for e-poster som brukes mot arbeidsgivere`() {
         opprettJavalin { true }
 
-        val response = Fuel.get("http://localhost:8301/template")
-            .response().second
+        val response = HttpClient.newHttpClient().send(
+            HttpRequest.newBuilder(URI.create("http://localhost:8301/template")).GET().build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
 
-        assertThat(response.statusCode).isEqualTo(200)
-        assertThat(response.body().asString("text/html;charset=UTF-8")).isEqualTo(epostTemplate)
+        assertThat(response.statusCode()).isEqualTo(200)
+        assertThat(response.body()).isEqualTo(epostTemplate)
     }
 
     @Test

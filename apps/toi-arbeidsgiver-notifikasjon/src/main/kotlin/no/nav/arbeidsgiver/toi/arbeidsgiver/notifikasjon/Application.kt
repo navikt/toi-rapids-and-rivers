@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.toi.arbeidsgiver.notifikasjon
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.noClassLogger
@@ -8,6 +9,7 @@ import no.nav.helse.rapids_rivers.RapidApplication
 
 private val log = noClassLogger()
 private val teamlog = teamlog(log)
+internal val objectMapper = jacksonObjectMapper()
 
 fun startApp(
     notifikasjonKlient: NotifikasjonKlient,
