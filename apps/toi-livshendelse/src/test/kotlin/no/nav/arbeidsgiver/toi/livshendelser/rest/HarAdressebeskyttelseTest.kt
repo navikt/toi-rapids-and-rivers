@@ -19,6 +19,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HarAdressebeskyttelseTest {
@@ -180,11 +181,13 @@ class HarAdressebeskyttelseTest {
         }
     }
 
-    private val httpClient = HttpClient.newHttpClient()
+    private val timeout = Duration.ofSeconds(15)
+    private val httpClient = HttpClient.newBuilder().connectTimeout(timeout).build()
 
     private fun post(url: String, body: String, token: String? = null): HttpResponse<String> =
         httpClient.send(
             HttpRequest.newBuilder(URI(url))
+                .timeout(timeout)
                 .apply { if (token != null) header("Authorization", "Bearer $token") }
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -193,7 +196,7 @@ class HarAdressebeskyttelseTest {
         )
 
     private fun get(url: String): HttpResponse<String> =
-        httpClient.send(HttpRequest.newBuilder(URI(url)).GET().build(), HttpResponse.BodyHandlers.ofString())
+        httpClient.send(HttpRequest.newBuilder(URI(url)).timeout(timeout).GET().build(), HttpResponse.BodyHandlers.ofString())
 
     private fun startApp(
         pdlKlient: PdlKlient,

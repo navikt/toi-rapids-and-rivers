@@ -17,6 +17,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EvalueringTest {
@@ -181,11 +182,13 @@ class EvalueringTest {
         )))) { true }
 }
 
-private val httpClient = HttpClient.newHttpClient()
+private val timeout = Duration.ofSeconds(15)
+private val httpClient = HttpClient.newBuilder().connectTimeout(timeout).build()
 
 private fun post(url: String, body: String, token: String): HttpResponse<String> =
     httpClient.send(
         HttpRequest.newBuilder(URI(url))
+            .timeout(timeout)
             .header("Authorization", "Bearer $token")
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -196,6 +199,7 @@ private fun post(url: String, body: String, token: String): HttpResponse<String>
 private fun get(url: String, token: String): HttpResponse<String> =
     httpClient.send(
         HttpRequest.newBuilder(URI(url))
+            .timeout(timeout)
             .header("Authorization", "Bearer $token")
             .GET()
             .build(),

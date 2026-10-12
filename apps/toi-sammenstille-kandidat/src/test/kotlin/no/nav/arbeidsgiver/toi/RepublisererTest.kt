@@ -10,6 +10,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RepublisererTest {
@@ -136,11 +137,13 @@ class RepublisererTest {
         }
     }
 
-    private val httpClient = HttpClient.newHttpClient()
+    private val timeout = Duration.ofSeconds(15)
+    private val httpClient = HttpClient.newBuilder().connectTimeout(timeout).build()
 
     private fun post(url: String, jsonBody: String): HttpResponse<String> =
         httpClient.send(
             HttpRequest.newBuilder(URI(url))
+                .timeout(timeout)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build(),
