@@ -1,14 +1,23 @@
 package no.nav.arbeidsgiver.toi.veileder
 
 
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.jackson.responseObject
 import no.nav.arbeidsgiver.toi.logging.log
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import java.net.URI
+import java.net.URLEncoder
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 import java.time.Instant
 import kotlin.RuntimeException
-import com.github.kittinunf.result.Result
 
 class AccessTokenClient(private val env: Map<String, String>) {
+    private val objectMapper = jacksonObjectMapper()
+    private val httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(15))
+        .build()
+
     private var tokenUtgår = Instant.ofEpochSecond(0)
     private var cachedToken = AccessTokenResponse("uinitialisert", 0)
         set(value) {
@@ -34,24 +43,32 @@ class AccessTokenClient(private val env: Map<String, String>) {
             "scope" to env.variable("NOM_API_SCOPE")
         )
 
-        val (_, _, result) = FuelManager()
-            .post(url, formData)
-            .responseObject<AccessTokenResponse>()
+        val request = HttpRequest.newBuilder()
+            .uri(URI(url))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .timeout(Duration.ofSeconds(15))
+            .POST(HttpRequest.BodyPublishers.ofString(formData.toFormData()))
+            .build()
+        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
 
-        when (result) {
-             is Result.Success -> {
-                 log.info("Fikk tak i access token med lengde ${result.get().access_token.length}")
-                 return result.get()
-             }
-
-             is Result.Failure -> throw RuntimeException("Noe feil skjedde ved henting av access_token: ", result.error)
+        if (response.statusCode() !in 200..299) {
+            throw RuntimeException("Noe feil skjedde ved henting av access_token: ${response.statusCode()} ${response.body()}")
         }
+
+        val accessTokenResponse = objectMapper.readValue(response.body(), AccessTokenResponse::class.java)
+        log.info("Fikk tak i access token med lengde ${accessTokenResponse.access_token.length}")
+        return accessTokenResponse
     }
 }
 
-data class AccessTokenResponse(
+private data class AccessTokenResponse(
     val access_token: String,
     val expires_in: Int
 )
 
-fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
+private fun Map<String, String>.variable(felt: String) = this[felt] ?: error("$felt er ikke angitt")
+
+private fun List<Pair<String, String>>.toFormData(): String =
+    joinToString("&") { (key, value) ->
+        "${URLEncoder.encode(key, Charsets.UTF_8)}=${URLEncoder.encode(value, Charsets.UTF_8)}"
+    }
