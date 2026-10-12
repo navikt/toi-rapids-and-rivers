@@ -20,6 +20,5 @@ dependencies {
     implementation("no.nav.common:audit-log:3.2024.11.26_16.35-432a29107830")
 
     testImplementation("no.nav.security:mock-oauth2-server:2.1.10")
-    testImplementation("com.github.kittinunf.fuel:fuel:2.3.1")
     testImplementation("com.h2database:h2:2.3.232")
 }

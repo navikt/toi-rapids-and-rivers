@@ -1,13 +1,15 @@
 package no.nav.arbeidsgiver.toi
 
 import tools.jackson.module.kotlin.jacksonObjectMapper
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.extensions.jsonBody
 import no.nav.toi.TestRapid
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.startApp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RepublisererTest {
@@ -33,10 +35,9 @@ class RepublisererTest {
         val lagredeKandidater = lagre3KandidaterTilDatabasen(Repository(testDatabase.dataSource))
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
 
-        val response = Fuel.post("http://localhost:9000/republiser")
-            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+        val response = post("http://localhost:9000/republiser", jacksonObjectMapper().writeValueAsString(body))
 
-        assertThat(response.statusCode).isEqualTo(200)
+        assertThat(response.statusCode()).isEqualTo(200)
 
         Thread.sleep(200) // Pga. asynkron håndtering av republisering
         val inspektør = testRapid.inspektør
@@ -54,9 +55,8 @@ class RepublisererTest {
         val lagredeKandidater = lagreNKandidaterTilDatabasen(Repository(testDatabase.dataSource), 350)
 
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-        val response = Fuel.post("http://localhost:9000/republiser")
-            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
-        assertThat(response.statusCode).isEqualTo(200)
+        val response = post("http://localhost:9000/republiser", jacksonObjectMapper().writeValueAsString(body))
+        assertThat(response.statusCode()).isEqualTo(200)
 
         Thread.sleep(2000)
         val inspektør = testRapid.inspektør
@@ -73,9 +73,8 @@ class RepublisererTest {
         val aktørIdTilKandidatSomSkalRepubliseres = lagredeKandidater[13]
 
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-        val response = Fuel.post("http://localhost:9000/republiser/$aktørIdTilKandidatSomSkalRepubliseres")
-            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
-        assertThat(response.statusCode).isEqualTo(200)
+        val response = post("http://localhost:9000/republiser/$aktørIdTilKandidatSomSkalRepubliseres", jacksonObjectMapper().writeValueAsString(body))
+        assertThat(response.statusCode()).isEqualTo(200)
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
@@ -95,9 +94,8 @@ class RepublisererTest {
             aktorIder = listOf(kandidat1, kandidat2, kandidat3)
         )
         val body1 = jacksonObjectMapper().writeValueAsString(body)
-        val response = Fuel.post("http://localhost:9000/republiser/liste")
-            .jsonBody(body1).response().second
-        assertThat(response.statusCode).isEqualTo(200)
+        val response = post("http://localhost:9000/republiser/liste", body1)
+        assertThat(response.statusCode()).isEqualTo(200)
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(3)
@@ -115,9 +113,8 @@ class RepublisererTest {
         val ugyldigAktørId = "enUgyldigAktørId"
 
         val body = Republiserer.RepubliseringBody(passord = riktigPassord)
-        val response = Fuel.post("http://localhost:9000/republiser/$ugyldigAktørId")
-            .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
-        assertThat(response.statusCode).isEqualTo(404)
+        val response = post("http://localhost:9000/republiser/$ugyldigAktørId", jacksonObjectMapper().writeValueAsString(body))
+        assertThat(response.statusCode()).isEqualTo(404)
 
         val inspektør = testRapid.inspektør
         assertThat(inspektør.size).isEqualTo(0)
@@ -130,15 +127,25 @@ class RepublisererTest {
         val feilPassord = "jalla"
         val body = Republiserer.RepubliseringBody(passord = feilPassord)
         listOf("republiser", "republiser/liste", "republiser/111").forEach { path ->
-            val response = Fuel.post("http://localhost:9000/$path")
-                .jsonBody(jacksonObjectMapper().writeValueAsString(body)).response().second
+            val response = post("http://localhost:9000/$path", jacksonObjectMapper().writeValueAsString(body))
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
 
             val inspektør = testRapid.inspektør
             assertThat(inspektør.size).isEqualTo(0)
         }
     }
+
+    private val httpClient = HttpClient.newHttpClient()
+
+    private fun post(url: String, jsonBody: String): HttpResponse<String> =
+        httpClient.send(
+            HttpRequest.newBuilder(URI(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
 
     private fun lagre3KandidaterTilDatabasen(repository: Repository) =
         listOf("111", "222", "333").map {

@@ -3,8 +3,6 @@ package no.nav.arbeidsgiver.toi.rest
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule
 import tools.jackson.module.kotlin.jacksonObjectMapper
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.extensions.authentication
 import io.javalin.Javalin
 import no.nav.arbeidsgiver.toi.*
 import no.nav.arbeidsgiver.toi.Testdata.Companion.komplettHendelseSomFørerTilSynlighetTrue
@@ -16,6 +14,9 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import java.net.InetAddress
 import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EvalueringTest {
@@ -57,14 +58,11 @@ class EvalueringTest {
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fødselsnummer = """"fodselsnummer": "$fødselsnummer""""))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
-        val response = Fuel.post("http://localhost:8301/evaluering")
-            .authentication().bearer(token.serialize())
-            .body("""{"fnr": "$fødselsnummer"}""")
-            .response().second
+        val response = post("http://localhost:8301/evaluering", """{"fnr": "$fødselsnummer"}""", token.serialize())
 
-        Assertions.assertThat(response.statusCode).isEqualTo(200)
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responseJson = response.body()
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
@@ -78,13 +76,11 @@ class EvalueringTest {
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fødselsnummer = """"fodselsnummer": "$fnr""""))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
 
-        val response = Fuel.get("http://localhost:8301/evaluering/$fnr")
-            .authentication().bearer(token.serialize())
-            .response().second
+        val response = get("http://localhost:8301/evaluering/$fnr", token.serialize())
 
-        Assertions.assertThat(response.statusCode).isEqualTo(200)
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responseJson = response.body()
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
     }
@@ -106,14 +102,11 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
 
-        val response = Fuel.post("http://localhost:8301/evaluering")
-            .authentication().bearer(token.serialize())
-            .body("""{"fnr": "12345678912"}""")
-            .response().second
+        val response = post("http://localhost:8301/evaluering", """{"fnr": "12345678912"}""", token.serialize())
 
-        Assertions.assertThat(response.statusCode).isEqualTo(200)
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responseJson = response.body()
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
             .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue().copy(erArbeidssøker = true))
@@ -136,13 +129,11 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
 
-        val response = Fuel.get("http://localhost:8301/evaluering/$fnr")
-            .authentication().bearer(token.serialize())
-            .response().second
+        val response = get("http://localhost:8301/evaluering/$fnr", token.serialize())
 
-        Assertions.assertThat(response.statusCode).isEqualTo(200)
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responseJson = response.body()
         val responeEvaluering = objectmapper.readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering)
             .isEqualTo(evalueringUtenDiskresjonskodeMedAltTrue())
@@ -154,14 +145,11 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
-        val response = Fuel.post("http://localhost:8301/evaluering")
-            .authentication().bearer(token.serialize())
-            .body("""{"fnr": "12345678912"}""")
-            .response().second
+        val response = post("http://localhost:8301/evaluering", """{"fnr": "12345678912"}""", token.serialize())
 
-        Assertions.assertThat(response.statusCode).isEqualTo(200)
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responseJson = response.body()
         val responeEvaluering =
             jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
@@ -173,13 +161,11 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
-        val response = Fuel.get("http://localhost:8301/evaluering/12345678912")
-            .authentication().bearer(token.serialize())
-            .response().second
+        val response = get("http://localhost:8301/evaluering/12345678912", token.serialize())
 
-        Assertions.assertThat(response.statusCode).isEqualTo(200)
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
-        val responseJson = response.body().asString("application/json; charset=UTF-8")
+        val responseJson = response.body()
         val responeEvaluering =
             jacksonObjectMapper().readValue(responseJson, EvalueringUtenDiskresjonskodeDTO::class.java)
         Assertions.assertThat(responeEvaluering).isEqualTo(evalueringUtenDiskresjonskodeMedAltFalse())
@@ -194,6 +180,27 @@ class EvalueringTest {
             listOf("audience")
         )))) { true }
 }
+
+private val httpClient = HttpClient.newHttpClient()
+
+private fun post(url: String, body: String, token: String): HttpResponse<String> =
+    httpClient.send(
+        HttpRequest.newBuilder(URI(url))
+            .header("Authorization", "Bearer $token")
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build(),
+        HttpResponse.BodyHandlers.ofString()
+    )
+
+private fun get(url: String, token: String): HttpResponse<String> =
+    httpClient.send(
+        HttpRequest.newBuilder(URI(url))
+            .header("Authorization", "Bearer $token")
+            .GET()
+            .build(),
+        HttpResponse.BodyHandlers.ofString()
+    )
 
 private fun hentToken(mockOAuth2Server: MockOAuth2Server) = mockOAuth2Server.issueToken(
     "isso-idtoken", "someclientid",

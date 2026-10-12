@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.toi.livshendelser.rest
 
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.arbeidsgiver.toi.livshendelser.AccessTokenClient
 import no.nav.arbeidsgiver.toi.livshendelser.PdlKlient
@@ -18,6 +16,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.net.InetAddress
 import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HarAdressebeskyttelseTest {
@@ -56,14 +57,11 @@ class HarAdressebeskyttelseTest {
         wiremock.stubPdl(ident = fnr, token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(200)
+            assertThat(response.statusCode()).isEqualTo(200)
             assertThat(
-                response.body().asString("application/json; charset=UTF-8")
+                response.body()
             ).isEqualTo("""{"harAdressebeskyttelse":true}""")
         }
     }
@@ -74,14 +72,11 @@ class HarAdressebeskyttelseTest {
         wiremock.stub404(ident = fnr, token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(200)
+            assertThat(response.statusCode()).isEqualTo(200)
             assertThat(
-                response.body().asString("application/json; charset=UTF-8")
+                response.body()
             ).isEqualTo("""{"harAdressebeskyttelse":false}""")
         }
     }
@@ -92,14 +87,11 @@ class HarAdressebeskyttelseTest {
         wiremock.stubPdl(ident = fnr, gradering = "UGRADERT", token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(200)
+            assertThat(response.statusCode()).isEqualTo(200)
             assertThat(
-                response.body().asString("application/json; charset=UTF-8")
+                response.body()
             ).isEqualTo("""{"harAdressebeskyttelse":false}""")
         }
     }
@@ -108,11 +100,9 @@ class HarAdressebeskyttelseTest {
     fun `Feil om token mangler`() {
         val fnr = "12345678912"
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""")
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
         }
     }
 
@@ -121,12 +111,9 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, expiry = -1000).serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
         }
     }
 
@@ -135,12 +122,9 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, issuerId = "falskissuer").serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
         }
     }
 
@@ -149,12 +133,9 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, navIdent = null).serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
         }
     }
 
@@ -163,12 +144,9 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val token = hentToken(mockOAuth2Server, audience = listOf("Feil aud")).serialize()
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer(token)
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
         }
     }
 
@@ -177,22 +155,18 @@ class HarAdressebeskyttelseTest {
         val fnr = "12345678912"
         val payload = hentToken(mockOAuth2Server).serialize().split(".")[1]
         startApp(pdlKlient, testRapid).use {
-            val response = Fuel.post("http://localhost:$appPort/adressebeskyttelse")
-                .body("""{"fnr": "$fnr"}""")
-                .authentication().bearer("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.$payload.")
-                .response().second
+            val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.$payload.")
 
-            assertThat(response.statusCode).isEqualTo(401)
+            assertThat(response.statusCode()).isEqualTo(401)
         }
     }
 
     @Test
     fun `isAlive kaster 500 om rapid er død`() {
         startApp(pdlKlient, testRapid) { false }.use {
-            val response = Fuel.get("http://localhost:$appPort/isalive")
-                .response().second
+            val response = get("http://localhost:$appPort/isalive")
 
-            assertThat(response.statusCode).isEqualTo(500)
+            assertThat(response.statusCode()).isEqualTo(500)
         }
 
     }
@@ -200,12 +174,26 @@ class HarAdressebeskyttelseTest {
     @Test
     fun `isAlive returnerer 200 om rapid er i livet`() {
         startApp(pdlKlient, testRapid) { true }.use {
-            val response = Fuel.get("http://localhost:$appPort/isalive")
-                .response().second
+            val response = get("http://localhost:$appPort/isalive")
 
-            assertThat(response.statusCode).isEqualTo(200)
+            assertThat(response.statusCode()).isEqualTo(200)
         }
     }
+
+    private val httpClient = HttpClient.newHttpClient()
+
+    private fun post(url: String, body: String, token: String? = null): HttpResponse<String> =
+        httpClient.send(
+            HttpRequest.newBuilder(URI(url))
+                .apply { if (token != null) header("Authorization", "Bearer $token") }
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build(),
+            HttpResponse.BodyHandlers.ofString()
+        )
+
+    private fun get(url: String): HttpResponse<String> =
+        httpClient.send(HttpRequest.newBuilder(URI(url)).GET().build(), HttpResponse.BodyHandlers.ofString())
 
     private fun startApp(
         pdlKlient: PdlKlient,
