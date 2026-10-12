@@ -12,13 +12,11 @@ dependencies {
     implementation("org.apache.avro:avro:1.12.2")
     testImplementation("org.apache.avro:avro-idl:1.12.2")
     implementation("io.confluent:kafka-avro-serializer:8.3.2")
-    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
-    implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
-    implementation("io.javalin:javalin:7.2.0")
-    implementation("tools.jackson.module:jackson-module-kotlin:3.1.3")
-    implementation("no.nav.security:token-validation-core:5.0.14")
+    implementation("io.javalin:javalin:7.2.3")
+    implementation("tools.jackson.module:jackson-module-kotlin:3.2.3")
+    implementation("no.nav.security:token-validation-core:6.0.13")
 
-    testImplementation("no.nav.security:mock-oauth2-server:2.1.0")
-    testImplementation("org.wiremock:wiremock-standalone:3.10.0")
+    testImplementation("no.nav.security:mock-oauth2-server:6.0.5")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.2")
     testImplementation("org.apache.avro:avro-compiler:1.12.2")
 }
