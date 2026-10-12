@@ -1,20 +1,21 @@
 package no.nav.arbeidsgiver.toi.veileder
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.result.Result
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import net.minidev.json.JSONObject
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.JsonNode
 import tools.jackson.module.kotlin.jacksonObjectMapper
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 class NomKlient(
-    val url: String,
-    val hentAccessToken: () -> String,
+    private val url: String,
+    private val httpClient: HttpClient = HttpClient.newHttpClient(),
+    private val hentAccessToken: () -> String,
 ) {
     private val teamlog = teamlog(log)
     private val objectMapper = jacksonObjectMapper()
@@ -35,25 +36,20 @@ class NomKlient(
     }
 
     private fun executeRequest(spørring: String, ident: String): String {
-        val (_, response: Response, result: Result<String, FuelError>) = Fuel
-            .post(path = url)
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
             .header("Content-type", "application/json")
             .header("Authorization", "Bearer ${hentAccessToken()}")
-            .body(spørring)
-            .responseString()
+            .POST(HttpRequest.BodyPublishers.ofString(spørring))
+            .build()
 
-        when (result) {
-            is Result.Success -> {
-                if (response.statusCode != 200) {
-                    teamlog.error("Uventet statuskode fra veilederoppslag for ident: $ident ${response.statusCode} ${response.responseMessage}")
-                    throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se teamlog) ${response.statusCode}")
-                } else {
-                    return result.get()
-                }
-            }
-
-            is Result.Failure -> throw result.error
+        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() !in 200..299) {
+            teamlog.error("Uventet statuskode fra veilederoppslag for ident: $ident ${response.statusCode()}")
+            throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se teamlog) ${response.statusCode()}")
         }
+
+        return response.body()
     }
 
     private fun parseResponse(response: String): Veilederinformasjon? {
