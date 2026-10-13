@@ -1,13 +1,13 @@
-val postgresVersion = "42.7.4"
-val hikariVersion = "6.2.1"
-val flywayVersion = "13.7.0"
-val h2Version = "2.3.232"
-val javalinVersion = "7.2.0"
-
+val postgresVersion = "42.7.14"
+val hikariVersion = "6.3.3"
+val flywayVersion = "13.10.0"
+val h2Version = "2.5.252"
+val javalinVersion = "7.2.3"
 
 
 plugins {
     id("toi.rapids-and-rivers")
+    id("io.github.ben-manes.versions") version "0.64.0"
 }
 
 application {
