@@ -21,7 +21,7 @@ spec:
       - name: toi-arbeidssoekeropplysninger
         type: POSTGRES_17
         diskType: SSD
-        highAvailability: "{{ cloudsql_high_availability }}"
+        highAvailability: {{ cloudsql_high_availability }}
         diskSize: 50
         diskAutoresize: true
         tier: "{{ cloudsql_tier }}"
@@ -65,4 +65,3 @@ spec:
       rules:
         - application: logging
           namespace: nais-system
-
