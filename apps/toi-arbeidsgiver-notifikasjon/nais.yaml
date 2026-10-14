@@ -58,6 +58,9 @@ spec:
     - name: NOTIFIKASJON_API_HOST
       value: {{notifikasjon_api_host}}
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: loki

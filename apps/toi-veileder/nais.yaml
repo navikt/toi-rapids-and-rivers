@@ -55,6 +55,9 @@ spec:
     - name: NOM_API_HOST
       value: {{nom_api_host}}
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: loki

@@ -68,6 +68,9 @@ spec:
   envFrom:
     - secret: toi-identmapper-servicebruker
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: loki

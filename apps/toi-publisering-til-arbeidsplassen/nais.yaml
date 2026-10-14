@@ -45,6 +45,9 @@ spec:
         - application: pam-import-api
           namespace: teampam
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: loki

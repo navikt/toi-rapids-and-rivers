@@ -35,6 +35,9 @@ spec:
         - application: logging
           namespace: nais-system
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: loki

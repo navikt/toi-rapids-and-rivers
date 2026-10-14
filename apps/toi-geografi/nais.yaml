@@ -36,6 +36,9 @@ spec:
     - name: PAM_GEOGRAFI_URL
       value: http://pam-geografi.teampam
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: loki
