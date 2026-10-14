@@ -1,5 +1,6 @@
 kafka_pool: nav-dev
 "cloudsql_tier": db-f1-micro
+"cloudsql_high_availability": false
 kafka_consumer_group_id: toi-arbeidssoekeropplysninger-rapidconsumer-1
 arbeidssoker_opplysninger_kafka_group_id: toi-arbeidssoekeropplysninger-3
 publiser_til_rapid_enabled: enabled
