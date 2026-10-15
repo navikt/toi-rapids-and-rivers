@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/oppgrader-avro
+      deploy_dev_branch: refs/heads/fjern_unyttig_dependency
     permissions:
       contents: read
       id-token: write
