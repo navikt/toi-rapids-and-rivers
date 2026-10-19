@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.MissingNode
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.MissingNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -45,7 +45,7 @@ class UferdigKandidatLytter(
     ) {
         if (packet.rejectOnAll("@behov", behovsListe)) return
 
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["aktørId"].asString()
         packet["@behov"] = packet["@behov"].toSet() + behovsListe
         val cvMelding =
             if (packet["arbeidsmarkedCv.opprettCv"].jsonNodeHasValue()) packet["arbeidsmarkedCv.opprettCv"]
@@ -65,17 +65,17 @@ class UferdigKandidatLytter(
     }
 
     private fun leggTilOntologiBehovFelt(packet: JsonMessage, cvMelding: JsonNode, jobbMelding: JsonNode) {
-        packet["kompetanse"] = jobbMelding.path("jobbprofil").path("kompetanser").map(JsonNode::asText)
+        packet["kompetanse"] = jobbMelding.path("jobbprofil").path("kompetanser").values().map(JsonNode::asString)
 
-        val jobbønskeListe = jobbMelding.path("jobbprofil").path("stillinger").map(JsonNode::asText)
-        val jobbønskeKladdeListe = jobbMelding.path("jobbprofil").path("stillingkladder").map(JsonNode::asText)
-        val arbeidserfaringsListe = cvMelding["cv"]["arbeidserfaring"].toList().map { it["stillingstittel"].asText() }
+        val jobbønskeListe = jobbMelding.path("jobbprofil").path("stillinger").values().map(JsonNode::asString)
+        val jobbønskeKladdeListe = jobbMelding.path("jobbprofil").path("stillingkladder").values().map(JsonNode::asString)
+        val arbeidserfaringsListe = cvMelding["cv"]["arbeidserfaring"].toList().map { it["stillingstittel"].asString() }
         packet["stillingstittel"] = arbeidserfaringsListe.union(jobbønskeListe).union(jobbønskeKladdeListe)
     }
 
     private fun leggTilGeografiBehovFelter(packet: JsonMessage, cvMelding: JsonNode, jobbMelding: JsonNode) {
         packet["postnummer"] = cvMelding["cv"]["postnummer"]
-        packet["geografiKode"] = jobbMelding.path("jobbprofil").path("geografi").map { it["kode"].asText() }
+        packet["geografiKode"] = jobbMelding.path("jobbprofil").path("geografi").values().map { it["kode"].asString() }
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
@@ -87,5 +87,5 @@ class UferdigKandidatLytter(
 private fun JsonNode.jsonNodeHasValue() = !this.isMissingOrNull()
 
 private fun JsonMessage.rejectOnAll(key: String, values: List<String>) = get(key).let { node ->
-    !node.isMissingNode && node.isArray && node.map(JsonNode::asText).containsAll(values)
+    !node.isMissingNode && node.isArray && node.values().map(JsonNode::asString).containsAll(values)
 }

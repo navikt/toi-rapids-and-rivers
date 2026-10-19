@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,7 +19,7 @@ class EsArbeidstidJobbonsker(
             + '\'' + ", arbeidstidKodeTekst='" + arbeidstidKodeTekst + '\'' + '}')
 
     companion object {
-        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode.path("arbeidstider").map(JsonNode::asText)
+        fun fraMelding(jobbProfilNode: JsonNode) = jobbProfilNode.path("arbeidstider").values().map(JsonNode::asString)
             .map(Arbeidstider::valueOf)
             .map { arbeidstidsordning ->
                 EsArbeidstidJobbonsker(

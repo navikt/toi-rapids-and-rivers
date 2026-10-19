@@ -1,8 +1,9 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.cfg.DateTimeFeature
+import tools.jackson.databind.introspect.DefaultAccessorNamingStrategy
+import tools.jackson.databind.json.JsonMapper
 import no.nav.arbeidsgiver.toi.logging.log
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import org.apache.hc.client5.http.auth.AuthScope
@@ -13,7 +14,7 @@ import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier
 import org.apache.hc.core5.http.HttpHost
 import org.apache.hc.core5.ssl.SSLContextBuilder
-import org.opensearch.client.json.jackson.JacksonJsonpMapper
+import org.opensearch.client.json.jackson3.JacksonJsonpMapper
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.FieldValue
 import org.opensearch.client.opensearch._types.Refresh
@@ -23,6 +24,14 @@ import org.opensearch.client.opensearch.indices.IndexSettings
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import java.io.StringReader
 
+fun esObjectMapper(): JsonMapper = JsonMapper.builder()
+    .addModule(offsetTidsmodul())
+    .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+    // Felt som starter med æ, ø eller å forsvinner stille uten denne
+    .accessorNaming(DefaultAccessorNamingStrategy.Provider().withFirstCharAcceptance(true, true))
+    // OpenSearch-klienten leser dokumenter midt i en større respons, så det kommer tokens etter dokumentet
+    .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+    .build()
 
 class ESClient(
     esUrl: String,
@@ -67,10 +76,6 @@ class ESClient(
         }
         val sslcontext = SSLContextBuilder.create().build()
 
-        val objectMapper = ObjectMapper()
-            .registerModule(JavaTimeModule())
-            .registerModule(offsetTidsmodul())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         val transport = ApacheHttpClient5TransportBuilder.builder(host)
             .setHttpClientConfigCallback { builder ->
                 val tlsStrategy = ClientTlsStrategyBuilder.create()
@@ -80,7 +85,7 @@ class ESClient(
                 val connectionManager = PoolingAsyncClientConnectionManagerBuilder.create().setTlsStrategy(tlsStrategy).build()
                 builder.setDefaultCredentialsProvider(credentialsProvider).setConnectionManager(connectionManager)
             }
-            .setMapper(JacksonJsonpMapper(objectMapper))
+            .setMapper(JacksonJsonpMapper(esObjectMapper()))
             .build()
         openSearchClient = OpenSearchClient(transport)
 

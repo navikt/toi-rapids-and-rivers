@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,11 +34,11 @@ class EsFagdokumentasjon(
             else -> fagdokumentType
         }
 
-        fun fraMelding(cvNode: JsonNode): List<EsFagdokumentasjon> = cvNode["fagdokumentasjon"].map { fagdokumentasjonNode ->
+        fun fraMelding(cvNode: JsonNode): List<EsFagdokumentasjon> = cvNode["fagdokumentasjon"].values().map { fagdokumentasjonNode ->
             EsFagdokumentasjon(
-                type = getFagdokumentTypeLabel(fagdokumentasjonNode["type"].asText(null)),
-                tittel = fagdokumentasjonNode["tittel"].asText(null),
-                beskrivelse = fagdokumentasjonNode["beskrivelse"].asText(null),
+                type = getFagdokumentTypeLabel(fagdokumentasjonNode["type"].asString(null)),
+                tittel = fagdokumentasjonNode["tittel"].asString(null),
+                beskrivelse = fagdokumentasjonNode["beskrivelse"].asString(null),
             )
         }
     }

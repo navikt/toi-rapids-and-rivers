@@ -1,0 +1,22 @@
+{
+  "standard" : {
+    "slettCv" : [ "123" ],
+    "publisert" : [ true ]
+  },
+  "aktørId som tall" : {
+    "slettCv" : [ "123" ],
+    "publisert" : [ true ]
+  },
+  "aktørId null" : {
+    "slettCv" : [ ],
+    "publisert" : [ ]
+  },
+  "aktørId mangler" : {
+    "slettCv" : [ ],
+    "publisert" : [ ]
+  },
+  "aktørId tom" : {
+    "slettCv" : [ "" ],
+    "publisert" : [ true ]
+  }
+}

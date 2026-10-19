@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
@@ -122,21 +122,21 @@ class EsYrkeserfaring(
                 ChronoUnit.MONTHS.between(fraDato, tilDato?: now()).toInt()
             }
         fun List<EsYrkeserfaring>.totalYrkeserfaringIManeder() = this.sumOf(EsYrkeserfaring::yrkeserfaringManeder)
-        fun fraMelding(packet: JsonMessage, cvNode: JsonNode): List<EsYrkeserfaring> = cvNode["arbeidserfaring"].map { arbeidserfaringNode ->
-            val stillingstittel = arbeidserfaringNode["stillingstittel"].asText()
+        fun fraMelding(packet: JsonMessage, cvNode: JsonNode): List<EsYrkeserfaring> = cvNode["arbeidserfaring"].values().map { arbeidserfaringNode ->
+            val stillingstittel = arbeidserfaringNode["stillingstittel"].asString()
             val ontologiRelasjoner = packet["ontologi.stillingstittel"][stillingstittel]
-            val typeahead = ontologiRelasjoner["synonymer"].map(JsonNode::asText)
+            val typeahead = ontologiRelasjoner["synonymer"].values().map(JsonNode::asString)
             EsYrkeserfaring(
-                fraDato = arbeidserfaringNode["fraTidspunkt"].asText(null)?.let(YearMonth::parse),
-                tilDato = arbeidserfaringNode["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
-                arbeidsgiver = arbeidserfaringNode["arbeidsgiver"].asText(),
-                styrkKode = arbeidserfaringNode["styrkkode"].asText(),
+                fraDato = arbeidserfaringNode["fraTidspunkt"].asString(null)?.let(YearMonth::parse),
+                tilDato = arbeidserfaringNode["tilTidspunkt"].asString(null)?.let(YearMonth::parse),
+                arbeidsgiver = arbeidserfaringNode["arbeidsgiver"].asString(),
+                styrkKode = arbeidserfaringNode["styrkkode"].asString(),
                 kodeverkStillingstittel = stillingstittel,
                 stillingstitlerForTypeahead = typeahead.toSet(),
-                alternativStillingstittel = arbeidserfaringNode["stillingstittelFritekst"].asText("").let { if(it=="") stillingstittel else it },
-                beskrivelse = arbeidserfaringNode["beskrivelse"].asText(null),
-                sokeTitler = typeahead + ontologiRelasjoner["merGenerell"].map(JsonNode::asText),
-                sted = arbeidserfaringNode["sted"]?.asText("") ?: ""
+                alternativStillingstittel = arbeidserfaringNode["stillingstittelFritekst"].asString("").let { if(it=="") stillingstittel else it },
+                beskrivelse = arbeidserfaringNode["beskrivelse"].asString(null),
+                sokeTitler = typeahead + ontologiRelasjoner["merGenerell"].values().map(JsonNode::asString),
+                sted = arbeidserfaringNode["sted"]?.asString("") ?: ""
             )
         }
     }

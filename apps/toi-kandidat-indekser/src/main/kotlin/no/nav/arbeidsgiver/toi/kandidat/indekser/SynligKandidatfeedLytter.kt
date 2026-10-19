@@ -44,7 +44,7 @@ class SynligKandidatfeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["aktørId"].asString()
 
         esClient.lagreEsCv(EsCv.fraMelding(packet))
         teamlog.info("Indekserte kandidat: $aktørId")

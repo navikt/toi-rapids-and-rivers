@@ -2,12 +2,12 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.node.MissingNode
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
+import tools.jackson.databind.node.MissingNode
+import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer
+import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsYrkeserfaring.Companion.totalYrkeserfaringIManeder
@@ -197,13 +197,13 @@ class EsCv(
 
     companion object {
         fun JsonNode.yyyymmddToLocalDate(): LocalDate {
-            if(runCatching { LocalDate.parse(asText()) }.isSuccess) return LocalDate.parse(asText())
-            val (year, month, day) = map { it.asInt() }
+            if(runCatching { LocalDate.parse(asString()) }.isSuccess) return LocalDate.parse(asString())
+            val (year, month, day) = values().map { it.asInt(0) }
             return LocalDate.of(year, month, day)
         }
 
         fun indekseringsnøkkel(packet: JsonMessage) = if(packet["arbeidsmarkedCv"].isMissingOrNull()) null else
-            getCvNode(packet["arbeidsmarkedCv"])[indekseringsnøkkel].asText(null)
+            getCvNode(packet["arbeidsmarkedCv"])[indekseringsnøkkel].asString(null)
 
         fun fraMelding(packet: JsonMessage): EsCv {
             val arbeidsmarkedCv = packet["arbeidsmarkedCv"]
@@ -214,54 +214,54 @@ class EsCv(
                 ?.get("jobbprofil")
                 ?: MissingNode.getInstance()
 
-            val kommunenummer = packet["geografi.kommune.kommunenummer"].asText(null)
+            val kommunenummer = packet["geografi.kommune.kommunenummer"].asString(null)
             return EsCv(
-                aktorId = packet["aktørId"].asText(null),
-                fodselsnummer = cvNode["fodselsnummer"].asText(null),
-                fornavn = cvNode["fornavn"].asText(null),
-                etternavn = cvNode["etternavn"].asText(null),
+                aktorId = packet["aktørId"].asString(null),
+                fodselsnummer = cvNode["fodselsnummer"].asString(null),
+                fornavn = cvNode["fornavn"].asString(null),
+                etternavn = cvNode["etternavn"].asString(null),
                 fodselsdato = cvNode["foedselsdato"].yyyymmddToLocalDate(),
-                fodselsdatoErDnr = cvNode["fodselsnummer"].asText(null).first() >= '4',
-                formidlingsgruppekode = packet["oppfølgingsinformasjon.formidlingsgruppe"].asText(jobbskifter),
-                epostadresse = cvNode["epost"].asText(null),
+                fodselsdatoErDnr = cvNode["fodselsnummer"].asString(null).first() >= '4',
+                formidlingsgruppekode = packet["oppfølgingsinformasjon.formidlingsgruppe"].asString(jobbskifter),
+                epostadresse = cvNode["epost"].asString(null),
                 mobiltelefon = ingenMobiltelefon,
-                telefon = cvNode["telefon"].asText(null),
+                telefon = cvNode["telefon"].asString(null),
                 statsborgerskap = ingenNasjonalitet,
-                kandidatnr = cvNode[indekseringsnøkkel].asText(null),
-                beskrivelse = cvNode["sammendrag"].asText(null),
+                kandidatnr = cvNode[indekseringsnøkkel].asString(null),
+                beskrivelse = cvNode["sammendrag"].asString(null),
                 samtykkeStatus = ingenAnonymitet,
-                samtykkeDato = Instant.ofEpochMilli((cvNode["opprettet"].asDouble() * 1000).toLong())
+                samtykkeDato = Instant.ofEpochMilli((cvNode["opprettet"].asDouble(0.0) * 1000).toLong())
                     .atOffset(ZoneOffset.UTC), // samtykkeDato, XXX hvorfor heter ikke feltet opprettetDato i EsCV ?
-                adresselinje1 = cvNode["gateadresse"].asText(null),
+                adresselinje1 = cvNode["gateadresse"].asString(null),
                 adresselinje2 = tomAdresse,
                 adresselinje3 = tomAdresse,
-                postnummer = cvNode["postnummer"].asText(null),
-                poststed = cvNode["poststed"].asText(null),
+                postnummer = cvNode["postnummer"].asString(null),
+                poststed = cvNode["poststed"].asString(null),
                 landkode = ingenLandkode,
                 kommunenummer = kommunenummer?.toInt(),
                 disponererBil = ingenDisponererBil,
-                tidsstempel = Instant.ofEpochMilli((cvNode["sistEndret"].asDouble() * 1000).toLong())
+                tidsstempel = Instant.ofEpochMilli((cvNode["sistEndret"].asDouble(0.0) * 1000).toLong())
                     .atOffset(ZoneOffset.ofHours(0)),
                 kommunenummerkw = kommunenummer?.toInt(),
                 doed = erIkkeDød,
                 frKode = defaultFrKode,
-                kvalifiseringsgruppekode = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asText(""),
-                hovedmaalkode = packet["oppfølgingsinformasjon.hovedmaal"].asText(""),
-                hovedmal = packet["siste14avedtak.hovedmal"].asText(harIkkeGjeldende14aVedtak),
-                innsatsgruppe = packet["siste14avedtak.innsatsgruppe"].asText(harIkkeGjeldende14aVedtak),
-                navkontor = packet["sisteOppfølgingsperiode.kontor.kontorNavn"].asText(null),
-                orgenhet = packet["sisteOppfølgingsperiode.kontor.kontorId"].asText(""),
-                fritattKandidatsok = packet["fritattKandidatsøk.fritattKandidatsok"].let { if(it.isMissingOrNull()) null else it.asBoolean() },
+                kvalifiseringsgruppekode = packet["oppfølgingsinformasjon.kvalifiseringsgruppe"].asString(""),
+                hovedmaalkode = packet["oppfølgingsinformasjon.hovedmaal"].asString(""),
+                hovedmal = packet["siste14avedtak.hovedmal"].asString(harIkkeGjeldende14aVedtak),
+                innsatsgruppe = packet["siste14avedtak.innsatsgruppe"].asString(harIkkeGjeldende14aVedtak),
+                navkontor = packet["sisteOppfølgingsperiode.kontor.kontorNavn"].asString(null),
+                orgenhet = packet["sisteOppfølgingsperiode.kontor.kontorId"].asString(""),
+                fritattKandidatsok = packet["fritattKandidatsøk.fritattKandidatsok"].let { if(it.isMissingOrNull()) null else it.asBoolean(false) },
                 fritattAgKandidatsok = fritattAgKandidatsokerDeprikert,
-                synligForArbeidsgiverSok = cvNode["synligForArbeidsgiver"].asBoolean(),
-                synligForVeilederSok = cvNode["synligForVeileder"].asBoolean(),
-                oppstartKode = jobbProfilNode.path("oppstartKode").asText(""),
+                synligForArbeidsgiverSok = cvNode["synligForArbeidsgiver"].asBoolean(false),
+                synligForVeilederSok = cvNode["synligForVeileder"].asBoolean(false),
+                oppstartKode = jobbProfilNode.path("oppstartKode").asString(""),
                 kommunenummerstring = kommunenummer,
-                veilederIdent = packet["veileder.veilederId"].asText(null),
-                veilederVisningsnavn = packet["veileder.veilederinformasjon.visningsNavn"].asText(null),
-                veilederEpost = packet["veileder.veilederinformasjon.epost"].asText(null),
-                fylkeNavn = packet["geografi.fylke.korrigertNavn"].asText(null),
-                kommuneNavn = packet["geografi.kommune.korrigertNavn"].asText(null),
+                veilederIdent = packet["veileder.veilederId"].asString(null),
+                veilederVisningsnavn = packet["veileder.veilederinformasjon.visningsNavn"].asString(null),
+                veilederEpost = packet["veileder.veilederinformasjon.epost"].asString(null),
+                fylkeNavn = packet["geografi.fylke.korrigertNavn"].asString(null),
+                kommuneNavn = packet["geografi.kommune.korrigertNavn"].asString(null),
                 utdanning = EsUtdanning.fraMelding(cvNode),
                 fagdokumentasjon = EsFagdokumentasjon.fraMelding(cvNode),
                 yrkeserfaring = EsYrkeserfaring.fraMelding(packet, cvNode),

@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -21,7 +21,7 @@ class UferdigKandidatLytterTest {
         val inspektør = testrapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).containsAll(behovsListe)
+        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asString).containsAll(behovsListe)
     }
 
     @Test
@@ -36,9 +36,9 @@ class UferdigKandidatLytterTest {
         val inspektør = testrapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["stillingstittel"].asIterable()).map<String>(JsonNode::asText)
+        assertThat(melding["stillingstittel"].asIterable()).map<String>(JsonNode::asString)
             .containsExactlyInAnyOrder("Lege", "Pianolærer", "Baker", "Sjåfør", "Sirkustekniker", "Produktsjef kjøretøy")
-        assertThat(melding["kompetanse"].asIterable()).map<String>(JsonNode::asText)
+        assertThat(melding["kompetanse"].asIterable()).map<String>(JsonNode::asString)
             .containsExactlyInAnyOrder("Sirkusestetikk", "Sirkusvokabular", "Definere riggebehov for sirkuskunster", "Kontrollere sirkusrigging før fremføring", "Servicearbeid")
     }
 
@@ -54,7 +54,7 @@ class UferdigKandidatLytterTest {
         val inspektør = testrapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).containsAll(behovsListe)
+        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asString).containsAll(behovsListe)
     }
 
     @Test
@@ -115,9 +115,9 @@ class UferdigKandidatLytterTest {
         val inspektør = testrapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).contains("geografi")
-        assertThat(melding["geografiKode"].map ( JsonNode::asText )).isEqualTo(listOf(expectedGeografiKode))
-        assertThat(melding["postnummer"].asText()).isEqualTo(expectedPostnummer)
+        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asString).contains("geografi")
+        assertThat(melding["geografiKode"].values().map ( JsonNode::asString )).isEqualTo(listOf(expectedGeografiKode))
+        assertThat(melding["postnummer"].asString()).isEqualTo(expectedPostnummer)
     }
 
     @Test
@@ -134,8 +134,8 @@ class UferdigKandidatLytterTest {
         val inspektør = testrapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
         val melding = inspektør.message(0)
-        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asText).contains("geografi")
-        assertThat(melding["geografiKode"].map ( JsonNode::asText )).hasSize(0)
+        assertThat(melding["@behov"].asIterable()).map<String>(JsonNode::asString).contains("geografi")
+        assertThat(melding["geografiKode"].values().map ( JsonNode::asString )).hasSize(0)
         assertThat(melding["postnummer"].isNull).isTrue
     }
 
@@ -155,13 +155,13 @@ class UferdigKandidatLytterTest {
 
         val resultat = inspektør.message(0)
         assertThat(resultat["@behov"].asIterable())
-            .map<String>(JsonNode::asText)
+            .map<String>(JsonNode::asString)
             .containsAll(behovsListe)
 
         assertFalse(resultat["kompetanse"].isMissingNode)
         assertThat(resultat["kompetanse"].toList()).isEmpty()
         assertThat(resultat["geografiKode"].toList()).isEmpty()
-        assertThat(resultat["stillingstittel"].map(JsonNode::asText))
+        assertThat(resultat["stillingstittel"].values().map(JsonNode::asString))
             .containsExactlyInAnyOrder("Lege", "Pianolærer", "Baker")
     }
 }

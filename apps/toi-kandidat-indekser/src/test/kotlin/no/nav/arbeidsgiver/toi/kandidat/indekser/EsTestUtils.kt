@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 import org.apache.hc.core5.http.HttpHost
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.Refresh
@@ -9,7 +9,7 @@ import org.opensearch.client.opensearch.core.DeleteByQueryRequest
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
-import org.opensearch.client.json.jackson.JacksonJsonpMapper
+import org.opensearch.client.json.jackson3.JacksonJsonpMapper
 
 /**
  * Felles testverktøy for ES-relaterte integrasjonstester.
@@ -26,9 +26,12 @@ object EsTestUtils {
     /** Lager en OpenSearchClient koblet til gitt container. */
     fun openSearchClient(container: ElasticsearchContainer): OpenSearchClient {
         val mapper =
-            JacksonJsonpMapper(jacksonObjectMapper()
-                .registerModule(JavaTimeModule())
-                .registerModule(offsetTidsmodul()))
+            JacksonJsonpMapper(
+                jacksonMapperBuilder()
+                    .addModule(offsetTidsmodul())
+                    .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                    .build()
+            )
         return OpenSearchClient(
             ApacheHttpClient5TransportBuilder.builder(
                 HttpHost.create(container.httpHostAddress)

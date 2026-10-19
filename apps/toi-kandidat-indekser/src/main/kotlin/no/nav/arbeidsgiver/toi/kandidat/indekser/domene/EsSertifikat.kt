@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.LocalDate
@@ -46,14 +46,14 @@ class EsSertifikat(
     override fun tilSamletKompetanse() = sertifikatKodeNavn?.let { listOf(EsSamletKompetanse(it)) } ?: emptyList()
 
     companion object {
-        fun fraMelding(cvNode: JsonNode) = cvNode["sertifikat"].map { sertifikatNode ->
+        fun fraMelding(cvNode: JsonNode) = cvNode["sertifikat"].values().map { sertifikatNode ->
             EsSertifikat(
                 fraDato = sertifikatNode["gjennomfoert"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
                 tilDato = sertifikatNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
-                sertifikatKode = sertifikatNode["konseptId"].asText(null),
-                sertifikatKodeNavn = sertifikatNode["sertifikatnavn"].asText(null),
-                alternativtNavn = sertifikatNode["sertifikatnavnFritekst"].asText(null),
-                utsteder = sertifikatNode["utsteder"].asText(),
+                sertifikatKode = sertifikatNode["konseptId"].asString(null),
+                sertifikatKodeNavn = sertifikatNode["sertifikatnavn"].asString(null),
+                alternativtNavn = sertifikatNode["sertifikatnavnFritekst"].asString(null),
+                utsteder = sertifikatNode["utsteder"].asString(),
             )
         }
     }

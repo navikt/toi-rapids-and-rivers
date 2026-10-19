@@ -1,5 +1,5 @@
 plugins {
-    id("toi.rapids-and-rivers-deprekert-jackson2")
+    id("toi.rapids-and-rivers")
 }
 
 application {
@@ -7,14 +7,19 @@ application {
 }
 
 val pamAnsettelseskodeverkVersion = "1.18"
+// Samme Jackson 3-linje som opensearch-java 3.10.0 er kompilert mot (3.2.x)
+val jackson3Version = "3.2.4"
 dependencies {
     implementation(project(":technical-libs:logging"))
-    testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
+    implementation(platform("tools.jackson:jackson-bom:$jackson3Version"))
+    implementation("tools.jackson.core:jackson-databind")
+    testImplementation("tools.jackson.module:jackson-module-kotlin")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.5"))
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:testcontainers-elasticsearch")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    implementation("org.opensearch.client:opensearch-java:3.2.0")
+    implementation("org.opensearch.client:opensearch-java:3.10.0")
     testImplementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelseskodeverkVersion")
-    testImplementation("io.mockk:mockk:1.14.9")
-    testImplementation("io.mockk:mockk-agent-jvm:1.14.9")
+    testImplementation("io.mockk:mockk:1.14.11")
+    testImplementation("io.mockk:mockk-agent-jvm:1.14.11")
 }
