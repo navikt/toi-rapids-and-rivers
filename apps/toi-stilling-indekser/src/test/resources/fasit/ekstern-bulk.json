@@ -1,0 +1,144 @@
+[ {
+  "index" : {
+    "_id" : "aaaaaaaa-1111-2222-3333-444444444444",
+    "_index" : "stilling_1"
+  }
+}, {
+  "stilling" : {
+    "uuid" : "aaaaaaaa-1111-2222-3333-444444444444",
+    "annonsenr" : "R123456",
+    "status" : "ACTIVE",
+    "privacy" : "SHOW_ALL",
+    "published" : "2025-01-01T12:00:00",
+    "publishedByAdmin" : "2025-01-01T12:00:01",
+    "expires" : "2025-02-01T00:00:00.123",
+    "created" : "2024-12-31T09:30:00",
+    "updated" : "2025-01-02T10:15:30.5",
+    "employer" : {
+      "name" : "Navn AS",
+      "orgnr" : "123456789",
+      "parentOrgnr" : "987654321",
+      "publicName" : "Offentlig navn AS",
+      "orgform" : "BEDR"
+    },
+    "categories" : [ {
+      "code" : "123",
+      "categoryType" : "JANZZ",
+      "name" : "Utvikler",
+      "description" : null,
+      "parentId" : null
+    }, {
+      "code" : "http://data.europa.eu/esco/occupation/1",
+      "categoryType" : "ESCO",
+      "name" : "Programmerer",
+      "description" : null,
+      "parentId" : null
+    } ],
+    "source" : "IMPORTAPI",
+    "medium" : "FINN",
+    "businessName" : "Testbedrift AS",
+    "locations" : [ {
+      "address" : "Gate 1",
+      "postalCode" : "0123",
+      "county" : "OSLO",
+      "municipalCode" : "0301",
+      "countyCode" : "03",
+      "municipal" : "OSLO",
+      "city" : "Oslo",
+      "country" : "NORGE",
+      "latitude" : "59.91",
+      "longitude" : "10.75"
+    } ],
+    "reference" : "ref-1",
+    "administration" : {
+      "status" : "PENDING",
+      "comments" : "kommentar",
+      "reportee" : "Rapportør Rapportørsen",
+      "remarks" : [ "FOREIGN_JOB", "DUPLICATE" ],
+      "navIdent" : "Z999999"
+    },
+    "properties" : {
+      "externalref" : "1005/18",
+      "sector" : "Offentlig",
+      "positioncount" : 2,
+      "salary" : 550000.5,
+      "stortall" : 12345678901234567890,
+      "antall" : 2,
+      "workday" : true,
+      "tom" : null,
+      "blank" : null,
+      "adtext" : "<p>Den beste stillingen</p>",
+      "tags" : [ "INKLUDERING__ARBEIDSTID", "TILTAK_ELLER_VIRKEMIDDEL__LÆRLINGPLASS" ],
+      "searchtags" : [ {
+        "label" : "Utvikler",
+        "score" : 1.0
+      }, {
+        "label" : "Programmerer",
+        "score" : 0.25137392
+      } ],
+      "ontologyJobtitle" : {
+        "konseptId" : "123",
+        "label" : "Utvikler",
+        "styrk08" : "2512"
+      }
+    },
+    "contacts" : [ {
+      "name" : "Kari Kontakt",
+      "email" : "kari@eksempel.no",
+      "phone" : "12345678",
+      "role" : "Kontaktperson",
+      "title" : "Leder"
+    } ],
+    "tittel" : "Utvikler i Nav"
+  },
+  "stillingsinfo" : {
+    "eierNavident" : "Z999999",
+    "eierNavn" : "Eier Eiersen",
+    "eierNavKontorEnhetId" : "0315",
+    "stillingsid" : "aaaaaaaa-1111-2222-3333-444444444444",
+    "stillingsinfoid" : "1",
+    "stillingskategori" : "STILLING"
+  },
+  "kandidatlisteInfo" : null
+}, {
+  "index" : {
+    "_id" : "bbbbbbbb-1111-2222-3333-444444444444",
+    "_index" : "stilling_1"
+  }
+}, {
+  "stilling" : {
+    "uuid" : "bbbbbbbb-1111-2222-3333-444444444444",
+    "annonsenr" : "R654321",
+    "status" : "INACTIVE",
+    "privacy" : "INTERNAL_NOT_SHOWN",
+    "published" : null,
+    "publishedByAdmin" : null,
+    "expires" : null,
+    "created" : "2025-03-30T01:30:00",
+    "updated" : "2025-03-30T02:30:00",
+    "employer" : null,
+    "categories" : [ ],
+    "source" : "DIR",
+    "medium" : "DIR",
+    "businessName" : null,
+    "locations" : [ {
+      "address" : null,
+      "postalCode" : null,
+      "county" : null,
+      "municipalCode" : null,
+      "countyCode" : null,
+      "municipal" : null,
+      "city" : null,
+      "country" : "NORGE",
+      "latitude" : null,
+      "longitude" : null
+    } ],
+    "reference" : "ref-2",
+    "administration" : null,
+    "properties" : { },
+    "contacts" : [ ],
+    "tittel" : "Stilling uten valgt jobbtittel"
+  },
+  "stillingsinfo" : null,
+  "kandidatlisteInfo" : null
+} ]

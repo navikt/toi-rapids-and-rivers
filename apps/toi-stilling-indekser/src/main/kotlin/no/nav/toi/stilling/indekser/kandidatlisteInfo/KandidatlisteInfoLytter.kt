@@ -41,7 +41,7 @@ class KandidatlisteInfoLytter(rapidsConnection: RapidsConnection,
 
         try {
             kandidatlisteInfo = JacksonConfig.objectMapper.readValue(kandidatlisteInfoPacket.toString(), KandidatlisteInfo::class.java)
-            stillingsId = UUID.fromString(stillingsIdPacket.asText())
+            stillingsId = UUID.fromString(stillingsIdPacket.asString())
         } catch (e: Exception) {
             log.error("Gå forbi feil format på melding", e)
             return

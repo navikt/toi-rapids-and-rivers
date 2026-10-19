@@ -1,8 +1,7 @@
 package no.nav.toi.stilling.indekser.eksternLytter
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.JsonNode
 import no.nav.pam.stilling.ext.avro.Ad
 import no.nav.pam.stilling.ext.avro.Classification
 import no.nav.pam.stilling.ext.avro.RemarkType
@@ -129,9 +128,9 @@ private fun no.nav.pam.stilling.ext.avro.StyrkCategory.harØnsketStyrk8Format():
 
 fun tilJson(string: String): JsonNode? {
     return try {
-        val json = jacksonObjectMapper().readTree(string)
+        val json = JacksonConfig.objectMapper.readTree(string)
         json
-    } catch (exception: JsonProcessingException) {
+    } catch (exception: JacksonException) {
         null
     }
 }

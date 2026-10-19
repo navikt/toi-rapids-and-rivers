@@ -1,8 +1,8 @@
 package no.nav.toi.stilling.indekser.dto
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.JsonNode
+import no.nav.toi.stilling.indekser.JacksonConfig
 import no.nav.toi.stilling.indekser.Stilling
 import no.nav.toi.stilling.indekser.log
 import java.time.LocalDateTime
@@ -83,9 +83,9 @@ data class DirektemeldtStilling(
             return null
         }
         return try {
-            val json = jacksonObjectMapper().readTree(value)
+            val json = JacksonConfig.objectMapper.readTree(value)
             json
-        } catch (exception: JsonProcessingException) {
+        } catch (exception: JacksonException) {
             null
         }
     }
