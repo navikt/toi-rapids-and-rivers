@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.util.*
 
@@ -25,14 +25,14 @@ class EsYrkeJobbonsker(
 
     companion object {
         fun fraMelding(jobbProfilNode: JsonNode, packet: JsonMessage) =
-            jobbProfilNode.path("stillinger").map (JsonNode::asText).map { stilling ->
+            jobbProfilNode.path("stillinger").values().map (JsonNode::asString).map { stilling ->
                 EsYrkeJobbonsker(
                     styrkKode = null,
                     styrkBeskrivelse = stilling,
                     primaertJobbonske = false,
                     sokeTitler = packet["ontologi.stillingstittel"][stilling].let { synonymer ->
-                        synonymer["synonymer"].map(JsonNode::asText) +
-                                synonymer["merGenerell"].map(JsonNode::asText)
+                        synonymer["synonymer"].values().map(JsonNode::asString) +
+                                synonymer["merGenerell"].values().map(JsonNode::asString)
                     }
                 )
             }

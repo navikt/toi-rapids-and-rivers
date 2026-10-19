@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.YearMonth
@@ -24,12 +24,12 @@ class EsAnnenErfaring(
             + beskrivelse + '\'' + ", rolle='" + rolle + '\'' + '}')
 
     companion object {
-        fun fraMelding(cvNode: JsonNode) = cvNode["annenErfaring"].map { annenErfaring ->
+        fun fraMelding(cvNode: JsonNode) = cvNode["annenErfaring"].values().map { annenErfaring ->
             EsAnnenErfaring(
-                fraDato = annenErfaring["fraTidspunkt"].asText(null)?.let(YearMonth::parse),
-                tilDato = annenErfaring["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
-                beskrivelse = annenErfaring["beskrivelse"].asText(),
-                rolle = annenErfaring["rolle"].asText()
+                fraDato = annenErfaring["fraTidspunkt"].asString(null)?.let(YearMonth::parse),
+                tilDato = annenErfaring["tilTidspunkt"].asString(null)?.let(YearMonth::parse),
+                beskrivelse = annenErfaring["beskrivelse"].asString(),
+                rolle = annenErfaring["rolle"].asString()
             )
         }
     }

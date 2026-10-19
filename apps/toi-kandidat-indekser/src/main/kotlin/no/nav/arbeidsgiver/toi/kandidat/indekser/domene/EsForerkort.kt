@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.OffsetDateTime
@@ -44,12 +44,12 @@ class EsForerkort(
 
     companion object {
         fun fraMelding(cvNode: JsonNode): List<EsForerkort> {
-            return cvNode["foererkort"]["klasse"].map { forerkortNode ->
+            return cvNode["foererkort"]["klasse"].values().map { forerkortNode ->
                 EsForerkort(
                     fraDato = forerkortNode["fraTidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate().atStartOfDay().atZone(ZoneId.of("Europe/Oslo")).toOffsetDateTime() },
                     tilDato = forerkortNode["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate().atStartOfDay().atZone(ZoneId.of("Europe/Oslo")).toOffsetDateTime() },
-                    klasse = forerkortNode["klasse"].asText(null),
-                    klassebeskrivelse = forerkortNode["klasseBeskrivelse"].asText(),
+                    klasse = forerkortNode["klasse"].asString(null),
+                    klassebeskrivelse = forerkortNode["klasseBeskrivelse"].asString(),
                 )
             }
         }

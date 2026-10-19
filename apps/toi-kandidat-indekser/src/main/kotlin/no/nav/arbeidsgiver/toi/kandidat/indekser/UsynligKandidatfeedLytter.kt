@@ -30,7 +30,7 @@ class UsynligKandidatfeedLytter(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry
     ) {
-        esClient.slettCv(packet["aktørId"].asText())
+        esClient.slettCv(packet["aktørId"].asString())
         packet["@slutt_av_hendelseskjede"] = true
         context.publish(packet.toJson())
     }

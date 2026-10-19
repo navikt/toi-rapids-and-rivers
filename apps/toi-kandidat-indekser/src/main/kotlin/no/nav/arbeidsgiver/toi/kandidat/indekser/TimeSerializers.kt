@@ -1,12 +1,12 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import tools.jackson.core.JsonGenerator
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.databind.ser.std.StdSerializer
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.YearMonth
@@ -18,35 +18,35 @@ fun offsetTidsmodul(): SimpleModule {
     val zone = ZoneId.of("Europe/Oslo")
 
     class YearMonthSerializer : StdSerializer<YearMonth>(YearMonth::class.java) {
-        override fun serialize(value: YearMonth, gen: JsonGenerator, provider: SerializerProvider) {
+        override fun serialize(value: YearMonth, gen: JsonGenerator, provider: SerializationContext) {
             gen.writeString(value.atDay(1).atStartOfDay(zone).toOffsetDateTime().format(formatter))
         }
     }
     class YearMonthDeserializer : StdDeserializer<YearMonth>(YearMonth::class.java) {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext) =
-            YearMonth.from(OffsetDateTime.parse(p.text.trim(), formatter))
+            YearMonth.from(OffsetDateTime.parse(p.string.trim(), formatter))
     }
 
     class LocalDateSerializer : StdSerializer<LocalDate>(LocalDate::class.java) {
-        override fun serialize(value: LocalDate, gen: JsonGenerator, provider: SerializerProvider) {
+        override fun serialize(value: LocalDate, gen: JsonGenerator, provider: SerializationContext) {
             gen.writeString(value.atStartOfDay(zone).toOffsetDateTime().format(formatter))
         }
     }
 
     class LocalDateDeserializer : StdDeserializer<LocalDate>(LocalDate::class.java) {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext) =
-            OffsetDateTime.parse(p.text.trim(), formatter).toLocalDate()
+            OffsetDateTime.parse(p.string.trim(), formatter).toLocalDate()
     }
 
     class OffsetDateTimeSerializer : StdSerializer<OffsetDateTime>(OffsetDateTime::class.java) {
-        override fun serialize(value: OffsetDateTime, gen: JsonGenerator, provider: SerializerProvider) {
+        override fun serialize(value: OffsetDateTime, gen: JsonGenerator, provider: SerializationContext) {
             gen.writeString(value.atZoneSameInstant(zone).format(formatter))
         }
     }
 
     class OffsetDateTimeDeserializer : StdDeserializer<OffsetDateTime>(OffsetDateTime::class.java) {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext) =
-            OffsetDateTime.parse(p.text.trim(), formatter)
+            OffsetDateTime.parse(p.string.trim(), formatter)
     }
 
     return SimpleModule()

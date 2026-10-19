@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.LocalDate
@@ -32,12 +32,12 @@ class EsKurs(
             + ", omfangVerdi=" + omfangVerdi + '\'' + '}')
 
     companion object {
-        fun fraMelding(cvNode: JsonNode) = cvNode["kurs"].map { kursNode ->
+        fun fraMelding(cvNode: JsonNode) = cvNode["kurs"].values().map { kursNode ->
             EsKurs(
-                tittel = kursNode["tittel"].asText(),
-                arrangor = kursNode["utsteder"].asText(),
-                omfangEnhet = kursNode["varighetEnhet"]?.asText("") ?: "",
-                omfangVerdi = kursNode["varighet"]?.asInt(),
+                tittel = kursNode["tittel"].asString(),
+                arrangor = kursNode["utsteder"].asString(),
+                omfangEnhet = kursNode["varighetEnhet"]?.asString("") ?: "",
+                omfangVerdi = kursNode["varighet"]?.asInt(0),
                 tilDato = kursNode["tidspunkt"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() }
             )
         }

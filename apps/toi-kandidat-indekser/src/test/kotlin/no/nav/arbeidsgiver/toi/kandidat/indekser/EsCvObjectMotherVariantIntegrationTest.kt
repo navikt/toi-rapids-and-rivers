@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -26,8 +24,6 @@ class EsCvObjectMotherVariantIntegrationTest {
     }
 
     private val mapper = jacksonObjectMapper()
-        .registerModule(JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     @BeforeEach
     fun setUp() {
@@ -47,19 +43,19 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
         val expectedJson = mapper.readTree(mapper.writeValueAsString(cv))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
 
         // Toppnivå felter (kun felt vi vet finnes i ES)
-        assertThat(cvJson["kommunenummerstring"].asText()).isEqualTo(expectedJson["kommunenummerstring"].asText())
-        assertThat(cvJson["fylkeNavn"].asText()).isEqualTo(expectedJson["fylkeNavn"].asText())
-        assertThat(cvJson["kommuneNavn"].asText()).isEqualTo(expectedJson["kommuneNavn"].asText())
-        assertThat(cvJson["oppstartKode"].asText()).isEqualTo(expectedJson["oppstartKode"].asText())
-        assertThat(cvJson["veilederIdent"].asText()).isEqualTo(expectedJson["veilederIdent"].asText())
-        assertThat(cvJson["veilederVisningsnavn"].asText()).isEqualTo(expectedJson["veilederVisningsnavn"].asText())
-        assertThat(cvJson["veilederEpost"].asText()).isEqualTo(expectedJson["veilederEpost"].asText())
+        assertThat(cvJson["kommunenummerstring"].asString()).isEqualTo(expectedJson["kommunenummerstring"].asString())
+        assertThat(cvJson["fylkeNavn"].asString()).isEqualTo(expectedJson["fylkeNavn"].asString())
+        assertThat(cvJson["kommuneNavn"].asString()).isEqualTo(expectedJson["kommuneNavn"].asString())
+        assertThat(cvJson["oppstartKode"].asString()).isEqualTo(expectedJson["oppstartKode"].asString())
+        assertThat(cvJson["veilederIdent"].asString()).isEqualTo(expectedJson["veilederIdent"].asString())
+        assertThat(cvJson["veilederVisningsnavn"].asString()).isEqualTo(expectedJson["veilederVisningsnavn"].asString())
+        assertThat(cvJson["veilederEpost"].asString()).isEqualTo(expectedJson["veilederEpost"].asString())
 
         val harKontakt = cvJson.get("harKontaktinformasjon") ?: cvJson.get("isHarKontaktinformasjon")
         assertThat(harKontakt).isNotNull
@@ -82,57 +78,57 @@ class EsCvObjectMotherVariantIntegrationTest {
 
         // Utdanning
         assertThat(cvJson["utdanning"].size()).isEqualTo(2)
-        assertThat(cvJson["utdanning"][0]["fraDato"].asText()).isEqualTo(expectedJson["utdanning"][0]["fraDato"].asText())
-        assertThat(cvJson["utdanning"][0]["tilDato"].asText()).isEqualTo(expectedJson["utdanning"][0]["tilDato"].asText())
-        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asText()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asText())
-        assertThat(cvJson["utdanning"][0]["nusKode"].asText()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asText())
-        assertThat(cvJson["utdanning"][0]["alternativGrad"].asText()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asText())
-        assertThat(cvJson["utdanning"][1]["utdannelsessted"].asText()).isEqualTo(expectedJson["utdanning"][1]["utdannelsessted"].asText())
-        assertThat(cvJson["utdanning"][1]["nusKode"].asText()).isEqualTo(expectedJson["utdanning"][1]["nusKode"].asText())
-        assertThat(cvJson["utdanning"][1]["alternativGrad"].asText()).isEqualTo(expectedJson["utdanning"][1]["alternativGrad"].asText())
+        assertThat(cvJson["utdanning"][0]["fraDato"].asString()).isEqualTo(expectedJson["utdanning"][0]["fraDato"].asString())
+        assertThat(cvJson["utdanning"][0]["tilDato"].asString()).isEqualTo(expectedJson["utdanning"][0]["tilDato"].asString())
+        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asString()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asString())
+        assertThat(cvJson["utdanning"][0]["nusKode"].asString()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asString())
+        assertThat(cvJson["utdanning"][0]["alternativGrad"].asString()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asString())
+        assertThat(cvJson["utdanning"][1]["utdannelsessted"].asString()).isEqualTo(expectedJson["utdanning"][1]["utdannelsessted"].asString())
+        assertThat(cvJson["utdanning"][1]["nusKode"].asString()).isEqualTo(expectedJson["utdanning"][1]["nusKode"].asString())
+        assertThat(cvJson["utdanning"][1]["alternativGrad"].asString()).isEqualTo(expectedJson["utdanning"][1]["alternativGrad"].asString())
 
         // Yrkeserfaring
         assertThat(cvJson["yrkeserfaring"].size()).isEqualTo(6)
-        assertThat(cvJson["yrkeserfaring"][0]["fraDato"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["fraDato"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["tilDato"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["tilDato"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["alternativStillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["alternativStillingstittel"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["sted"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["sted"].asText())
+        assertThat(cvJson["yrkeserfaring"][0]["fraDato"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["fraDato"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["tilDato"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["tilDato"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["alternativStillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["alternativStillingstittel"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["sted"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["sted"].asString())
 
         // Kompetanse
         assertThat(cvJson["kompetanseObj"].size()).isEqualTo(4)
-        assertThat(cvJson["kompetanseObj"][0]["kompKode"].asText()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKode"].asText())
-        assertThat(cvJson["kompetanseObj"][0]["kompKodeNavn"].asText()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKodeNavn"].asText())
-        assertThat(cvJson["kompetanseObj"][1]["kompKodeNavn"].asText()).isEqualTo(expectedJson["kompetanseObj"][1]["kompKodeNavn"].asText())
-        assertThat(cvJson["kompetanseObj"][2]["kompKodeNavn"].asText()).isEqualTo(expectedJson["kompetanseObj"][2]["kompKodeNavn"].asText())
-        assertThat(cvJson["kompetanseObj"][3]["kompKodeNavn"].asText()).isEqualTo(expectedJson["kompetanseObj"][3]["kompKodeNavn"].asText())
+        assertThat(cvJson["kompetanseObj"][0]["kompKode"].asString()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKode"].asString())
+        assertThat(cvJson["kompetanseObj"][0]["kompKodeNavn"].asString()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKodeNavn"].asString())
+        assertThat(cvJson["kompetanseObj"][1]["kompKodeNavn"].asString()).isEqualTo(expectedJson["kompetanseObj"][1]["kompKodeNavn"].asString())
+        assertThat(cvJson["kompetanseObj"][2]["kompKodeNavn"].asString()).isEqualTo(expectedJson["kompetanseObj"][2]["kompKodeNavn"].asString())
+        assertThat(cvJson["kompetanseObj"][3]["kompKodeNavn"].asString()).isEqualTo(expectedJson["kompetanseObj"][3]["kompKodeNavn"].asString())
 
         // Språk
         assertThat(cvJson["sprak"].size()).isEqualTo(2)
-        assertThat(cvJson["sprak"][0]["sprakKodeTekst"].asText()).isEqualTo(expectedJson["sprak"][0]["sprakKodeTekst"].asText())
-        assertThat(cvJson["sprak"][0]["alternativTekst"].asText()).isEqualTo(expectedJson["sprak"][0]["alternativTekst"].asText())
-        assertThat(cvJson["sprak"][0]["ferdighetMuntlig"].asText()).isEqualTo(expectedJson["sprak"][0]["ferdighetMuntlig"].asText())
+        assertThat(cvJson["sprak"][0]["sprakKodeTekst"].asString()).isEqualTo(expectedJson["sprak"][0]["sprakKodeTekst"].asString())
+        assertThat(cvJson["sprak"][0]["alternativTekst"].asString()).isEqualTo(expectedJson["sprak"][0]["alternativTekst"].asString())
+        assertThat(cvJson["sprak"][0]["ferdighetMuntlig"].asString()).isEqualTo(expectedJson["sprak"][0]["ferdighetMuntlig"].asString())
 
         // Kurs
         assertThat(cvJson["kursObj"].size()).isEqualTo(3)
-        assertThat(cvJson["kursObj"][0]["tittel"].asText()).isEqualTo(expectedJson["kursObj"][0]["tittel"].asText())
-        assertThat(cvJson["kursObj"][0]["arrangor"].asText()).isEqualTo(expectedJson["kursObj"][0]["arrangor"].asText())
-        assertThat(cvJson["kursObj"][1]["tittel"].asText()).isEqualTo(expectedJson["kursObj"][1]["tittel"].asText())
-        assertThat(cvJson["kursObj"][2]["tittel"].asText()).isEqualTo(expectedJson["kursObj"][2]["tittel"].asText())
+        assertThat(cvJson["kursObj"][0]["tittel"].asString()).isEqualTo(expectedJson["kursObj"][0]["tittel"].asString())
+        assertThat(cvJson["kursObj"][0]["arrangor"].asString()).isEqualTo(expectedJson["kursObj"][0]["arrangor"].asString())
+        assertThat(cvJson["kursObj"][1]["tittel"].asString()).isEqualTo(expectedJson["kursObj"][1]["tittel"].asString())
+        assertThat(cvJson["kursObj"][2]["tittel"].asString()).isEqualTo(expectedJson["kursObj"][2]["tittel"].asString())
 
         // Sertifikater
         assertThat(cvJson["sertifikatObj"].size()).isEqualTo(3)
-        assertThat(cvJson["sertifikatObj"][0]["sertifikatKodeNavn"].asText()).isEqualTo(expectedJson["sertifikatObj"][0]["sertifikatKodeNavn"].asText())
-        assertThat(cvJson["sertifikatObj"][0]["sertifikatKode"].asText()).isEqualTo(expectedJson["sertifikatObj"][0]["sertifikatKode"].asText())
-        assertThat(cvJson["sertifikatObj"][0]["fraDato"].asText()).isEqualTo(expectedJson["sertifikatObj"][0]["fraDato"].asText())
-        assertThat(cvJson["sertifikatObj"][0]["tilDato"].asText()).isEqualTo(expectedJson["sertifikatObj"][0]["tilDato"].asText())
+        assertThat(cvJson["sertifikatObj"][0]["sertifikatKodeNavn"].asString()).isEqualTo(expectedJson["sertifikatObj"][0]["sertifikatKodeNavn"].asString())
+        assertThat(cvJson["sertifikatObj"][0]["sertifikatKode"].asString()).isEqualTo(expectedJson["sertifikatObj"][0]["sertifikatKode"].asString())
+        assertThat(cvJson["sertifikatObj"][0]["fraDato"].asString()).isEqualTo(expectedJson["sertifikatObj"][0]["fraDato"].asString())
+        assertThat(cvJson["sertifikatObj"][0]["tilDato"].asString()).isEqualTo(expectedJson["sertifikatObj"][0]["tilDato"].asString())
 
         // Førerkort
         assertThat(cvJson["forerkort"].size()).isEqualTo(4)
-        assertThat(cvJson["forerkort"][0]["forerkortKodeKlasse"].asText()).isEqualTo(expectedJson["forerkort"][0]["forerkortKodeKlasse"].asText())
-        assertThat(cvJson["forerkort"][1]["forerkortKodeKlasse"].asText()).isEqualTo(expectedJson["forerkort"][1]["forerkortKodeKlasse"].asText())
+        assertThat(cvJson["forerkort"][0]["forerkortKodeKlasse"].asString()).isEqualTo(expectedJson["forerkort"][0]["forerkortKodeKlasse"].asString())
+        assertThat(cvJson["forerkort"][1]["forerkortKodeKlasse"].asString()).isEqualTo(expectedJson["forerkort"][1]["forerkortKodeKlasse"].asString())
     }
 
     @Test
@@ -142,23 +138,23 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
         val expectedJson = mapper.readTree(mapper.writeValueAsString(cv))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
 
         // Utdanning
         assertThat(cvJson["utdanning"].size()).isEqualTo(1)
-        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asText()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asText())
-        assertThat(cvJson["utdanning"][0]["nusKode"].asText()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asText())
-        assertThat(cvJson["utdanning"][0]["alternativGrad"].asText()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asText())
+        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asString()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asString())
+        assertThat(cvJson["utdanning"][0]["nusKode"].asString()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asString())
+        assertThat(cvJson["utdanning"][0]["alternativGrad"].asString()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asString())
 
         // Yrkeserfaring
         assertThat(cvJson["yrkeserfaring"].size()).isEqualTo(6)
-        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["alternativStillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["alternativStillingstittel"].asText())
+        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["alternativStillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["alternativStillingstittel"].asString())
     }
 
     @Test
@@ -168,23 +164,23 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
         val expectedJson = mapper.readTree(mapper.writeValueAsString(cv))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
 
         // Utdanning
         assertThat(cvJson["utdanning"].size()).isEqualTo(1)
-        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asText()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asText())
-        assertThat(cvJson["utdanning"][0]["nusKode"].asText()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asText())
-        assertThat(cvJson["utdanning"][0]["alternativGrad"].asText()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asText())
+        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asString()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asString())
+        assertThat(cvJson["utdanning"][0]["nusKode"].asString()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asString())
+        assertThat(cvJson["utdanning"][0]["alternativGrad"].asString()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asString())
 
         // Yrkeserfaring
         assertThat(cvJson["yrkeserfaring"].size()).isEqualTo(6)
-        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["alternativStillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["alternativStillingstittel"].asText())
+        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["alternativStillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["alternativStillingstittel"].asString())
     }
 
     @Test
@@ -194,22 +190,22 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
         val expectedJson = mapper.readTree(mapper.writeValueAsString(cv))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
 
         // Utdanning
         assertThat(cvJson["utdanning"].size()).isEqualTo(1)
-        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asText()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asText())
-        assertThat(cvJson["utdanning"][0]["nusKode"].asText()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asText())
-        assertThat(cvJson["utdanning"][0]["alternativGrad"].asText()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asText())
+        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asString()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asString())
+        assertThat(cvJson["utdanning"][0]["nusKode"].asString()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asString())
+        assertThat(cvJson["utdanning"][0]["alternativGrad"].asString()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asString())
 
         // Yrkeserfaring
         assertThat(cvJson["yrkeserfaring"].size()).isEqualTo(6)
-        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asText())
+        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asString())
     }
 
     @Test
@@ -219,21 +215,21 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
         val expectedJson = mapper.readTree(mapper.writeValueAsString(cv))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
 
         // Yrkeserfaring
         assertThat(cvJson["yrkeserfaring"].size()).isEqualTo(6)
-        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asText())
+        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["stillingstittel"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["stillingstittel"].asString())
 
         // Kompetanse
         assertThat(cvJson["kompetanseObj"].size()).isGreaterThan(0)
-        assertThat(cvJson["kompetanseObj"][0]["kompKode"].asText()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKode"].asText())
-        assertThat(cvJson["kompetanseObj"][0]["kompKodeNavn"].asText()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKodeNavn"].asText())
+        assertThat(cvJson["kompetanseObj"][0]["kompKode"].asString()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKode"].asString())
+        assertThat(cvJson["kompetanseObj"][0]["kompKodeNavn"].asString()).isEqualTo(expectedJson["kompetanseObj"][0]["kompKodeNavn"].asString())
     }
 
     @Test
@@ -243,21 +239,21 @@ class EsCvObjectMotherVariantIntegrationTest {
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
         val expectedJson = mapper.readTree(mapper.writeValueAsString(cv))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
 
         // Utdanning
         assertThat(cvJson["utdanning"].size()).isEqualTo(1)
-        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asText()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asText())
-        assertThat(cvJson["utdanning"][0]["nusKode"].asText()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asText())
-        assertThat(cvJson["utdanning"][0]["alternativGrad"].asText()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asText())
+        assertThat(cvJson["utdanning"][0]["utdannelsessted"].asString()).isEqualTo(expectedJson["utdanning"][0]["utdannelsessted"].asString())
+        assertThat(cvJson["utdanning"][0]["nusKode"].asString()).isEqualTo(expectedJson["utdanning"][0]["nusKode"].asString())
+        assertThat(cvJson["utdanning"][0]["alternativGrad"].asString()).isEqualTo(expectedJson["utdanning"][0]["alternativGrad"].asString())
 
         // Yrkeserfaring
         assertThat(cvJson["yrkeserfaring"].size()).isEqualTo(6)
-        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asText())
-        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asText()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asText())
+        assertThat(cvJson["yrkeserfaring"][0]["arbeidsgiver"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["arbeidsgiver"].asString())
+        assertThat(cvJson["yrkeserfaring"][0]["styrkKode"].asString()).isEqualTo(expectedJson["yrkeserfaring"][0]["styrkKode"].asString())
 
         // Kurs
         assertThat(cvJson["kursObj"].isArray).isTrue
@@ -269,9 +265,9 @@ class EsCvObjectMotherVariantIntegrationTest {
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
         assertThat(cvJson["kompetanseObj"].size()).isEqualTo(0)
     }
@@ -282,9 +278,9 @@ class EsCvObjectMotherVariantIntegrationTest {
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
         assertThat(cvJson["doed"].asBoolean()).isTrue
     }
@@ -295,11 +291,11 @@ class EsCvObjectMotherVariantIntegrationTest {
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
-        assertThat(cvJson["frKode"].asText()).isEqualTo("6")
+        assertThat(cvJson["frKode"].asString()).isEqualTo("6")
     }
 
     @Test
@@ -308,11 +304,11 @@ class EsCvObjectMotherVariantIntegrationTest {
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
-        assertThat(cvJson["frKode"].asText()).isEqualTo("7")
+        assertThat(cvJson["frKode"].asString()).isEqualTo("7")
     }
 
     @Test
@@ -321,9 +317,9 @@ class EsCvObjectMotherVariantIntegrationTest {
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
         assertThat(cvJson["fritattKandidatsok"].asBoolean()).isTrue
     }
@@ -335,9 +331,9 @@ class EsCvObjectMotherVariantIntegrationTest {
         val response = lagreOgHent(cv)
         assertThat(response.found()).isTrue
         val cvJson = mapper.readTree(mapper.writeValueAsString(response.source()))
-        val kandidatnr = cvJson.get("kandidatnr").asText()
+        val kandidatnr = cvJson.get("kandidatnr").asString()
         assertThat(kandidatnr).isNotBlank
-        assertThat(cvJson.get("arenaKandidatnr").asText()).isEqualTo(kandidatnr)
+        assertThat(cvJson.get("arenaKandidatnr").asString()).isEqualTo(kandidatnr)
         assertThat(cv.indekseringsnøkkel()).isEqualTo(kandidatnr)
         assertThat(cvJson.has("fritattAgKandidatsok")).isFalse
     }

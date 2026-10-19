@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv.Companion.yyyymmddToLocalDate
 import java.time.LocalDate
@@ -22,13 +22,13 @@ class EsGodkjenning(
     override fun tilSamletKompetanse() = listOf(EsSamletKompetanse(tittel))
 
     companion object {
-        fun fraMelding(cvNode: JsonNode) = cvNode["godkjenninger"].map { godkjenning ->
+        fun fraMelding(cvNode: JsonNode) = cvNode["godkjenninger"].values().map { godkjenning ->
             EsGodkjenning(
-                tittel = godkjenning["tittel"].asText(),
-                utsteder = godkjenning["utsteder"].asText(),
+                tittel = godkjenning["tittel"].asString(),
+                utsteder = godkjenning["utsteder"].asString(),
                 gjennomfoert = godkjenning["gjennomfoert"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
                 utloeper = godkjenning["utloeper"]?.let { if(it.isMissingOrNull()) null else it.yyyymmddToLocalDate() },
-                konseptId = godkjenning["konseptId"].asText(null),
+                konseptId = godkjenning["konseptId"].asString(null),
             )
         }
     }

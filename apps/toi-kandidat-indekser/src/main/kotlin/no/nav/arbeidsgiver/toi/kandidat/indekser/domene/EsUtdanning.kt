@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser.domene
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import java.time.OffsetDateTime
 import java.time.YearMonth
 import java.util.Objects
@@ -45,15 +45,15 @@ class EsUtdanning(
             + ", beskrivelse='" + beskrivelse + '\'' + '}')
 
     companion object {
-        fun fraMelding(cvNode: JsonNode) = cvNode["utdannelse"].map { utdannelseNode ->
+        fun fraMelding(cvNode: JsonNode) = cvNode["utdannelse"].values().map { utdannelseNode ->
             EsUtdanning(
-                fraDato = YearMonth.parse(utdannelseNode["fraTidspunkt"].asText()),
-                tilDato = utdannelseNode["tilTidspunkt"].asText(null)?.let(YearMonth::parse),
-                utdannelsessted = utdannelseNode["laerested"].asText(),
-                nusKode = utdannelseNode["nuskodeGrad"].asText(),
-                alternativGrad = utdannelseNode["utdanningsretning"].asText(),
-                beskrivelse = utdannelseNode["beskrivelse"].asText(""),
-                yrkestatus = utdannelseNode["utdannelseYrkestatus"].asText(null)?.let(UtdannelseYrkestatus::valueOf) ?: UtdannelseYrkestatus.INGEN
+                fraDato = YearMonth.parse(utdannelseNode["fraTidspunkt"].asString()),
+                tilDato = utdannelseNode["tilTidspunkt"].asString(null)?.let(YearMonth::parse),
+                utdannelsessted = utdannelseNode["laerested"].asString(),
+                nusKode = utdannelseNode["nuskodeGrad"].asString(),
+                alternativGrad = utdannelseNode["utdanningsretning"].asString(),
+                beskrivelse = utdannelseNode["beskrivelse"].asString(""),
+                yrkestatus = utdannelseNode["utdannelseYrkestatus"].asString(null)?.let(UtdannelseYrkestatus::valueOf) ?: UtdannelseYrkestatus.INGEN
             )
         }
     }
