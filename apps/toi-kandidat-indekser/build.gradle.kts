@@ -9,6 +9,7 @@ application {
 val pamAnsettelseskodeverkVersion = "1.18"
 // Samme Jackson 3-linje som opensearch-java 3.10.0 er kompilert mot (3.2.x)
 val jackson3Version = "3.2.4"
+val jsonUnitVersion = "6.3.0"
 dependencies {
     implementation(project(":technical-libs:logging"))
     implementation(platform("tools.jackson:jackson-bom:$jackson3Version"))
@@ -18,8 +19,15 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:testcontainers-elasticsearch")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    implementation("org.opensearch.client:opensearch-java:3.10.0")
+    implementation("org.opensearch.client:opensearch-java:3.10.0") {
+        // Klienten er satt opp med jackson3-mapperen. Jackson 2 brukes bare av den gamle mapperen i
+        // org.opensearch.client.json.jackson, som vi ikke bruker. jackson-annotations trengs også av Jackson 3.
+        exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
+        exclude(group = "com.fasterxml.jackson.core", module = "jackson-databind")
+    }
     testImplementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelseskodeverkVersion")
     testImplementation("io.mockk:mockk:1.14.11")
     testImplementation("io.mockk:mockk-agent-jvm:1.14.11")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.2")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:$jsonUnitVersion")
 }

@@ -24,7 +24,7 @@
   "disponererBil" : null,
   "doed" : false,
   "epostadresse" : "julenissen@nordpolen.no",
-  "etternavn" : "Testfamilien",
+  "etternavn" : "Fasitsen",
   "fagdokumentasjon" : [ {
     "beskrivelse" : null,
     "tittel" : "Fagbrev industriell matproduksjon",
@@ -40,7 +40,7 @@
   } ],
   "fodselsdato" : "1980-10-10",
   "fodselsdatoErDnr" : false,
-  "fodselsnummer" : "10108000398",
+  "fodselsnummer" : "01010000000",
   "forerkort" : [ {
     "alternativKlasse" : null,
     "forerkortKode" : null,
@@ -134,7 +134,7 @@
     "utsteder" : null
   } ],
   "formidlingsgruppekode" : "ARBS",
-  "fornavn" : "Aremark M.",
+  "fornavn" : "Fornavn",
   "frKode" : "0",
   "fritattAgKandidatsok" : null,
   "fritattKandidatsok" : false,

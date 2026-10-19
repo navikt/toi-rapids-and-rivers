@@ -7,7 +7,7 @@
     "beskrivelse" : "Trente barn og unge i fotball",
     "fraDato" : "2010-03-01T00:00:00.000+01:00",
     "rolle" : "Fotballtrener",
-    "tilDato" : "2012-11-01T00:00:00.000+01:00"
+    "tilDato" : null
   } ],
   "ansettelsesformJobbonskerObj" : [ {
     "ansettelsesformKode" : "FAST",
@@ -23,8 +23,8 @@
   "beskrivelse" : "Jeg er en dyktig hjernekirurg som kan skrive sykt gode journaler i word.",
   "disponererBil" : null,
   "doed" : false,
-  "epostadresse" : "julenissen@nordpolen.no",
-  "etternavn" : "Testfamilien",
+  "epostadresse" : null,
+  "etternavn" : "Fasitsen",
   "fagdokumentasjon" : [ {
     "beskrivelse" : null,
     "tittel" : "Fagbrev industriell matproduksjon",
@@ -40,7 +40,7 @@
   } ],
   "fodselsdato" : "1980-10-10",
   "fodselsdatoErDnr" : false,
-  "fodselsnummer" : "10108000398",
+  "fodselsnummer" : "01010000000",
   "forerkort" : [ {
     "alternativKlasse" : null,
     "forerkortKode" : null,
@@ -133,11 +133,11 @@
     "tilDato" : "2020-12-13T00:00:00.000+01:00",
     "utsteder" : null
   } ],
-  "formidlingsgruppekode" : "ARBS",
-  "fornavn" : "Aremark M.",
+  "formidlingsgruppekode" : "JOBBS",
+  "fornavn" : "Fornavn",
   "frKode" : "0",
   "fritattAgKandidatsok" : null,
-  "fritattKandidatsok" : false,
+  "fritattKandidatsok" : null,
   "fylkeNavn" : "Oslo",
   "geografiJobbonsker" : [ {
     "geografiKode" : "NO03",
@@ -147,7 +147,7 @@
     "geografiKodeTekst" : "Vestnes"
   } ],
   "godkjenninger" : [ {
-    "gjennomfoert" : "2019-12-18T00:00:00.000+01:00",
+    "gjennomfoert" : null,
     "konseptId" : "1903811",
     "tittel" : "Taxiløyve",
     "utloeper" : null,
@@ -159,15 +159,15 @@
     "utloeper" : "2060-06-01T00:00:00.000+02:00",
     "utsteder" : "Legeautorisasjonstjenesten"
   } ],
-  "harKontaktinformasjon" : true,
-  "hovedmaalkode" : "SKAFFEA",
-  "hovedmal" : "SKAFFEB",
-  "innsatsgruppe" : "BATT",
+  "harKontaktinformasjon" : false,
+  "hovedmaalkode" : "",
+  "hovedmal" : "HAR_IKKE_GJELDENDE_14A_VEDTAK",
+  "innsatsgruppe" : "HAR_IKKE_GJELDENDE_14A_VEDTAK",
   "kandidatnr" : "CG133309",
-  "kommuneNavn" : "Oslo",
-  "kommunenummer" : 1,
-  "kommunenummerkw" : 1,
-  "kommunenummerstring" : "01",
+  "kommuneNavn" : null,
+  "kommunenummer" : null,
+  "kommunenummerkw" : null,
+  "kommunenummerstring" : null,
   "kompetanseObj" : [ {
     "alternativtNavn" : "Sirkusestetikk",
     "beskrivelse" : "",
@@ -210,7 +210,7 @@
     "fraDato" : null,
     "omfangEnhet" : "TIME",
     "omfangVerdi" : 5,
-    "tilDato" : "2013-02-18T00:00:00.000+01:00",
+    "tilDato" : null,
     "tittel" : "Førstehjelpskurs"
   }, {
     "arrangor" : "Itkursagenten",
@@ -229,19 +229,16 @@
     "tilDato" : null,
     "tittel" : "Word-kurs"
   } ],
-  "kvalifiseringsgruppekode" : "IVURD",
+  "kvalifiseringsgruppekode" : "",
   "landkode" : null,
   "mobiltelefon" : null,
-  "navkontor" : "NAV et kontor",
-  "omfangJobbonskerObj" : [ {
-    "omfangKode" : "HELTID",
-    "omfangKodeTekst" : "Heltid"
-  } ],
-  "oppstartKode" : "SNART",
-  "orgenhet" : "1234",
+  "navkontor" : null,
+  "omfangJobbonskerObj" : [ ],
+  "oppstartKode" : "",
+  "orgenhet" : "",
   "perioderMedInaktivitet" : {
     "sluttdatoerForInaktivePerioderPaToArEllerMer" : [ "2020-01-01T00:00:00.000+01:00", "2018-03-15T00:00:00.000+01:00" ],
-    "startdatoForInnevarendeInaktivePeriode" : "2022-05-10T00:00:00.000+02:00"
+    "startdatoForInnevarendeInaktivePeriode" : null
   },
   "postnummer" : "1798",
   "poststed" : "AREMARK",
@@ -301,7 +298,7 @@
     "fraDato" : "2002-02-01T00:00:00.000+01:00",
     "sertifikatKode" : null,
     "sertifikatKodeNavn" : null,
-    "tilDato" : "2080-06-01T00:00:00.000+02:00",
+    "tilDato" : null,
     "utsteder" : "Espa bolle-service"
   } ],
   "sprak" : [ {
@@ -316,9 +313,9 @@
   "statsborgerskap" : null,
   "synligForArbeidsgiverSok" : true,
   "synligForVeilederSok" : true,
-  "telefon" : "12345678",
-  "tidsstempel" : "2022-05-10T14:13:24.440+02:00",
-  "totalLengdeYrkeserfaring" : 276,
+  "telefon" : null,
+  "tidsstempel" : "1970-01-01T01:00:00.000+01:00",
+  "totalLengdeYrkeserfaring" : 47,
   "utdanning" : [ {
     "alternativGrad" : "Tømrermester",
     "beskrivelse" : "",
@@ -344,10 +341,10 @@
     "utdannelsessted" : "test2",
     "yrkestatus" : "INGEN"
   } ],
-  "veileder" : "Z123456",
-  "veilederEpost" : "veileder@nav.no",
-  "veilederIdent" : "z123456",
-  "veilederVisningsnavn" : "Per Veiviser",
+  "veileder" : null,
+  "veilederEpost" : null,
+  "veilederIdent" : null,
+  "veilederVisningsnavn" : null,
   "vervObj" : [ ],
   "yrkeJobbonskerObj" : [ {
     "primaertJobbonske" : false,
@@ -369,7 +366,7 @@
     "alternativStillingstittel" : "Lege",
     "arbeidsgiver" : "Sykehuset Mjøsa",
     "beskrivelse" : "Operere og reparere",
-    "fraDato" : "2007-08-01T00:00:00.000+02:00",
+    "fraDato" : null,
     "naceKode" : null,
     "organisasjonsnummer" : null,
     "sokeTitler" : [ "Medisiner", "Allmennlege", "Helsepersonell", "Lege" ],
@@ -381,7 +378,7 @@
     "styrkKode4Siffer" : "2211",
     "tilDato" : null,
     "utelukketForFremtiden" : false,
-    "yrkeserfaringManeder" : 230
+    "yrkeserfaringManeder" : 1
   }, {
     "alternativStillingstittel" : "Pianolærer",
     "arbeidsgiver" : "Piano-skolen",
