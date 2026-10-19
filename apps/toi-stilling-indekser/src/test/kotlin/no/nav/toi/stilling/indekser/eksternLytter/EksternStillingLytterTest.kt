@@ -56,9 +56,9 @@ class EksternStillingLytterTest {
 
         val inspektør = rapid.inspektør
         assertThat(inspektør.size).isEqualTo(1)
-        assertThat(inspektør.field(0, "@event_name").asText()).isEqualTo("indekserKandidatlisteInfo")
-        assertThat(inspektør.field(0, "stillingsId").asText()).isEqualTo(uuid)
-        assertThat(inspektør.field(0, "@behov").map { it.asText() }).containsExactly("kandidatlisteInfo")
+        assertThat(inspektør.field(0, "@event_name").asString()).isEqualTo("indekserKandidatlisteInfo")
+        assertThat(inspektør.field(0, "stillingsId").asString()).isEqualTo(uuid)
+        assertThat(inspektør.field(0, "@behov").values().map { it.asString() }).containsExactly("kandidatlisteInfo")
     }
 
     @Test
@@ -100,7 +100,7 @@ class EksternStillingLytterTest {
         lytter(rapid).behandleStillingerMedRetry(listOf(ad(uuid), ad(uuid)), indeks)
 
         assertThat(rapid.inspektør.size).isEqualTo(1)
-        assertThat(rapid.inspektør.field(0, "stillingsId").asText()).isEqualTo(uuid)
+        assertThat(rapid.inspektør.field(0, "stillingsId").asString()).isEqualTo(uuid)
     }
 
     @Test
@@ -114,7 +114,7 @@ class EksternStillingLytterTest {
             .behandleStillingerMedRetry(listOf(ad(uuid)), indeks)
 
         assertThat(rapid.inspektør.size).isEqualTo(1)
-        assertThat(rapid.inspektør.field(0, "stillingsId").asText()).isEqualTo(uuid)
+        assertThat(rapid.inspektør.field(0, "stillingsId").asString()).isEqualTo(uuid)
         verify(exactly = 2) { openSearchService.indekser(any(), any()) }
     }
 
@@ -158,7 +158,7 @@ class EksternStillingLytterTest {
         verify(exactly = 1) {
             openSearchService.indekser(match { it.map { s -> s.stilling.uuid.toString() } == forventet }, indeks)
         }
-        assertThat((0 until rapid.inspektør.size).map { rapid.inspektør.field(it, "stillingsId").asText() })
+        assertThat((0 until rapid.inspektør.size).map { rapid.inspektør.field(it, "stillingsId").asString() })
             .containsExactlyElementsOf(forventet)
     }
 

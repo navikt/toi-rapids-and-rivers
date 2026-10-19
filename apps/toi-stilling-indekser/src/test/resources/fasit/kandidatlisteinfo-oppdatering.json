@@ -1,0 +1,11 @@
+{
+  "doc" : {
+    "kandidatlisteInfo" : {
+      "kandidatlisteId" : "aaaabbbb-cccc-dddd-eeee-ffff00000002",
+      "antallKandidater" : 7,
+      "kandidatlisteStatus" : "LUKKET",
+      "opprettetDato" : "2024-06-01T12:00:00.5+02:00",
+      "eier" : "Z999999"
+    }
+  }
+}

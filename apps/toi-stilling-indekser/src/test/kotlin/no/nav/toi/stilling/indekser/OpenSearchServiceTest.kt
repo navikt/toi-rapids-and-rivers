@@ -1,10 +1,5 @@
 package no.nav.toi.stilling.indekser
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -16,6 +11,10 @@ import no.nav.toi.stilling.indekser.kandidatlisteInfo.KandidatlisteInfoLytter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.opensearch.client.opensearch.OpenSearchClient
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.cfg.DateTimeFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,11 +23,13 @@ class OpenSearchServiceTest {
     private val env = mutableMapOf<String, String>()
     private val osContainer = OpenSearchContainer()
 
-    private val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+    private val objectMapper: JsonMapper = jacksonMapperBuilder()
+        .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .setTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+        .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+        .defaultTimeZone(TimeZone.getTimeZone("Europe/Oslo"))
+        .build()
 
     private lateinit var openSearchClient: OpenSearchClient
     private lateinit var indexClient: IndexClient

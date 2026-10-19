@@ -1,6 +1,6 @@
 package no.nav.toi.stilling.indekser
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.databind.ObjectMapper
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient

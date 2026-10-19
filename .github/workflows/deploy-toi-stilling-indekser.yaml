@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/deploy-toi-template.yaml
     with:
       app_name: ${{ github.workflow }}
-      deploy_dev_branch: refs/heads/fjern_unyttig_dependency
+      deploy_dev_branch: refs/heads/jackson3-stilling-indekser
     permissions:
       contents: read
       id-token: write

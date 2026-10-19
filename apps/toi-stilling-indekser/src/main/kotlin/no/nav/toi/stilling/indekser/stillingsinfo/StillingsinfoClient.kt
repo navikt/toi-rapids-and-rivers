@@ -1,7 +1,7 @@
 package no.nav.toi.stilling.indekser.stillingsinfo
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.ObjectMapper
 import no.nav.toi.stilling.indekser.AccessTokenClient
 import no.nav.toi.stilling.indekser.dto.Stillingsinfo
 import no.nav.toi.stilling.indekser.log

@@ -1,0 +1,12 @@
+{
+  "@event_name": "indekserKandidatlisteInfo",
+  "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+  "kandidatlisteInfo": {
+    "kandidatlisteId": "aaaabbbb-cccc-dddd-eeee-ffff00000002",
+    "antallKandidater": 7,
+    "kandidatlisteStatus": "LUKKET",
+    "opprettetDato": "2024-06-01T10:00:00.5Z",
+    "eier": "Z999999",
+    "ukjentFelt": "ignoreres"
+  }
+}
