@@ -76,6 +76,7 @@ private fun streamProperties(env: Map<String, String>): Properties {
     p[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]
     p[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
     p[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.String()::class.java
+    p[StreamsConfig.STATE_DIR_CONFIG] = "/var/lib/kafka-streams"
     env["KAFKA_CREDSTORE_PASSWORD"]?.let {
         p[StreamsConfig.SECURITY_PROTOCOL_CONFIG] = "SSL"
         p[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
