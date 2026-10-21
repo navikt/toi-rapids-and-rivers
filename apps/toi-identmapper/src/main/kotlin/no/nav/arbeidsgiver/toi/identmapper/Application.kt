@@ -47,6 +47,12 @@ fun startApp(
             cluster = cluster,
             hentFødselsnummer = identCache::hentFødselsnummer,
         )
+
+        FødselsnummerlisteBehovLytter(
+            rapidsConnection = rapidsConnection,
+            cluster = cluster,
+            hentFødselsnummer = identCache::hentFødselsnummer,
+        )
     }.start()
 }
 
