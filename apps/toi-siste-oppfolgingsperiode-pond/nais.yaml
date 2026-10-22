@@ -30,7 +30,7 @@ spec:
   filesFrom:
     - emptyDir:
         medium: Disk
-      mountPath: /var/lib/kafka-streams
+      mountPath: /var/lib/kafka-streams # Samspiller med filen Application.kt: p[StreamsConfig.STATE_DIR_CONFIG] = "/var/lib/kafka-streams/state"
   accessPolicy:
     outbound:
       rules:
