@@ -27,10 +27,6 @@ spec:
   kafka:
     pool: {{ kafka_pool }}
     streams: true
-  filesFrom:
-    - emptyDir:
-        medium: Disk
-      mountPath: /var/lib/kafka-streams
   accessPolicy:
     outbound:
       rules:
