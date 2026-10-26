@@ -1,0 +1,13 @@
+{
+  "@event_name": "indekserStillingsinfo",
+  "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+  "stillingsinfo": {
+    "eierNavident": "Z999999",
+    "eierNavn": "Eier Eiersen",
+    "eierNavKontorEnhetId": null,
+    "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
+    "stillingsinfoid": "24553",
+    "stillingskategori": "FORMIDLING",
+    "ukjentFelt": "ignoreres"
+  }
+}

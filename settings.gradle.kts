@@ -27,7 +27,6 @@ include(
     "apps:toi-stilling-indekser",
     "apps:toi-publiser-dir-stillinger",
     "technical-libs:testrapid",
-    "technical-libs:testrapid-jackson2-deprekert",
     "apps:toi-kandidat-indekser",
     "apps:toi-geografi",
     "technical-libs:logging"

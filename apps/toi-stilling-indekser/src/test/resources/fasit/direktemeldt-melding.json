@@ -1,0 +1,101 @@
+{
+  "@event_name": "indekserDirektemeldtStilling",
+  "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+  "ukjentFelt": { "ignoreres": true },
+  "stillingsinfo": {
+    "eierNavident": "Z999999",
+    "eierNavn": "Eier Eiersen",
+    "eierNavKontorEnhetId": "0315",
+    "stillingsid": "123e4567-e89b-12d3-a456-426614174000",
+    "stillingsinfoid": "24553",
+    "stillingskategori": "STILLING",
+    "ukjentFelt": "ignoreres"
+  },
+  "direktemeldtStilling": {
+    "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+    "annonsenr": "123456789",
+    "innhold": {
+      "title": "Utvikler i Nav",
+      "administration": {
+        "status": "DONE",
+        "comments": "En kommentar",
+        "reportee": "Rapportør Rapportørsen",
+        "remarks": ["FOREIGN_JOB", "DUPLICATE"],
+        "navIdent": "Z999999"
+      },
+      "contactList": [
+        { "name": "Kari Kontakt", "email": "kari@eksempel.no", "phone": "12345678", "role": "Kontaktperson", "title": "Leder" }
+      ],
+      "privacy": "SHOW_ALL",
+      "source": "DIR",
+      "medium": "DIR",
+      "reference": "ref-1",
+      "employer": {
+        "name": "Navn AS",
+        "orgnr": "123456789",
+        "parentOrgnr": "987654321",
+        "publicName": "Offentlig navn AS",
+        "orgform": "BEDR"
+      },
+      "locationList": [
+        {
+          "address": "Gate 1",
+          "postalCode": "0123",
+          "county": "OSLO",
+          "municipalCode": "0301",
+          "municipal": "OSLO",
+          "city": "Oslo",
+          "country": "NORGE",
+          "latitude": "59.91",
+          "longitude": "10.75"
+        },
+        {
+          "address": null,
+          "postalCode": null,
+          "county": "VESTLAND",
+          "municipalCode": "4601",
+          "countyCode": "46",
+          "municipal": "BERGEN",
+          "city": null,
+          "country": "NORGE",
+          "latitude": null,
+          "longitude": null
+        }
+      ],
+      "categoryList": [
+        { "code": "123", "categoryType": "JANZZ", "name": "Utvikler", "description": "Beskrivelse", "parentId": 456 },
+        { "code": "2512.01", "categoryType": "STYRK08", "name": "Programvareutvikler" }
+      ],
+      "properties": {
+        "externalref": "1005/18",
+        "sector": "Offentlig",
+        "positioncount": "2",
+        "salary": "550000.5",
+        "stortall": "12345678901234567890",
+        "antall": "2 stillinger",
+        "workday": "true story",
+        "tom": "",
+        "blank": "   ",
+        "nullverdi": null,
+        "tallverdi": 5,
+        "adtext": "<p>Den beste stillingen</p>",
+        "tags": "[\"INKLUDERING__ARBEIDSTID\",\"TILTAK_ELLER_VIRKEMIDDEL__LÆRLINGPLASS\"]",
+        "searchtags": "[{\"label\":\"Utvikler\",\"score\":1.0},{\"label\":\"Programmerer\",\"score\":0.25137392}]",
+        "ontologyJobtitle": "{\"konseptId\":\"123\",\"label\":\"Utvikler\",\"styrk08\":\"2512\"}"
+      },
+      "businessName": "Testbedrift AS",
+      "firstPublished": true,
+      "deactivatedByExpiry": false,
+      "activationOnPublishingDate": true
+    },
+    "opprettet": "2023-01-01T12:00:00Z",
+    "opprettetAv": "Z999999",
+    "sistEndret": "2023-06-02T12:00:00.123+02:00",
+    "sistEndretAv": "Z888888",
+    "status": "ACTIVE",
+    "utløpsdato": "2023-12-31T23:30:00Z",
+    "publisert": "2023-03-26T01:30:00Z",
+    "publisertAvAdmin": "2023-03-26T03:30:00",
+    "adminStatus": "DONE"
+  }
+}

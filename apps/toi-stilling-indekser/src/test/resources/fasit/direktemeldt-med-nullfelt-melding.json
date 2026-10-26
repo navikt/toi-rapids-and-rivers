@@ -1,0 +1,43 @@
+{
+  "@event_name": "indekserDirektemeldtStilling",
+  "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+  "stillingsinfo": null,
+  "direktemeldtStilling": {
+    "stillingsId": "123e4567-e89b-12d3-a456-426614174000",
+    "annonsenr": "123456789",
+    "innhold": {
+      "title": "Stilling med nullfelt",
+      "administration": null,
+      "privacy": null,
+      "source": null,
+      "medium": null,
+      "reference": null,
+      "employer": null,
+      "locationList": [
+        {
+          "address": null,
+          "postalCode": null,
+          "county": null,
+          "municipalCode": "3",
+          "municipal": null,
+          "city": null,
+          "country": null,
+          "latitude": null,
+          "longitude": null
+        }
+      ],
+      "businessName": null,
+      "firstPublished": null,
+      "deactivatedByExpiry": null,
+      "activationOnPublishingDate": null
+    },
+    "opprettet": "2023-01-02T12:00:00+01:00[Europe/Oslo]",
+    "opprettetAv": "Z999999",
+    "sistEndret": "2023-07-02T12:00:00.000000001+02:00[Europe/Oslo]",
+    "sistEndretAv": "Z999999",
+    "status": "INACTIVE",
+    "utløpsdato": null,
+    "publisertAvAdmin": null,
+    "adminStatus": "PENDING"
+  }
+}
