@@ -20,6 +20,7 @@ private val uinteressanteHendelser = listOf(
     "application_down",
     "republisert",
     "reindekserDirektemeldtStilling",
+    "adressebeskyttelse",
     "rekrutteringstreffoppdatering",    // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
     "rekrutteringstreffinvitasjon",     // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
     "minsideVarselSvar",                // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
@@ -110,7 +111,6 @@ class SisteEvent(private val eventName: String, private val duration: Duration) 
 
     companion object {
         private fun grenseverdiForAlarm(eventName: String) = when (eventName) {
-            "adressebeskyttelse" -> justertGrenseverdiForAlarm(Duration.ofDays(9))
             "kvp" -> justertGrenseverdiForAlarm(Duration.ofHours(4))
             "siste14avedtak" -> justertGrenseverdiForAlarm(Duration.ofHours(3))
             "arbeidsgiversKandidatliste.VisningKontaktinfo" -> justertGrenseverdiForAlarm(Duration.ofHours(3))
