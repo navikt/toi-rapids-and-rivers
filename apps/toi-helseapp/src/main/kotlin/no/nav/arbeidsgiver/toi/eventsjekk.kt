@@ -21,6 +21,7 @@ private val uinteressanteHendelser = listOf(
     "republisert",
     "reindekserDirektemeldtStilling",
     "adressebeskyttelse",
+    "aktivitetskort-feil-rekrutteringstreff",
     "rekrutteringstreffoppdatering",    // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
     "rekrutteringstreffinvitasjon",     // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
     "minsideVarselSvar",                // TODO: Så lenge rekrutteringstreff er i demo forventer man at disse meldingene blir sendt uforutsibart
