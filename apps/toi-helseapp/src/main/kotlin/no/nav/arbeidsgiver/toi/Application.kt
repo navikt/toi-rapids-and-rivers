@@ -53,11 +53,7 @@ suspend fun logException(jobbNavn: String, envs: Map<String, String>, funksjon: 
     try {
         funksjon(envs)
     } catch (e: CancellationException) {
-        if(e.cause == null) {
-            log.info("Kansellerer jobben $jobbNavn")
-        } else {
-            log.error("Feil i $jobbNavn: ${e.message}", e)
-        }
+        log.info("Kansellerer jobben $jobbNavn")
         throw e
     } catch (e: Exception) {
         log.error("Feil i $jobbNavn: ${e.message}", e)
@@ -66,51 +62,46 @@ suspend fun logException(jobbNavn: String, envs: Map<String, String>, funksjon: 
 }
 
 suspend fun sjekkOffsets(envs: Map<String, String>) {
-    try {
-        val listOfGroupIds = listOf(
-            "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
-            "toi-arbeidssoekeropplysninger" to "toi-arbeidssoekeropplysninger-rapidconsumer-1",
-            "toi-arbeidssoekerperiode" to "toi-arbeidssoekerperiode-rapidconsumer-1",
-            "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
-            "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-4",
-            "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
-            "toi-siste-14a-vedtak" to "toi-siste-14a-vedtak-rapidconsumer-2",
-            "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
-            "toi-veileder" to "toi-veileder-rapidconsumer-12",
-            "toi-hull-i-cv" to "toi-hull-i-cv-rapidconsumer-1",
-            "toi-ontologitjeneste" to "toi-ontologitjeneste-rapidconsumer-1",
-            "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1",
-            "rekrutteringsbistand-stilling-api" to "rekrutteringsbistand-stilling-rapidconsumer-2",
-            "presenterte-kandidagter-api" to "presenterte-kandidagter-api-rapidconsumer-1",
-            "foresporsel-om-deling-av-cv-api" to "foresporsel-om-deling-av-cv-api-rapidconsumer-1",
-            "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-2",
-            "toi-livshendelse"  to "toi-livshendelse-rapidconsumer-1",
-            "toi-kvp" to "toi-kvp-rapidconsumer-4",
-            "toi-kandidat-indekser" to "toi-kandidat-indekser-rapidconsumer-1"
-        )
-        while (true) {
-            val sisteOffset = sisteOffset(envs)
-            val resultsPerApplicationPerPartitions = listOfGroupIds.map { (application, groupId) ->
-                consumerOffset(groupId, envs).map { (partition, consumerOffset) ->
-                    ResultsPerApplicationPerPartition(
-                        application,
-                        consumerOffset,
-                        sisteOffset[partition]!! - consumerOffset,
-                        partition
-                    )
-                }
-            }.flatten().sortedByDescending(ResultsPerApplicationPerPartition::behind)
-            val result = formatResults(resultsPerApplicationPerPartitions, sisteOffset)
-            if (resultsPerApplicationPerPartitions.any(ResultsPerApplicationPerPartition::erFeilsituasjon)) {
-                log.error(result)
-            } else {
-                log.info(result)
+    val listOfGroupIds = listOf(
+        "toi-arbeidsmarked-cv" to "toi-arbeidsmarked-cv-rapid-1",
+        "toi-arbeidssoekeropplysninger" to "toi-arbeidssoekeropplysninger-rapidconsumer-1",
+        "toi-arbeidssoekerperiode" to "toi-arbeidssoekerperiode-rapidconsumer-1",
+        "toi-identmapper" to "toi-identmapper-rapidconsumer-4",
+        "toi-oppfolgingsinformasjon" to "toi-oppfølgingsinformasjon-rapidconsumer-4",
+        "toi-sammenstille-kandidat" to "toi-sammenstille-kandidat-rapidconsumer-1",
+        "toi-siste-14a-vedtak" to "toi-siste-14a-vedtak-rapidconsumer-2",
+        "toi-synlighetsmotor" to "toi-synlighetsmotor-rapidconsumer-4",
+        "toi-veileder" to "toi-veileder-rapidconsumer-12",
+        "toi-hull-i-cv" to "toi-hull-i-cv-rapidconsumer-1",
+        "toi-ontologitjeneste" to "toi-ontologitjeneste-rapidconsumer-1",
+        "toi-arbeidsgiver-notifikasjon" to "toi-arbeidsgiver-notifikasjon-rapid-1",
+        "rekrutteringsbistand-stilling-api" to "rekrutteringsbistand-stilling-rapidconsumer-2",
+        "presenterte-kandidagter-api" to "presenterte-kandidagter-api-rapidconsumer-1",
+        "foresporsel-om-deling-av-cv-api" to "foresporsel-om-deling-av-cv-api-rapidconsumer-1",
+        "rekrutteringsbistand-statistikk-api" to "rekrutteringsbistand-statistikk-api-rapidconsumer-2",
+        "toi-livshendelse"  to "toi-livshendelse-rapidconsumer-1",
+        "toi-kvp" to "toi-kvp-rapidconsumer-4",
+        "toi-kandidat-indekser" to "toi-kandidat-indekser-rapidconsumer-1"
+    )
+    while (true) {
+        val sisteOffset = sisteOffset(envs)
+        val resultsPerApplicationPerPartitions = listOfGroupIds.map { (application, groupId) ->
+            consumerOffset(groupId, envs).map { (partition, consumerOffset) ->
+                ResultsPerApplicationPerPartition(
+                    application,
+                    consumerOffset,
+                    sisteOffset[partition]!! - consumerOffset,
+                    partition
+                )
             }
-            delay(Duration.ofSeconds(10))
+        }.flatten().sortedByDescending(ResultsPerApplicationPerPartition::behind)
+        val result = formatResults(resultsPerApplicationPerPartitions, sisteOffset)
+        if (resultsPerApplicationPerPartitions.any(ResultsPerApplicationPerPartition::erFeilsituasjon)) {
+            log.error(result)
+        } else {
+            log.info(result)
         }
-    } catch (e: Exception) {
-        log.error("Feil i jobb: $e", e)
-        throw e
+        delay(Duration.ofSeconds(10))
     }
 }
 
