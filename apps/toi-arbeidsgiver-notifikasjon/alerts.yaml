@@ -21,7 +21,7 @@ spec:
 
         - alert: toi-arbeidsgiver-notifikasjon
           expr: sum(increase(log_messages_errors{app="toi-arbeidsgiver-notifikasjon", level="Error"}[10m])) > 0
-          for: 1s
+          for: 2m
           annotations:
             summary: Appen har logget en error
             action: "https://logs.az.nav.no/goto/46327773317c1bda319f8fb2a70efa92?security_tenant=navlogs"

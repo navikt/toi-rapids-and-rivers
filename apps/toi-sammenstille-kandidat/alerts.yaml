@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-sammenstille-kandidat
           expr: kube_deployment_status_replicas_available{deployment="toi-sammenstille-kandidat"} == 0
-          for: 1s
+          for: 2m
           annotations:
             summary: Appen er nede
             action: "https://logs.az.nav.no/goto/cfcd170b8b2622d944bfd714106bfd6c?security_tenant=navlogs"
