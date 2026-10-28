@@ -20,10 +20,10 @@ spec:
     max: 1
   resources:
     limits:
-      memory: 2048Mi
+      memory: 1280Mi
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 1024Mi
   strategy:
     type: Recreate
   kafka:
