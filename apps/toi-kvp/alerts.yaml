@@ -11,7 +11,7 @@ spec:
       rules:
         - alert: toi-kvp
           expr: kube_deployment_status_replicas_available{deployment="toi-kvp"} == 0
-          for: 2m
+          for: 5m
           annotations:
             summary: Appen er nede
             action: "https://logs.az.nav.no/goto/404117da03436a4a70ae970dd956242e?security_tenant=navlogs"
