@@ -40,7 +40,7 @@ class RetryTest {
         assertThat(antallKall).isEqualTo(2)
     }
 
-    /*@Test
+    @Test
     fun `prøver ikke på nytt ved 4xx`() {
         var antallKall = 0
 
@@ -48,7 +48,7 @@ class RetryTest {
 
         assertThat(response.statusCode()).isEqualTo(404)
         assertThat(antallKall).isEqualTo(1)
-    }*/
+    }
 
     @Test
     fun `returnerer siste 5xx-svar når alle forsøk er brukt opp`() {
