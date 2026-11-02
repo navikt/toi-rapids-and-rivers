@@ -19,7 +19,7 @@ fun <T> medRetry(
     repeat(maksForsøk - 1) { i ->
         try {
             val response = kall()
-            if (response.statusCode() !in 500..599) return response
+            if (response.statusCode() !in 400..599) return response
             log.warn("Statuskode ${response.statusCode()} fra ${response.uri()}, forsøk ${i + 1} av $maksForsøk")
         } catch (e: IOException) {
             log.warn("${e.javaClass.simpleName} ved HTTP-kall, forsøk ${i + 1} av $maksForsøk", e)
