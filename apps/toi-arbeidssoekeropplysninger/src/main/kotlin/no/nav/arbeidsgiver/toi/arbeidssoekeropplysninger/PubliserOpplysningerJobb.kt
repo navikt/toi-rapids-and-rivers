@@ -40,12 +40,16 @@ class PubliserOpplysningerJobb(
                 // Her kunne vi sikkert brukt noe Job og corutine greier for at det skal passe med resten av arkitekture
                 // Stoler på at Joar tar den ballen ved behov
                 Thread.sleep(Duration.ofSeconds(5))
-                if (leaderElector.isLeader())
-                    do {
-                        val n = behandleOpplysninger()
-                        if (n > 0)
-                            log.info("Publiserte $n arbeidsøkerperioder")
-                    } while (n> 0)
+                try {
+                    if (leaderElector.isLeader())
+                        do {
+                            val n = behandleOpplysninger()
+                            if (n > 0)
+                                log.info("Publiserte $n arbeidsøkerperioder")
+                        } while (n > 0)
+                } catch (e: Exception) {
+                    log.error("Feil i jobb for behandling av opplysninger, prøver igjen: ${e.message}", e)
+                }
             }
         }
     }
