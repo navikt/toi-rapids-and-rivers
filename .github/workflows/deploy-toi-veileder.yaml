@@ -12,6 +12,7 @@ on:
     - buildSrc/**
     - technical-libs/testrapid/**
     - technical-libs/logging/**
+    - technical-libs/http/**
   workflow_dispatch:
 
 jobs:

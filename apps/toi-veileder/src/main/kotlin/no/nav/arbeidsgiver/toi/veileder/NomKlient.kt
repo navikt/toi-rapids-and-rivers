@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.toi.veileder
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import net.minidev.json.JSONObject
+import no.nav.arbeidsgiver.toi.http.medRetry
 import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.JsonNode
@@ -39,15 +40,16 @@ class NomKlient(
     }
 
     private fun executeRequest(spørring: String, ident: String): String {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header("Content-type", "application/json")
-            .header("Authorization", "Bearer ${hentAccessToken()}")
-            .timeout(Duration.ofSeconds(15))
-            .POST(HttpRequest.BodyPublishers.ofString(spørring))
-            .build()
-
-        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        val response = medRetry {
+            val request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer ${hentAccessToken()}")
+                .timeout(Duration.ofSeconds(15))
+                .POST(HttpRequest.BodyPublishers.ofString(spørring))
+                .build()
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        }
         if (response.statusCode() !in 200..299) {
             teamlog.error("Uventet statuskode fra veilederoppslag for ident: $ident ${response.statusCode()}")
             throw RuntimeException("Uventet statuskode fra veilederoppslag for ident: (se teamlog) ${response.statusCode()}")
