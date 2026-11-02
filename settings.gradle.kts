@@ -29,5 +29,6 @@ include(
     "technical-libs:testrapid",
     "apps:toi-kandidat-indekser",
     "apps:toi-geografi",
-    "technical-libs:logging"
+    "technical-libs:logging",
+    "technical-libs:http"
 )
