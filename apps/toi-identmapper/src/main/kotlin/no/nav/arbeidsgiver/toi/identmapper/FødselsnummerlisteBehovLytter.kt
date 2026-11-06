@@ -55,7 +55,7 @@ class FødselsnummerlisteBehovLytter(
             }.toMap()
 
         packet[fødselsnummerlisteKey] = fødselsnummerliste
-        rapidsConnection.publish(packet.toJson())
+        rapidsConnection.publish("Fast fødselsnummerliste-key", packet.toJson())
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
