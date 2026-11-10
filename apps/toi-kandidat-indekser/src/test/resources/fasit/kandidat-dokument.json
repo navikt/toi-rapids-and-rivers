@@ -379,7 +379,7 @@
     "styrkKode" : "2211",
     "styrkKode3Siffer" : "221",
     "styrkKode4Siffer" : "2211",
-    "tilDato" : null,
+     "tilDato" : "2026-10-01T00:00:00.000+02:00",
     "utelukketForFremtiden" : false,
     "yrkeserfaringManeder" : 230
   }, {
