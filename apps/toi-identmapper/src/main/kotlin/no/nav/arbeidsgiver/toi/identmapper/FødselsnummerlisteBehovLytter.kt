@@ -17,7 +17,7 @@ class FødselsnummerlisteBehovLytter(
     private val cluster: String,
     private val hentFødselsnummer: (aktørId: String) -> String?,
 ) : River.PacketListener {
-    private val aktørIdListeKey = "aktøridliste"
+    private val aktørIdListeKey = "aktørIder"
     private val fødselsnummerlisteKey = "fodselsnummerliste"
 
     init {

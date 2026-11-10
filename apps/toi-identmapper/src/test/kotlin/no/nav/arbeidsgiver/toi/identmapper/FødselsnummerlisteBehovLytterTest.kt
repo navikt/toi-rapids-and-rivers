@@ -113,7 +113,7 @@ class FødselsnummerlisteBehovLytterTest {
 
     private fun behovsMelding(behovListe: String, løsninger: List<Pair<String, String>> = emptyList()) = """
         {
-            "aktøridliste":["aktør1", "aktør2"],
+            "aktørIder":["aktør1", "aktør2"],
             "@behov":$behovListe
             ${løsninger.joinToString() { ""","${it.first}":${it.second}""" }}
         }
