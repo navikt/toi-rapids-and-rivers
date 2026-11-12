@@ -22,7 +22,8 @@ private val uinteressanteHendelser = listOf(
     "reindekserDirektemeldtStilling",
     "adressebeskyttelse",
     "aktivitetskort-feil-rekrutteringstreff",
-    "workopinvitasjon" // TODO: Så lenge workop er i pilot forventer man at disse meldingene blir sendt uforutsibart
+    "workopinvitasjon", // TODO: Så lenge workop er i pilot forventer man at disse meldingene blir sendt uforutsibart
+    "workopSvarOgStatus", // TODO: Så lenge workop er i pilot forventer man at disse meldingene blir sendt uforutsibart
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
@@ -110,6 +111,7 @@ class SisteEvent(private val eventName: String, private val duration: Duration) 
             "indekserDirektemeldtStilling" -> justertGrenseverdiForAlarm(Duration.ofHours(2))
             "indekserStillingsinfo" -> justertGrenseverdiForAlarm(Duration.ofDays(7))
             "publiserEllerAvpubliserTilArbeidsplassen" -> justertGrenseverdiForAlarm(Duration.ofDays(30))
+            "rekrutteringstreffoppdatering" -> justertGrenseverdiForAlarm(Duration.ofDays(7))
             else -> Duration.ofHours(1)
         }
 
