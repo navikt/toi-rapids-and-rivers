@@ -98,6 +98,14 @@ class PdlKlientTest {
     }
 
     @Test
+    fun `returnerer null når PDL svarer med tom identliste`() {
+        stubPdl(identSvar())
+
+        assertThat(pdlKlient.hentFødselsnummer(aktørId)).isNull()
+        assertThat(pdlKlient.hentAktørId(fødselsnummer)).isNull()
+    }
+
+    @Test
     fun `gjenbruker token på tvers av kall`() {
         stubPdl(identSvar(aktørId))
 

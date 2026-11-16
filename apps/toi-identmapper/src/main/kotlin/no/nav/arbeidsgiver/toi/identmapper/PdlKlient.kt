@@ -55,12 +55,16 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
             throw RuntimeException("Noe feil skjedde ved henting av aktørId: ", e)
         }
 
-        return respons.data.hentIdenter?.identer?.first()?.ident
-            ?: behandleErrorFraPDL(respons.errors)
+        return respons.data.hentIdenter?.identer?.firstOrNull()?.ident
+            ?: behandleManglendeIdent(gruppe = gruppe, errors = respons.errors)
     }
 
-    private fun behandleErrorFraPDL(errors: List<Error>?): String? {
-        log.warn("Klarte ikke å hente identer fra PDL-respons: $errors")
+    private fun behandleManglendeIdent(gruppe: String, errors: List<Error>?): String? {
+        if (errors.isNullOrEmpty()) {
+            log.warn("Fant ingen aktiv ident for gruppe $gruppe i PDL-respons (tom identliste)")
+        } else {
+            log.warn("Klarte ikke å hente ident for gruppe $gruppe fra PDL-respons: $errors")
+        }
 
         return null
     }
