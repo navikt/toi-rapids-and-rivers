@@ -2,7 +2,9 @@ package no.nav.arbeidsgiver.toi
 
 import tools.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.time.delay
+import kotlinx.coroutines.withContext
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -77,6 +79,7 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
                                 .filterNot(SisteEvent::erUtdatert)
                                 .joinToString("\n", transform = SisteEvent::beskrivelse) + "\n\n"
                 )
+                delay(Duration.ofMinutes(9).plus(Duration.ofSeconds(30)))
             } else {
                 log.info(
                     "Tid siden hendelser:\n" + sorterteEventer.joinToString(
