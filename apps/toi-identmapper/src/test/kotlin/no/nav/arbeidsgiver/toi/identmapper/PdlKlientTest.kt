@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.containing
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.slf4j.LoggerFactory
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PdlKlientTest {
@@ -103,6 +107,36 @@ class PdlKlientTest {
 
         assertThat(pdlKlient.hentFødselsnummer(aktørId)).isNull()
         assertThat(pdlKlient.hentAktørId(fødselsnummer)).isNull()
+    }
+
+    @Test
+    fun `logger ident kun til teamlog ved manglende ident i PDL`() {
+        val logger = LoggerFactory.getLogger(PdlKlient::class.java) as Logger
+        val listAppender = ListAppender<ILoggingEvent>().apply { start() }
+        logger.addAppender(listAppender)
+
+        try {
+            stubPdl(identSvar())
+
+            assertThat(pdlKlient.hentFødselsnummer(aktørId)).isNull()
+
+            val ordinæreLogger = listAppender.list.filter { event ->
+                event.markerList.orEmpty().none { it.name == "TEAM_LOGS" }
+            }
+            val teamLogger = listAppender.list.filter { event ->
+                event.markerList.orEmpty().any { it.name == "TEAM_LOGS" }
+            }
+
+            assertThat(ordinæreLogger).anySatisfy {
+                assertThat(it.formattedMessage).contains("FOLKEREGISTERIDENT", "se teamlog")
+                assertThat(it.formattedMessage).doesNotContain(aktørId)
+            }
+            assertThat(teamLogger).anySatisfy {
+                assertThat(it.formattedMessage).contains("FOLKEREGISTERIDENT", aktørId)
+            }
+        } finally {
+            logger.detachAppender(listAppender)
+        }
     }
 
     @Test

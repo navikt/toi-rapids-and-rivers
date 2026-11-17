@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.toi.identmapper
 
+import no.nav.arbeidsgiver.toi.logging.TeamLogLogger.Companion.teamlog
 import no.nav.arbeidsgiver.toi.logging.log
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.module.kotlin.jacksonMapperBuilder
@@ -23,6 +24,8 @@ private val objectMapper = jacksonMapperBuilder()
     .build()
 
 class PdlKlient(private val pdlUrl: String, private val accessTokenClient: AccessTokenClient) {
+    private val teamlog = teamlog(log)
+
     fun hentAktørId(fødselsnummer: String): String? {
         return hentIdent(ident = fødselsnummer, gruppe = "AKTORID")
     }
@@ -56,14 +59,18 @@ class PdlKlient(private val pdlUrl: String, private val accessTokenClient: Acces
         }
 
         return respons.data.hentIdenter?.identer?.firstOrNull()?.ident
-            ?: behandleManglendeIdent(gruppe = gruppe, errors = respons.errors)
+            ?: behandleManglendeIdent(ident = ident, gruppe = gruppe, errors = respons.errors)
     }
 
-    private fun behandleManglendeIdent(gruppe: String, errors: List<Error>?): String? {
+    private fun behandleManglendeIdent(ident: String, gruppe: String, errors: List<Error>?): String? {
         if (errors.isNullOrEmpty()) {
-            log.warn("Fant ingen aktiv ident for gruppe $gruppe i PDL-respons (tom identliste)")
+            log.warn("Fant ingen aktiv ident for gruppe $gruppe i PDL-respons (tom identliste), se teamlog")
+            teamlog.warn("Fant ingen aktiv ident for gruppe $gruppe i PDL-respons (tom identliste) for ident TODO")
+            //teamlog.warn("Fant ingen aktiv ident for gruppe $gruppe i PDL-respons (tom identliste) for ident $ident")
         } else {
-            log.warn("Klarte ikke å hente ident for gruppe $gruppe fra PDL-respons: $errors")
+            log.warn("Klarte ikke å hente ident for gruppe $gruppe fra PDL-respons (se teamlog): $errors")
+            teamlog.warn("Klarte ikke å hente ident for gruppe $gruppe fra PDL-respons for ident TODO")
+            //teamlog.warn("Klarte ikke å hente ident for gruppe $gruppe fra PDL-respons for ident $ident: $errors")
         }
 
         return null
