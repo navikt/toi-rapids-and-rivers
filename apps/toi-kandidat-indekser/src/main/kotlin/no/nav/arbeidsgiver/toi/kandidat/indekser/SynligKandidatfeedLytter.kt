@@ -32,7 +32,7 @@ class SynligKandidatfeedLytter(
             }
             validate {
                 it.requireKey("arbeidsmarkedCv", "ontologi.stillingstittel", "ontologi.kompetansenavn", "hullICv.sluttdatoerForInaktivePerioder", "geografi.geografi")
-                it.interestedIn("oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn", "sisteOppfølgingsperiode.kontor.kontorNavn", "sisteOppfølgingsperiode.kontor.kontorId")
+                it.interestedIn("fodselsnummer", "oppfølgingsinformasjon.fodselsnummer", "oppfølgingsinformasjon.kvalifiseringsgruppe", "oppfølgingsinformasjon.formidlingsgruppe", "oppfølgingsinformasjon.hovedmaal", "siste14avedtak.hovedmal", "siste14avedtak.innsatsgruppe", "fritattKandidatsøk.fritattKandidatsok", "veileder.veilederId", "veileder.veilederinformasjon.visningsNavn", "veileder.veilederinformasjon.epost", "hullICv.førsteDagIInneværendeInaktivePeriode", "geografi.kommune.kommunenummer", "geografi.fylke.korrigertNavn", "geografi.kommune.korrigertNavn", "sisteOppfølgingsperiode.kontor.kontorNavn", "sisteOppfølgingsperiode.kontor.kontorId")
             }
         }.register(this)
     }
@@ -46,10 +46,25 @@ class SynligKandidatfeedLytter(
     ) {
         val aktørId = packet["aktørId"].asString()
 
+        loggFødselsnummeravvik(packet)
         esClient.lagreEsCv(EsCv.fraMelding(packet))
         teamlog.info("Indekserte kandidat: $aktørId")
         packet["@slutt_av_hendelseskjede"] = true
         context.publish(packet.toJson())
+    }
+
+    private fun loggFødselsnummeravvik(packet: JsonMessage) {
+        val fødselsnummerFraRoten = packet["fodselsnummer"].asString(null) ?: return
+        val avvikendeKilder = mapOf(
+            "arbeidsmarkedCv" to EsCv.getCvNode(packet["arbeidsmarkedCv"])["fodselsnummer"].asString(null),
+            "oppfølgingsinformasjon" to packet["oppfølgingsinformasjon.fodselsnummer"].asString(null)
+        ).filterValues { it != null && it != fødselsnummerFraRoten }.keys
+
+        if (avvikendeKilder.isNotEmpty()) {
+            val melding = "Fødselsnummer i ${avvikendeKilder.joinToString()} avviker fra fødselsnummeret på roten. Indekserer med fødselsnummeret fra roten."
+            log.warn(melding)
+            teamlog.warn(melding)
+        }
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
