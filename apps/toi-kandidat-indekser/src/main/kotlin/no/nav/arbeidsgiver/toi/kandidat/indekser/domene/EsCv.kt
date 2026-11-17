@@ -283,11 +283,7 @@ class EsCv(
                 perioderMedInaktivitet = EsPerioderMedInaktivitet.fraMelding(packet)
             ).apply { require(indekseringsnøkkel() == indekseringsnøkkel(packet)) }
         }
-
-        /**
-         * Fødselsnummer fra identmapper på roten er oppdatert ved identendring, CV-en kan ha gammelt.
-         * I dev-gcp kan roten være null for testpersoner som ikke finnes i PDL, da brukes CV-en.
-         */
+        
         private fun fødselsnummer(packet: JsonMessage): String =
             packet["fodselsnummer"].asString(null)
                 ?: getCvNode(packet["arbeidsmarkedCv"])["fodselsnummer"].asString()
