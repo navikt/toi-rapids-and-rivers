@@ -154,7 +154,7 @@ class KandidatFeedTest {
     }
 
     @Test
-    fun `Melding med utdatert fødselsnummer i CV indekseres med fødselsnummer fra roten`() {
+    fun `Melding der fødselsnummer i CV avviker fra roten indekseres med fødselsnummer fra roten`() {
         val esClient = mockk<ESClient>(relaxed = true)
         val rapid = nyRapidMedLyttere(esClient)
         val fødselsnummerFraIdentmapper = "0-fnr-fra-identmapper"
@@ -162,7 +162,7 @@ class KandidatFeedTest {
             synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
             ontologi = ontologiDel(),
             geografi = geografiDel(),
-            fødselsnummer = "0-utdatert-fnr-i-cv",
+            fødselsnummer = "0-annet-fnr-i-cv",
             fødselsnummerFraIdentmapper = fødselsnummerFraIdentmapper
         )
 
