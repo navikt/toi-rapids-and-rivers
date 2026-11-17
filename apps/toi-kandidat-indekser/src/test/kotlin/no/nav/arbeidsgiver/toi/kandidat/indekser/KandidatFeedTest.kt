@@ -2,10 +2,13 @@ package no.nav.arbeidsgiver.toi.kandidat.indekser
 
 import io.mockk.confirmVerified
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
+import no.nav.arbeidsgiver.toi.kandidat.indekser.domene.EsCv
 import no.nav.toi.TestRapid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.node.ObjectNode
 
 /**
  * Tester scenarier hvor kandidat IKKE skal opprettes/lagres i ES.
@@ -148,6 +151,73 @@ class KandidatFeedTest {
         verify(exactly = 0) { esClient.slettCv(any()) }
         confirmVerified(esClient)
         assertThat(rapid.inspektør.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `Melding der fødselsnummer i CV avviker fra roten indekseres med fødselsnummer fra roten`() {
+        val esClient = mockk<ESClient>(relaxed = true)
+        val rapid = nyRapidMedLyttere(esClient)
+        val fødselsnummerFraIdentmapper = "0-fnr-fra-identmapper"
+        val melding = rapidMelding(
+            synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
+            ontologi = ontologiDel(),
+            geografi = geografiDel(),
+            fødselsnummer = "0-annet-fnr-i-cv",
+            fødselsnummerFraIdentmapper = fødselsnummerFraIdentmapper
+        )
+
+        rapid.sendTestMessage(melding)
+
+        val lagretCv = slot<EsCv>()
+        verify(exactly = 1) { esClient.lagreEsCv(capture(lagretCv)) }
+        val mapper = esObjectMapper()
+        val cvJson = mapper.readTree(mapper.writeValueAsString(lagretCv.captured))
+        assertThat(cvJson["fodselsnummer"].asString()).isEqualTo(fødselsnummerFraIdentmapper)
+        assertThat(rapid.inspektør.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `Melding med fødselsnummer null på roten indekseres med fødselsnummer fra CV`() {
+        val esClient = mockk<ESClient>(relaxed = true)
+        val rapid = nyRapidMedLyttere(esClient)
+        val melding = rapidMelding(
+            synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
+            ontologi = ontologiDel(),
+            geografi = geografiDel(),
+            fødselsnummer = "0-fnr-fra-cv",
+            fødselsnummerFraIdentmapper = null
+        )
+
+        rapid.sendTestMessage(melding)
+
+        val lagretCv = slot<EsCv>()
+        verify(exactly = 1) { esClient.lagreEsCv(capture(lagretCv)) }
+        val mapper = esObjectMapper()
+        val cvJson = mapper.readTree(mapper.writeValueAsString(lagretCv.captured))
+        assertThat(cvJson["fodselsnummer"].asString()).isEqualTo("0-fnr-fra-cv")
+    }
+
+    @Test
+    fun `Melding uten fødselsnummer på roten indekseres med fødselsnummer fra CV`() {
+        val esClient = mockk<ESClient>(relaxed = true)
+        val rapid = nyRapidMedLyttere(esClient)
+        val mapper = esObjectMapper()
+        val melding = mapper.readTree(
+            rapidMelding(
+                synlighetJson = synlighet(erSynlig = true, ferdigBeregnet = true),
+                ontologi = ontologiDel(),
+                geografi = geografiDel(),
+                fødselsnummer = "0-fnr-fra-cv"
+            )
+        ) as ObjectNode
+        melding.remove("fodselsnummer")
+
+        rapid.sendTestMessage(melding.toString())
+
+        val lagretCv = slot<EsCv>()
+        verify(exactly = 1) { esClient.lagreEsCv(capture(lagretCv)) }
+        val cvJson = mapper.readTree(mapper.writeValueAsString(lagretCv.captured))
+        assertThat(cvJson["fodselsnummer"].asString()).isEqualTo("0-fnr-fra-cv")
     }
 
     @Test

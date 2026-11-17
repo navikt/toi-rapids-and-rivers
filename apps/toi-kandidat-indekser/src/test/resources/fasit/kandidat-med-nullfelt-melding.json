@@ -1,6 +1,7 @@
 {
   "@event_name": "arbeidsmarked-cv",
   "aktørId": "123",
+  "fodselsnummer": "01010000000",
   "oppfølgingsinformasjon": null,
   "siste14avedtak": null,
   "fritattKandidatsøk": null,

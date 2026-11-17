@@ -215,13 +215,14 @@ class EsCv(
                 ?: MissingNode.getInstance()
 
             val kommunenummer = packet["geografi.kommune.kommunenummer"].asString(null)
+            val fodselsnummer = fødselsnummer(packet)
             return EsCv(
                 aktorId = packet["aktørId"].asString(null),
-                fodselsnummer = cvNode["fodselsnummer"].asString(null),
+                fodselsnummer = fodselsnummer,
                 fornavn = cvNode["fornavn"].asString(null),
                 etternavn = cvNode["etternavn"].asString(null),
                 fodselsdato = cvNode["foedselsdato"].yyyymmddToLocalDate(),
-                fodselsdatoErDnr = cvNode["fodselsnummer"].asString(null).first() >= '4',
+                fodselsdatoErDnr = fodselsnummer.first() >= '4',
                 formidlingsgruppekode = packet["oppfølgingsinformasjon.formidlingsgruppe"].asString(jobbskifter),
                 epostadresse = cvNode["epost"].asString(null),
                 mobiltelefon = ingenMobiltelefon,
@@ -282,6 +283,10 @@ class EsCv(
                 perioderMedInaktivitet = EsPerioderMedInaktivitet.fraMelding(packet)
             ).apply { require(indekseringsnøkkel() == indekseringsnøkkel(packet)) }
         }
+        
+        private fun fødselsnummer(packet: JsonMessage): String =
+            packet["fodselsnummer"].asString(null)
+                ?: getCvNode(packet["arbeidsmarkedCv"])["fodselsnummer"].asString()
 
         private fun getCvNode(arbeidsmarkedCv: JsonNode): JsonNode =
             listOf("slettCv", "endreCv", "opprettCv").first { arbeidsmarkedCv.hasNonNull(it) }
