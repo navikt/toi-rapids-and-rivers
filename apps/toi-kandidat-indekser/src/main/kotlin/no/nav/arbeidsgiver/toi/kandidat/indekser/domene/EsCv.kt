@@ -288,11 +288,11 @@ class EsCv(
          * Fødselsnummer fra identmapper på roten er oppdatert ved identendring, CV-en kan ha gammelt.
          * I dev-gcp kan roten være null for testpersoner som ikke finnes i PDL, da brukes CV-en.
          */
-        internal fun fødselsnummer(packet: JsonMessage): String =
+        private fun fødselsnummer(packet: JsonMessage): String =
             packet["fodselsnummer"].asString(null)
                 ?: getCvNode(packet["arbeidsmarkedCv"])["fodselsnummer"].asString()
 
-        internal fun getCvNode(arbeidsmarkedCv: JsonNode): JsonNode =
+        private fun getCvNode(arbeidsmarkedCv: JsonNode): JsonNode =
             listOf("slettCv", "endreCv", "opprettCv").first { arbeidsmarkedCv.hasNonNull(it) }
                 .let { arbeidsmarkedCv[it] }["cv"]
     }

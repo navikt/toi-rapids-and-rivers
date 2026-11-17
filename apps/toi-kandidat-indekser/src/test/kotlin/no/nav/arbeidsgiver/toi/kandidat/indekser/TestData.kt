@@ -481,15 +481,13 @@ fun rapidMelding(
     cvEksisterer: Boolean = true,
     jobbprofilEksisterer: Boolean = true,
     yyyymmddTilLocalDate: Boolean = false,
-    fødselsnummerFraIdentmapper: String? = fødselsnummer,
-    fødselsnummerFraOppfølging: String? = null
+    fødselsnummerFraIdentmapper: String? = fødselsnummer
 ): String = """
         {
           "@event_name": "arbeidsmarked-cv",
           "aktørId": "$aktørId",
           "fodselsnummer": ${fødselsnummerFraIdentmapper.tilJsonStreng()},
           "oppfølgingsinformasjon": {
-                "fodselsnummer": ${fødselsnummerFraOppfølging.tilJsonStreng()},
                 "oppfolgingsenhet":"$oppfølgingsenhet",
                 "formidlingsgruppe": "$formidlingsgruppe",
                 "kvalifiseringsgruppe": "$kvalifiseringsgruppe",
