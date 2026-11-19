@@ -115,3 +115,6 @@ spec:
     - team: toi
       application: toi-deling-av-cv-api
       access: readwrite
+    - team: toi
+      application: toi-cvdeling-samtykkestatus
+      access: readwrite
