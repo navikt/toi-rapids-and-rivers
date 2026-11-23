@@ -9,8 +9,24 @@ private val log = noClassLogger()
 
 fun main() {
     log.info("Starter app.")
-    startApp(ontologiUrl(), RapidApplication.create(System.getenv()))
+    val ontologiUrl = ontologiUrl()
+    val rapidsConnection = opprettRapidHvisJvmIkkeAvslutter { RapidApplication.create(System.getenv()) } ?: return
+    startApp(ontologiUrl, rapidsConnection)
 }
+
+/**
+ * RapidApplication registrerer en shutdown hook i konstruktøren. Får podden SIGTERM under oppstart, kaster
+ * Runtime.addShutdownHook IllegalStateException("Shutdown in progress"). Det er ufarlig siden podden skal avsluttes
+ * uansett, så vi returnerer null i stedet for å logge en feil.
+ */
+internal fun <T> opprettRapidHvisJvmIkkeAvslutter(opprettRapid: () -> T): T? =
+    try {
+        opprettRapid()
+    } catch (e: IllegalStateException) {
+        if (e.message != "Shutdown in progress") throw e
+        log.info("JVM-en avslutter allerede under oppstart, så appen startes ikke.")
+        null
+    }
 
 fun startApp(ontologiUrl: String, rapidsConnection: RapidsConnection) = rapidsConnection.also {
     OntologiLytter(ontologiUrl, rapidsConnection)
