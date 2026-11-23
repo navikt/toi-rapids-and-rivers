@@ -14,9 +14,9 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.zaxxer:HikariCP:6.2.1")
-    implementation("io.javalin:javalin:7.2.0")
+    implementation("io.javalin:javalin:7.3.0")
     implementation("tools.jackson.module:jackson-module-kotlin:3.1.3")
-    implementation("no.nav.security:token-validation-core:5.0.14")
+    implementation("no.nav.security:token-validation-core:5.0.30")
     implementation("no.nav.common:audit-log:3.2024.11.26_16.35-432a29107830")
 
     testImplementation("no.nav.security:mock-oauth2-server:2.1.10")
