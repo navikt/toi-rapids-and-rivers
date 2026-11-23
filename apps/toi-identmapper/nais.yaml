@@ -38,6 +38,9 @@ spec:
       - type: {{ postgres_versjon }}
         tier: {{ gcp_db_tier }}
         diskAutoresize: {{ gcp_disk_autoresize }}
+        pointInTimeRecovery: {{ gcp_db_point_in_time_recovery }}
+        insights:
+          queryStringLength: 4500
         databases:
           - name: identmapping-db
   azure:

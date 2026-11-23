@@ -25,6 +25,9 @@ spec:
         diskSize: 50
         diskAutoresize: true
         tier: "{{ cloudsql_tier }}"
+        pointInTimeRecovery: {{ gcp_db_point_in_time_recovery }}
+        insights:
+          queryStringLength: 4500
         databases:
           - name: toiarbeidssoekeropplysninger
             envVarPrefix: DB
