@@ -24,8 +24,9 @@ private val uinteressanteHendelser = listOf(
     "reindekserDirektemeldtStilling",
     "adressebeskyttelse",
     "aktivitetskort-feil-rekrutteringstreff",
-    "workopinvitasjon", // TODO: Så lenge workop er i pilot forventer man at disse meldingene blir sendt uforutsibart
-    "workopSvarOgStatus", // TODO: Så lenge workop er i pilot forventer man at disse meldingene blir sendt uforutsibart
+    "workopinvitasjon",
+    "workopSvarOgStatus",
+    "rekrutteringstreffinvitasjon"
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
