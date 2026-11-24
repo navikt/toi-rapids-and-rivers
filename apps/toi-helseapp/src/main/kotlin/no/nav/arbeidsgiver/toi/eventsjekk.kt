@@ -26,7 +26,8 @@ private val uinteressanteHendelser = listOf(
     "aktivitetskort-feil-rekrutteringstreff",
     "workopinvitasjon",
     "workopSvarOgStatus",
-    "rekrutteringstreffinvitasjon"
+    "rekrutteringstreffinvitasjon",
+    "rekrutteringstreffSvarOgStatus"
 )
 private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
