@@ -43,7 +43,7 @@ class AvroAktorTopicContractTest {
     fun `avro-melding fra topic wireformat skal kunne leses`() {
         val originalMelding = Aktor(
             listOf(
-                Identifikator("12345678910", Type.FOLKEREGISTERIDENT, true),
+                Identifikator("00000000015", Type.FOLKEREGISTERIDENT, true),
                 Identifikator("1000000000001", Type.AKTORID, true)
             )
         )

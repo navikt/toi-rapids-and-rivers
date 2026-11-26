@@ -54,7 +54,7 @@ class SynlighetBehovsLytterTest {
     @Test
     fun `skal ikke reagere på behov som allerede er løst`() {
         testProgramMedBehovHendelse(
-            behovMeldingMedLøsning("10828497311"),
+            behovMeldingMedLøsning("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(0)
@@ -64,7 +64,7 @@ class SynlighetBehovsLytterTest {
     @Test
     fun `skal ikke reagere på andre behov`() {
         testProgramMedBehovHendelse(
-            annetBehovMelding("10828497311"),
+            annetBehovMelding("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(0)
@@ -74,7 +74,7 @@ class SynlighetBehovsLytterTest {
     @Test
     fun `skal legge på behov om nødvendige data om det er et behov for synlighet`() {
         testProgramMedBehovHendelse(
-            behovMelding("10828497311"),
+            behovMelding("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -96,7 +96,7 @@ class SynlighetBehovsLytterTest {
     @Test
     fun `skal ignorere behov om synlighet om det finnes et felt på meldingen som plukkes opp av SynlighetsgrunnlagLytter`() {
         testProgramMedBehovHendelse(
-            behovMeldingMedOppfølgingsinformasjon("10828497311"),
+            behovMeldingMedOppfølgingsinformasjon("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(0)
@@ -106,7 +106,7 @@ class SynlighetBehovsLytterTest {
     @Test
     fun `skal ignorere at førstkommende behov er synlighet om alle andre behov ligger i lista og er løst`() {
         testProgramMedBehovHendelse(
-            behovMeldingMedAlleAndreBehovLøste("10828497311"),
+            behovMeldingMedAlleAndreBehovLøste("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(0)

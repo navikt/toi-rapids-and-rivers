@@ -189,7 +189,7 @@ class KandidatfeedIntegrasjonsTest {
         assertIngenIIndekser()
         val expectedKandidatnr = "CG133310"
         val expectedAktorId = "987654321"
-        val expectedFodselsnummer = "12345678910"
+        val expectedFodselsnummer = "00000000015"
         val expectedFornavn = "Ola"
         val expectedEtternavn = "Nordmann"
         val expectedFodselsdato = LocalDate.of(1990, 1, 1)

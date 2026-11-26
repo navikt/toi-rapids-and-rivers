@@ -278,7 +278,7 @@ object EsCvObjectMother {
 
         return EsCv(
             aktorId,
-            "01016012345",
+            "00000000004",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -645,7 +645,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(2),
-            "05236984567",
+            "00000000010",
             "KARI",
             "NORDMANN",
             fodselsdatoForAlder(39),
@@ -925,7 +925,7 @@ object EsCvObjectMother {
 
         return  EsCv(
             nteAktorId(3),
-            "04265983651",
+            "00000000009",
             "HANS",
             "NORDMANN",
             LocalDate.parse("1955-11-04"),
@@ -1208,7 +1208,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(4),
-            "09568410230",
+            "00000000011",
             "HANNE",
             "NORDMANN",
             LocalDate.parse("2002-06-04"),
@@ -1477,7 +1477,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(5),
-            "03050316895",
+            "00000000008",
             "BOB",
             "NORDMANN",
             LocalDate.parse("1964-09-01"),
@@ -1710,7 +1710,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(5),
-            "03050316895",
+            "00000000008",
             "BOB",
             "NORDMANN",
             LocalDate.parse("1964-09-01"),
@@ -1965,7 +1965,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(1),
-            "02016012345",
+            "00000000007",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -2222,7 +2222,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(6),
-            "01016034215",
+            "00000000005",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -2492,7 +2492,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(7),
-            "01016034215",
+            "00000000005",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -2763,7 +2763,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(8),
-            "01016034215",
+            "00000000005",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -3033,7 +3033,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(9),
-            "01016034215",
+            "00000000005",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -3303,7 +3303,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(10),
-            "01016034215",
+            "00000000005",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),
@@ -3573,7 +3573,7 @@ object EsCvObjectMother {
 
         return EsCv(
             nteAktorId(11),
-            "01016034215",
+            "00000000005",
             "OLA",
             "NORDMANN",
             LocalDate.parse("1960-01-01"),

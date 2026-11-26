@@ -183,7 +183,7 @@ private fun JsonNode.assertHarArbeidssokeropplysninger() {
 }
 
 private fun behovsMelding(
-    ident: String = "12312312312",
+    ident: String = "00000000014",
     behovListe: String,
     løsninger: List<Pair<String, String>> = emptyList(),
 ) = """

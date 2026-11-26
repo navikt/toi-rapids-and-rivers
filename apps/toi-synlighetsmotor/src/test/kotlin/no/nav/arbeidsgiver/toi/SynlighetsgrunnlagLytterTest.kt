@@ -34,7 +34,7 @@ class SynlighetsgrunnlagLytterTest {
     private val adressebeskyttelseSynlig = adressebeskyttelse("UGRADERT")
     private val adressebeskyttelseIkkeSynlig = adressebeskyttelse("STRENGT_FORTROLIG")
     private val fodselsnummerFeltNavn = "fodselsnummer"
-    private val fødselsnummerSvar = """"fodselsnummer": "12345678910""""
+    private val fødselsnummerSvar = """"fodselsnummer": "00000000015""""
 
     private val alleFelterUnntattAdressebeskyttelse = Felt.entries.map(Felt::navn) + "veileder" + "siste14avedtak" + "fodselsnummer"
 

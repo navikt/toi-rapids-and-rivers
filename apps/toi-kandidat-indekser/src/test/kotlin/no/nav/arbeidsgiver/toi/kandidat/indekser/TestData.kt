@@ -197,7 +197,7 @@ fun rapidMelding(
     meldingstype: String = "ENDRE",
     endretAv: String = "SYSTEMBRUKER",
     opprettetCv: String = "1578319832.314",
-    fødselsnummer: String = "10108000398",
+    fødselsnummer: String = "00000000001",
     fødselsdato: LocalDate = LocalDate.of(1980, 10, 10),
     fornavn: String = "Aremark M.",
     etternavn: String = "Testfamilien",

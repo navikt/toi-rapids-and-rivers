@@ -43,11 +43,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMelding("10828497311"),
+            behovMelding("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -74,11 +74,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMeldingMedAdressebeskyttelse("10828497311", "STRENGT_FORTROLIG"),
+            behovMeldingMedAdressebeskyttelse("00000000012", "STRENGT_FORTROLIG"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -104,11 +104,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMeldingMedAdressebeskyttelse("10828497311", "UGRADERT"),
+            behovMeldingMedAdressebeskyttelse("00000000012", "UGRADERT"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -135,11 +135,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMelding("10828497311"),
+            behovMelding("00000000012"),
             repository
         ) {
             // Skal trigge adressebeskyttelse-behov
@@ -167,7 +167,7 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
@@ -175,7 +175,7 @@ class SynlighetRekrutteringstreffLytterTest {
                 {
                     "@event_name": "behov",
                     "@behov": ["synlighetRekrutteringstreff", "adressebeskyttelse"],
-                    "fodselsnummer": "10828497311",
+                    "fodselsnummer": "00000000012",
                     "aktørId": "1234567890123"
                 }
             """.trimIndent(),
@@ -205,11 +205,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMeldingMedAdressebeskyttelse("10828497311", "UGRADERT"),
+            behovMeldingMedAdressebeskyttelse("00000000012", "UGRADERT"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -238,11 +238,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMeldingMedAdressebeskyttelse("10828497311", "STRENGT_FORTROLIG"),
+            behovMeldingMedAdressebeskyttelse("00000000012", "STRENGT_FORTROLIG"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -269,11 +269,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMeldingMedAdressebeskyttelse("10828497311", "STRENGT_FORTROLIG_UTLAND"),
+            behovMeldingMedAdressebeskyttelse("00000000012", "STRENGT_FORTROLIG_UTLAND"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -299,11 +299,11 @@ class SynlighetRekrutteringstreffLytterTest {
                 komplettBeregningsgrunnlag = true
             ),
             aktørId = "1234567890123",
-            fødselsnummer = "10828497311"
+            fødselsnummer = "00000000012"
         )
 
         testProgramMedBehovHendelse(
-            behovMeldingMedAdressebeskyttelse("10828497311", "FORTROLIG"),
+            behovMeldingMedAdressebeskyttelse("00000000012", "FORTROLIG"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -316,7 +316,7 @@ class SynlighetRekrutteringstreffLytterTest {
     @Test
     fun `skal besvare behov med erSynlig false som default når person ikke finnes i database`() {
         testProgramMedBehovHendelse(
-            behovMelding("99999999999"),
+            behovMelding("00000000017"),
             repository
         ) {
             assertThat(size).isEqualTo(1)
@@ -333,7 +333,7 @@ class SynlighetRekrutteringstreffLytterTest {
             {
                 "@event_name": "behov",
                 "@behov": ["synlighetRekrutteringstreff"],
-                "fodselsnummer": "10828497311"
+                "fodselsnummer": "00000000012"
             }
             """.trimIndent(),
             repository
@@ -345,7 +345,7 @@ class SynlighetRekrutteringstreffLytterTest {
     @Test
     fun `skal ikke reagere på behov som allerede er løst`() {
         testProgramMedBehovHendelse(
-            behovMeldingMedLøsning("10828497311"),
+            behovMeldingMedLøsning("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(0)
@@ -355,7 +355,7 @@ class SynlighetRekrutteringstreffLytterTest {
     @Test
     fun `skal ikke reagere på andre behov`() {
         testProgramMedBehovHendelse(
-            annetBehovMelding("10828497311"),
+            annetBehovMelding("00000000012"),
             repository
         ) {
             assertThat(size).isEqualTo(0)

@@ -54,7 +54,7 @@ class EvalueringTest {
     fun `POST mot evalueringsendepunkt skal returnere 200 OK med evaluering på oppgitt fødselsnummer`() {
         val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
-        val fødselsnummer = "12345678912"
+        val fødselsnummer = "00000000016"
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue(fødselsnummer = """"fodselsnummer": "$fødselsnummer""""))
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -90,7 +90,7 @@ class EvalueringTest {
     fun `POST mot evalueringsendepunkt med oppdatert kandidat skal oppdatere evaluering`() {
         val objectmapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
         val token = hentToken(mockOAuth2Server)
-        val fødselsnummer = "12345678912"
+        val fødselsnummer = "00000000016"
 
         rapid.sendTestMessage(komplettHendelseSomFørerTilSynlighetTrue())
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(1)
@@ -103,7 +103,7 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(2)
 
-        val response = post("http://localhost:8301/evaluering", """{"fnr": "12345678912"}""", token.serialize())
+        val response = post("http://localhost:8301/evaluering", """{"fnr": "00000000016"}""", token.serialize())
 
         Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
@@ -146,7 +146,7 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
-        val response = post("http://localhost:8301/evaluering", """{"fnr": "12345678912"}""", token.serialize())
+        val response = post("http://localhost:8301/evaluering", """{"fnr": "00000000016"}""", token.serialize())
 
         Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
@@ -162,7 +162,7 @@ class EvalueringTest {
 
         Assertions.assertThat(rapid.inspektør.size).isEqualTo(0)
 
-        val response = get("http://localhost:8301/evaluering/12345678912", token.serialize())
+        val response = get("http://localhost:8301/evaluering/00000000016", token.serialize())
 
         Assertions.assertThat(response.statusCode()).isEqualTo(200)
 

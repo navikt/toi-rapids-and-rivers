@@ -40,7 +40,7 @@
   } ],
   "fodselsdato" : "1980-10-10",
   "fodselsdatoErDnr" : false,
-  "fodselsnummer" : "01010000000",
+  "fodselsnummer" : "00000000002",
   "forerkort" : [ {
     "alternativKlasse" : null,
     "forerkortKode" : null,

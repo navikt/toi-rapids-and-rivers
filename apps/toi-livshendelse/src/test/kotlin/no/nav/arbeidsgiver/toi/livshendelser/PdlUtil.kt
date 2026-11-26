@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
 
 fun WireMockServer.stub404(
-    ident: String = "12312312312",
+    ident: String = "00000000014",
     token: String? = "mockedAccessToken"
 ) {
     stubMedSvar(token, ident,
@@ -33,7 +33,7 @@ fun WireMockServer.stub404(
 }
 
 fun WireMockServer.stubPdl(
-    ident: String = "12312312312",
+    ident: String = "00000000014",
     identSvar: String = """
         {
             "ident" : "$ident"
@@ -68,7 +68,7 @@ fun WireMockServer.stubPdl(
 }
 
 fun WireMockServer.stubMedFlereGraderinger(
-    ident: String = "12312312312",
+    ident: String = "00000000014",
     identSvar: String = """
         {
             "ident" : "$ident"

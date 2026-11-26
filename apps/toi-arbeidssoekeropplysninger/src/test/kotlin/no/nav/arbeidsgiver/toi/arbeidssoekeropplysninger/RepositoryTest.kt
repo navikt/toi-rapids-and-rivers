@@ -68,11 +68,11 @@ class RepositoryTest {
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(periodeId)
 
         assertThat(periodeOpplysninger).isNotNull
-        assertThat(periodeOpplysninger?.identitetsnummer).isEqualTo("01010012345")
+        assertThat(periodeOpplysninger?.identitetsnummer).isEqualTo("00000000003")
 
         val opplysningerByAktørId = repository.hentPeriodeOpplysninger("123456789")
         assertThat(opplysningerByAktørId).isNotNull
-        assertThat(opplysningerByAktørId?.identitetsnummer).isEqualTo("01010012345")
+        assertThat(opplysningerByAktørId?.identitetsnummer).isEqualTo("00000000003")
     }
 
     @Test
@@ -121,7 +121,7 @@ class RepositoryTest {
         return jacksonObjectMapper().readTree("""
             {
                 "periode_id": "$periodeId",
-                "identitetsnummer": "01010012345",
+                "identitetsnummer": "00000000003",
                 "aktørId": "$aktørId",
                 "startet": "$startStr",
                 "avsluttet": $sluttStr

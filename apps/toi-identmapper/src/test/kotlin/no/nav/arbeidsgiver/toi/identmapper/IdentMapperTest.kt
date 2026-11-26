@@ -11,7 +11,7 @@ class IdentMapperTest {
     fun `skal legge til aktørId på en melding med "fodselsnummer" og uten aktørId og publisere på rapid`() {
         val rapid = TestRapid()
         val fødselsnummerKey = "fodselsnummer"
-        val fødselsnummer = "12345678912"
+        val fødselsnummer = "00000000016"
         val aktørId = "123456789"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
@@ -47,7 +47,7 @@ class IdentMapperTest {
     fun `skal legge til aktørId på en melding med "fnr" og uten aktørId og publisere på rapid`() {
         val rapid = TestRapid()
         val fødselsnummerKey = "fnr"
-        val fødselsnummer = "12345678912"
+        val fødselsnummer = "00000000016"
         val aktørId = "123456789"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }
@@ -65,7 +65,7 @@ class IdentMapperTest {
     fun `skal legge til aktørId på en melding med "fodselsnr" og uten aktørId og publisere på rapid`() {
         val rapid = TestRapid()
         val fødselsnummerKey = "fodselsnr"
-        val fødselsnummer = "12345678912"
+        val fødselsnummer = "00000000016"
         val aktørId = "123456789"
 
         AktørIdPopulator(fødselsnummerKey, rapid, "test") { aktørId }

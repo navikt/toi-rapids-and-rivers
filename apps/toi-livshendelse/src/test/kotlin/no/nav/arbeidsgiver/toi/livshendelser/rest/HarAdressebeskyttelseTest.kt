@@ -54,7 +54,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Returner at har adressebeskyttelse for person som har adressebeskyttelse`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         wiremock.stubPdl(ident = fnr, token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid).use {
@@ -69,7 +69,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Returner at person ikke har adressebeskyttelse for person som ikke finnes`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         wiremock.stub404(ident = fnr, token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid).use {
@@ -84,7 +84,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Returner at person ikke har adressebeskyttelse for person som ikke har adressebeskyttelse`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         wiremock.stubPdl(ident = fnr, gradering = "UGRADERT", token = null)
         val token = hentToken(mockOAuth2Server).serialize()
         startApp(pdlKlient, testRapid).use {
@@ -99,7 +99,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Feil om token mangler`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         startApp(pdlKlient, testRapid).use {
             val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""")
 
@@ -109,7 +109,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Feil hvis token er utgått`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         val token = hentToken(mockOAuth2Server, expiry = -1000).serialize()
         startApp(pdlKlient, testRapid).use {
             val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
@@ -120,7 +120,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Sjekk på adressebeskyttelse må ha token med rett issuer`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         val token = hentToken(mockOAuth2Server, issuerId = "falskissuer").serialize()
         startApp(pdlKlient, testRapid).use {
             val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
@@ -131,7 +131,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Sjekk på adressebeskyttelse token må ha Nav-ident`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         val token = hentToken(mockOAuth2Server, navIdent = null).serialize()
         startApp(pdlKlient, testRapid).use {
             val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
@@ -142,7 +142,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Sjekk på adressebeskyttelse må ha token med rett audience`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         val token = hentToken(mockOAuth2Server, audience = listOf("Feil aud")).serialize()
         startApp(pdlKlient, testRapid).use {
             val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", token)
@@ -153,7 +153,7 @@ class HarAdressebeskyttelseTest {
 
     @Test
     fun `Sjekk på adressebeskyttelse token må ha rett algoritme`() {
-        val fnr = "12345678912"
+        val fnr = "00000000016"
         val payload = hentToken(mockOAuth2Server).serialize().split(".")[1]
         startApp(pdlKlient, testRapid).use {
             val response = post("http://localhost:$appPort/adressebeskyttelse", """{"fnr": "$fnr"}""", "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.$payload.")

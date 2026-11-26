@@ -165,7 +165,7 @@ class CvLytterTest {
         aktoerId = "123"
         sistEndret = Instant.now()
         opprettet = Instant.now()
-        fodselsnummer = "11111111111"
+        fodselsnummer = "00000000013"
         foedselsdato = LocalDate.of(1992, 1, 11)
         fornavn = "Test"
         etternavn = "Testesen"

@@ -188,7 +188,7 @@ class Testdata {
             diskresjonskode: String? = null
         ) = """
             "oppfølgingsinformasjon": {
-                "fodselsnummer": "12345678912",
+                "fodselsnummer": "00000000016",
                 "formidlingsgruppe": "$formidlingsgruppe",
                 "iservFraDato": null,
                 "fornavn": "TULLETE",
@@ -216,7 +216,7 @@ class Testdata {
                 "kontorId": "0602"
               },
               "aktorId": "123456789",
-              "ident": "12345678910",
+              "ident": "00000000015",
               "sisteEndringsType": "OPPFOLGING_STARTET",
               "oppfolgingsperiodeUuid": "d4adee13-ae6c-4ae8-9071-f7d2a46f7741",
               "sluttTidspunkt": null,
@@ -234,7 +234,7 @@ class Testdata {
             return """
                 "arbeidssokeropplysninger": {
                     "periode_id": "0b0e2261-343d-488e-a70f-807f4b151a2f",
-                    "identitetsnummer": "01010012345",
+                    "identitetsnummer": "00000000003",
                     "periode_startet": "2020-10-30T14:15:38+01:00",
                     "periode_avsluttet": $avsluttet
                 }
@@ -250,7 +250,7 @@ class Testdata {
                 "kontorId": "0602"
               },
               "aktorId": "123456789",
-              "ident": "12345678910",
+              "ident": "00000000015",
               "sisteEndringsType": "OPPFOLGING_STARTET",
               "oppfolgingsperiodeUuid": "d4adee13-ae6c-4ae8-9071-f7d2a46f7741",
               "sluttTidspunkt": "2021-10-30T14:15:38.748054+01:00",
@@ -266,12 +266,12 @@ class Testdata {
                 "endreJobbprofil": null,
                 "opprettCv": {
                     "cv": {
-                        "fodselsnummer": "12345678912"
+                        "fodselsnummer": "00000000016"
                     }
                 },
                 "endreCv": {
                     "cv": {
-                        "fodselsnummer": "12345678912"
+                        "fodselsnummer": "00000000016"
                     }
                 }
             }

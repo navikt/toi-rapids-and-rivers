@@ -58,17 +58,17 @@ class ArbeidssoekerperiodeRapidLytterTest {
 
         val periodeOpplysninger = repository.hentPeriodeOpplysninger(periodeId)
         assertThat(periodeOpplysninger).isNotNull
-        assertThat(periodeOpplysninger!!.identitetsnummer).isEqualTo("01010012345")
+        assertThat(periodeOpplysninger!!.identitetsnummer).isEqualTo("00000000003")
     }
 
     private fun rapidPeriodeMelding(periodeId: String, aktørId: String? = null): String = StringBuilder(
         """
         {
           "@event_name": "arbeidssokerperiode",
-          "fodselsnummer": "01010012345", 
+          "fodselsnummer": "00000000003",
           "arbeidssokerperiode": {
             "periode_id": "$periodeId",
-            "identitetsnummer": "01010012345",
+            "identitetsnummer": "00000000003",
             "startet": "2025-03-07T15:08:20.582330+01:00[Europe/Oslo]",
             "avsluttet": null
           }

@@ -46,7 +46,7 @@ class PubliserOpplysningerJobbTest {
         PeriodeOpplysninger(
             id=1,
             periodeId = UUID.randomUUID(),
-            identitetsnummer = "01010012345",
+            identitetsnummer = "00000000003",
             aktørId = "1234566789",
             periodeStartet = ZonedDateTime.now().minusMonths(2),
             periodeMottattDato = ZonedDateTime.now()
