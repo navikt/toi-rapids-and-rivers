@@ -305,7 +305,7 @@ class HåndterPersonhendelserTest {
         assertThat(resultat).containsEntry(ident, Gradering.FORTROLIG.name)
     }
 
-    private fun stubPdlPersonNotFound(ident: String = "00000000014") {
+    private fun stubPdlPersonNotFound(ident: String = "aktørId-nr") {
         val pesostegn = "$"
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo("/graphql"))
@@ -334,7 +334,7 @@ class HåndterPersonhendelserTest {
         )
     }
 
-    private fun stubPdlOtherError(ident: String = "00000000014") {
+    private fun stubPdlOtherError(ident: String = "aktørId-nr") {
         val pesostegn = "$"
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo("/graphql"))
@@ -420,7 +420,7 @@ fun personhendelse(
 )
 
 private fun behovsMelding(
-    ident: String = "00000000014",
+    ident: String = "aktørId-nr",
     behovListe: String,
     løsninger: List<Pair<String, String>> = emptyList(),
 ) = """
