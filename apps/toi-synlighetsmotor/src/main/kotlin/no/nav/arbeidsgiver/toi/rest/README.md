@@ -19,10 +19,10 @@
 #### POST https://toi-synlighetsmotor.intern.nav.no/synlighet
 ### Inputbody
 #### Format: ```List<String>``` Der 'String' er fødselsnummer
-#### Eksempel Json: ```["12345678912","10000000000"]```
+#### Eksempel Json: ```["00000000001","00000000002"]```
 ### Response
 #### Format: ```Map<String, Boolean>``` Der 'String' er fødselsnummer
-#### Eksempel Json: ```{"12345678912":true,"10000000000":false}```
+#### Eksempel Json: ```{"00000000001":true,"00000000002":false}```
 ### Regler
 #### Vi returnerer synlighet true dersom alle kriteriene for synlighet er oppfyllt.
 #### Vi returnerer synlighet false dersom ikke alle kriterier er oppfylt, og også om fødselsnummer ikke finnes i systemet vårt.

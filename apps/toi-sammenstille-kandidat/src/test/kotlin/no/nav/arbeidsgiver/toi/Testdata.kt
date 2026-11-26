@@ -80,10 +80,10 @@ fun cvMeldingMedSystemParticipatingServices(aktørid: String = "123") = """
 fun oppfølgingsinformasjonMelding(aktørId: String) = """
         {
             "aktørId": "$aktørId",
-            "fodselsnummer": "12345678912",
+            "fodselsnummer": "00000000016",
             "@event_name": "oppfølgingsinformasjon",
             "oppfølgingsinformasjon": {
-                "fodselsnummer": "12345678912",
+                "fodselsnummer": "00000000016",
                 "formidlingsgruppe": "ARBS",
                 "iservFraDato": null,
                 "fornavn": "TULLETE",

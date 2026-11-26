@@ -1,7 +1,7 @@
 {
   "@event_name": "arbeidsmarked-cv",
   "aktørId": "123",
-  "fodselsnummer": "01010000000",
+  "fodselsnummer": "00000000002",
   "oppfølgingsinformasjon": null,
   "siste14avedtak": null,
   "fritattKandidatsøk": null,
@@ -12,7 +12,7 @@
     "endreCv": {
       "cv": {
         "opprettet": 1578319832.314,
-        "fodselsnummer": "01010000000",
+        "fodselsnummer": "00000000002",
         "foedselsdato": "1980-10-10",
         "fornavn": "Fornavn",
         "etternavn": "Fasitsen",

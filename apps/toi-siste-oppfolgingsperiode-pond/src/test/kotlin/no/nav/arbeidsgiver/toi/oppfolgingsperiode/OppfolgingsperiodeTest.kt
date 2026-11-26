@@ -50,7 +50,7 @@ class OppfolgingsperiodeTest {
             assertThat(get("aktorId").asString()).isEqualTo(aktørId)
             assertThat(get("startTidspunkt").asString()).isEqualTo("2026-01-01T03:01:07.024557+01:00")
             assertThat(get("sluttTidspunkt").isNull).isTrue
-            assertThat(get("ident").asString()).isEqualTo("01234567890")
+            assertThat(get("ident").asString()).isEqualTo("00000000006")
             assertThat(get("sisteEndringsType").asString()).isEqualTo("OPPFOLGING_STARTET")
             assertThat(get("oppfolgingsperiodeUuid").asString()).isEqualTo("11b016d9-37a0-4c5d-8296-62ccf90f9745")
             assertThat(get("producerTimestamp").asString()).isEqualTo("2026-01-01T03:01:08.921369321+01:00")
@@ -65,7 +65,7 @@ class OppfolgingsperiodeTest {
                 "kontorId":"0220"
             },
             "aktorId":"$aktørId",
-            "ident":"01234567890",
+            "ident":"00000000006",
             "sisteEndringsType":"OPPFOLGING_STARTET",
             "oppfolgingsperiodeUuid":"11b016d9-37a0-4c5d-8296-62ccf90f9745",
             "sluttTidspunkt":null,

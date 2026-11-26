@@ -178,7 +178,7 @@ class NeedSamleLytterTest {
 }
 
 private fun behovsMelding(
-    ident: String = "12312312312",
+    ident: String = "aktørId-nr",
     behovListe: String,
     løsninger: List<Pair<String, String>> = emptyList(),
 ) = """
