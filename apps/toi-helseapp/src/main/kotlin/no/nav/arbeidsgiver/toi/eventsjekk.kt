@@ -33,6 +33,8 @@ private val uinteressanteHendelsePrefikser = listOf("kandidat_v2.")
 private val hendelserSomIkkeSendesLenger = listOf<String>()
 private val objectMapper = jacksonObjectMapper()
 
+private val startAvDag = 8
+
 suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     val consument = KafkaConsumer(
         consumerProperties(envs, "toi-helseapp-eventsjekker", "toi-helseapp-eventsjekker"),
@@ -69,8 +71,9 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
             val nå = Instant.now()
             val sorterteEventer =
                 sisteEvent.toList().filterNot { (eventName, _) -> eventName in hendelserSomIkkeSendesLenger }
-                    .map { (eventName, instant) -> eventName to Duration.between(instant, nå) }
-                    .map { (eventName, duration) -> SisteEvent(eventName, duration) }.sortedDescending()
+                    .map { (eventName, instant) ->
+                        val duration = Duration.between(instant, nå)
+                        SisteEvent(eventName, duration, instant) }.sortedDescending()
             if (sorterteEventer.any(SisteEvent::erUtdatert) && forventerIkkeUtdaterteHendelserNå()) {
                 log.error(
                     "Tid siden hendelser (grenseverdi er nådd):\n" +
@@ -100,10 +103,15 @@ suspend fun sjekkTidSidenEvent(envs: Map<String, String>) {
     }
 }
 
-class SisteEvent(private val eventName: String, private val duration: Duration) : Comparable<SisteEvent> {
+class SisteEvent(private val eventName: String, private val duration: Duration, instant: Instant) : Comparable<SisteEvent> {
+    private val time = instant.atZone(ZoneId.of("Europe/Oslo")).toLocalTime()
+
     override fun compareTo(other: SisteEvent) = duration.compareTo(other.duration)
 
-    fun erUtdatert() = duration > grenseverdiForAlarm(eventName)
+    fun erUtdatert() = duration > grenseverdiForAlarm(eventName) &&
+            (duration > Duration.ofDays(1) ||
+                    time.isAfter(LocalTime.of(startAvDag, 0).plus(grenseverdiForAlarm(eventName))))
+
 
     fun beskrivelse() = "$eventName: ${duration.prettify()}"
 
@@ -153,7 +161,7 @@ private fun forventerUtdaterteHendelserNå(): Boolean = LocalDateTime.now(ZoneId
         it.dayOfWeek == SATURDAY -> true
         it.dayOfWeek == SUNDAY -> true
         it.dayOfWeek == MONDAY && it.hour < 10 -> true
-        it.hour < 9 -> true
+        it.hour < startAvDag+1 -> true
         it.hour > 15 -> true
         else -> false
     }
